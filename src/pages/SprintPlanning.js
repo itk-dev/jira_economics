@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
-import MainSection from '../components/MainSection';
 import ContentWrapper from '../components/ContentWrapper';
 import PageTitle from '../components/PageTitle';
 
-export default class HomePage extends Component {
+export default class SprintPlanning extends Component {
   render() {
     return (
       <ContentWrapper>
-        <PageTitle>Settings</PageTitle>
-        <MainSection />
+        <PageTitle>Sprintplanning</PageTitle>
+        <p>Show Sprintplanning</p>
       </ContentWrapper>
-    );
+      );
+    }
   }
-}

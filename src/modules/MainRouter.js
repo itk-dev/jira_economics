@@ -3,7 +3,9 @@ import React, { Component } from 'react';
 import { Router, Route, browserHistory } from 'react-router';
 import App from './App';
 import HomePage from '../pages/HomePage';
-import SettingsPage from '../pages/SettingsPage';
+import Billing from '../pages/Billing';
+import Statistics from '../pages/Statistics';
+import SprintPlanning from '../pages/SprintPlanning';
 
 export default class MainRouter extends Component {
   constructor() {
@@ -40,7 +42,9 @@ export default class MainRouter extends Component {
       <Router history={browserHistory}>
         <Route component={this.appWithPersistentNav()}>
           <Route path="/" component={HomePage} />
-          <Route path="/settings" component={SettingsPage} />
+          <Route path="/billing" component={Billing} />
+          <Route path="/statistics" component={Statistics} />
+          <Route path="/sprintplanning" component={SprintPlanning} />
         </Route>
       </Router>
     );
