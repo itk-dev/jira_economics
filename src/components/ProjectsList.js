@@ -51,7 +51,7 @@ export const rows = projects.map((project, index) => ({
       key: createKey(project.nm),
       content: (
         <NameWrapper>
-          <a href="https://itkdev.atlassian.net/browse/{project.sn}" >{project.nm}</a>
+          <a href={"https://itkdev.atlassian.net/browse/" + project.sn}>{project.nm}</a>
         </NameWrapper>
       ),
     },
