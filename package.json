@@ -1,7 +1,7 @@
 {
-  "name": "atlaskit-starter",
+  "name": "ITK Jira Economics",
   "version": "1.0.0",
-  "description": "Get your ADG3 on with this sample project using Atlaskit React components",
+  "description": "Jira billing integration",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -10,7 +10,7 @@
     "surge": "bash surge_login.sh && surge --project ./build/ --domain atlaskit-starter.surge.sh"
   },
   "keywords": [],
-  "author": "Atlassian",
+  "author": "ITK Dev",
   "license": "ISC",
   "dependencies": {
     "@atlaskit/avatar": "^14.0.9",
