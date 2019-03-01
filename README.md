@@ -13,7 +13,7 @@ Please make sure you have [node](https://nodejs.org/en/download/) and [yarn](htt
 Then run the following commands to clone the project, install dependencies and start the application.
 
 ```bash
-git clone #TODO: Insert itk-dev git ulr # clone the project
+git clone git@github.com:aakb/jira_economics.git # clone the project
 yarn install  # install dependencies
 yarn start  # start the project
 ```
