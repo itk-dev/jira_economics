@@ -15,7 +15,9 @@ Then run the following commands to clone the project, install dependencies and s
 ```bash
 git clone git@github.com:aakb/jira_economics.git # clone the project
 yarn install  # install dependencies
-yarn start  # start the project
+composer install  # install dependencies
+yarn run encore dev --watch # start webpack encore
+bin/console server:run # start PHP's built-in web server
 ```
 
 ## Using more Atlaskit components
