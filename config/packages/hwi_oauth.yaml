@@ -1,0 +1,11 @@
+hwi_oauth:
+    # list of names of the firewalls in which this bundle is active, this setting MUST be set
+    firewall_names: [secured_area]
+
+    # https://github.com/hwi/HWIOAuthBundle/blob/master/Resources/doc/2-configuring_resource_owners.md
+    resource_owners:
+        jira:
+            type:                jira
+            client_id:           '%env(JIRA_OAUTH_CUSTOMER_KEY)%'
+            client_secret:       '%env(JIRA_OAUTH_PEM_PATH)%'
+            base_url:            '%env(JIRA_URL)%'

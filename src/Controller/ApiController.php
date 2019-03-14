@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\JiraService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,29 +18,10 @@ class ApiController extends Controller
     /**
      * @Route("/projects", name="api_projects")
      */
-    public function projectsAction()
+    public function projectsAction(JiraService $jiraService)
     {
-        return new JsonResponse(json_decode('
-[
-  {
-    "id": "#id",
-    "report_url": "sprint_report/project/10221",
-    "sn": "AAPLUS",
-    "nm": "Aa+"
-  },
-  {
-    "id": "#id",
-    "report_url": "sprint_report/project/10223",
-    "sn": "AAKBET",
-    "nm": "aakb.dk"
-  },
-  {
-    "id": "#id",
-    "report_url": "sprint_report/project/15207",
-    "sn": "AAR",
-    "nm": "Aarhus-mål 2018-2021"
-  }
-]
-  '));
+        $projects = $jiraService->getProjects();
+
+        return new JsonResponse($projects);
     }
 }

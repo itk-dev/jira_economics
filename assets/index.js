@@ -14,4 +14,5 @@ ReactDOM.render(
   </Provider>,
   rootElement);
 
-store.dispatch(fetchProjects()).then(() => console.log(store.getState()));
+// Fetch projects. @TODO: Move to project list and only fetch when old data.
+store.dispatch(fetchProjects());

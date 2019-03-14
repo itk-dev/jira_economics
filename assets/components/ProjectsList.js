@@ -1,23 +1,29 @@
 import React from 'react';
 import styled from 'styled-components';
-//import projects from '../content/sample-data/projects.json';
 import BillingFilledIcon from '@atlaskit/icon/glyph/billing-filled';
 import MediaServicesPdfIcon from '@atlaskit/icon/glyph/media-services/pdf';
 import Button, { ButtonGroup } from '@atlaskit/button';
 import Icon from '@atlaskit/icon';
-
-function createKey (input) {
-  return input ? input.replace(/^(the|a|an)/, '').replace(/\s/g, '') : input;
-}
+//import projects from '../content/sample-data/projects.json';
 
 const NameWrapper = styled.span`
   display: flex;
   align-items: center;
 `;
 
-export const createHead = (withWidth: boolean) => {
+const imageStyle = {
+  maxWidth: '20px'
+};
+
+export const createHead = (withWidth) => {
   return {
     cells: [
+      {
+        key: 'avatar',
+        content: '',
+        isSortable: false,
+        width: withWidth ? 2 : undefined,
+      },
       {
         key: 'name',
         content: 'Name',
@@ -48,31 +54,39 @@ export const createRows = (projects) => {
   }
 
   return projects.map((project, index) => ({
-    key: `row-${index}-${project.nm}`,
+    key: `row-${project.id}`,
+    values: {
+      name: project.name,
+      key: project.key
+    },
     cells: [
       {
-        key: createKey(project.nm),
+        key: `avatar-${project.id}`,
+        content: (
+          <img src={project.avatarUrls['16x16']} style={imageStyle}/>
+        )
+      },
+      {
+        key: `name-${project.id}`,
         content: (
           <NameWrapper>
             <a
-              href={'https://itkdev.atlassian.net/browse/' + project.sn}>{project.nm}</a>
+              href={project.self}>{project.name}</a>
           </NameWrapper>
         ),
       },
       {
-        key: createKey(project.sn),
-        content: project.sn,
+        key: `shortname-${project.id}`,
+        content: project.key,
       },
       {
+        key: `tools-${project.id}`,
         content: (
           <ButtonGroup>
-            <Button href="/billing"
-                    iconBefore={<Icon glyph={BillingFilledIcon} label="Billing"
-                                      size="medium"/>}>Billing</Button>
-            <Button href="sprint_report/project/"
-                    iconBefore={<Icon glyph={MediaServicesPdfIcon}
-                                      label="Sprint report"
-                                      size="medium"/>}>Sprint report</Button>
+            <Button href="/billing" iconBefore={<Icon glyph={BillingFilledIcon}
+              label="Billing" size="medium"/>}>Billing</Button>
+            <Button href="sprint_report/project/" iconBefore={<Icon glyph={MediaServicesPdfIcon}
+              label="Sprint report" size="medium"/>}>Sprint report</Button>
           </ButtonGroup>
         ),
       },
