@@ -130,4 +130,15 @@ class JiraService
         return $projects;
     }
 
+    /**
+     * Get current user.
+     *
+     * @return mixed
+     */
+    public function getCurrentUser() {
+        $result = $this->get('/rest/api/3/myself');
+
+        return $result;
+    }
+
 }

@@ -58,3 +58,35 @@ export function fetchProjects () {
       });
   };
 }
+
+// CURRENT_USER
+
+export const REQUEST_CURRENT_USER = 'REQUEST_CURRENT_USER';
+
+export function requestCurrentUser () {
+  return {type: REQUEST_CURRENT_USER};
+}
+
+export const RECEIVE_CURRENT_USER = 'RECEIVE_CURRENT_USER';
+
+export function receiveCurrentUser (currentUser) {
+  return {
+    type: RECEIVE_CURRENT_USER,
+    current_user: currentUser,
+    receivedAt: Date.now()
+  };
+}
+
+export function fetchCurrentUser () {
+  return function (dispatch) {
+    dispatch(requestCurrentUser());
+    return fetch(`/api/current_user`)
+      .then(
+        response => response.json(),
+        error => console.log('An error occurred.', error)
+      )
+      .then(currentUser => {
+        dispatch(receiveCurrentUser(currentUser));
+      });
+  };
+}
