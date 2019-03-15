@@ -8,8 +8,6 @@ function projects (state = {
   isFetching: false,
   projects: []
 }, action) {
-  console.log(state, action);
-
   switch (action.type) {
   case REQUEST_PROJECTS:
     return Object.assign({}, state, {

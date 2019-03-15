@@ -5,6 +5,7 @@ import MediaServicesPdfIcon from '@atlaskit/icon/glyph/media-services/pdf';
 import Button, { ButtonGroup } from '@atlaskit/button';
 import Icon from '@atlaskit/icon';
 //import projects from '../content/sample-data/projects.json';
+import { Link } from 'react-router';
 
 const NameWrapper = styled.span`
   display: flex;
@@ -82,8 +83,10 @@ export const createRows = (projects) => {
         key: `tools-${project.id}`,
         content: (
           <ButtonGroup>
-            <Button href="/billing" iconBefore={<Icon glyph={BillingFilledIcon}
-              label="Billing" size="medium"/>}>Billing</Button>
+            <Link to={`/project/${project.id}`}>
+              <Button iconBefore={<Icon glyph={BillingFilledIcon}
+                label="Billing" size="medium"/>}>Billing</Button>
+            </Link>
             <Button href="sprint_report/project/" iconBefore={<Icon glyph={MediaServicesPdfIcon}
               label="Sprint report" size="medium"/>}>Sprint report</Button>
           </ButtonGroup>

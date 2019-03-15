@@ -51,11 +51,10 @@ export function fetchProjects () {
         error => console.log('An error occurred.', error)
       )
       .then(projects => {
-          // We can dispatch many times!
-          // Here, we update the app state with the results of the API call.
+        // We can dispatch many times!
+        // Here, we update the app state with the results of the API call.
 
-          dispatch(receiveProjects(projects));
-        }
-      );
+        dispatch(receiveProjects(projects));
+      });
   };
 }
