@@ -27,6 +27,12 @@ class HomePage extends Component {
     });
   }
 
+  filterProjectRows() {
+    return this.props.projectRows.filter(row => row.values.name.toLowerCase().search(
+      this.state.inputFilter.toLowerCase()
+    ) !== -1)
+  }
+
   render () {
     return (
       <ContentWrapper>
@@ -41,24 +47,17 @@ class HomePage extends Component {
         />
 
         <Wrapper>
-          {(!this.props.isFetching ?
-            (
-              <DynamicTable
-                head={head}
-                rows={this.props.projectRows.filter(row => row.values.name.toLowerCase().search(
-                  this.state.inputFilter.toLowerCase()
-                ) !== -1)}
-                rowsPerPage={10}
-                defaultPage={1}
-                loadingSpinnerSize="large"
-                isLoading={false}
-                isFixedSize
-                defaultSortKey="name"
-                defaultSortOrder="ASC"
-              />
-            ) :
-            (<div>Loading...</div>)
-          )}
+          <DynamicTable
+            head={head}
+            rows={this.filterProjectRows()}
+            rowsPerPage={20}
+            defaultPage={1}
+            loadingSpinnerSize="large"
+            isLoading={this.props.isFetching}
+            isFixedSize
+            defaultSortKey="name"
+            defaultSortOrder="ASC"
+          />
         </Wrapper>
       </ContentWrapper>
     );

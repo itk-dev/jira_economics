@@ -14,5 +14,6 @@ ReactDOM.render(
   </Provider>,
   rootElement);
 
-// Fetch projects. @TODO: Move to project list and only fetch when old data.
+// Fetch projects.
+// @TODO: Move to project list and only fetch when old data.
 store.dispatch(fetchProjects());
