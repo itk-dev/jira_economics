@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * Class ApiController
  * @package App\Controller
  *
- * @Route("/api")
+ * @Route("/jira_api")
  */
 class ApiController extends Controller
 {
