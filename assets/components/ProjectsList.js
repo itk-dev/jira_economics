@@ -70,8 +70,7 @@ export const createRows = (projects) => {
         key: `name-${project.id}`,
         content: (
           <NameWrapper>
-            <a
-              href={project.self}>{project.name}</a>
+            <a href={project.url}>{project.name}</a>
           </NameWrapper>
         ),
       },
