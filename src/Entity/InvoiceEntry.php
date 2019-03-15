@@ -6,13 +6,10 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource(
- *     collectionOperations={"get"},
- *     itemOperations={"get"}
- * )
- * @ORM\Entity(repositoryClass="App\Repository\InvoiceRepository")
+ * @ApiResource()
+ * @ORM\Entity(repositoryClass="App\Repository\InvoiceEntryRepository")
  */
-class Invoice
+class InvoiceEntry
 {
     /**
      * @ORM\Id()
@@ -25,12 +22,6 @@ class Invoice
      * @ORM\Column(type="string", length=255)
      */
     private $name;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Project", inversedBy="invoices")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $project;
 
     public function getId(): ?int
     {
@@ -45,18 +36,6 @@ class Invoice
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getProject(): ?Project
-    {
-        return $this->project;
-    }
-
-    public function setProject(?Project $project): self
-    {
-        $this->project = $project;
 
         return $this;
     }
