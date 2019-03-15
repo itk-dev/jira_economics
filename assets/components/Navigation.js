@@ -22,6 +22,10 @@ import {
   NavigationProvider,
 } from '@atlaskit/navigation-next';
 
+import { Link } from 'react-router';
+
+
+
 const gridSize = gridSizeFn();
 
 const itkSymbol = () => (
@@ -122,25 +126,31 @@ export default class Navigation extends Component {
         {({className}) => (
           <div className={className}>
             <GroupHeading>ITK Jira</GroupHeading>
-            <Item
-              before={FolderFilledIcon}
-              text="Projectslist"
-              isSelected
-              testKey="container-item-all-projects"
-              href="/"
-            />
-            <Item
-              before={GraphLineIcon}
-              text="Statistics"
-              testKey="container-item-sprintplanning"
-              href="/statistics"
-            />
-            <Item
-              before={RoadmapIcon}
-              text="Sprintplanning"
-              testKey="container-item-sprintplanning"
-              href="/sprintplanning"
-            />
+
+            <Link to={`/billing`}>
+              <Item
+                before={FolderFilledIcon}
+                text="Projectslist"
+//                isSelected
+                testKey="container-item-all-projects"
+              />
+            </Link>
+
+            <Link to={`/statistics`}>
+              <Item
+                before={GraphLineIcon}
+                text="Statistics"
+                testKey="container-item-sprintplanning"
+              />
+            </Link>
+
+            <Link to={`/planning`}>
+              <Item
+                before={RoadmapIcon}
+                text="Sprintplanning"
+                testKey="container-item-sprintplanning"
+              />
+            </Link>
           </div>
         )}
       </MenuSection>
