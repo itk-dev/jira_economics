@@ -127,11 +127,18 @@ export default class Navigation extends Component {
           <div className={className}>
             <GroupHeading>ITK Jira</GroupHeading>
 
+            <Link to={`/`}>
+              <Item
+                before={FolderFilledIcon}
+                text="Project List"
+                testKey="container-item-all-projects"
+              />
+            </Link>
+
             <Link to={`/billing`}>
               <Item
                 before={FolderFilledIcon}
-                text="Projectslist"
-//                isSelected
+                text="Billing"
                 testKey="container-item-all-projects"
               />
             </Link>
@@ -147,7 +154,7 @@ export default class Navigation extends Component {
             <Link to={`/planning`}>
               <Item
                 before={RoadmapIcon}
-                text="Sprintplanning"
+                text="Planning"
                 testKey="container-item-sprintplanning"
               />
             </Link>
