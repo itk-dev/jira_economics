@@ -5,6 +5,10 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
+    env(JIRA_OAUTH_CUSTOMER_KEY): null
+    env(JIRA_OAUTH_PEM_PATH): null
+    env(JIRA_URL): null
+    env(JIRA_DEFAULT_BOARD): null
 
 services:
     # default configuration for services in *this* file
@@ -26,3 +30,9 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Service\JiraService:
+        arguments:
+            $token_storage: '@security.token_storage'
+            $customer_key: '%env(JIRA_OAUTH_CUSTOMER_KEY)%'
+            $pem_path: '%env(JIRA_OAUTH_PEM_PATH)%'
+            $jira_url: '%env(JIRA_URL)%'
