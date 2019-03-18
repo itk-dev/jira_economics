@@ -28,6 +28,8 @@ export default class Billing extends Component {
 
       <p>Show list of invoices</p>
 
+      <p>{this.props.params.projectId}</p>
+
       {/* <Wrapper>
         <DynamicTable
           head={head}

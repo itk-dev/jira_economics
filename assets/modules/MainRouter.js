@@ -3,10 +3,9 @@ import React, { Component } from 'react';
 import { Router, Route, browserHistory, hashHistory, IndexRoute } from 'react-router';
 import App from './App';
 import HomePage from '../pages/HomePage';
-import Billing from '../pages/Billing';
 import Statistics from '../pages/Statistics';
 import SprintPlanning from '../pages/SprintPlanning';
-import ProjectBilling from '../pages/ProjectBilling';
+import Billing from '../pages/Billing';
 
 export default class MainRouter extends Component {
   constructor() {
@@ -43,8 +42,7 @@ export default class MainRouter extends Component {
       <Router history={browserHistory}>
         <Route path="/" component={this.appWithPersistentNav()}>
           <IndexRoute component={HomePage} />
-          <Route path="project/:projectId" component={ProjectBilling} />
-          <Route path="billing" component={Billing} />
+          <Route path="billing/:projectId" component={Billing} />
           <Route path="statistics" component={Statistics} />
           <Route path="planning" component={SprintPlanning} />
         </Route>

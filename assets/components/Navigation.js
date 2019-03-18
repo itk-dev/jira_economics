@@ -135,14 +135,6 @@ export default class Navigation extends Component {
               />
             </Link>
 
-            <Link to={`/billing`}>
-              <Item
-                before={FolderFilledIcon}
-                text="Billing"
-                testKey="container-item-all-projects"
-              />
-            </Link>
-
             <Link to={`/statistics`}>
               <Item
                 before={GraphLineIcon}
