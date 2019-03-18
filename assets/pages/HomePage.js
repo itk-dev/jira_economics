@@ -6,12 +6,18 @@ import DynamicTable from '@atlaskit/dynamic-table';
 import { head, createRows } from '../components/ProjectsList';
 import connect from 'react-redux/es/connect/connect';
 import PropTypes from 'prop-types';
+import store from '../redux/store';
+import { fetchProjectsIfNeeded } from '../redux/actions';
 
 const Wrapper = styled.div`
   min-width: 400px;
 `;
 
 class HomePage extends Component {
+  componentDidMount() {
+    store.dispatch(fetchProjectsIfNeeded());
+  }
+
   constructor(){
     super();
     this.state = {

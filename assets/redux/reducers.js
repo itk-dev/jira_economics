@@ -7,16 +7,19 @@ import {
 
 function projects (state = {
   isFetching: false,
+  receivedAt: null,
   projects: []
 }, action) {
   switch (action.type) {
   case REQUEST_PROJECTS:
     return Object.assign({}, state, {
-      isFetching: true
+      isFetching: true,
+      receivedAt: null
     });
   case RECEIVE_PROJECTS:
     return Object.assign({}, state, {
       isFetching: false,
+      receivedAt: action.receivedAt,
       projects: action.projects,
     });
   default:
@@ -26,16 +29,19 @@ function projects (state = {
 
 function currentUser (state = {
   isFetching: false,
+  receivedAt: null,
   currentUser: {}
 }, action) {
   switch (action.type) {
   case REQUEST_CURRENT_USER:
     return Object.assign({}, state, {
-      isFetching: true
+      isFetching: true,
+      receivedAt: null
     });
   case RECEIVE_CURRENT_USER:
     return Object.assign({}, state, {
       isFetching: false,
+      receivedAt: action.receivedAt,
       currentUser: action.currentUser,
     });
   default:

@@ -106,7 +106,7 @@ const GlobalNavigation = () => (
  * Content navigation
  */
 
-export default class Navigation extends Component {
+class Navigation extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -178,3 +178,5 @@ export default class Navigation extends Component {
     );
   }
 }
+
+export default Navigation;

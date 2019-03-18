@@ -58,7 +58,8 @@ export const createRows = (projects) => {
     key: `row-${project.id}`,
     values: {
       name: project.name,
-      key: project.key
+      key: project.key,
+      id: project.id
     },
     cells: [
       {
@@ -83,7 +84,7 @@ export const createRows = (projects) => {
         key: `tools-${project.id}`,
         content: (
           <ButtonGroup>
-            <Link to={`/project/${project.id}`}>
+            <Link to={`/billing/${project.id}`}>
               <Button iconBefore={<Icon glyph={BillingFilledIcon}
                 label="Billing" size="medium"/>}>Billing</Button>
             </Link>

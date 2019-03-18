@@ -113,14 +113,16 @@ class JiraService
 
         $start = 0;
         while (true) {
-            $result = $this->get('/rest/api/3/project/search?startAt='.$start);
-            $projects = array_merge($projects, array_map(function ($res) {
-                $res->url = parse_url($res->self, PHP_URL_SCHEME) . '://' . parse_url($res->self, PHP_URL_HOST) . '/browse/' . $res->key;
+            $results = $this->get('/rest/api/3/project/search?startAt='.$start);
+            foreach ($results->values as $result) {
+                if (!isset($result->projectCategory) || $result->projectCategory->name != 'Lukket') {
+                    $result->url = parse_url($result->self, PHP_URL_SCHEME) . '://' . parse_url($result->self, PHP_URL_HOST) . '/browse/' . $result->key;
 
-                return $res;
-            }, $result->values));
+                    $projects[] = $result;
+                }
+            }
 
-            if ($result->isLast) {
+            if ($results->isLast) {
                 break;
             }
 

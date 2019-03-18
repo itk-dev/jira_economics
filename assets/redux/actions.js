@@ -1,17 +1,13 @@
 import fetch from 'cross-fetch';
 
-// REQUEST_PROJECTS:
+// PROJECTS:
 
 export const REQUEST_PROJECTS = 'REQUEST_PROJECTS';
-
 export function requestProjects () {
   return {type: REQUEST_PROJECTS};
 }
 
-// REQUEST_PROJECTS:
-
 export const RECEIVE_PROJECTS = 'RECEIVE_PROJECTS';
-
 export function receiveProjects (projects) {
   return {
     type: RECEIVE_PROJECTS,
@@ -20,59 +16,55 @@ export function receiveProjects (projects) {
   };
 }
 
-/*
- * Thunk creators.
- */
+function shouldFetchProjects(state) {
+  const projects = state.projects;
+
+  if (!projects) {
+    return true;
+  } else if (projects.isFetching) {
+    return false;
+  } else if (projects.receivedAt === null) {
+    return true;
+  } else {
+    return projects.receivedAt + 5 * 60 * 1000 < Date.now()
+  }
+}
 
 export function fetchProjects () {
-  // Thunk middleware knows how to handle functions.
-  // It passes the dispatch method as an argument to the function,
-  // thus making it able to dispatch actions itself.
-
   return function (dispatch) {
-    // First dispatch: the app state is updated to inform
-    // that the API call is starting.
-
     dispatch(requestProjects());
-
-    // The function called by the thunk middleware can return a value,
-    // that is passed on as the return value of the dispatch method.
-
-    // In this case, we return a promise to wait for.
-    // This is not required by thunk middleware, but it is convenient for us.
-
     return fetch(`/api/projects`)
       .then(
         response => response.json(),
-        // Do not use catch, because that will also catch
-        // any errors in the dispatch and resulting render,
-        // causing a loop of 'Unexpected batch number' errors.
-        // https://github.com/facebook/react/issues/6895
         error => console.log('An error occurred.', error)
       )
       .then(projects => {
-        // We can dispatch many times!
-        // Here, we update the app state with the results of the API call.
-
         dispatch(receiveProjects(projects));
       });
   };
 }
 
-// CURRENT_USER
+export function fetchProjectsIfNeeded() {
+  return (dispatch, getState) => {
+    if (shouldFetchProjects(getState())) {
+      return dispatch(fetchProjects())
+    }
+  }
+}
+
+
+// CURRENT_USER:
 
 export const REQUEST_CURRENT_USER = 'REQUEST_CURRENT_USER';
-
 export function requestCurrentUser () {
   return {type: REQUEST_CURRENT_USER};
 }
 
 export const RECEIVE_CURRENT_USER = 'RECEIVE_CURRENT_USER';
-
 export function receiveCurrentUser (currentUser) {
   return {
     type: RECEIVE_CURRENT_USER,
-    current_user: currentUser,
+    currentUser: currentUser,
     receivedAt: Date.now()
   };
 }
@@ -89,4 +81,38 @@ export function fetchCurrentUser () {
         dispatch(receiveCurrentUser(currentUser));
       });
   };
+}
+
+export const REQUEST_PROJECT = 'REQUEST_PROJECT';
+export function requestProject () {
+  return {type: REQUEST_PROJECT};
+}
+export const REQUEST_PROJECT_FAILURE = 'REQUEST_PROJECT_FAILURE';
+export function requestProjectFailure (err) {
+  return {
+    type: REQUEST_PROJECT_FAILURE,
+    error: err
+  };
+}
+export const REQUEST_PROJECT_SUCCESS = 'REQUEST_PROJECT_SUCCESS';
+export function requestProjectSuccess (jiraProjectId, json) {
+  return {
+    type: REQUEST_PROJECT_SUCCESS,
+    jiraProjectId: jiraProjectId,
+    project: json
+  };
+}
+
+export function fetchProject(jiraProjectId) {
+  return function(dispatch) {
+    dispatch(requestProject(jiraProjectId));
+    return fetch(`/api/project/${jiraProjectId}`)
+      .then(
+        response => response.json(),
+        dispatch(requestProjectFailure(jiraProjectId, response))
+      )
+      .then(json =>
+        dispatch(requestProjectSuccess(jiraProjectId, json))
+      )
+  }
 }
