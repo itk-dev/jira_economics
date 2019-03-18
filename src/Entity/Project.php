@@ -8,10 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource(
- *     collectionOperations={"get"},
- *     itemOperations={"get"}
- * )
+ * @ApiResource()
  * @ORM\Entity(repositoryClass="App\Repository\ProjectRepository")
  */
 class Project
