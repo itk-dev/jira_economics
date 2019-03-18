@@ -41,7 +41,7 @@ export function fetchProjects () {
     // In this case, we return a promise to wait for.
     // This is not required by thunk middleware, but it is convenient for us.
 
-    return fetch(`/api/projects`)
+    return fetch(`/jira_api/projects`)
       .then(
         response => response.json(),
         // Do not use catch, because that will also catch
@@ -80,7 +80,7 @@ export function receiveCurrentUser (currentUser) {
 export function fetchCurrentUser () {
   return function (dispatch) {
     dispatch(requestCurrentUser());
-    return fetch(`/api/current_user`)
+    return fetch(`/jira_api/current_user`)
       .then(
         response => response.json(),
         error => console.log('An error occurred.', error)
