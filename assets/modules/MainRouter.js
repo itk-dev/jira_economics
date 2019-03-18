@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Router, Route, browserHistory } from 'react-router';
+import { Router, Route, browserHistory, hashHistory, IndexRoute } from 'react-router';
 import App from './App';
 import HomePage from '../pages/HomePage';
 import Billing from '../pages/Billing';
 import Statistics from '../pages/Statistics';
 import SprintPlanning from '../pages/SprintPlanning';
+import ProjectBilling from '../pages/ProjectBilling';
 
 export default class MainRouter extends Component {
   constructor() {
@@ -29,22 +30,23 @@ export default class MainRouter extends Component {
       onNavResize={this.onNavResize}
       {...props}
     />
-  )
+  );
 
   onNavResize = (navOpenState) => {
     this.setState({
       navOpenState,
     });
-  }
+  };
 
   render() {
     return (
       <Router history={browserHistory}>
-        <Route component={this.appWithPersistentNav()}>
-          <Route path="/" component={HomePage} />
-          <Route path="/billing" component={Billing} />
-          <Route path="/statistics" component={Statistics} />
-          <Route path="/sprintplanning" component={SprintPlanning} />
+        <Route path="/" component={this.appWithPersistentNav()}>
+          <IndexRoute component={HomePage} />
+          <Route path="project/:projectId" component={ProjectBilling} />
+          <Route path="billing" component={Billing} />
+          <Route path="statistics" component={Statistics} />
+          <Route path="planning" component={SprintPlanning} />
         </Route>
       </Router>
     );
@@ -52,5 +54,5 @@ export default class MainRouter extends Component {
 }
 
 MainRouter.childContextTypes = {
-  navOpenState: PropTypes.object,
-}
+  navOpenState: PropTypes.object
+};

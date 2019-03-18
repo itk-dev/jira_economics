@@ -109,9 +109,36 @@ class JiraService
      */
     public function getProjects()
     {
-        return $this->get(
-            '/rest/api/3/project'
-        );
+        $projects = [];
+
+        $start = 0;
+        while (true) {
+            $result = $this->get('/rest/api/3/project/search?startAt='.$start);
+            $projects = array_merge($projects, array_map(function ($res) {
+                $res->url = parse_url($res->self, PHP_URL_SCHEME) . '://' . parse_url($res->self, PHP_URL_HOST) . '/browse/' . $res->key;
+
+                return $res;
+            }, $result->values));
+
+            if ($result->isLast) {
+                break;
+            }
+
+            $start = $start + 50;
+        }
+
+        return $projects;
+    }
+
+    /**
+     * Get current user.
+     *
+     * @return mixed
+     */
+    public function getCurrentUser() {
+        $result = $this->get('/rest/api/3/myself');
+
+        return $result;
     }
 
 }

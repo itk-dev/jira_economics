@@ -20,8 +20,14 @@ class ApiController extends Controller
      */
     public function projectsAction(JiraService $jiraService)
     {
-        $projects = $jiraService->getProjects();
+        return new JsonResponse($jiraService->getProjects());
+    }
 
-        return new JsonResponse($projects);
+    /**
+     * @Route("/current_user", name="api_current_user")
+     */
+    public function currentUserAction(JiraService $jiraService)
+    {
+        return new JsonResponse($jiraService->getCurrentUser());
     }
 }
