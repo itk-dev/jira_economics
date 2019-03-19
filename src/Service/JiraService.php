@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Project;
+use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Exception\RequestException;
@@ -18,6 +20,7 @@ class JiraService
     protected $customer_key;
     protected $pem_path;
     protected $jira_url;
+    private $entity_manager;
 
     /**
      * Constructor.
@@ -26,12 +29,14 @@ class JiraService
         $token_storage,
         $customer_key,
         $pem_path,
-        $jira_url
+        $jira_url,
+        EntityManagerInterface $entity_manager
     ) {
         $this->token_storage = $token_storage;
         $this->customer_key = $customer_key;
         $this->pem_path = $pem_path;
         $this->jira_url = $jira_url;
+        $this->entity_manager = $entity_manager;
     }
 
     /**
@@ -100,6 +105,53 @@ class JiraService
         );
 
         return $middleware;
+    }
+
+    /**
+     * Get specific project by Jira project ID
+     *
+     * @param $jira_id
+     * @return array
+     */
+    public function getProject($jiraProjectId)
+    {
+        $project_to_return = [];
+
+        try {
+            $result = $this->get('/rest/api/3/project/' . $jiraProjectId);
+        }
+        catch (HttpException $e) {
+            throw $e;
+        }
+
+        $repository = $this->entity_manager->getRepository(Project::class);
+        $project = $repository->findOneBy(['jira_id' => $jiraProjectId]);
+
+        if (!$project) {
+            $project = new Project();
+        }
+
+        //TODO cleanup redundancy
+
+        $project->setJiraId($result->id);
+        $project->setJiraKey($result->key);
+        $project->setName($result->name);
+        $project->setUrl($result->self);
+        $avatarUrls = $result->avatarUrls;
+        $avatarUrlsArr = json_decode(json_encode($avatarUrls, TRUE), TRUE);
+        $avatarUrl = $avatarUrlsArr['48x48'];
+        $project->setAvatarUrl($avatarUrl);
+
+        $this->entity_manager->persist($project);
+        $this->entity_manager->flush();
+
+        $project_to_return = ['jira_id'     => $result->id,
+                              'jira_key'    => $result->key,
+                              'name'        => $result->name,
+                              'url'         => $result->self,
+                              'avatar_url'  => $avatarUrl];
+
+        return $project_to_return;
     }
 
     /**

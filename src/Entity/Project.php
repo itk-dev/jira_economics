@@ -6,10 +6,12 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ApiResource()
  * @ORM\Entity(repositoryClass="App\Repository\ProjectRepository")
+ * @UniqueEntity("jira_id")
  */
 class Project
 {
@@ -31,19 +33,24 @@ class Project
     private $jira_key;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $description;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $avatar;
-
-    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Invoice", mappedBy="project", orphanRemoval=true)
      */
     private $invoices;
+
+    /**
+     * @ORM\Column(type="integer", unique=true)
+     */
+    private $jira_id;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $url;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $avatar_url;
 
     public function __construct()
     {
@@ -79,30 +86,6 @@ class Project
         return $this;
     }
 
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(string $description): self
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getAvatar(): ?string
-    {
-        return $this->avatar;
-    }
-
-    public function setAvatar(string $avatar): self
-    {
-        $this->avatar = $avatar;
-
-        return $this;
-    }
-
     /**
      * @return Collection|Invoice[]
      */
@@ -130,6 +113,42 @@ class Project
                 $invoice->setProject(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getJiraId(): ?int
+    {
+        return $this->jira_id;
+    }
+
+    public function setJiraId(int $jira_id): self
+    {
+        $this->jira_id = $jira_id;
+
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(string $url): self
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    public function getAvatarUrl(): ?string
+    {
+        return $this->avatar_url;
+    }
+
+    public function setAvatarUrl(string $avatar_url): self
+    {
+        $this->avatar_url = $avatar_url;
 
         return $this;
     }

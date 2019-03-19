@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Service\JiraService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -15,6 +16,17 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ApiController extends Controller
 {
+    /**
+     * @Route("/project/{token}", name="api_project")
+     * defaults={"token"="...."})
+     */
+    public function projectAction(JiraService $jiraService, Request $request)
+    {
+        $jiraProjectId = $request->get('token');
+        $result = $jiraService->getProject($jiraProjectId);
+        return new JsonResponse($result);
+    }
+
     /**
      * @Route("/projects", name="api_projects")
      */
