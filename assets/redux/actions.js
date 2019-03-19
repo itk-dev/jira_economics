@@ -69,6 +69,20 @@ export function receiveCurrentUser (currentUser) {
   };
 }
 
+function shouldFetchCurrentUser(state) {
+  const currentUser = state.currentUser;
+
+  if (!currentUser) {
+    return true;
+  } else if (currentUser.isFetching) {
+    return false;
+  } else if (currentUser.receivedAt === null) {
+    return true;
+  } else {
+    return currentUser.receivedAt + 5 * 60 * 1000 < Date.now()
+  }
+}
+
 export function fetchCurrentUser () {
   return function (dispatch) {
     dispatch(requestCurrentUser());
@@ -82,6 +96,17 @@ export function fetchCurrentUser () {
       });
   };
 }
+
+export function fetchCurrentUserIfNeeded() {
+  return (dispatch, getState) => {
+    if (shouldFetchCurrentUser(getState())) {
+      return dispatch(fetchCurrentUser())
+    }
+  }
+}
+
+
+// PROJECT:
 
 export const REQUEST_PROJECT = 'REQUEST_PROJECT';
 export function requestProject () {
@@ -109,7 +134,7 @@ export function fetchProject(jiraProjectId) {
     return fetch(`/api/project/${jiraProjectId}`)
       .then(
         response => response.json(),
-        dispatch(requestProjectFailure(jiraProjectId, response))
+        dispatch(requestProjectFailure(jiraProjectId, ''))
       )
       .then(json =>
         dispatch(requestProjectSuccess(jiraProjectId, json))

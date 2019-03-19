@@ -4,7 +4,10 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import MainRouter from './modules/MainRouter';
 import store from './redux/store';
-import { fetchCurrentUser } from './redux/actions';
+import {
+  fetchCurrentUserIfNeeded,
+  fetchProjectsIfNeeded
+} from './redux/actions';
 
 const rootElement = document.getElementById('app-root');
 
@@ -12,8 +15,9 @@ ReactDOM.render(
   <Provider store={store}>
     <MainRouter/>
   </Provider>,
-  rootElement);
+  rootElement
+);
 
-// Fetch projects.
-// @TODO: Move to project list and only fetch when old data.
-store.dispatch(fetchCurrentUser());
+// Load initial data to make it faster available.
+//store.dispatch(fetchProjectsIfNeeded());
+//store.dispatch(fetchCurrentUserIfNeeded());

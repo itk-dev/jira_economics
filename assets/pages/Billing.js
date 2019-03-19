@@ -3,10 +3,10 @@ import ContentWrapper from '../components/ContentWrapper';
 import PageTitle from '../components/PageTitle';
 import styled from 'styled-components';
 import DynamicTable from '@atlaskit/dynamic-table';
-import { createRows, head, rows } from '../components/ProjectsList';
 import { BreadcrumbsStateless, BreadcrumbsItem } from '@atlaskit/breadcrumbs';
 import PageHeader from '@atlaskit/page-header';
 import connect from 'react-redux/es/connect/connect';
+import { Link } from 'react-router';
 
 const Wrapper = styled.div`
   min-width: 400px;
@@ -30,6 +30,8 @@ export class Billing extends Component {
         <p>Show list of invoices</p>
 
         <p>{this.props.params.projectId}</p>
+
+        <Link to={`/invoice/${this.props.params.projectId}/entry/1`}>Link til invoice</Link>
 
       </ContentWrapper>
     );
