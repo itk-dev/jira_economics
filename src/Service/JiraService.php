@@ -115,6 +115,10 @@ class JiraService
      */
     public function getProject($jiraProjectId)
     {
+        if (!intval($jiraProjectId)) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
         $project_to_return = [];
 
         try {
