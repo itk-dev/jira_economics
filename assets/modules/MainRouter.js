@@ -5,8 +5,9 @@ import App from './App';
 import HomePage from '../pages/HomePage';
 import Statistics from '../pages/Statistics';
 import SprintPlanning from '../pages/SprintPlanning';
-import { Invoice } from '../pages/Invoice';
-import { InvoiceEntry } from '../pages/InvoiceEntry';
+import Project from '../pages/Project';
+import Invoice from '../pages/Invoice';
+import InvoiceEntry from '../pages/InvoiceEntry';
 
 export default class MainRouter extends Component {
   constructor() {
@@ -43,8 +44,10 @@ export default class MainRouter extends Component {
       <Router history={browserHistory}>
         <Route path="/" component={this.appWithPersistentNav()}>
           <IndexRoute component={HomePage} />
-          <Route path="billing/:projectId" component={Invoice} />
-          <Route path="invoice/:projectId/entry/:invoiceId" component={InvoiceEntry}/>
+          <Route path="project/:projectId" component={Project} />
+          <Route path="project/:projectId/entry/:invoiceEntryId" component={Project}/>
+          <Route path="project/:projectId/:invoiceId" component={Invoice}/>
+          <Route path="project/:projectId/:invoiceId/:invoiceEntryId" component={InvoiceEntry}/>
           <Route path="statistics" component={Statistics} />
           <Route path="planning" component={SprintPlanning} />
         </Route>

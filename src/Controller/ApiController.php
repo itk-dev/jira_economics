@@ -32,10 +32,10 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/project/{jiraId}", name="api_projects")
+     * @Route("/project/{jiraId}", name="api_project")
      */
     public function projectAction(JiraService $jiraService, $jiraId)
     {
-        return new JsonResponse(['jiraId' => $jiraId]);
+        return new JsonResponse(['jiraId' => $jiraId, 'name' => 'TestProject']);
     }
 }

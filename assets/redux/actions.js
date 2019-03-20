@@ -135,10 +135,10 @@ export function fetchProject(jiraProjectId) {
     return fetch(`/api/project/${jiraProjectId}`)
       .then(
         response => response.json(),
-        dispatch(requestProjectFailure(jiraProjectId, ''))
+        error => dispatch(requestProjectFailure(jiraProjectId, error))
       )
-      .then(json =>
-        dispatch(requestProjectSuccess(jiraProjectId, json))
+      .then(
+        json => dispatch(requestProjectSuccess(jiraProjectId, json))
       )
   }
 }

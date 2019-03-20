@@ -1,46 +1,32 @@
 import React, { Component } from 'react';
+import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from '../components/ContentWrapper';
 import PageTitle from '../components/PageTitle';
-import { BreadcrumbsStateless, BreadcrumbsItem } from '@atlaskit/breadcrumbs';
-import PageHeader from '@atlaskit/page-header';
-import connect from 'react-redux/es/connect/connect';
 import { Link } from 'react-router';
-import store from '../redux/store';
-import { fetchProject } from '../redux/actions';
 
-const breadcrumbs = (
-  <BreadcrumbsStateless onExpand={() => {}}>
-    <BreadcrumbsItem text="Some project" key="Some project"/>
-  </BreadcrumbsStateless>
-);
-
-export class Invoice extends Component {
+class Invoice extends Component {
   componentDidMount() {
-    store.dispatch(fetchProject(this.props.params.projectId));
+    // @TODO: Implement this.
+    // store.dispatch(fetchInvoice(this.props.params.invoiceId));
   }
 
   render () {
     return (
       <ContentWrapper>
-        <PageTitle>Billing</PageTitle>
-        <PageHeader breadcrumbs={breadcrumbs}>
-          Invoices
-        </PageHeader>
+        <PageTitle>Invoice</PageTitle>
+        <div>ProjectID: {this.props.params.projectId}</div>
+        <div>InvoiceID: {this.props.params.invoiceId}</div>
 
-        <p>Show list of invoices</p>
-
-        <p>{this.props.params.projectId}</p>
-
-        <Link to={`/invoice/${this.props.params.projectId}/entry/1`}>Link til invoice</Link>
-
+        <Link to={`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/1`}>InvoiceEntry</Link>
       </ContentWrapper>
     );
   }
 }
 
 const mapStateToProps = state => {
+  // @TODO: Hook up with state.
+
   return {
-    selectedProject: state.selectedProject.selectedProject,
   };
 };
 

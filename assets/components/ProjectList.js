@@ -76,9 +76,9 @@ const createRows = (projects) => {
         key: `tools-${project.id}`,
         content: (
           <ButtonGroup>
-            <Link to={`/billing/${project.id}`}>
-              <Button iconBefore={<Icon glyph={BillingFilledIcon} label="Billing" size="medium"/>}>
-                Billing
+            <Link to={`/project/${project.id}`}>
+              <Button iconBefore={<Icon glyph={BillingFilledIcon} label="Invoices" size="medium"/>}>
+                Invoices
               </Button>
             </Link>
             <Button href="sprint_report/project/" iconBefore={<Icon glyph={MediaServicesPdfIcon} label="Sprint report" size="medium"/>}>

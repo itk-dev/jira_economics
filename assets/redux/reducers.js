@@ -61,6 +61,8 @@ function selectedProject (state = {
       isFetching: true,
       receivedAt: null
     });
+  case REQUEST_PROJECT_FAILURE:
+    return state;
   case REQUEST_PROJECT_SUCCESS:
     return Object.assign({}, state, {
       isFetching: false,
