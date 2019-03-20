@@ -5,6 +5,8 @@ import { BreadcrumbsStateless, BreadcrumbsItem } from '@atlaskit/breadcrumbs';
 import PageHeader from '@atlaskit/page-header';
 import connect from 'react-redux/es/connect/connect';
 import { Link } from 'react-router';
+import store from '../redux/store';
+import { fetchProject } from '../redux/actions';
 
 const breadcrumbs = (
   <BreadcrumbsStateless onExpand={() => {}}>
@@ -13,6 +15,10 @@ const breadcrumbs = (
 );
 
 export class Invoice extends Component {
+  componentDidMount() {
+    store.dispatch(fetchProject(this.props.params.projectId));
+  }
+
   render () {
     return (
       <ContentWrapper>
@@ -34,6 +40,7 @@ export class Invoice extends Component {
 
 const mapStateToProps = state => {
   return {
+    selectedProject: state.selectedProject.selectedProject,
   };
 };
 

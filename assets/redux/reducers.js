@@ -3,6 +3,7 @@ import { combineReducers } from 'redux';
 import {
   REQUEST_PROJECTS, RECEIVE_PROJECTS,
   REQUEST_CURRENT_USER, RECEIVE_CURRENT_USER,
+  REQUEST_PROJECT, REQUEST_PROJECT_FAILURE, REQUEST_PROJECT_SUCCESS
 } from './actions';
 
 function projects (state = {
@@ -49,9 +50,32 @@ function currentUser (state = {
   }
 }
 
+function selectedProject (state = {
+  isFetching: false,
+  receivedAt: null,
+  selectedProject: {}
+}, action) {
+  switch (action.type) {
+  case REQUEST_PROJECT:
+    return Object.assign({}, state, {
+      isFetching: true,
+      receivedAt: null
+    });
+  case REQUEST_PROJECT_SUCCESS:
+    return Object.assign({}, state, {
+      isFetching: false,
+      receivedAt: action.receivedAt,
+      selectedProject: action.selectedProject,
+    });
+  default:
+    return state;
+  }
+}
+
 const rootReducer = combineReducers({
   projects,
-  currentUser
+  currentUser,
+  selectedProject
 });
 
 export default rootReducer;

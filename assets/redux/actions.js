@@ -120,11 +120,12 @@ export function requestProjectFailure (err) {
   };
 }
 export const REQUEST_PROJECT_SUCCESS = 'REQUEST_PROJECT_SUCCESS';
-export function requestProjectSuccess (jiraProjectId, json) {
+export function requestProjectSuccess (jiraProjectId, selectedProject) {
   return {
     type: REQUEST_PROJECT_SUCCESS,
+    receivedAt: Date.now(),
     jiraProjectId: jiraProjectId,
-    project: json
+    selectedProject: selectedProject
   };
 }
 
