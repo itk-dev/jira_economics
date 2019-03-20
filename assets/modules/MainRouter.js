@@ -5,9 +5,9 @@ import App from './App';
 import HomePage from '../pages/HomePage';
 import Statistics from '../pages/Statistics';
 import SprintPlanning from '../pages/SprintPlanning';
-import Project from '../pages/Project';
-import Invoice from '../pages/Invoice';
-import InvoiceEntry from '../pages/InvoiceEntry';
+import Project from '../components/Project';
+import Invoice from '../components/Invoice';
+import InvoiceEntry from '../components/InvoiceEntry';
 
 export default class MainRouter extends Component {
   constructor() {

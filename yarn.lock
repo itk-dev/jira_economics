@@ -620,6 +620,16 @@
     babel-runtime "^6.26.0"
     react-transition-group "^2.2.1"
 
+"@atlaskit/spinner@^10.0.1":
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/@atlaskit/spinner/-/spinner-10.0.1.tgz#b43d3e12161d0842298a7c61d7c7245288840505"
+  integrity sha512-VTtTT/lkw1gIljcvuzg20T2Z7Tod99dhIJykTsdDlSGzf209CjL65rMCyA3K5DyJqG1V713NyRncm/m5Tf9yuA==
+  dependencies:
+    "@atlaskit/theme" "^8.0.1"
+    "@babel/runtime" "^7.0.0"
+    babel-runtime "^6.26.0"
+    react-transition-group "^2.2.1"
+
 "@atlaskit/spinner@^9.0.13":
   version "9.0.13"
   resolved "https://registry.yarnpkg.com/@atlaskit/spinner/-/spinner-9.0.13.tgz#030005c51a8acab842ce0771e16fe8c6cc7d585a"
