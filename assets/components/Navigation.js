@@ -1,16 +1,10 @@
 import React, {Component} from 'react';
-import Avatar from '@atlaskit/avatar';
-import AddIcon from '@atlaskit/icon/glyph/add';
 import FolderFilledIcon from '@atlaskit/icon/glyph/folder-filled';
 import GraphLineIcon from '@atlaskit/icon/glyph/graph-line';
-import QuestionCircleIcon from '@atlaskit/icon/glyph/question-circle';
-import SearchIcon from '@atlaskit/icon/glyph/search';
 import RoadmapIcon from '@atlaskit/icon/glyph/roadmap';
-import Icon from '@atlaskit/icon';
 import ItkLogo from '../components/ItkLogo';
 import {gridSize as gridSizeFn} from '@atlaskit/theme';
 import {
-  GlobalNav,
   GroupHeading,
   Item,
   LayoutManager,
@@ -22,6 +16,8 @@ import store from '../redux/store';
 import { fetchCurrentUserIfNeeded } from '../redux/actions';
 import connect from 'react-redux/es/connect/connect';
 import PropTypes from 'prop-types';
+import { DropdownItemGroup, DropdownItem } from '@atlaskit/dropdown-menu';
+import GlobalNavigation from '@atlaskit/global-navigation';
 
 const gridSize = gridSizeFn();
 
@@ -39,13 +35,7 @@ class Navigation extends Component {
     store.dispatch(fetchCurrentUserIfNeeded());
   }
 
-  toggleContainerNav = () => {
-    this.setState(state => ({
-      shouldDisplayContainerNav: !state.shouldDisplayContainerNav,
-    }));
-  };
-
-  ContainerNavigation = () => (
+  renderNavigation = () => (
     <div data-webdriver-test-key="container-navigation">
       <MenuSection>
         {({className}) => (
@@ -81,66 +71,35 @@ class Navigation extends Component {
     </div>
   );
 
+  renderGlobalNavigation = () => {
+    const UserDropdown = () => (
+      <DropdownItemGroup title="User options">
+        <DropdownItem><a href={this.props.jiraUrl + "/people/" + this.props.userUrl}>Open user in Jira</a></DropdownItem>
+      </DropdownItemGroup>
+    );
+
+    // @TODO: Handle click events.
+    return <GlobalNavigation
+      productIcon={ItkLogo}
+      productHref="/"
+      onProductClick={() => console.log('product clicked')}
+      onCreateClick={() => console.log('create clicked')}
+      onSearchClick={() => console.log('search clicked')}
+      onSettingsClick={() => console.log('settings clicked')}
+      profileItems={UserDropdown}
+      profileIconUrl={this.props.avatar}
+    />
+  };
+
   render() {
-    const {shouldDisplayContainerNav} = this.state;
-
-    const globalNavPrimaryItems = [
-      {
-        id: 'itk',
-        icon: () => <Icon glyph={ItkLogo} label="ITK" size="large"/>,
-        label: 'ITK',
-      },
-      {id: 'search', icon: SearchIcon, label: 'Search'},
-      {id: 'create', icon: AddIcon, label: 'Add'},
-    ];
-
-    const globalNavSecondaryItems = [
-      {
-        id: '10-composed-navigation',
-        icon: QuestionCircleIcon,
-        label: 'Help',
-        size: 'small',
-      },
-      {
-        id: '10-composed-navigation-2',
-        icon: () => (
-          <Avatar
-            borderColor="transparent"
-            isActive={false}
-            isHover={false}
-            size="small"
-            src={this.props.avatar}
-          />
-        ),
-        label: 'Profile',
-        size: 'small',
-        href: `${this.props.jiraUrl}/people/${this.props.userUrl}`
-      },
-    ];
-
     return (
       <NavigationProvider>
         <LayoutManager
-          globalNavigation={() => (<div data-webdriver-test-key="global-navigation">
-            {
-              this.props.avatar ? (
-                <GlobalNav
-                  primaryItems={globalNavPrimaryItems}
-                  secondaryItems={globalNavSecondaryItems}
-                />
-              ) : (<div></div>)
-            }
-          </div>)}
+          globalNavigation={this.renderGlobalNavigation}
           productNavigation={() => null}
-          containerNavigation={
-            shouldDisplayContainerNav ? this.ContainerNavigation : null
-          }
+          containerNavigation={this.renderNavigation}
         >
-          <div
-            data-webdriver-test-key="content"
-            style={{padding: `${gridSize * 4}px ${gridSize * 5}px`}}
-          >
-
+          <div data-webdriver-test-key="content" style={{padding: `${gridSize * 4}px ${gridSize * 5}px`}}>
           </div>
         </LayoutManager>
       </NavigationProvider>
