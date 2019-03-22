@@ -139,7 +139,7 @@ export function requestProjectSuccess (jiraProjectId, selectedProject) {
 export function fetchProject(jiraProjectId) {
   return function(dispatch) {
     dispatch(requestProject(jiraProjectId));
-    return fetch(`/api/project/${jiraProjectId}`)
+    return fetch(`/jira_api/project/${jiraProjectId}`)
       .then(
         response => response.json(),
         error => dispatch(requestProjectFailure(jiraProjectId, error))
