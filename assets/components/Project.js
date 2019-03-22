@@ -23,8 +23,6 @@ class Project extends Component {
 
           <p>Show list of invoices</p>
 
-          <p>{this.props.params.projectId}</p>
-
           <Link
             to={`/project/${this.props.params.projectId}/1`}>Link til invoice</Link>
         </ContentWrapper>

@@ -11,7 +11,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ApiResource()
  * @ORM\Entity(repositoryClass="App\Repository\ProjectRepository")
- * @UniqueEntity("jira_id")
+ * @UniqueEntity("jiraId")
  */
 class Project
 {
@@ -28,19 +28,9 @@ class Project
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $jira_key;
-
-    /**
      * @ORM\OneToMany(targetEntity="App\Entity\Invoice", mappedBy="project", orphanRemoval=true)
      */
     private $invoices;
-
-    /**
-     * @ORM\Column(type="integer", unique=true)
-     */
-    private $jira_id;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -50,7 +40,17 @@ class Project
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $avatar_url;
+    private $jiraKey;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $jiraId;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $avatarUrl;
 
     public function __construct()
     {
@@ -70,18 +70,6 @@ class Project
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getJiraKey(): ?string
-    {
-        return $this->jira_key;
-    }
-
-    public function setJiraKey(string $jira_key): self
-    {
-        $this->jira_key = $jira_key;
 
         return $this;
     }
@@ -117,18 +105,6 @@ class Project
         return $this;
     }
 
-    public function getJiraId(): ?int
-    {
-        return $this->jira_id;
-    }
-
-    public function setJiraId(int $jira_id): self
-    {
-        $this->jira_id = $jira_id;
-
-        return $this;
-    }
-
     public function getUrl(): ?string
     {
         return $this->url;
@@ -141,14 +117,38 @@ class Project
         return $this;
     }
 
-    public function getAvatarUrl(): ?string
+    public function getJiraKey(): ?string
     {
-        return $this->avatar_url;
+        return $this->jiraKey;
     }
 
-    public function setAvatarUrl(string $avatar_url): self
+    public function setJiraKey(string $jiraKey): self
     {
-        $this->avatar_url = $avatar_url;
+        $this->jiraKey = $jiraKey;
+
+        return $this;
+    }
+
+    public function getJiraId(): ?int
+    {
+        return $this->jiraId;
+    }
+
+    public function setJiraId(int $jiraId): self
+    {
+        $this->jiraId = $jiraId;
+
+        return $this;
+    }
+
+    public function getAvatarUrl(): ?string
+    {
+        return $this->avatarUrl;
+    }
+
+    public function setAvatarUrl(string $avatarUrl): self
+    {
+        $this->avatarUrl = $avatarUrl;
 
         return $this;
     }

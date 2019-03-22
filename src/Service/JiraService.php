@@ -129,7 +129,7 @@ class JiraService
         }
 
         $repository = $this->entity_manager->getRepository(Project::class);
-        $project = $repository->findOneBy(['jira_id' => $jiraProjectId]);
+        $project = $repository->findOneBy(['jiraId' => $jiraProjectId]);
 
         if (!$project) {
             $project = new Project();
@@ -149,11 +149,11 @@ class JiraService
         $this->entity_manager->persist($project);
         $this->entity_manager->flush();
 
-        $project_to_return = ['jira_id'     => $result->id,
-                              'jira_key'    => $result->key,
+        $project_to_return = ['jiraId'     => $result->id,
+                              'jiraKey'    => $result->key,
                               'name'        => $result->name,
                               'url'         => $result->self,
-                              'avatar_url'  => $avatarUrl];
+                              'avatarUrl'  => $avatarUrl];
 
         return $project_to_return;
     }

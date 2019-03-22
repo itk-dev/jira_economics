@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20190322130121 extends AbstractMigration
+final class Version20190322132530 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -22,7 +22,7 @@ final class Version20190322130121 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE project ADD foo VARCHAR(255) NOT NULL');
+        $this->addSql('ALTER TABLE project DROP jira_key, DROP jira_id, DROP avatar_url');
     }
 
     public function down(Schema $schema) : void
@@ -30,6 +30,6 @@ final class Version20190322130121 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE project DROP foo');
+        $this->addSql('ALTER TABLE project ADD jira_key VARCHAR(255) NOT NULL COLLATE utf8mb4_unicode_ci, ADD jira_id INT NOT NULL, ADD avatar_url VARCHAR(255) NOT NULL COLLATE utf8mb4_unicode_ci');
     }
 }
