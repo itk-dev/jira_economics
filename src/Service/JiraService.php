@@ -221,8 +221,6 @@ class JiraService
             throw new HttpException(400, 'Expected integer in request');
         }
 
-        $project_to_return = [];
-
         try {
             $result = $this->get('/rest/api/3/project/' . $jiraProjectId);
         }
@@ -237,8 +235,6 @@ class JiraService
             $project = new Project();
         }
 
-        //TODO cleanup redundancy
-
         $project->setJiraId($result->id);
         $project->setJiraKey($result->key);
         $project->setName($result->name);
@@ -251,13 +247,11 @@ class JiraService
         $this->entity_manager->persist($project);
         $this->entity_manager->flush();
 
-        $project_to_return = ['jiraId'     => $result->id,
-                              'jiraKey'    => $result->key,
-                              'name'        => $result->name,
-                              'url'         => $result->self,
-                              'avatarUrl'  => $avatarUrl];
-
-        return $project_to_return;
+        return ['jiraId'    => $result->id,
+                'jiraKey'   => $result->key,
+                'name'      => $result->name,
+                'url'       => $result->self,
+                'avatarUrl' => $avatarUrl];
     }
 
     /**
