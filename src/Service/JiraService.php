@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Invoice;
+use App\Entity\InvoiceEntry;
 use App\Entity\Project;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
@@ -105,6 +107,106 @@ class JiraService
         );
 
         return $middleware;
+    }
+
+    /**
+     * Get invoices for specific Jira project
+     * @param jira_id
+     * @return array
+     */
+    public function getInvoices($jiraProjectId)
+    {
+        if (!intval($jiraProjectId)) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
+        $repository = $this->entity_manager->getRepository(Project::class);
+        $project = $repository->findOneBy(['jiraId' => $jiraProjectId]);
+
+        if (!$project) {
+            throw new HttpException(404, 'Project with id ' . $jiraProjectId . ' not found');
+        }
+
+        $invoices = $project->getInvoices();
+
+        $invoicesJson = [];
+
+        foreach ($invoices AS $invoice) {
+            $invoicesJson[] = ['id'   => $invoice->getId(),
+                               'name' => $invoice->getName()];
+        }
+
+        return $invoicesJson;
+    }
+
+    /**
+     * Get specific invoice by id
+     * @param invoiceId
+     * @return array
+     */
+    public function getInvoice($invoiceId)
+    {
+        if (!intval($invoiceId)) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
+        $repository = $this->entity_manager->getRepository(Invoice::class);
+        $invoice = $repository->findOneBy(['id' => $invoiceId]);
+
+        if (!$invoice) {
+            throw new HttpException(404, 'Invoice with id ' . $invoiceId . ' not found');
+        }
+
+        return ['name'   => $invoice->getName(),
+                'jiraId' => $invoice->getProject()->getJiraId()];
+    }
+
+    /**
+     * Get invoiceEntries for specific invoice
+     * @param invoice_id
+     * @return array
+     */
+    public function getInvoiceEntries($invoiceId)
+    {
+        if (!intval($invoiceId)) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
+        $repository = $this->entity_manager->getRepository(Invoice::class);
+        $invoice = $repository->findOneBy(['id' => $invoiceId]);
+
+        $invoiceEntries = $invoice->getInvoiceEntries();
+
+        $invoiceEntriesJson = [];
+
+        foreach ($invoiceEntries AS $invoiceEntry) {
+            $invoiceEntriesJson[] = ['id'   => $invoiceEntry->getId(),
+                                     'name' => $invoiceEntry->getName()];
+        }
+
+        return $invoiceEntriesJson;
+    }
+
+    /**
+     * Get specific invoiceEntry by id
+     * @param invoice_entry_id
+     * @return array
+     */
+    public function getInvoiceEntry($invoiceEntryId)
+    {
+        if (!intval($invoiceEntryId)) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
+        $repository = $this->entity_manager->getRepository(InvoiceEntry::class);
+        $invoiceEntry = $repository->findOneBy(['id' => $invoiceEntryId]);
+
+        if (!$invoiceEntry) {
+            throw new HttpException(404, 'InvoiceEntry with id ' . $invoiceEntryId . ' not found');
+        }
+
+        return ['id'    => $invoiceEntry->getId(),
+                'name'  => $invoiceEntry->getName()];
     }
 
     /**

@@ -17,12 +17,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class ApiController extends Controller
 {
     /**
-     * @Route("/project/{token}", name="api_project")
-     * defaults={"token"="...."})
+     * @Route("/project/{jiraProjectId}", name="api_project")
+     * defaults={"jiraProjectId"="...."})
      */
     public function projectAction(JiraService $jiraService, Request $request)
     {
-        $jiraProjectId = $request->get('token');
+        $jiraProjectId = $request->get('jiraProjectId');
         $result = $jiraService->getProject($jiraProjectId);
         return new JsonResponse($result);
     }
@@ -33,6 +33,50 @@ class ApiController extends Controller
     public function projectsAction(JiraService $jiraService)
     {
         return new JsonResponse($jiraService->getProjects());
+    }
+
+    /**
+     * @Route("/invoice/{jiraProjectId}", name="api_invoice")
+     * defaults={"jiraProjectId"="...."})
+     */
+    public function invoiceAction(JiraService $jiraService, Request $request)
+    {
+        $invoiceId = $request->get('jiraProjectId');
+        $result = $jiraService->getInvoice($invoiceId);
+        return new JsonResponse($result);
+    }
+
+    /**
+     * @Route("/invoices/{invoiceId}", name="api_invoices")
+     * defaults={"invoiceId"="...."})
+    */
+    public function invoicesAction(JiraService $jiraService, Request $request)
+    {
+        $jiraProjectId = $request->get('invoiceId');
+        $result = $jiraService->getInvoices($jiraProjectId);
+        return new JsonResponse($result);
+    }
+
+    /**
+     * @Route("/invoice_entry/{invoiceEntryId}", name="api_invoice_entry")
+     * defaults={"invoiceEntryId"="...."})
+    */
+    public function invoiceEntryAction(JiraService $jiraService, Request $request)
+    {
+        $invoiceEntryId = $request->get('invoiceEntryId');
+        $result = $jiraService->getInvoiceEntry($invoiceEntryId);
+        return new JsonResponse($result);
+    }
+
+    /**
+     * @Route("/invoice_entries/{invoiceId}", name="api_invoice_entries")
+     * defaults={"invoiceId"="...."})
+    */
+    public function invoiceEntriesAction(JiraService $jiraService, Request $request)
+    {
+        $jiraProjectId = $request->get('invoiceId');
+        $result = $jiraService->getInvoiceEntries($jiraProjectId);
+        return new JsonResponse($result);
     }
 
     /**
