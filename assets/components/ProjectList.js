@@ -10,6 +10,7 @@ import { fetchProjectsIfNeeded } from '../redux/actions';
 import DynamicTable from '@atlaskit/dynamic-table/dist/esm/components/Stateful';
 import PropTypes from 'prop-types';
 import connect from 'react-redux/es/connect/connect';
+import TextField from '@atlaskit/field-text';
 
 const createHead = (withWidth) => {
   return {
@@ -106,6 +107,11 @@ const Wrapper = styled.div`
   min-width: 400px;
 `;
 
+const InputWrapper = styled.div`
+  width: 50%;
+  margin-bottom: 20px;
+`;
+
 class ProjectList extends Component {
   constructor(){
     super();
@@ -135,13 +141,17 @@ class ProjectList extends Component {
   render () {
     return (
       <Wrapper>
-        <input
-          type="text"
-          className="form-control form-control-lg"
-          placeholder="Search"
-          value={this.state.inputFilter}
-          onChange={this.onFilterChange}
-        />
+
+        <InputWrapper>
+          <TextField
+            type="text"
+            label="Search"
+            placeholder="Enter the name of a project"
+            value={this.state.inputFilter}
+            onChange={this.onFilterChange}
+            shouldFitContainer
+          />
+        </InputWrapper>
 
         <DynamicTable
           head={head}

@@ -44,6 +44,14 @@
     babel-runtime "^6.26.0"
     prop-types "^15.5.10"
 
+"@atlaskit/analytics-next@^4.0.1":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@atlaskit/analytics-next/-/analytics-next-4.0.2.tgz#bfc117eda02aa384d9af10c8ea6087e857b3667c"
+  integrity sha512-P80C5KIfdat2JAJ/121EoCUDOR0B7zJS79KoOj6ZvvPP9JCnbCVESsuwGUE/P+0DNlMM6IuMmbIicGGXP/LmrA==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    prop-types "^15.5.10"
+
 "@atlaskit/analytics@^4.0.7":
   version "4.0.7"
   resolved "https://registry.yarnpkg.com/@atlaskit/analytics/-/analytics-4.0.7.tgz#eb60bf2aa03e5370e0c269a368fe1992810c38f5"
@@ -261,7 +269,7 @@
     prop-types "^15.5.10"
     react-beautiful-dnd "^10.0.2"
 
-"@atlaskit/field-base@^11.0.13", "@atlaskit/field-base@^11.0.14":
+"@atlaskit/field-base@^11.0.14":
   version "11.0.15"
   resolved "https://registry.yarnpkg.com/@atlaskit/field-base/-/field-base-11.0.15.tgz#bd06931a462bbe2ad4e9222f39b1734762f47342"
   integrity sha512-Zlp/y5WaZsKoh377tUujB1xHsZvxSkOfvT5sUoKVlwTK4dYRnIg3uSteuAXPgn6YvuxCa4lVL/QwOlQ3+zpS1A==
@@ -273,14 +281,25 @@
     "@babel/runtime" "^7.0.0"
     babel-runtime "^6.26.0"
 
-"@atlaskit/field-text@^7.1.0":
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/@atlaskit/field-text/-/field-text-7.1.0.tgz#870bda2297030dda28987688ce993ac38cc499c3"
-  integrity sha512-2/ZB1+XLbBgKrmkVZ3C1OHMJwDDqqC1Y7licVY5Z5zgR4TNH4rz07uyd3EE1uoCDgYIx3UKkfCPfEIjqp+GD6A==
+"@atlaskit/field-base@^12.0.0":
+  version "12.0.1"
+  resolved "https://registry.yarnpkg.com/@atlaskit/field-base/-/field-base-12.0.1.tgz#29abe8deb7d6fb58116af819c74db3102777f578"
+  integrity sha512-tgAKAXwxEjwokNhXsxHcXFeIQkAihwdb5Qo5HUWc6PI0UlMD+g1kG2d9JQ6VYcmce8yGKExuDfoxVPCjeW0Ccw==
   dependencies:
-    "@atlaskit/analytics-next" "^3.1.2"
-    "@atlaskit/field-base" "^11.0.13"
-    "@atlaskit/theme" "^7.0.1"
+    "@atlaskit/icon" "^16.0.6"
+    "@atlaskit/inline-dialog" "^10.0.0"
+    "@atlaskit/spinner" "^10.0.3"
+    "@atlaskit/theme" "^8.0.0"
+    "@babel/runtime" "^7.0.0"
+
+"@atlaskit/field-text@^8.0.1":
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/@atlaskit/field-text/-/field-text-8.0.1.tgz#85e8c090806641304681a4e98b8263de4928b6c5"
+  integrity sha512-eUEeKTRa6aDlFqWzJJWfFpfriVey9O6ySu6fT9zxJbu2sn4Tb+DNiG5JiljNP3YaW0rMmcDZ+KPk8biMnBs6Lg==
+  dependencies:
+    "@atlaskit/analytics-next" "^4.0.1"
+    "@atlaskit/field-base" "^12.0.0"
+    "@atlaskit/theme" "^8.0.1"
     "@babel/runtime" "^7.0.0"
 
 "@atlaskit/flag@^9.0.7":
@@ -343,6 +362,26 @@
     "@babel/runtime" "^7.0.0"
     babel-runtime "^6.26.0"
     uuid "^3.1.0"
+
+"@atlaskit/icon@^16.0.6":
+  version "16.0.6"
+  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-16.0.6.tgz#cc13f8beada180f8c1c89fde38de0999b092eed6"
+  integrity sha512-qoacwPXQgtDBE9U5YB6y/lTY/Re72S5B+ZdnedD+ILuDcn+BNYxCu4ZLzoPTd3oRV8zPyXZGD+Y7cJARoVA6Tg==
+  dependencies:
+    "@atlaskit/theme" "^8.0.1"
+    "@babel/runtime" "^7.0.0"
+    uuid "^3.1.0"
+
+"@atlaskit/inline-dialog@^10.0.0":
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/@atlaskit/inline-dialog/-/inline-dialog-10.0.1.tgz#53fb3ab6002eb1500ac51dafe9d1de3fea065eb3"
+  integrity sha512-0jTUpjV6TWf57xIU6ypAeDaquJevxacmfsScYQqohjJecyzhdWEk3hxNvNek+6AR0U5vexHBwD9GJe4AjCKirw==
+  dependencies:
+    "@atlaskit/analytics-next" "^4.0.1"
+    "@atlaskit/popper" "^0.4.1"
+    "@atlaskit/theme" "^8.0.1"
+    "@babel/runtime" "^7.0.0"
+    react-node-resolver "^1.0.1"
 
 "@atlaskit/inline-dialog@^9.0.14":
   version "9.0.15"
@@ -562,6 +601,15 @@
     memoize-one "^3.0.1"
     react-popper "1.0.2"
 
+"@atlaskit/popper@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@atlaskit/popper/-/popper-0.4.1.tgz#be7a693ccef168d6088e6e299540d7882f3c1f16"
+  integrity sha512-c7qkwuvYUJ+wmX4hXEu6EjCVxVRKFmRd8j98WDrbY4IPN+5FhIH1zeav7WHPffh5IxdRoYs5juW56sDWrzDipg==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    memoize-one "^3.0.1"
+    react-popper "1.0.2"
+
 "@atlaskit/portal@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@atlaskit/portal/-/portal-0.1.0.tgz#15b954582bf9646b4b9e7a9b8a478d9e3a3038a2"
@@ -628,6 +676,15 @@
     "@atlaskit/theme" "^8.0.1"
     "@babel/runtime" "^7.0.0"
     babel-runtime "^6.26.0"
+    react-transition-group "^2.2.1"
+
+"@atlaskit/spinner@^10.0.3":
+  version "10.0.3"
+  resolved "https://registry.yarnpkg.com/@atlaskit/spinner/-/spinner-10.0.3.tgz#7664501177b968714f20a2d72c07220192f1d205"
+  integrity sha512-KSESSO+ORo9KqrrnCfo4hafjb3YkGB+ikjJxZ5OB2TOnkE/E9bOMVbVG3K31Jj7E/qrya0Y20fRSIkZPRfJ8Pg==
+  dependencies:
+    "@atlaskit/theme" "^8.0.1"
+    "@babel/runtime" "^7.0.0"
     react-transition-group "^2.2.1"
 
 "@atlaskit/spinner@^9.0.13":
