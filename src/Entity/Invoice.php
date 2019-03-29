@@ -36,6 +36,16 @@ class Invoice
      */
     private $invoiceEntries;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $recorded;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $created;
+
     public function __construct()
     {
         $this->invoiceEntries = new ArrayCollection();
@@ -97,6 +107,30 @@ class Invoice
                 $invoiceEntry->setInvoice(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRecorded(): ?bool
+    {
+        return $this->recorded;
+    }
+
+    public function setRecorded(bool $recorded): self
+    {
+        $this->recorded = $recorded;
+
+        return $this;
+    }
+
+    public function getCreated(): ?\DateTimeInterface
+    {
+        return $this->created;
+    }
+
+    public function setCreated(\DateTimeInterface $created): self
+    {
+        $this->created = $created;
 
         return $this;
     }
