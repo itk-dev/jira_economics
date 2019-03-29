@@ -4,13 +4,14 @@ import PageTitle from '../components/PageTitle';
 import connect from 'react-redux/es/connect/connect';
 import { Link } from 'react-router';
 import store from '../redux/store';
-import { fetchProject } from '../redux/actions';
+import { fetchProject, fetchInvoices } from '../redux/actions';
 import PropTypes from 'prop-types';
 import Spinner from '@atlaskit/spinner';
 
 class Project extends Component {
   componentDidMount() {
     store.dispatch(fetchProject(this.props.params.projectId));
+    store.dispatch(fetchInvoices(this.props.params.projectId));
   }
 
   render () {
@@ -36,11 +37,13 @@ class Project extends Component {
 
 Project.propTypes = {
   selectedProject: PropTypes.object,
+  invoices: PropTypes.array
 };
 
 const mapStateToProps = state => {
   return {
     selectedProject: state.selectedProject.selectedProject,
+    invoices: state.invoices.invoices
   };
 };
 

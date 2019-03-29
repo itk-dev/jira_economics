@@ -59,6 +59,44 @@ export function fetchProjectsIfNeeded() {
   }
 }
 
+// INVOICES:
+
+export const REQUEST_INVOICES = 'REQUEST_INVOICES';
+export function requestInvoices () {
+  return {type: REQUEST_INVOICES};
+}
+
+export const REQUEST_INVOICES_FAILURE = 'REQUEST_INVOICES_FAILURE';
+export function requestInvoicesFailure (err) {
+  return {
+    type: REQUEST_INVOICES_FAILURE,
+    error: err
+  };
+}
+export const REQUEST_INVOICES_SUCCESS = 'REQUEST_INVOICES_SUCCESS';
+export function requestInvoicesSuccess (jiraProjectId, invoices) {
+  return {
+    type: REQUEST_INVOICES_SUCCESS,
+    receivedAt: Date.now(),
+    jiraProjectId: jiraProjectId,
+    invoices: invoices
+  };
+}
+
+export function fetchInvoices(jiraProjectId) {
+  return function(dispatch) {
+    dispatch(requestInvoices(jiraProjectId));
+    return fetch(`/jira_api/invoices/${jiraProjectId}`)
+      .then(
+        response => response.json(),
+        error => dispatch(requestInvoicesFailure(jiraProjectId, error))
+      )
+      .then(
+        json => dispatch(requestInvoicesSuccess(jiraProjectId, json))
+      )
+  }
+}
+
 
 // CURRENT_USER:
 
@@ -146,6 +184,43 @@ export function fetchProject(jiraProjectId) {
       )
       .then(
         json => dispatch(requestProjectSuccess(jiraProjectId, json))
+      )
+  }
+}
+
+// INVOICE
+
+export const REQUEST_INVOICE = 'REQUEST_INVOICE';
+export function requestInvoice () {
+  return {type: REQUEST_INVOICE};
+}
+export const REQUEST_INVOICE_FAILURE = 'REQUEST_INVOICE_FAILURE';
+export function requestInvoiceFailure (err) {
+  return {
+    type: REQUEST_INVOICE_FAILURE,
+    error: err
+  };
+}
+export const REQUEST_INVOICE_SUCCESS = 'REQUEST_INVOICE_SUCCESS';
+export function requestInvoiceSuccess (invoiceId, selectedInvoice) {
+  return {
+    type: REQUEST_INVOICE_SUCCESS,
+    receivedAt: Date.now(),
+    invoiceId: invoiceId,
+    selectedInvoice: selectedInvoice
+  };
+}
+
+export function fetchInvoice(invoiceId) {
+  return function(dispatch) {
+    dispatch(requestInvoice(invoiceId));
+    return fetch(`/jira_api/invoice/${invoiceId}`)
+      .then(
+        response => response.json(),
+        error => dispatch(requestInvoiceFailure(invoiceId, error))
+      )
+      .then(
+        json => dispatch(requestInvoiceSuccess(invoiceId, json))
       )
   }
 }
