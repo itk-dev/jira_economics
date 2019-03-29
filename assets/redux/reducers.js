@@ -5,7 +5,8 @@ import {
   REQUEST_CURRENT_USER, RECEIVE_CURRENT_USER,
   REQUEST_PROJECT, REQUEST_PROJECT_FAILURE, REQUEST_PROJECT_SUCCESS,
   REQUEST_INVOICES, REQUEST_INVOICES_FAILURE, REQUEST_INVOICES_SUCCESS,
-  REQUEST_INVOICE, REQUEST_INVOICE_FAILURE, REQUEST_INVOICE_SUCCESS
+  REQUEST_INVOICE, REQUEST_INVOICE_FAILURE, REQUEST_INVOICE_SUCCESS,
+  REQUEST_INVOICE_ENTRY, REQUEST_INVOICE_ENTRY_FAILURE, REQUEST_INVOICE_ENTRY_SUCCESS
 } from './actions';
 
 function projects (state = {
@@ -124,13 +125,39 @@ function selectedInvoice (state = {
   }
 }
 
+function selectedInvoiceEntry (state = {
+  isFetching: false,
+  receivedAt: null,
+  selectedInvoiceEntry: {}
+}, action) {
+  switch (action.type) {
+  case REQUEST_INVOICE_ENTRY:
+    return Object.assign({}, state, {
+      isFetching: true,
+      receivedAt: null
+    });
+  case REQUEST_INVOICE_ENTRY_FAILURE:
+    return state;
+  case REQUEST_INVOICE_ENTRY_SUCCESS:
+    return Object.assign({}, state, {
+      isFetching: false,
+      receivedAt: action.receivedAt,
+      selectedInvoiceEntry: action.selectedInvoiceEntry,
+    });
+  default:
+    return state;
+  }
+}
+
+
 
 const rootReducer = combineReducers({
   projects,
   invoices,
   currentUser,
   selectedProject,
-  selectedInvoice
+  selectedInvoice,
+  selectedInvoiceEntry
 });
 
 export default rootReducer;

@@ -11,7 +11,7 @@ class Invoice extends Component {
   componentDidMount() {
     store.dispatch(fetchInvoice(this.props.params.invoiceId));
   }
-
+  // @TODO: Retrieve all invoiceEntries for an entry and display them
   render () {
     return (
       <ContentWrapper>
@@ -20,7 +20,7 @@ class Invoice extends Component {
         <div>InvoiceID: {this.props.params.invoiceId}</div>
         <div>InvoiceName: {this.props.selectedInvoice.name}</div>
 
-        <Link to={`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/1`}>InvoiceEntry</Link>
+        <Link to={`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/2`}>InvoiceEntry</Link>
       </ContentWrapper>
     );
   }

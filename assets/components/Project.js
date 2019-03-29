@@ -13,7 +13,7 @@ class Project extends Component {
     store.dispatch(fetchProject(this.props.params.projectId));
     store.dispatch(fetchInvoices(this.props.params.projectId));
   }
-
+  // @TODO: Retrieve all invoices for a project and display them
   render () {
     if (this.props.selectedProject.name) {
       return (

@@ -188,7 +188,7 @@ export function fetchProject(jiraProjectId) {
   }
 }
 
-// INVOICE
+// INVOICE:
 
 export const REQUEST_INVOICE = 'REQUEST_INVOICE';
 export function requestInvoice () {
@@ -221,6 +221,43 @@ export function fetchInvoice(invoiceId) {
       )
       .then(
         json => dispatch(requestInvoiceSuccess(invoiceId, json))
+      )
+  }
+}
+
+// INVOICE_ENTRY:
+
+export const REQUEST_INVOICE_ENTRY = 'REQUEST_INVOICE_ENTRY';
+export function requestInvoiceEntry () {
+  return {type: REQUEST_INVOICE_ENTRY}
+}
+export const REQUEST_INVOICE_ENTRY_FAILURE = 'REQUEST_INVOICE_ENTRY_FAILURE';
+export function requestInvoiceEntryFailure (err) {
+  return {
+    type: REQUEST_INVOICE_ENTRY_FAILURE,
+    error: err
+  };
+}
+export const REQUEST_INVOICE_ENTRY_SUCCESS = 'REQUEST_INVOICE_ENTRY_SUCCESS';
+export function requestInvoiceEntrySuccess (invoiceEntryId, selectedInvoiceEntry) {
+  return {
+    type: REQUEST_INVOICE_ENTRY_SUCCESS,
+    receivedAt: Date.now(),
+    invoiceEntryId: invoiceEntryId,
+    selectedInvoiceEntry: selectedInvoiceEntry
+  };
+}
+
+export function fetchInvoiceEntry(invoiceEntryId) {
+  return function(dispatch) {
+    dispatch(requestInvoiceEntry(invoiceEntryId));
+    return fetch(`/jira_api/invoice_entry/${invoiceEntryId}`)
+      .then(
+        response => response.json(),
+        error => dispatch(requestInvoiceEntryFailure(invoiceEntryId, error))
+      )
+      .then(
+        json => dispatch(requestInvoiceEntrySuccess(invoiceEntryId, json))
       )
   }
 }
