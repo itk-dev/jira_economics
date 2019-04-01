@@ -13,7 +13,6 @@ class Project extends Component {
     store.dispatch(fetchProject(this.props.params.projectId));
     store.dispatch(fetchInvoices(this.props.params.projectId));
   }
-  // @TODO: Retrieve all invoices for a project and display them
   render () {
     if (this.props.selectedProject.name) {
       return (
@@ -22,10 +21,9 @@ class Project extends Component {
             {this.props.selectedProject.name + ' (' + this.props.selectedProject.jiraId + ')'}
           </PageTitle>
 
-          <p>Show list of invoices</p>
-
-          <Link
-            to={`/project/${this.props.params.projectId}/1`}>Link til invoice</Link>
+          {this.props.invoices && this.props.invoices.map((item, key) =>
+            <div><Link to={`/project/${this.props.params.projectId}/${item.id}`}>Link til {item.name}</Link></div>
+          )}
         </ContentWrapper>
       );
     }

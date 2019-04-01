@@ -97,6 +97,43 @@ export function fetchInvoices(jiraProjectId) {
   }
 }
 
+// INVOICE_ENTRIES:
+
+export const REQUEST_INVOICE_ENTRIES = 'REQUEST_INVOICE_ENTRIES';
+export function requestInvoiceEntries () {
+  return {type: REQUEST_INVOICE_ENTRIES};
+}
+
+export const REQUEST_INVOICE_ENTRIES_FAILURE = 'REQUEST_INVOICE_ENTRIES_FAILURE';
+export function requestInvoiceEntriesFailure (err) {
+  return {
+    type: REQUEST_INVOICE_ENTRIES_FAILURE,
+    error: err
+  };
+}
+export const REQUEST_INVOICE_ENTRIES_SUCCESS = 'REQUEST_INVOICE_ENTRIES_SUCCESS';
+export function requestInvoiceEntriesSuccess (invoiceId, invoiceEntries) {
+  return {
+    type: REQUEST_INVOICE_ENTRIES_SUCCESS,
+    receivedAt: Date.now(),
+    invoiceId: invoiceId,
+    invoiceEntries: invoiceEntries
+  };
+}
+
+export function fetchInvoiceEntries(invoiceId) {
+  return function(dispatch) {
+    dispatch(requestInvoiceEntries(invoiceId));
+    return fetch(`/jira_api/invoice_entries/${invoiceId}`)
+      .then(
+        response => response.json(),
+        error => dispatch(requestInvoiceEntriesFailure(invoiceId, error))
+      )
+      .then(
+        json => dispatch(requestInvoiceEntriesSuccess(invoiceId, json))
+      )
+  }
+}
 
 // CURRENT_USER:
 
