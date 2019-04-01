@@ -157,8 +157,17 @@ class JiraService
             throw new HttpException(404, 'Invoice with id ' . $invoiceId . ' not found');
         }
 
+        if ($invoice->getRecorded() == "1") {
+            $recorded = "true";
+        }
+        else {
+            $recorded = "false";
+        }
+
         return ['name'   => $invoice->getName(),
-                'jiraId' => $invoice->getProject()->getJiraId()];
+                'jiraId' => $invoice->getProject()->getJiraId(),
+                'recorded' => $recorded,
+                'created' => $invoice->getCreated()];
     }
 
     /**

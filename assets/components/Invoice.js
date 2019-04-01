@@ -7,6 +7,15 @@ import store from '../redux/store';
 import { fetchInvoice } from '../redux/actions';
 import PropTypes from 'prop-types';
 
+const timeStamp = (created) => {
+  if (created == undefined) {
+    return "";
+  }
+  return Array.from(created).map(function (i) {
+    return i.date;
+  })
+};
+
 class Invoice extends Component {
   componentDidMount() {
     store.dispatch(fetchInvoice(this.props.params.invoiceId));
@@ -19,7 +28,8 @@ class Invoice extends Component {
         <div>ProjectID: {this.props.params.projectId}</div>
         <div>InvoiceID: {this.props.params.invoiceId}</div>
         <div>InvoiceName: {this.props.selectedInvoice.name}</div>
-
+        <div>InvoiceRecorded: {this.props.selectedInvoice.recorded}</div>
+        <div>InvoiceCreated: {this.props.createdAt}</div>
         <Link to={`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/2`}>InvoiceEntry</Link>
       </ContentWrapper>
     );
@@ -27,12 +37,16 @@ class Invoice extends Component {
 }
 
 Invoice.propTypes = {
-  selectedInvoice: PropTypes.object
+  selectedInvoice: PropTypes.object,
+  createdAt: PropTypes.object
 };
 
 const mapStateToProps = state => {
+  let createdAt = timeStamp(state.selectedInvoice.selectedInvoice.created);
+
   return {
-    selectedInvoice: state.selectedInvoice.selectedInvoice
+    selectedInvoice: state.selectedInvoice.selectedInvoice,
+    createdAt: createdAt
   };
 };
 
