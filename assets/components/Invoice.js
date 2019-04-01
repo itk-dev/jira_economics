@@ -6,15 +6,8 @@ import { Link } from 'react-router';
 import store from '../redux/store';
 import { fetchInvoice } from '../redux/actions';
 import PropTypes from 'prop-types';
-
-const timeStamp = (created) => {
-  if (created == undefined) {
-    return "";
-  }
-  return Array.from(created).map(function (i) {
-    return i.date;
-  })
-};
+import Moment from 'react-moment';
+import 'moment-timezone';
 
 class Invoice extends Component {
   componentDidMount() {
@@ -29,7 +22,7 @@ class Invoice extends Component {
         <div>InvoiceID: {this.props.params.invoiceId}</div>
         <div>InvoiceName: {this.props.selectedInvoice.name}</div>
         <div>InvoiceRecorded: {this.props.selectedInvoice.recorded}</div>
-        <div>InvoiceCreated: {this.props.createdAt}</div>
+        <div>InvoiceCreated: <Moment format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></div>
         <Link to={`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/2`}>InvoiceEntry</Link>
       </ContentWrapper>
     );
@@ -38,11 +31,11 @@ class Invoice extends Component {
 
 Invoice.propTypes = {
   selectedInvoice: PropTypes.object,
-  createdAt: PropTypes.object
+  createdAt: PropTypes.string
 };
 
 const mapStateToProps = state => {
-  let createdAt = timeStamp(state.selectedInvoice.selectedInvoice.created);
+  let createdAt = state.selectedInvoice.selectedInvoice.created ? state.selectedInvoice.selectedInvoice.created.date : "";
 
   return {
     selectedInvoice: state.selectedInvoice.selectedInvoice,
