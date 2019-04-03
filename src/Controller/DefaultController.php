@@ -7,9 +7,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends Controller
 {
-    //TODO find a nicer way to exclude routes that shouldn't be handled by React
+    // @TODO find a nicer way to exclude routes that shouldn't be handled by React
     /**
-     * @Route("/{reactRouting}", name="index", defaults={"reactRouting": null}, requirements={"reactRouting"="^(?!api|login|connect|favicon).+"})
+     * @Route("/{reactRouting}", name="index", defaults={"reactRouting": null}, requirements={"reactRouting"="^(?!api|login|connect|favicon|jira_api).+"})
      */
     public function indexAction()
     {

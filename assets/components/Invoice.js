@@ -4,9 +4,12 @@ import ContentWrapper from '../components/ContentWrapper';
 import PageTitle from '../components/PageTitle';
 import { Link } from 'react-router';
 import store from '../redux/store';
-import { fetchInvoice, fetchInvoiceEntries } from '../redux/actions';
+import { fetchInvoice, fetchInvoiceEntries, editInvoice } from '../redux/actions';
 import PropTypes from 'prop-types';
+import Button, {ButtonAppearances} from '@atlaskit/button';
+import Form, {Field, FormFooter} from '@atlaskit/form';
 import Spinner from '@atlaskit/spinner';
+import TextField from '@atlaskit/field-text';
 import Moment from 'react-moment';
 import 'moment-timezone';
 
@@ -14,6 +17,16 @@ class Invoice extends Component {
   componentDidMount() {
     store.dispatch(fetchInvoice(this.props.params.invoiceId));
     store.dispatch(fetchInvoiceEntries(this.props.params.invoiceId));
+  }
+  // @TODO handle updating of remaining invoice properties project, invoiceEntries, recorded, created etc.
+  handleSubmit = (e) => {
+    const id = this.props.params.invoiceId;
+    const name = e.invoiceName;
+    const invoiceData = {
+      id,
+      name
+    }
+    store.dispatch(editInvoice(invoiceData));
   }
   render () {
     if (this.props.selectedInvoice.name) {
@@ -25,7 +38,19 @@ class Invoice extends Component {
           <div>InvoiceName: {this.props.selectedInvoice.name}</div>
           <div>InvoiceRecorded: {this.props.selectedInvoice.recorded}</div>
           <div>InvoiceCreated: <Moment format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></div>
-          {console.log(this.props.invoiceEntries)}
+          <div>
+            <Form onSubmit={this.handleSubmit}>
+              {({ formProps }) => (
+                <form {...formProps} name="submit-form">
+                  <Field name="invoiceName" defaultValue={this.props.selectedInvoice.name} label="Enter invoice name" isRequired>
+                    {({ fieldProps}) => <TextField {...fieldProps} />}
+                  </Field>
+                  <Button type="submit" appearance="primary">Submit</Button>
+                </form>
+              )}
+            </Form>
+          </div>
+          <div>Invoice entries:</div>
           {this.props.invoiceEntries && this.props.invoiceEntries.map((item, key) =>
             <div><Link to={`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/${item.id}`}>Link til {item.name}</Link></div>
           )}

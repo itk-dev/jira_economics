@@ -23,6 +23,7 @@
     "@atlaskit/dynamic-table": "^10.0.23",
     "@atlaskit/field-text": "^7.1.0",
     "@atlaskit/flag": "^9.0.7",
+    "@atlaskit/form": "^5.2.4",
     "@atlaskit/global-navigation": "^5.7.1",
     "@atlaskit/icon": "^13.4.0",
     "@atlaskit/inline-edit": "^7.0.7",

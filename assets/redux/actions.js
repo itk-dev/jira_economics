@@ -262,6 +262,43 @@ export function fetchInvoice(invoiceId) {
   }
 }
 
+export const UPDATE_INVOICE = 'UPDATE_INVOICE';
+export function updateInvoice() {
+  return {type: UPDATE_INVOICE};
+}
+export const UPDATE_INVOICE_FAILURE = 'UPDATE_INVOICE_FAILURE';
+export function updateInvoiceFailure (err) {
+  return {
+    type: UPDATE_INVOICE_FAILURE,
+    error: err
+  };
+}
+export const UPDATE_INVOICE_SUCCESS = 'UPDATE_INVOICE_SUCCESS';
+export function updateInvoiceSuccess (invoiceId) {
+  return {
+    type: UPDATE_INVOICE_SUCCESS,
+    receivedAt: Date.now(),
+    invoiceId: invoiceId
+  };
+}
+
+export function editInvoice(invoiceData) {
+  return function(dispatch) {
+    dispatch(updateInvoice(invoiceData));
+    return fetch(`/jira_api/invoice/${invoiceData.id}`, {
+      method: 'PUT',
+      body: JSON.stringify(invoiceData)
+    })
+    .then(
+      response => response.json(),
+      error => dispatch(updateInvoiceFailure(invoiceData.id, error))
+    )
+    .then(
+      json => dispatch(updateInvoiceSuccess(invoiceData.id, json))
+    )
+  }
+}
+
 // INVOICE_ENTRY:
 
 export const REQUEST_INVOICE_ENTRY = 'REQUEST_INVOICE_ENTRY';

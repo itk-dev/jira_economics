@@ -171,6 +171,38 @@ class JiraService
     }
 
     /**
+     * Put specific invoice, replacing the invoice referenced by the given id
+     * @param invoiceData
+     * @return array
+     */
+    public function putInvoice($invoiceData)
+    {
+        if (empty($invoiceData['id']) || !intval($invoiceData['id'])) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
+        $repository = $this->entity_manager->getRepository(Invoice::class);
+        $invoice = $repository->findOneBy(['id' => $invoiceData['id']]);
+
+        if (!$invoice) {
+            throw new HttpException(404, 'Unable to update invoice with id ' . $invoiceData['id'] . ' as it does not already exist');
+        }
+
+        $invoiceName = $invoiceData['name'] ? $invoiceData['name'] : "";
+        $invoice->setName($invoiceName);
+
+        // @TODO existing invoice object should be entirely replaced, not only have its name updated
+
+        $this->entity_manager->persist($invoice);
+        $this->entity_manager->flush();
+
+        return ['name'      => $invoiceName,
+                'jiraId'    => $invoice->getProject()->getJiraId(),
+                'recorded'  => $recorded = $invoice->getRecorded(),
+                'created'   => $invoice->getCreated()];
+    }
+
+    /**
      * Get invoiceEntries for specific invoice
      * @param invoice_id
      * @return array
