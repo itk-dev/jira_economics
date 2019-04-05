@@ -18,13 +18,21 @@ class Invoice extends Component {
     store.dispatch(fetchInvoice(this.props.params.invoiceId));
     store.dispatch(fetchInvoiceEntries(this.props.params.invoiceId));
   }
-  // @TODO handle updating of remaining invoice properties project, invoiceEntries, recorded, created etc.
-  handleSubmit = (e) => {
+  handleEditSubmit = (e) => {
     const id = this.props.params.invoiceId;
     const name = e.invoiceName;
     const invoiceData = {
       id,
       name
+    }
+    store.dispatch(editInvoice(invoiceData));
+  }
+  handleRecordSubmit = (e) => {
+    const id = this.props.params.invoiceId;
+    const recorded = "true";
+    const invoiceData = {
+      id,
+      recorded
     }
     store.dispatch(editInvoice(invoiceData));
   }
@@ -39,13 +47,22 @@ class Invoice extends Component {
           <div>InvoiceRecorded: {this.props.selectedInvoice.recorded}</div>
           <div>InvoiceCreated: <Moment format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></div>
           <div>
-            <Form onSubmit={this.handleSubmit}>
+            <Form onSubmit={this.handleEditSubmit}>
               {({ formProps }) => (
-                <form {...formProps} name="submit-form">
+                <form {...formProps} name="submit-edit-form">
                   <Field name="invoiceName" defaultValue={this.props.selectedInvoice.name} label="Enter invoice name" isRequired>
                     {({ fieldProps}) => <TextField {...fieldProps} />}
                   </Field>
                   <Button type="submit" appearance="primary">Submit</Button>
+                </form>
+              )}
+            </Form>
+          </div>
+          <div>
+            <Form onSubmit={this.handleRecordSubmit}>
+              {({ formProps }) => (
+                <form {...formProps} name="submit-recorded-form">
+                  <Button type="submit" appearance="primary">Record invoice</Button>
                 </form>
               )}
             </Form>

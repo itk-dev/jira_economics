@@ -178,7 +178,11 @@ class JiraService
     public function putInvoice($invoiceData)
     {
         if (empty($invoiceData['id']) || !intval($invoiceData['id'])) {
-            throw new HttpException(400, 'Expected integer in request');
+            throw new HttpException(400, "Expected integer value for 'id' in request");
+        }
+
+        if (isset($invoiceData['recorded']) && !boolval($invoiceData['recorded'])) {
+            throw new HttpException(400, "Expected boolean value for 'recorded' in request");
         }
 
         $repository = $this->entity_manager->getRepository(Invoice::class);
@@ -188,17 +192,21 @@ class JiraService
             throw new HttpException(404, 'Unable to update invoice with id ' . $invoiceData['id'] . ' as it does not already exist');
         }
 
-        $invoiceName = $invoiceData['name'] ? $invoiceData['name'] : "";
-        $invoice->setName($invoiceName);
+        if (!empty($invoiceData['name'])) {
+            $invoice->setName($invoiceData['name']);
+        }
 
-        // @TODO existing invoice object should be entirely replaced, not only have its name updated
+        if (isset($invoiceData['recorded'])) {
+            $invoiceRecorded = $invoiceData['recorded'];
+            $invoice->setRecorded($invoiceRecorded);
+        }
 
         $this->entity_manager->persist($invoice);
         $this->entity_manager->flush();
 
-        return ['name'      => $invoiceName,
+        return ['name'      => $invoice->getName(),
                 'jiraId'    => $invoice->getProject()->getJiraId(),
-                'recorded'  => $recorded = $invoice->getRecorded(),
+                'recorded'  => $invoice->getRecorded(),
                 'created'   => $invoice->getCreated()];
     }
 
