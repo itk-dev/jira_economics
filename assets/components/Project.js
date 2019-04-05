@@ -21,8 +21,8 @@ class Project extends Component {
             {this.props.selectedProject.name + ' (' + this.props.selectedProject.jiraId + ')'}
           </PageTitle>
 
-          {this.props.invoices && this.props.invoices.map((item, key) =>
-            <div><Link to={`/project/${this.props.params.projectId}/${item.id}`}>Link til {item.name}</Link></div>
+          {this.props.invoices && this.props.invoices.map((item) =>
+            <div key={item.id}><Link to={`/project/${this.props.params.projectId}/${item.id}`}>Link til {item.name}</Link></div>
           )}
         </ContentWrapper>
       );

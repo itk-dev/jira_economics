@@ -51,8 +51,8 @@ class Invoice extends Component {
             </Form>
           </div>
           <div>Invoice entries:</div>
-          {this.props.invoiceEntries && this.props.invoiceEntries.map((item, key) =>
-            <div><Link to={`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/${item.id}`}>Link til {item.name}</Link></div>
+          {this.props.invoiceEntries && this.props.invoiceEntries.map((item) =>
+            <div key={item.id}><Link to={`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/${item.id}`}>Link til {item.name}</Link></div>
           )}
         </ContentWrapper>
       );
