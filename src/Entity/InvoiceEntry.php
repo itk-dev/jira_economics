@@ -23,6 +23,12 @@ class InvoiceEntry
      */
     private $name;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Invoice", inversedBy="invoiceEntries")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $invoice;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -36,6 +42,18 @@ class InvoiceEntry
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getInvoice(): ?Invoice
+    {
+        return $this->invoice;
+    }
+
+    public function setInvoice(?Invoice $invoice): self
+    {
+        $this->invoice = $invoice;
 
         return $this;
     }

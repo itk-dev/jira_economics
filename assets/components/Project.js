@@ -4,15 +4,15 @@ import PageTitle from '../components/PageTitle';
 import connect from 'react-redux/es/connect/connect';
 import { Link } from 'react-router';
 import store from '../redux/store';
-import { fetchProject } from '../redux/actions';
+import { fetchProject, fetchInvoices } from '../redux/actions';
 import PropTypes from 'prop-types';
 import Spinner from '@atlaskit/spinner';
 
 class Project extends Component {
   componentDidMount() {
     store.dispatch(fetchProject(this.props.params.projectId));
+    store.dispatch(fetchInvoices(this.props.params.projectId));
   }
-
   render () {
     if (this.props.selectedProject.name) {
       return (
@@ -21,12 +21,9 @@ class Project extends Component {
             {this.props.selectedProject.name + ' (' + this.props.selectedProject.jiraId + ')'}
           </PageTitle>
 
-          <p>Show list of invoices</p>
-
-          <p>{this.props.params.projectId}</p>
-
-          <Link
-            to={`/project/${this.props.params.projectId}/1`}>Link til invoice</Link>
+          {this.props.invoices && this.props.invoices.map((item) =>
+            <div key={item.id}><Link to={`/project/${this.props.params.projectId}/${item.id}`}>Link til {item.name}</Link></div>
+          )}
         </ContentWrapper>
       );
     }
@@ -38,11 +35,13 @@ class Project extends Component {
 
 Project.propTypes = {
   selectedProject: PropTypes.object,
+  invoices: PropTypes.array
 };
 
 const mapStateToProps = state => {
   return {
     selectedProject: state.selectedProject.selectedProject,
+    invoices: state.invoices.invoices
   };
 };
 

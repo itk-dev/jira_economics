@@ -6,6 +6,7 @@ Encore.setOutputPath('public/build/')
   .enableSourceMaps()
   .disableSingleRuntimeChunk()
   .cleanupOutputBeforeBuild()
+  .enableVersioning()
   .addEntry('js/app', './assets/index.js')
   .enableSassLoader(function (options) {
     options.includePaths = ['node_modules'];

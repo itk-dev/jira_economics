@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Invoice;
+use App\Entity\InvoiceEntry;
 use App\Entity\Project;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
@@ -108,6 +110,155 @@ class JiraService
     }
 
     /**
+     * Get invoices for specific Jira project
+     * @param jira_id
+     * @return array
+     */
+    public function getInvoices($jiraProjectId)
+    {
+        if (!intval($jiraProjectId)) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
+        $repository = $this->entity_manager->getRepository(Project::class);
+        $project = $repository->findOneBy(['jiraId' => $jiraProjectId]);
+
+        if (!$project) {
+            throw new HttpException(404, 'Project with id ' . $jiraProjectId . ' not found');
+        }
+
+        $invoices = $project->getInvoices();
+
+        $invoicesJson = [];
+
+        foreach ($invoices AS $invoice) {
+            $invoicesJson[] = ['id'   => $invoice->getId(),
+                               'name' => $invoice->getName()];
+        }
+
+        return $invoicesJson;
+    }
+
+    /**
+     * Get specific invoice by id
+     * @param invoiceId
+     * @return array
+     */
+    public function getInvoice($invoiceId)
+    {
+        if (!intval($invoiceId)) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
+        $repository = $this->entity_manager->getRepository(Invoice::class);
+        $invoice = $repository->findOneBy(['id' => $invoiceId]);
+
+        if (!$invoice) {
+            throw new HttpException(404, 'Invoice with id ' . $invoiceId . ' not found');
+        }
+
+        if ($invoice->getRecorded() == "1") {
+            $recorded = true;
+        }
+        else {
+            $recorded = false;
+        }
+
+        return ['name'   => $invoice->getName(),
+                'jiraId' => $invoice->getProject()->getJiraId(),
+                'recorded' => $recorded,
+                'created' => $invoice->getCreated()];
+    }
+
+    /**
+     * Put specific invoice, replacing the invoice referenced by the given id
+     * @param invoiceData
+     * @return array
+     */
+    public function putInvoice($invoiceData)
+    {
+        if (empty($invoiceData['id']) || !intval($invoiceData['id'])) {
+            throw new HttpException(400, "Expected integer value for 'id' in request");
+        }
+
+        if (isset($invoiceData['recorded']) && !in_array($invoiceData['recorded'], [true, false])) {
+            throw new HttpException(400, "Expected boolean value for 'recorded' in request");
+        }
+
+        $repository = $this->entity_manager->getRepository(Invoice::class);
+        $invoice = $repository->findOneBy(['id' => $invoiceData['id']]);
+
+        if (!$invoice) {
+            throw new HttpException(404, 'Unable to update invoice with id ' . $invoiceData['id'] . ' as it does not already exist');
+        }
+
+        if (!empty($invoiceData['name'])) {
+            $invoice->setName($invoiceData['name']);
+        }
+
+        if (isset($invoiceData['recorded'])) {
+            $invoiceRecorded = $invoiceData['recorded'];
+            $invoice->setRecorded($invoiceRecorded);
+        }
+
+        $this->entity_manager->persist($invoice);
+        $this->entity_manager->flush();
+
+        return ['name'      => $invoice->getName(),
+                'jiraId'    => $invoice->getProject()->getJiraId(),
+                'recorded'  => $invoice->getRecorded(),
+                'created'   => $invoice->getCreated()];
+    }
+
+    /**
+     * Get invoiceEntries for specific invoice
+     * @param invoice_id
+     * @return array
+     */
+    public function getInvoiceEntries($invoiceId)
+    {
+        if (!intval($invoiceId)) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
+        $repository = $this->entity_manager->getRepository(Invoice::class);
+        $invoice = $repository->findOneBy(['id' => $invoiceId]);
+
+        $invoiceEntries = $invoice->getInvoiceEntries();
+
+        $invoiceEntriesJson = [];
+
+        foreach ($invoiceEntries AS $invoiceEntry) {
+            $invoiceEntriesJson[] = ['id'   => $invoiceEntry->getId(),
+                                     'name' => $invoiceEntry->getName()];
+        }
+
+        return $invoiceEntriesJson;
+    }
+
+    /**
+     * Get specific invoiceEntry by id
+     * @param invoice_entry_id
+     * @return array
+     */
+    public function getInvoiceEntry($invoiceEntryId)
+    {
+        if (!intval($invoiceEntryId)) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
+        $repository = $this->entity_manager->getRepository(InvoiceEntry::class);
+        $invoiceEntry = $repository->findOneBy(['id' => $invoiceEntryId]);
+
+        if (!$invoiceEntry) {
+            throw new HttpException(404, 'InvoiceEntry with id ' . $invoiceEntryId . ' not found');
+        }
+
+        return ['id'    => $invoiceEntry->getId(),
+                'name'  => $invoiceEntry->getName()];
+    }
+
+    /**
      * Get specific project by Jira project ID
      *
      * @param $jira_id
@@ -119,8 +270,6 @@ class JiraService
             throw new HttpException(400, 'Expected integer in request');
         }
 
-        $project_to_return = [];
-
         try {
             $result = $this->get('/rest/api/3/project/' . $jiraProjectId);
         }
@@ -129,13 +278,11 @@ class JiraService
         }
 
         $repository = $this->entity_manager->getRepository(Project::class);
-        $project = $repository->findOneBy(['jira_id' => $jiraProjectId]);
+        $project = $repository->findOneBy(['jiraId' => $jiraProjectId]);
 
         if (!$project) {
             $project = new Project();
         }
-
-        //TODO cleanup redundancy
 
         $project->setJiraId($result->id);
         $project->setJiraKey($result->key);
@@ -149,13 +296,11 @@ class JiraService
         $this->entity_manager->persist($project);
         $this->entity_manager->flush();
 
-        $project_to_return = ['jira_id'     => $result->id,
-                              'jira_key'    => $result->key,
-                              'name'        => $result->name,
-                              'url'         => $result->self,
-                              'avatar_url'  => $avatarUrl];
-
-        return $project_to_return;
+        return ['jiraId'    => $result->id,
+                'jiraKey'   => $result->key,
+                'name'      => $result->name,
+                'url'       => $result->self,
+                'avatarUrl' => $avatarUrl];
     }
 
     /**
