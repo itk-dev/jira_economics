@@ -5504,6 +5504,11 @@ eyes@0.1.x:
   resolved "https://registry.yarnpkg.com/eyes/-/eyes-0.1.8.tgz#62cf120234c683785d902348a800ef3e0cc20bc0"
   integrity sha1-Ys8SAjTGg3hdkCNIqADvPgzCC8A=
 
+fast-apply@0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/fast-apply/-/fast-apply-0.0.3.tgz#7791bb3f7f76b7064c0b73bc3e75bfad8553c861"
+  integrity sha1-d5G7P392twZMC3O8PnW/rYVTyGE=
+
 fast-deep-equal@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-1.1.0.tgz#c053477817c86b51daa853c81e059b733d023614"
@@ -10160,6 +10165,11 @@ q@^1.1.2:
   resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
   integrity sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc=
 
+qs@5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-5.2.0.tgz#a9f31142af468cb72b25b30136ba2456834916be"
+  integrity sha1-qfMRQq9GjLcrJbMBNrokVoNJFr4=
+
 qs@6.5.2, qs@~6.5.2:
   version "6.5.2"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
@@ -10674,6 +10684,14 @@ reduce-function-call@^1.0.1:
   integrity sha1-WiAL+S4ON3UXUv5FsKszD9S2vpk=
   dependencies:
     balanced-match "^0.4.2"
+
+redux-api@^0.11.2:
+  version "0.11.2"
+  resolved "https://registry.yarnpkg.com/redux-api/-/redux-api-0.11.2.tgz#8ff407c352f4459c1158e4611387146305abed24"
+  integrity sha512-oUdM7Y52cpjq9eDETE1/7LkpRg69Hig7msFOludc2nK3G6b9bmje5RaUjLPHePncTMqzo7P+QQIGbN5R+9a/UQ==
+  dependencies:
+    fast-apply "0.0.3"
+    qs "5.2.0"
 
 redux-devtools-instrument@^1.9.0:
   version "1.9.6"
