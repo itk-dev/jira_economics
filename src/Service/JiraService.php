@@ -158,10 +158,10 @@ class JiraService
         }
 
         if ($invoice->getRecorded() == "1") {
-            $recorded = "true";
+            $recorded = true;
         }
         else {
-            $recorded = "false";
+            $recorded = false;
         }
 
         return ['name'   => $invoice->getName(),
@@ -181,7 +181,7 @@ class JiraService
             throw new HttpException(400, "Expected integer value for 'id' in request");
         }
 
-        if (isset($invoiceData['recorded']) && !boolval($invoiceData['recorded'])) {
+        if (isset($invoiceData['recorded']) && !in_array($invoiceData['recorded'], [true, false])) {
             throw new HttpException(400, "Expected boolean value for 'recorded' in request");
         }
 

@@ -14,6 +14,12 @@ import Moment from 'react-moment';
 import 'moment-timezone';
 
 class Invoice extends Component {
+  constructor(props) {
+    super(props);
+
+    this.handleRecordSubmit = this.handleRecordSubmit.bind(this);
+    this.handleEditSubmit = this.handleEditSubmit.bind(this);
+  }
   componentDidMount() {
     store.dispatch(fetchInvoice(this.props.params.invoiceId));
     store.dispatch(fetchInvoiceEntries(this.props.params.invoiceId));
@@ -21,18 +27,26 @@ class Invoice extends Component {
   handleEditSubmit = (e) => {
     const id = this.props.params.invoiceId;
     const name = e.invoiceName;
+    const recorded = this.props.selectedInvoice.recorded;
+    const created = this.props.createdAt;
     const invoiceData = {
       id,
-      name
+      name,
+      recorded,
+      created
     }
     store.dispatch(editInvoice(invoiceData));
   }
   handleRecordSubmit = (e) => {
     const id = this.props.params.invoiceId;
-    const recorded = "true";
+    const name = this.props.selectedInvoice.name;
+    const recorded = true;
+    const created = this.props.createdAt;
     const invoiceData = {
       id,
-      recorded
+      name,
+      recorded,
+      created
     }
     store.dispatch(editInvoice(invoiceData));
   }
@@ -44,7 +58,7 @@ class Invoice extends Component {
           <div>ProjectID: {this.props.params.projectId}</div>
           <div>InvoiceID: {this.props.params.invoiceId}</div>
           <div>InvoiceName: {this.props.selectedInvoice.name}</div>
-          <div>InvoiceRecorded: {this.props.selectedInvoice.recorded}</div>
+          <div>InvoiceRecorded: {String(this.props.selectedInvoice.recorded)}</div>
           <div>InvoiceCreated: <Moment format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></div>
           <div>
             <Form onSubmit={this.handleEditSubmit}>

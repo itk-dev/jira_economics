@@ -134,13 +134,16 @@ function selectedInvoice (state = {
 }, action) {
   switch (action.type) {
   case REQUEST_INVOICE:
+  case UPDATE_INVOICE:
     return Object.assign({}, state, {
       isFetching: true,
       receivedAt: null
     });
   case REQUEST_INVOICE_FAILURE:
+  case UPDATE_INVOICE_FAILURE:
     return state;
   case REQUEST_INVOICE_SUCCESS:
+  case UPDATE_INVOICE_SUCCESS:
     return Object.assign({}, state, {
       isFetching: false,
       receivedAt: action.receivedAt,

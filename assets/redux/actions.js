@@ -274,11 +274,12 @@ export function updateInvoiceFailure (err) {
   };
 }
 export const UPDATE_INVOICE_SUCCESS = 'UPDATE_INVOICE_SUCCESS';
-export function updateInvoiceSuccess (invoiceId) {
+export function updateInvoiceSuccess (invoiceData, json) {
   return {
     type: UPDATE_INVOICE_SUCCESS,
     receivedAt: Date.now(),
-    invoiceId: invoiceId
+    invoiceId: invoiceData.id,
+    selectedInvoice: json
   };
 }
 
@@ -291,10 +292,10 @@ export function editInvoice(invoiceData) {
     })
     .then(
       response => response.json(),
-      error => dispatch(updateInvoiceFailure(invoiceData.id, error))
+      error => dispatch(updateInvoiceFailure(invoiceData, error))
     )
     .then(
-      json => dispatch(updateInvoiceSuccess(invoiceData.id, json))
+      json => dispatch(updateInvoiceSuccess(invoiceData, json))
     )
   }
 }
