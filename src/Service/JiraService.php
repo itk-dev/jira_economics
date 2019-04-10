@@ -259,6 +259,36 @@ class JiraService
     }
 
     /**
+     * Put specific invoiceEntry, replacing the invoiceEntry referenced by the given id
+     * @param invoiceEntryData
+     * @return array
+     */
+    public function putInvoiceEntry($invoiceEntryData)
+    {
+        if (empty($invoiceEntryData['id']) || !intval($invoiceEntryData['id'])) {
+            throw new HttpException(400, "Expected integer value for 'id' in request");
+        }
+
+        $repository = $this->entity_manager->getRepository(InvoiceEntry::class);
+        $invoiceEntry = $repository->findOneBy(['id' => $invoiceEntryData['id']]);
+
+        if (!$invoiceEntry) {
+            throw new HttpException(404, 'Unable to update invoiceEntry with id ' . $invoiceEntryData['id'] . ' as it does not already exist');
+        }
+
+        if (!empty($invoiceEntryData['name'])) {
+            $invoiceEntry->setName($invoiceEntryData['name']);
+        }
+
+        $this->entity_manager->persist($invoiceEntry);
+        $this->entity_manager->flush();
+
+        return ['name'      => $invoiceEntry->getName(),
+                'jiraId'    => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
+                'invoiceId' => $invoiceEntry->getInvoice()->getId()];
+    }
+
+    /**
      * Get specific project by Jira project ID
      *
      * @param $jira_id

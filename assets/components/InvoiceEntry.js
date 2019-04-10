@@ -5,7 +5,10 @@ import PageTitle from '../components/PageTitle';
 import store from '../redux/store';
 import { fetchInvoiceEntry } from '../redux/actions';
 import PropTypes from 'prop-types';
+import Button from '@atlaskit/button';
+import Form, {Field} from '@atlaskit/form';
 import Spinner from '@atlaskit/spinner';
+import TextField from '@atlaskit/field-text';
 import rest from '../redux/utils/rest';
 
 export class InvoiceEntry extends Component {
@@ -13,7 +16,18 @@ export class InvoiceEntry extends Component {
     const {dispatch} = this.props;
     dispatch(rest.actions.getInvoiceEntry({id: `${this.props.params.invoiceEntryId}`}));
   }
-
+  handleEditSubmit = (e) => {
+    const {dispatch} = this.props;
+    const id = this.props.params.invoiceEntryId;
+    const name = e.invoiceEntryName;
+    const invoiceEntryData = {
+      id,
+      name,
+    }
+    dispatch(rest.actions.updateInvoiceEntry({id: `${this.props.params.invoiceEntryId}`}, {
+      body: JSON.stringify(invoiceEntryData)
+    }));
+  }
   render () {
     if (this.props.invoiceEntry.data.name) {
       return (
@@ -23,6 +37,18 @@ export class InvoiceEntry extends Component {
           <div>InvoiceID: {this.props.params.invoiceId}</div>
           <div>InvoiceEntryID: {this.props.params.invoiceEntryId}</div>
           <div>InvoiceEntryName: {this.props.invoiceEntry.data.name}</div>
+          <div>
+            <Form onSubmit={this.handleEditSubmit}>
+              {({ formProps }) => (
+                <form {...formProps} name="submit-edit-form">
+                  <Field name="invoiceEntryName" defaultValue={this.props.invoiceEntry.data.name} label="Enter invoice entry name" isRequired>
+                    {({ fieldProps}) => <TextField {...fieldProps} />}
+                  </Field>
+                  <Button type="submit" appearance="primary">Submit</Button>
+                </form>
+              )}
+            </Form>
+          </div>
         </ContentWrapper>
       );
     }
