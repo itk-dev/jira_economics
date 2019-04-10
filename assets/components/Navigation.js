@@ -13,11 +13,11 @@ import {
 } from '@atlaskit/navigation-next';
 import { Link } from 'react-router';
 import store from '../redux/store';
-import { fetchCurrentUserIfNeeded } from '../redux/actions';
 import connect from 'react-redux/es/connect/connect';
 import PropTypes from 'prop-types';
 import { DropdownItemGroup, DropdownItem } from '@atlaskit/dropdown-menu';
 import GlobalNavigation from '@atlaskit/global-navigation';
+import rest from '../redux/utils/rest';
 
 const gridSize = gridSizeFn();
 
@@ -32,7 +32,8 @@ class Navigation extends Component {
   }
 
   componentDidMount() {
-    store.dispatch(fetchCurrentUserIfNeeded());
+    const {dispatch} = this.props;
+    dispatch(rest.actions.getCurrentUser());
   }
 
   renderNavigation = () => (
@@ -118,8 +119,8 @@ const mapStateToProps = state => {
   return {
     // @TODO: Get this from backend.
     jiraUrl: 'https://itkdev.atlassian.net',
-    avatar: state.currentUser.currentUser.hasOwnProperty('avatarUrls') ? state.currentUser.currentUser.avatarUrls['16x16'] : '',
-    userUrl: state.currentUser.currentUser.hasOwnProperty('accountId') ? state.currentUser.currentUser.accountId : '',
+    avatar: state.currentUser.hasOwnProperty('avatarUrls') ? state.currentUser.avatarUrls['16x16'] : '',
+    userUrl: state.currentUser.hasOwnProperty('accountId') ? state.currentUser.accountId : '',
     isFetching: state.currentUser.isFetching
   };
 };

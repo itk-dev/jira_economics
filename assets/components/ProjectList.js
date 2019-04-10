@@ -6,11 +6,11 @@ import Button, { ButtonGroup } from '@atlaskit/button';
 import Icon from '@atlaskit/icon';
 import { Link } from 'react-router';
 import store from '../redux/store';
-import { fetchProjectsIfNeeded } from '../redux/actions';
 import DynamicTable from '@atlaskit/dynamic-table/dist/esm/components/Stateful';
 import PropTypes from 'prop-types';
 import connect from 'react-redux/es/connect/connect';
 import TextField from '@atlaskit/field-text';
+import rest from '../redux/utils/rest';
 
 const createHead = (withWidth) => {
   return {
@@ -43,11 +43,11 @@ const createHead = (withWidth) => {
   };
 };
 const createRows = (projects) => {
-  if (projects === undefined) {
+  if (projects.data.data === undefined) {
     return [];
   }
 
-  return projects.map((project, index) => ({
+  return projects.data.data.map((project, index) => ({
     key: `row-${project.id}`,
     values: {
       name: project.name,
@@ -123,7 +123,8 @@ class ProjectList extends Component {
   }
 
   componentDidMount() {
-    store.dispatch(fetchProjectsIfNeeded());
+    const {dispatch} = this.props;
+    dispatch(rest.actions.getProjects());
   }
 
   onFilterChange(event) {
@@ -170,16 +171,16 @@ class ProjectList extends Component {
 }
 
 ProjectList.propTypes = {
-  projects: PropTypes.array,
+  projects: PropTypes.object,
   projectRows: PropTypes.array,
   isFetching: PropTypes.bool
 };
 
 const mapStateToProps = state => {
-  let projectRows = createRows(state.projects.projects);
+  let projectRows = createRows(state.projects);
 
   return {
-    projects: state.projects.projects,
+    projects: state.projects,
     projectRows: projectRows,
     isFetching: state.projects.isFetching
   };

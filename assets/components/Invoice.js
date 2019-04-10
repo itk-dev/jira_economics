@@ -24,7 +24,7 @@ class Invoice extends Component {
   componentDidMount() {
     const {dispatch} = this.props;
     dispatch(rest.actions.getInvoice({id: `${this.props.params.invoiceId}`}));
-    store.dispatch(fetchInvoiceEntries(this.props.params.invoiceId));
+    dispatch(rest.actions.getInvoiceEntries({id: `${this.props.params.invoiceId}`}));
   }
   // @TODO: consider cleaning up redundancy
   handleEditSubmit = (e) => {
@@ -91,7 +91,7 @@ class Invoice extends Component {
             </Form>
           </div>
           <div>Invoice entries:</div>
-          {this.props.invoiceEntries && this.props.invoiceEntries.map((item) =>
+          {this.props.invoiceEntries.data.data && this.props.invoiceEntries.data.data.map((item) =>
             <div key={item.id}><Link to={`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/${item.id}`}>Link til {item.name}</Link></div>
           )}
         </ContentWrapper>
@@ -106,7 +106,7 @@ class Invoice extends Component {
 Invoice.propTypes = {
   invoice: PropTypes.object,
   createdAt: PropTypes.string,
-  invoiceEntries: PropTypes.array,
+  invoiceEntries: PropTypes.object,
   dispatch: PropTypes.func.isRequired
 };
 
@@ -116,7 +116,7 @@ const mapStateToProps = state => {
   return {
     invoice: state.invoice,
     createdAt: createdAt,
-    invoiceEntries: state.invoiceEntries.invoiceEntries
+    invoiceEntries: state.invoiceEntries
   };
 };
 

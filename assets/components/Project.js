@@ -12,8 +12,8 @@ import rest from '../redux/utils/rest';
 class Project extends Component {
   componentDidMount() {
     const {dispatch} = this.props;
-    dispatch(rest.actions.project({id: `${this.props.params.projectId}`}));
-    store.dispatch(fetchInvoices(this.props.params.projectId));
+    dispatch(rest.actions.getProject({id: `${this.props.params.projectId}`}));
+    dispatch(rest.actions.getInvoices({id: `${this.props.params.projectId}`}));
   }
   render () {
     if (this.props.project.data.name) {
@@ -23,7 +23,7 @@ class Project extends Component {
             {this.props.project.data.name + ' (' + this.props.project.data.jiraId + ')'}
           </PageTitle>
 
-          {this.props.invoices && this.props.invoices.map((item) =>
+          {this.props.invoices.data.data && this.props.invoices.data.data.map((item) =>
             <div key={item.id}><Link to={`/project/${this.props.params.projectId}/${item.id}`}>Link til {item.name}</Link></div>
           )}
         </ContentWrapper>
@@ -36,14 +36,14 @@ class Project extends Component {
 }
 
 Project.propTypes = {
-  invoices: PropTypes.array,
+  invoices: PropTypes.object,
   project: PropTypes.object,
   dispatch: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => {
   return {
-    invoices: state.invoices.invoices,
+    invoices: state.invoices,
     project: state.project
   };
 };
