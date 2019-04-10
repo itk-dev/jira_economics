@@ -6,21 +6,23 @@ import store from '../redux/store';
 import { fetchInvoiceEntry } from '../redux/actions';
 import PropTypes from 'prop-types';
 import Spinner from '@atlaskit/spinner';
+import rest from '../redux/utils/rest';
 
 export class InvoiceEntry extends Component {
   componentDidMount() {
-    store.dispatch(fetchInvoiceEntry(this.props.params.invoiceEntryId));
+    const {dispatch} = this.props;
+    dispatch(rest.actions.getInvoiceEntry({id: `${this.props.params.invoiceEntryId}`}));
   }
 
   render () {
-    if (this.props.selectedInvoiceEntry.name) {
+    if (this.props.invoiceEntry.data.name) {
       return (
         <ContentWrapper>
           <PageTitle>Invoice Entry</PageTitle>
           <div>ProjectID: {this.props.params.projectId}</div>
           <div>InvoiceID: {this.props.params.invoiceId}</div>
           <div>InvoiceEntryID: {this.props.params.invoiceEntryId}</div>
-          <div>InvoiceEntryName: {this.props.selectedInvoiceEntry.name}</div>
+          <div>InvoiceEntryName: {this.props.invoiceEntry.data.name}</div>
         </ContentWrapper>
       );
     }
@@ -31,12 +33,12 @@ export class InvoiceEntry extends Component {
 }
 
 InvoiceEntry.propTypes = {
-  selectedInvoiceEntry: PropTypes.object
+  invoiceEntry: PropTypes.object
 };
 
 const mapStateToProps = state => {
   return {
-    selectedInvoiceEntry: state.selectedInvoiceEntry.selectedInvoiceEntry
+    invoiceEntry: state.invoiceEntry
   };
 };
 

@@ -1,12 +1,10 @@
 import { combineReducers } from 'redux';
+import rest from "./utils/rest";
 
 import {
   REQUEST_PROJECTS, RECEIVE_PROJECTS,
   REQUEST_CURRENT_USER, RECEIVE_CURRENT_USER,
-  REQUEST_PROJECT, REQUEST_PROJECT_FAILURE, REQUEST_PROJECT_SUCCESS,
   REQUEST_INVOICES, REQUEST_INVOICES_FAILURE, REQUEST_INVOICES_SUCCESS,
-  REQUEST_INVOICE, REQUEST_INVOICE_FAILURE, REQUEST_INVOICE_SUCCESS,
-  REQUEST_INVOICE_ENTRY, REQUEST_INVOICE_ENTRY_FAILURE, REQUEST_INVOICE_ENTRY_SUCCESS,
   REQUEST_INVOICE_ENTRIES, REQUEST_INVOICE_ENTRIES_FAILURE, REQUEST_INVOICE_ENTRIES_SUCCESS,
   UPDATE_INVOICE, UPDATE_INVOICE_FAILURE, UPDATE_INVOICE_SUCCESS
 } from './actions';
@@ -103,91 +101,12 @@ function currentUser (state = {
   }
 }
 
-function selectedProject (state = {
-  isFetching: false,
-  receivedAt: null,
-  selectedProject: {}
-}, action) {
-  switch (action.type) {
-  case REQUEST_PROJECT:
-    return Object.assign({}, state, {
-      isFetching: true,
-      receivedAt: null
-    });
-  case REQUEST_PROJECT_FAILURE:
-    return state;
-  case REQUEST_PROJECT_SUCCESS:
-    return Object.assign({}, state, {
-      isFetching: false,
-      receivedAt: action.receivedAt,
-      selectedProject: action.selectedProject,
-    });
-  default:
-    return state;
-  }
-}
-
-function selectedInvoice (state = {
-  isFetching: false,
-  receivedAt: null,
-  selectedInvoice: {}
-}, action) {
-  switch (action.type) {
-  case REQUEST_INVOICE:
-  case UPDATE_INVOICE:
-    return Object.assign({}, state, {
-      isFetching: true,
-      receivedAt: null
-    });
-  case REQUEST_INVOICE_FAILURE:
-  case UPDATE_INVOICE_FAILURE:
-    return state;
-  case REQUEST_INVOICE_SUCCESS:
-  case UPDATE_INVOICE_SUCCESS:
-    return Object.assign({}, state, {
-      isFetching: false,
-      receivedAt: action.receivedAt,
-      selectedInvoice: action.selectedInvoice,
-    });
-  default:
-    return state;
-  }
-}
-
-function selectedInvoiceEntry (state = {
-  isFetching: false,
-  receivedAt: null,
-  selectedInvoiceEntry: {}
-}, action) {
-  switch (action.type) {
-  case REQUEST_INVOICE_ENTRY:
-    return Object.assign({}, state, {
-      isFetching: true,
-      receivedAt: null
-    });
-  case REQUEST_INVOICE_ENTRY_FAILURE:
-    return state;
-  case REQUEST_INVOICE_ENTRY_SUCCESS:
-    return Object.assign({}, state, {
-      isFetching: false,
-      receivedAt: action.receivedAt,
-      selectedInvoiceEntry: action.selectedInvoiceEntry,
-    });
-  default:
-    return state;
-  }
-}
-
-
-
 const rootReducer = combineReducers({
   projects,
   invoices,
   invoiceEntries,
   currentUser,
-  selectedProject,
-  selectedInvoice,
-  selectedInvoiceEntry
+  ...rest.reducers
 });
 
 export default rootReducer;

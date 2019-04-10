@@ -7,18 +7,20 @@ import store from '../redux/store';
 import { fetchProject, fetchInvoices } from '../redux/actions';
 import PropTypes from 'prop-types';
 import Spinner from '@atlaskit/spinner';
+import rest from '../redux/utils/rest';
 
 class Project extends Component {
   componentDidMount() {
-    store.dispatch(fetchProject(this.props.params.projectId));
+    const {dispatch} = this.props;
+    dispatch(rest.actions.project({id: `${this.props.params.projectId}`}));
     store.dispatch(fetchInvoices(this.props.params.projectId));
   }
   render () {
-    if (this.props.selectedProject.name) {
+    if (this.props.project.data.name) {
       return (
         <ContentWrapper>
           <PageTitle>
-            {this.props.selectedProject.name + ' (' + this.props.selectedProject.jiraId + ')'}
+            {this.props.project.data.name + ' (' + this.props.project.data.jiraId + ')'}
           </PageTitle>
 
           {this.props.invoices && this.props.invoices.map((item) =>
@@ -34,14 +36,15 @@ class Project extends Component {
 }
 
 Project.propTypes = {
-  selectedProject: PropTypes.object,
-  invoices: PropTypes.array
+  invoices: PropTypes.array,
+  project: PropTypes.object,
+  dispatch: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => {
   return {
-    selectedProject: state.selectedProject.selectedProject,
-    invoices: state.invoices.invoices
+    invoices: state.invoices.invoices,
+    project: state.project
   };
 };
 
