@@ -13,6 +13,7 @@ import TextField from '@atlaskit/field-text';
 import Moment from 'react-moment';
 import 'moment-timezone';
 import rest from '../redux/utils/rest';
+import { push } from 'react-router-redux';
 
 class Invoice extends Component {
   constructor(props) {
@@ -75,6 +76,8 @@ class Invoice extends Component {
   handleDeleteSubmit = (e) => {
     const {dispatch} = this.props;
     dispatch(rest.actions.deleteInvoice({id: `${this.props.params.invoiceId}`}));
+    // @TODO: Check that deletion is successful before navigating back to project page
+    dispatch(push(`/project/${this.props.params.projectId}`));
   }
   render () {
     if (this.props.invoice.data.name) {

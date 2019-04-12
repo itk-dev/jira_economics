@@ -378,6 +378,15 @@
     babel-runtime "^6.26.0"
     uuid "^3.1.0"
 
+"@atlaskit/icon@^16.0.5":
+  version "16.0.8"
+  resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-16.0.8.tgz#708a1a78529931149316fdeb2af055f0cc8e6681"
+  integrity sha512-G5LBxmI5vggCtO1IbJbyE9cBDvHSyzhN/FiQfWZnHnVuMXbwxzxd+zmyTRwfck6omTZyMakr9Nz/cHcp1UlLhA==
+  dependencies:
+    "@atlaskit/theme" "^8.1.6"
+    "@babel/runtime" "^7.0.0"
+    uuid "^3.1.0"
+
 "@atlaskit/icon@^16.0.6":
   version "16.0.6"
   resolved "https://registry.yarnpkg.com/@atlaskit/icon/-/icon-16.0.6.tgz#cc13f8beada180f8c1c89fde38de0999b092eed6"
@@ -733,6 +742,15 @@
   version "8.0.2"
   resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-8.0.2.tgz#8aa85edafcc1c620a6f8a5cb6f9b605d55648fa2"
   integrity sha512-3FFwFJq7GKOpGH/ggLSaOxkALrKNp9UjeRX/7csYoERh+w7QOTRwqycTNHg8jvA0/IG8o0kTSE/gOMNx65dCQQ==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    exenv "^1.2.2"
+    prop-types "^15.5.10"
+
+"@atlaskit/theme@^8.1.6":
+  version "8.1.6"
+  resolved "https://registry.yarnpkg.com/@atlaskit/theme/-/theme-8.1.6.tgz#3638d1b443c9fac5430643c08688f81f90c63370"
+  integrity sha512-RiYUEyXPw3TBXgeAx/Kx1woQxJJJShKcJOMKas1MTEiEPFV0KZ8JkV4XwYJW3op9g0PpdcsyGGhq+rgoY5rrmw==
   dependencies:
     "@babel/runtime" "^7.0.0"
     exenv "^1.2.2"
@@ -10494,6 +10512,11 @@ react-router-dom@^4.2.2:
     prop-types "^15.6.1"
     react-router "^4.3.1"
     warning "^4.0.1"
+
+react-router-redux@^4.0.8:
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/react-router-redux/-/react-router-redux-4.0.8.tgz#227403596b5151e182377dab835b5d45f0f8054e"
+  integrity sha1-InQDWWtRUeGCN32rg1tdRfD4BU4=
 
 react-router@^3.2.0:
   version "3.2.1"

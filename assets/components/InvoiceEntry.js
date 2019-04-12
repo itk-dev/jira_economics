@@ -10,6 +10,7 @@ import Form, {Field} from '@atlaskit/form';
 import Spinner from '@atlaskit/spinner';
 import TextField from '@atlaskit/field-text';
 import rest from '../redux/utils/rest';
+import { push } from 'react-router-redux';
 
 export class InvoiceEntry extends Component {
   componentDidMount() {
@@ -31,6 +32,8 @@ export class InvoiceEntry extends Component {
   handleDeleteSubmit = (e) => {
     const {dispatch} = this.props;
     dispatch(rest.actions.deleteInvoiceEntry({id: `${this.props.params.invoiceEntryId}`}));
+    // @TODO: Check that deletion is successful before navigating back to invoice page
+    dispatch(push(`/project/${this.props.params.projectId}/${this.props.params.invoiceId}`));
   }
   render () {
     if (this.props.invoiceEntry.data.name) {
