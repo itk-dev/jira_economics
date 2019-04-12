@@ -69,13 +69,22 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/invoice_entry/{invoiceEntryId}", name="api_invoice_entry", methods={"GET"})
+     * @Route("/invoice_entry/{invoiceEntryId}", name="api_invoice_entry_get", methods={"GET"})
      * defaults={"invoiceEntryId"="...."})
     */
     public function invoiceEntryGetAction(JiraService $jiraService, Request $request)
     {
         $invoiceEntryId = $request->get('invoiceEntryId');
         $result = $jiraService->getInvoiceEntry($invoiceEntryId);
+        return new JsonResponse($result);
+    }
+
+    /**
+     * @Route("/invoice_entry", name="api_invoice_entry_post", methods={"POST"})
+     */
+    public function invoiceEntryPostAction(JiraService $jiraService, Request $request) {
+        $invoiceEntryData = json_decode($request->getContent(), true);
+        $result = $jiraService->postInvoiceEntry($invoiceEntryData);
         return new JsonResponse($result);
     }
 

@@ -44,7 +44,7 @@ export class InvoiceEntry extends Component {
                   <Field name="invoiceEntryName" defaultValue={this.props.invoiceEntry.data.name} label="Enter invoice entry name" isRequired>
                     {({ fieldProps}) => <TextField {...fieldProps} />}
                   </Field>
-                  <Button type="submit" appearance="primary">Submit</Button>
+                  <Button type="submit" appearance="primary">Submit invoice entry name</Button>
                 </form>
               )}
             </Form>

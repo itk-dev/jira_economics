@@ -259,6 +259,41 @@ class JiraService
     }
 
     /**
+     * Post new invoiceEntry, creating a new entity referenced by the returned id
+     * @return invoiceEntryData
+     * @return array
+     */
+    public function postInvoiceEntry($invoiceEntryData)
+    {
+        if (empty($invoiceEntryData['invoiceId']) || !intval($invoiceEntryData['invoiceId'])) {
+            throw new HttpException(400, "Expected integer value for 'invoiceId' in request");
+        }
+
+        if (empty($invoiceEntryData['name'])) {
+            throw new HttpException(400, "Missing 'name' for new invoice entry in request");
+        }
+
+        $repository = $this->entity_manager->getRepository(Invoice::class);
+        $invoice = $repository->findOneBy(['id' => $invoiceEntryData['invoiceId']]);
+
+        if (!$invoice) {
+            throw new HttpException(400, "Invoice with id " . $invoiceEntryData['invoiceId'] . " not found");
+        }
+
+        $invoiceEntry = new InvoiceEntry();
+        $invoiceEntry->setName($invoiceEntryData['name']);
+        $invoiceEntry->setInvoice($invoice);
+
+        $this->entity_manager->persist($invoiceEntry);
+        $this->entity_manager->flush();
+
+        return ['invoiceEntryId'    => $invoiceEntry->getId(),
+                'name'              => $invoiceEntry->getName(),
+                'jiraId'            => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
+                'invoiceId'         => $invoiceEntry->getInvoice()->getId()];
+    }
+
+    /**
      * Put specific invoiceEntry, replacing the invoiceEntry referenced by the given id
      * @param invoiceEntryData
      * @return array

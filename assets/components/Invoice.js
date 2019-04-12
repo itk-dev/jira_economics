@@ -20,6 +20,7 @@ class Invoice extends Component {
 
     this.handleRecordSubmit = this.handleRecordSubmit.bind(this);
     this.handleEditSubmit = this.handleEditSubmit.bind(this);
+    this.state = { invoiceEntryName: '' };
   }
   componentDidMount() {
     const {dispatch} = this.props;
@@ -59,6 +60,18 @@ class Invoice extends Component {
       body: JSON.stringify(invoiceData)
     }));
   }
+  handleCreateSubmit = (e) => {
+    const {dispatch} = this.props;
+    const invoiceId = this.props.params.invoiceId;
+    const name = e.invoiceEntryName;
+    const invoiceEntryData = {
+      invoiceId,
+      name
+    }
+    dispatch(rest.actions.createInvoiceEntry({}, {
+      body: JSON.stringify(invoiceEntryData)
+    }));
+  }
   render () {
     if (this.props.invoice.data.name) {
       return (
@@ -94,6 +107,19 @@ class Invoice extends Component {
           {this.props.invoiceEntries.data.data && this.props.invoiceEntries.data.data.map((item) =>
             <div key={item.id}><Link to={`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/${item.id}`}>Link til {item.name}</Link></div>
           )}
+          <div>Create new invoice entry</div>
+          <div>
+            <Form onSubmit={this.handleCreateSubmit}>
+                {({ formProps }) => (
+                  <form {...formProps} name="submit-create-form">
+                    <Field name="invoiceEntryName" defaultValue={this.state.invoiceEntryName} label="Enter invoice entry name for new invoice" isRequired>
+                      {({ fieldProps}) => <TextField {...fieldProps} />}
+                    </Field>
+                    <Button type="submit" appearance="primary">Submit new invoice entry</Button>
+                  </form>
+                )}
+            </Form>
+          </div>
         </ContentWrapper>
       );
     }
