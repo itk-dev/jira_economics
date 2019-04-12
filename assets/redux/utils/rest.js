@@ -16,6 +16,13 @@ export default reduxApi({
             method: "put"
         }
     },
+    createInvoice: {
+        reducerName: "invoice",
+        url: "/jira_api/invoice",
+        options: {
+            method: "post"
+        }
+    },
     getInvoiceEntry: {
         reducerName: "invoiceEntry",
         url: "/jira_api/invoice_entry/:id"

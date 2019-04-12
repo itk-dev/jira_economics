@@ -171,6 +171,44 @@ class JiraService
     }
 
     /**
+     * Post new invoice, creating a new entity referenced by the returned id
+     * @return invoiceData
+     * @return array
+     */
+    public function postInvoice($invoiceData)
+    {
+        if (empty($invoiceData['projectId']) || !intval($invoiceData['projectId'])) {
+            throw new HttpException(400, "Expected integer value for 'projectId' in request");
+        }
+
+        if (empty($invoiceData['name'])) {
+            throw new HttpException(400, "Expected 'name' in request");
+        }
+
+        $repository = $this->entity_manager->getRepository(Project::class);
+        $project = $repository->findOneBy(['jiraId' => $invoiceData['projectId']]);
+
+        if (!$project) {
+            throw new HttpException(400, "Project with id " . $invoiceData['projectId'] . " not found");
+        }
+
+        $invoice = new Invoice();
+        $invoice->setName($invoiceData['name']);
+        $invoice->setProject($project);
+        $invoice->setRecorded(false);
+        $invoice->setCreated(new \DateTime("now"));
+
+        $this->entity_manager->persist($invoice);
+        $this->entity_manager->flush();
+
+        return ['invoiceId' => $invoice->getId(),
+                'name'      => $invoice->getName(),
+                'jiraId'    => $invoice->getProject()->getJiraId(),
+                'recorded'  => $invoice->getRecorded(),
+                'created'   => $invoice->getCreated()];
+    }
+
+    /**
      * Put specific invoice, replacing the invoice referenced by the given id
      * @param invoiceData
      * @return array

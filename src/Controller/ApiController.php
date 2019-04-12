@@ -47,6 +47,15 @@ class ApiController extends Controller
     }
 
     /**
+     * @Route("/invoice", name="api_invoice_post", methods={"POST"})
+     */
+    public function invoicePostAction(JiraService $jiraService, Request $request) {
+        $invoiceData = json_decode($request->getContent(), true);
+        $result = $jiraService->postInvoice($invoiceData);
+        return new JsonResponse($result);
+    }
+
+    /**
      * @Route("/invoice/{jiraProjectId}", name="api_invoice_put", methods={"PUT"})
      * defaults={"jiraProjectId"="...."})
      */

@@ -6,14 +6,35 @@ import { Link } from 'react-router';
 import store from '../redux/store';
 import { fetchProject, fetchInvoices } from '../redux/actions';
 import PropTypes from 'prop-types';
+import Button from '@atlaskit/button';
+import Form, {Field} from '@atlaskit/form';
 import Spinner from '@atlaskit/spinner';
+import TextField from '@atlaskit/field-text';
 import rest from '../redux/utils/rest';
 
 class Project extends Component {
+  constructor(props) {
+    super(props);
+
+    this.handleCreateSubmit = this.handleCreateSubmit.bind(this);
+    this.state = { invoiceName: '' };
+  }
   componentDidMount() {
     const {dispatch} = this.props;
     dispatch(rest.actions.getProject({id: `${this.props.params.projectId}`}));
     dispatch(rest.actions.getInvoices({id: `${this.props.params.projectId}`}));
+  }
+  handleCreateSubmit = (e) => {
+    const {dispatch} = this.props;
+    const projectId = this.props.params.projectId;
+    const name = e.invoiceName;
+    const invoiceData = {
+      projectId,
+      name
+    }
+    dispatch(rest.actions.createInvoice({}, {
+      body: JSON.stringify(invoiceData)
+    }));
   }
   render () {
     if (this.props.project.data.name) {
@@ -26,6 +47,19 @@ class Project extends Component {
           {this.props.invoices.data.data && this.props.invoices.data.data.map((item) =>
             <div key={item.id}><Link to={`/project/${this.props.params.projectId}/${item.id}`}>Link til {item.name}</Link></div>
           )}
+          <div>Create new invoice</div>
+          <div>
+            <Form onSubmit={this.handleCreateSubmit}>
+                {({ formProps }) => (
+                  <form {...formProps} name="submit-create-form">
+                    <Field name="invoiceName" defaultValue={this.state.invoiceName} label="Enter invoice name for new invoice" isRequired>
+                      {({ fieldProps}) => <TextField {...fieldProps} />}
+                    </Field>
+                    <Button type="submit" appearance="primary">Submit new invoice</Button>
+                  </form>
+                )}
+            </Form>
+          </div>
         </ContentWrapper>
       );
     }
