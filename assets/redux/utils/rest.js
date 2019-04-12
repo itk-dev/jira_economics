@@ -23,6 +23,16 @@ export default reduxApi({
             method: "post"
         }
     },
+    deleteInvoice: {
+        reducerName: "invoice",
+        url: "/jira_api/invoice/:id",
+        options: {
+            method: "delete",
+            headers: {
+                "Access-Control-Request-Method": "DELETE"
+            },
+        },
+    },
     getInvoiceEntry: {
         reducerName: "invoiceEntry",
         url: "/jira_api/invoice_entry/:id"
@@ -40,6 +50,16 @@ export default reduxApi({
         options: {
             method : "post"
         }
+    },
+    deleteInvoiceEntry: {
+        reducerName: "invoiceEntry",
+        url: "/jira_api/invoice_entry/:id",
+        options: {
+            method: "delete",
+            headers: {
+                "Access-Control-Request-Method": "DELETE"
+            },
+        },
     },
     getInvoices: {
         reducerName: "invoices",

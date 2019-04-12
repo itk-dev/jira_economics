@@ -72,6 +72,10 @@ class Invoice extends Component {
       body: JSON.stringify(invoiceEntryData)
     }));
   }
+  handleDeleteSubmit = (e) => {
+    const {dispatch} = this.props;
+    dispatch(rest.actions.deleteInvoice({id: `${this.props.params.invoiceId}`}));
+  }
   render () {
     if (this.props.invoice.data.name) {
       return (
@@ -116,6 +120,15 @@ class Invoice extends Component {
                       {({ fieldProps}) => <TextField {...fieldProps} />}
                     </Field>
                     <Button type="submit" appearance="primary">Submit new invoice entry</Button>
+                  </form>
+                )}
+            </Form>
+          </div>
+          <div>
+            <Form onSubmit={this.handleDeleteSubmit}>
+                {({ formProps }) => (
+                  <form {...formProps} name="submit-delete-form">
+                    <Button type="submit" appearance="danger">Delete invoice</Button>
                   </form>
                 )}
             </Form>

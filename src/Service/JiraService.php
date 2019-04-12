@@ -249,6 +249,27 @@ class JiraService
     }
 
     /**
+     * Delete specific invoice referenced by the given id
+     * @param invoiceId
+     */
+    public function deleteInvoice($invoiceId)
+    {
+        if (empty($invoiceId) || !intval($invoiceId)) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
+        $repository = $this->entity_manager->getRepository(Invoice::class);
+        $invoice = $repository->findOneBy(['id' => $invoiceId]);
+
+        if (!$invoice) {
+            throw new HttpException(404, 'Invoice with id ' . $invoiceId . ' did not exist');
+        }
+
+        $this->entity_manager->remove($invoice);
+        $this->entity_manager->flush();
+    }
+
+    /**
      * Get invoiceEntries for specific invoice
      * @param invoice_id
      * @return array
@@ -359,6 +380,27 @@ class JiraService
         return ['name'      => $invoiceEntry->getName(),
                 'jiraId'    => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
                 'invoiceId' => $invoiceEntry->getInvoice()->getId()];
+    }
+
+    /**
+     * Delete specific invoice entry referenced by the given id
+     * @param invoiceEntryId
+     */
+    public function deleteInvoiceEntry($invoiceEntryId)
+    {
+        if (empty($invoiceEntryId) || !intval($invoiceEntryId)) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
+        $repository = $this->entity_manager->getRepository(InvoiceEntry::class);
+        $invoiceEntry = $repository->findOneBy(['id' => $invoiceEntryId]);
+
+        if (!$invoiceEntry) {
+            throw new HttpException(404, 'InvoiceEntry with id ' . $invoiceEntryId . ' did not exist');
+        }
+
+        $this->entity_manager->remove($invoiceEntry);
+        $this->entity_manager->flush();
     }
 
     /**

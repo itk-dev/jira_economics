@@ -67,6 +67,17 @@ class ApiController extends Controller
     }
 
     /**
+     * @Route("/invoice/{invoiceId}", name="api_invoice_delete", methods={"DELETE"})
+     * defaults={"invoiceId"="...."})
+     */
+    public function invoiceDeleteAction(JiraService $jiraService, Request $request)
+    {
+        $invoiceId = $request->get('invoiceId');
+        $result = $jiraService->deleteInvoice($invoiceId);
+        return new JsonResponse($result);
+    }
+
+    /**
      * @Route("/invoices/{invoiceId}", name="api_invoices")
      * defaults={"invoiceId"="...."})
     */
@@ -105,6 +116,17 @@ class ApiController extends Controller
     {
         $invoiceEntryData = json_decode($request->getContent(), true);
         $result = $jiraService->putInvoiceEntry($invoiceEntryData);
+        return new JsonResponse($result);
+    }
+
+    /**
+     * @Route("/invoice_entry/{invoiceEntryId}", name="api_invoice_entry_delete", methods={"DELETE"})
+     * defaults={"invoiceEntryId"="...."})
+     */
+    public function invoiceEntryDeleteAction(JiraService $jiraService, Request $request)
+    {
+        $invoiceEntryId = $request->get('invoiceEntryId');
+        $result = $jiraService->deleteInvoiceEntry($invoiceEntryId);
         return new JsonResponse($result);
     }
 
