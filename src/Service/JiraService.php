@@ -539,7 +539,13 @@ class JiraService
                 $jiraIssue->setSummary($jiraIssueResult->fields->summary);
                 // @TODO: should we add other users than the assignee?
                 $jiraIssue->setJiraUsers([$jiraIssueResult->fields->assignee->key]);
-                $jiraIssues[] = $jiraIssueResult;
+                $jiraIssues[] = ['issue_id'     => $jiraIssue->getIssueId(),
+                                 'summary'      => $jiraIssue->getSummary(),
+                                 'created'      => $jiraIssue->getCreated(),
+                                 'finished'     => $jiraIssue->getFinished(),
+                                 'jira_users'   => $jiraIssue->getJiraUsers(),
+                                 'time_spent'   => $jiraIssue->getTimeSpent(),
+                                 'project_id'   => $jiraIssue->getProject()->getId()];
 
                 $this->entity_manager->persist($jiraIssue);
             }

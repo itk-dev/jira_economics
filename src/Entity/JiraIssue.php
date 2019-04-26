@@ -53,6 +53,11 @@ class JiraIssue
      */
     private $project;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\InvoiceEntry", inversedBy="jiraIssues")
+     */
+    private $InvoiceEntryId;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -138,6 +143,18 @@ class JiraIssue
     public function setProject(?Project $project): self
     {
         $this->project = $project;
+
+        return $this;
+    }
+
+    public function getInvoiceEntryId(): ?InvoiceEntry
+    {
+        return $this->InvoiceEntryId;
+    }
+
+    public function setInvoiceEntryId(?InvoiceEntry $InvoiceEntryId): self
+    {
+        $this->InvoiceEntryId = $InvoiceEntryId;
 
         return $this;
     }
