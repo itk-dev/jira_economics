@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Invoice;
 use App\Entity\InvoiceEntry;
+use App\Entity\JiraIssue;
 use App\Entity\Project;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
@@ -189,7 +190,7 @@ class JiraService
         $project = $repository->findOneBy(['jiraId' => $invoiceData['projectId']]);
 
         if (!$project) {
-            throw new HttpException(400, "Project with id " . $invoiceData['projectId'] . " not found");
+            throw new HttpException(404, "Project with id " . $invoiceData['projectId'] . " not found");
         }
 
         $invoice = new Invoice();
@@ -434,6 +435,7 @@ class JiraService
         $project->setName($result->name);
         $project->setUrl($result->self);
         $avatarUrls = $result->avatarUrls;
+        // @TODO: cleanup decode + encode
         $avatarUrlsArr = json_decode(json_encode($avatarUrls, TRUE), TRUE);
         $avatarUrl = $avatarUrlsArr['48x48'];
         $project->setAvatarUrl($avatarUrl);
@@ -487,6 +489,70 @@ class JiraService
         $result = $this->get('/rest/api/3/myself');
 
         return $result;
+    }
+
+    /**
+     * Get jiraIssues for project
+     * @param $jira_id
+     * @return array
+     */
+    public function getJiraIssues($jiraProjectId) {
+        $jiraIssues = [];
+
+        if (!intval($jiraProjectId)) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
+        $repository = $this->entity_manager->getRepository(Project::class);
+        $project = $repository->findOneBy(['jiraId' => $jiraProjectId]);
+
+        if (!$project) {
+            throw new HttpException(404, 'Project with id ' . $jiraProjectId . ' not found');
+        }
+
+        $start = 0;
+
+        while (true) {
+            try {
+                $results = $this->get('rest/api/3/search?jql=project=' . $jiraProjectId . '&maxResults=1000&startAt=' . $start);
+            }
+            catch (HttpException $e) {
+                throw $e;
+            }
+            foreach ($results->issues as $jiraIssueResult) {
+                $repository = $this->entity_manager->getRepository(JiraIssue::class);
+                $jiraIssue = $repository->findOneBy(['issueId' => $jiraIssueResult->id]);
+
+                if (!$jiraIssue) {
+                    $jiraIssue = new JiraIssue();
+                }
+
+                $jiraIssue->setIssueId($jiraIssueResult->id);
+                $jiraIssue->setProject($project);
+
+                if (!empty($jiraIssueResult->fields->timespent)) {
+                    $jiraIssue->setTimeSpent($jiraIssueResult->fields->timespent);
+                }
+
+                $jiraIssue->setCreated(new \DateTime($jiraIssueResult->fields->created));
+                $jiraIssue->setFinished(new \DateTime($jiraIssueResult->fields->resolutiondate));
+                $jiraIssue->setSummary($jiraIssueResult->fields->summary);
+                // @TODO: should we add other users than the assignee?
+                $jiraIssue->setJiraUsers([$jiraIssueResult->fields->assignee->key]);
+                $jiraIssues[] = $jiraIssueResult;
+
+                $this->entity_manager->persist($jiraIssue);
+            }
+
+            $start += 50;
+
+            if ($start > $results->total) {
+                break;
+            }
+        }
+        $this->entity_manager->flush();
+
+        return $jiraIssues;
     }
 
 }
