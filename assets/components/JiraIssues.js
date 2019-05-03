@@ -8,65 +8,119 @@ import PropTypes from 'prop-types';
 import Moment from 'react-moment';
 import 'moment-timezone';
 import rest from '../redux/utils/rest';
+import ReactTable from 'react-table';
+import '!style-loader!css-loader!react-table/react-table.css';
+
+function makeIssueColumns(jiraIssues) {
+  if (jiraIssues.data.data === undefined) {
+    return [];
+  }
+  return jiraIssues.data.data.map((item, i) => ({
+    key: `row-${i}`,
+    id: item.issue_id,
+    summary: item.summary,
+    created: item.created.date,
+    finished: item.finished.date,
+    invoiceStatus: "?",
+    jiraUsers: item.jiraUsers,
+    timeSpent: item.time_spent ? (item.time_spent / 3600) : "N/A"
+  }));
+}
+
+const columns = [
+  {
+    Header: "Issue",
+    accessor: "summary"
+  },
+  // @TODO: fix date format
+  {
+    Header: "Oprettet",
+    id: "created",
+    accessor: "created"
+  },
+  {
+    Header: "Færdiggjort",
+    id: "finished",
+    accessor: "finished"
+  },
+  {
+    Header: "Fakturastatus",
+    accessor: "invoiceStatus"
+  },
+  // @TODO: fix users not showing
+  {
+    Header: "Jirabrugere",
+    accessor: "jiraUsers"
+  },
+  {
+    Header: "Registrerede timer",
+    accessor: "timeSpent"
+  }
+]
 
 class JiraIssues extends Component {
   constructor(props) {
     super(props);
+    this.toggleRow = this.toggleRow.bind(this);
+    this.state = { selected: {}, selectAll: 0 };
   }
+
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch(rest.actions.getJiraIssues({ id: `${this.props.params.projectId}` }));
   }
+
+  toggleRow(issueId) {
+    const newSelected = Object.assign({}, this.state.selected);
+    newSelected[issueId] = !this.state.selected[issueId];
+    this.setState({
+      selected: newSelected,
+      selectAll: 2
+    });
+  }
+
+  toggleSelectAll() {
+    let newSelected = {};
+
+    if (this.state.selectAll === 0) {
+      this.props.issueColumns.forEach(x => {
+        newSelected[x.issueId] = true;
+        console.log("Iterating");
+      });
+    }
+    this.setState({
+      selected: newSelected,
+      selectAll: this.state.selectAll === 0 ? 1 : 0
+    });
+  }
+
   render() {
     return (
-      // @TODO: Cleanup redundancy in if/else
       <ContentWrapper>
         <PageTitle>Jira Issues</PageTitle>
         <div>Vælg issues fra Jira</div>
-        <table>
-          <thead>
-            <tr>
-              <td>Issue</td><td>Oprettet</td><td>Done</td><td>Fakturastatus</td><td>Jira brugere</td><td>Registrerede timer</td>
-            </tr>
-          </thead>
-          <tbody>
-            {this.props.jiraIssues.data.data && this.props.jiraIssues.data.data.map(function (item, i) {
-              if (item.time_spent != null) {
-                return <tr key={i}>
-                  <td>{item.summary}</td>
-                  <td><Moment format="YYYY-MM-DD HH:mm">{item.created.date}</Moment></td>
-                  <td><Moment format="YYYY-MM-DD HH:mm">{item.finished.date}</Moment></td>
-                  <td>?</td>
-                  <td>Users go here...</td>
-                  <td>{item.time_spent / 3600}</td>
-                </tr>;
-              }
-              else {
-                return <tr key={i}>
-                  <td>{item.summary}</td>
-                  <td><Moment format="YYYY-MM-DD HH:mm">{item.created.date}</Moment></td>
-                  <td><Moment format="YYYY-MM-DD HH:mm">{item.finished.date}</Moment></td>
-                  <td>?</td>
-                  <td>Users go here...</td>
-                  <td>N/A</td>
-                </tr>;
-              }
-            })}
-          </tbody>
-        </table>
+        <ReactTable
+          data={this.props.issueColumns}
+          columns={columns}
+          defaultPageSize={10}
+          defaultSorted={[{ id: "issueId", desc: false }]}
+        />
       </ContentWrapper>
     );
   }
-  //{item.jira_users}
 }
 
 JiraIssues.propTypes = {
-  jiraIssues: PropTypes.object
+  jiraIssues: PropTypes.object,
+  issueColumns: PropTypes.array
 };
 
 const mapStateToProps = state => {
+  let issueColumns = makeIssueColumns(state.jiraIssues);
+
   return {
-    jiraIssues: state.jiraIssues
+    jiraIssues: state.jiraIssues,
+    issueColumns: issueColumns
   };
 };
 
