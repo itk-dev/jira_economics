@@ -5,11 +5,11 @@ import PageTitle from '../components/PageTitle';
 import store from '../redux/store';
 import { getJiraIssues } from '../redux/actions';
 import PropTypes from 'prop-types';
-import Moment from 'react-moment';
 import 'moment-timezone';
 import rest from '../redux/utils/rest';
 import ReactTable from 'react-table';
 import '!style-loader!css-loader!react-table/react-table.css';
+import moment from 'moment';
 
 function makeIssueColumns(jiraIssues) {
   if (jiraIssues.data.data === undefined) {
@@ -22,7 +22,7 @@ function makeIssueColumns(jiraIssues) {
     created: item.created.date,
     finished: item.finished.date,
     invoiceStatus: "?",
-    jiraUsers: item.jiraUsers,
+    jiraUsers: item.jira_users,
     timeSpent: item.time_spent ? (item.time_spent / 3600) : "N/A"
   }));
 }
@@ -32,25 +32,30 @@ const columns = [
     Header: "Issue",
     accessor: "summary"
   },
-  // @TODO: fix date format
   {
     Header: "Oprettet",
     id: "created",
-    accessor: "created"
+    accessor: d => {
+      return moment(d.created).format("YYYY-MM-DD HH:mm")
+    }
   },
   {
     Header: "Færdiggjort",
     id: "finished",
-    accessor: "finished"
+    accessor: d => {
+      return moment(d.finished).format("YYYY-MM-DD HH:mm")
+    }
   },
   {
     Header: "Fakturastatus",
     accessor: "invoiceStatus"
   },
-  // @TODO: fix users not showing
   {
     Header: "Jirabrugere",
-    accessor: "jiraUsers"
+    id: "jiraUsers",
+    accessor: d => {
+      return d.jiraUsers
+    }
   },
   {
     Header: "Registrerede timer",
