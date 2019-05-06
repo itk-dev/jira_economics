@@ -11,7 +11,7 @@ import ReactTable from 'react-table';
 import '!style-loader!css-loader!react-table/react-table.css';
 import moment from 'moment';
 
-function makeIssueColumns(jiraIssues) {
+function makeIssueData(jiraIssues) {
   if (jiraIssues.data.data === undefined) {
     return [];
   }
@@ -27,47 +27,11 @@ function makeIssueColumns(jiraIssues) {
   }));
 }
 
-const columns = [
-  {
-    Header: "Issue",
-    accessor: "summary"
-  },
-  {
-    Header: "Oprettet",
-    id: "created",
-    accessor: d => {
-      return moment(d.created).format("YYYY-MM-DD HH:mm")
-    }
-  },
-  {
-    Header: "Færdiggjort",
-    id: "finished",
-    accessor: d => {
-      return moment(d.finished).format("YYYY-MM-DD HH:mm")
-    }
-  },
-  {
-    Header: "Fakturastatus",
-    accessor: "invoiceStatus"
-  },
-  {
-    Header: "Jirabrugere",
-    id: "jiraUsers",
-    accessor: d => {
-      return d.jiraUsers
-    }
-  },
-  {
-    Header: "Registrerede timer",
-    accessor: "timeSpent"
-  }
-]
-
 class JiraIssues extends Component {
   constructor(props) {
     super(props);
-    this.toggleRow = this.toggleRow.bind(this);
     this.state = { selected: {}, selectAll: 0 };
+    this.toggleRow = this.toggleRow.bind(this);
   }
 
   componentDidMount() {
@@ -75,12 +39,33 @@ class JiraIssues extends Component {
     dispatch(rest.actions.getJiraIssues({ id: `${this.props.params.projectId}` }));
   }
 
+  // @TODO: consider simplifying logic here
   toggleRow(issueId) {
     const newSelected = Object.assign({}, this.state.selected);
     newSelected[issueId] = !this.state.selected[issueId];
+    let checked_iter = Object.values(newSelected).values()
+    let result = checked_iter.next()
+    let checked_num = 0
+    while (!result.done) {
+      let checked_val = result.value
+      if (checked_val === true) {
+        checked_num++;
+      }
+      result = checked_iter.next()
+    }
+
+    if (checked_num === this.props.issueData.length) {
+      this.setState({
+        selectAll: 1
+      })
+    }
+    else {
+      this.setState({
+        selectAll: 2
+      })
+    }
     this.setState({
-      selected: newSelected,
-      selectAll: 2
+      selected: newSelected
     });
   }
 
@@ -88,9 +73,8 @@ class JiraIssues extends Component {
     let newSelected = {};
 
     if (this.state.selectAll === 0) {
-      this.props.issueColumns.forEach(x => {
-        newSelected[x.issueId] = true;
-        console.log("Iterating");
+      this.props.issueData.forEach(x => {
+        newSelected[x.id] = true;
       });
     }
     this.setState({
@@ -99,14 +83,81 @@ class JiraIssues extends Component {
     });
   }
 
+  createColumns() {
+    return [
+      {
+        id: "checkbox",
+        accessor: "",
+        Cell: ({ original }) => {
+          return (
+            <input
+              type="checkbox"
+              className="checkbox"
+              checked={this.state.selected[original.id] === true}
+              onChange={() => this.toggleRow(original.id)}
+            />
+          );
+        },
+        Header: x => {
+          return (
+            <input
+              type="checkbox"
+              className="checkbox"
+              checked={this.state.selectAll === 1}
+              ref={input => {
+                if (input) {
+                  input.indeterminate = this.state.selectAll === 2;
+                }
+              }}
+              onChange={() => this.toggleSelectAll()}
+            />
+          );
+        }
+      },
+      {
+        Header: "Issue",
+        accessor: "summary"
+      },
+      {
+        Header: "Oprettet",
+        id: "created",
+        accessor: d => {
+          return moment(d.created).format("YYYY-MM-DD HH:mm")
+        }
+      },
+      {
+        Header: "Færdiggjort",
+        id: "finished",
+        accessor: d => {
+          return moment(d.finished).format("YYYY-MM-DD HH:mm")
+        }
+      },
+      {
+        Header: "Fakturastatus",
+        accessor: "invoiceStatus"
+      },
+      {
+        Header: "Jirabrugere",
+        id: "jiraUsers",
+        accessor: d => {
+          return d.jiraUsers
+        }
+      },
+      {
+        Header: "Registrerede timer",
+        accessor: "timeSpent"
+      }
+    ]
+  }
+
   render() {
     return (
       <ContentWrapper>
         <PageTitle>Jira Issues</PageTitle>
         <div>Vælg issues fra Jira</div>
         <ReactTable
-          data={this.props.issueColumns}
-          columns={columns}
+          data={this.props.issueData}
+          columns={this.createColumns()}
           defaultPageSize={10}
           defaultSorted={[{ id: "issueId", desc: false }]}
         />
@@ -117,15 +168,15 @@ class JiraIssues extends Component {
 
 JiraIssues.propTypes = {
   jiraIssues: PropTypes.object,
-  issueColumns: PropTypes.array
+  issueData: PropTypes.array
 };
 
 const mapStateToProps = state => {
-  let issueColumns = makeIssueColumns(state.jiraIssues);
+  let issueData = makeIssueData(state.jiraIssues);
 
   return {
     jiraIssues: state.jiraIssues,
-    issueColumns: issueColumns
+    issueData: issueData
   };
 };
 
