@@ -44,7 +44,7 @@ export default class MainRouter extends Component {
   render() {
     return (
       <Router history={browserHistory}>
-        <Route path="/" component={this.appWithPersistentNav()}>
+        <Route path="/billing" component={this.appWithPersistentNav()}>
           <IndexRoute component={HomePage} />
           <Route path="project/:projectId" component={Project} />
           <Route path="project/:projectId/entry/:invoiceEntryId" component={Project}/>
