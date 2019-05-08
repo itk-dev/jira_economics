@@ -79,6 +79,11 @@ class Invoice extends Component {
     // @TODO: Check that deletion is successful before navigating back to project page
     dispatch(push(`/project/${this.props.params.projectId}`));
   }
+  handleAddFromJira = (e) => {
+    const {dispatch} = this.props;
+    dispatch(push(`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/jiraIssues`));
+  }
+  // @TODO: Remove form to create invoice_entry with only a name
   render () {
     if (this.props.invoice.data.name) {
       return (
@@ -110,6 +115,15 @@ class Invoice extends Component {
               )}
             </Form>
           </div>
+          <div>
+            <Form onSubmit={this.handleDeleteSubmit}>
+                {({ formProps }) => (
+                  <form {...formProps} name="submit-delete-form">
+                    <Button type="submit" appearance="danger">Delete invoice</Button>
+                  </form>
+                )}
+            </Form>
+          </div>
           <div>Invoice entries:</div>
           {this.props.invoiceEntries.data.data && this.props.invoiceEntries.data.data.map((item) =>
             <div key={item.id}><Link to={`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/${item.id}`}>Link til {item.name}</Link></div>
@@ -128,12 +142,12 @@ class Invoice extends Component {
             </Form>
           </div>
           <div>
-            <Form onSubmit={this.handleDeleteSubmit}>
-                {({ formProps }) => (
-                  <form {...formProps} name="submit-delete-form">
-                    <Button type="submit" appearance="danger">Delete invoice</Button>
-                  </form>
-                )}
+            <Form onSubmit={this.handleAddFromJira}>
+              {({ formProps }) => (
+                <form {...formProps} name="add-from-jira-form">
+                  <Button type="submit" appearance="primary">Add new line from Jira</Button>
+                </form>
+              )}
             </Form>
           </div>
         </ContentWrapper>

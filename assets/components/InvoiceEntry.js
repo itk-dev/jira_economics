@@ -23,7 +23,7 @@ export class InvoiceEntry extends Component {
     const name = e.invoiceEntryName;
     const invoiceEntryData = {
       id,
-      name,
+      name
     }
     dispatch(rest.actions.updateInvoiceEntry({id: `${this.props.params.invoiceEntryId}`}, {
       body: JSON.stringify(invoiceEntryData)

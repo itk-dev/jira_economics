@@ -5,11 +5,14 @@ import PageTitle from '../components/PageTitle';
 import store from '../redux/store';
 import { getJiraIssues } from '../redux/actions';
 import PropTypes from 'prop-types';
+import Button from '@atlaskit/button';
+import Form, {Field} from '@atlaskit/form';
 import 'moment-timezone';
 import rest from '../redux/utils/rest';
 import ReactTable from 'react-table';
 import '!style-loader!css-loader!react-table/react-table.css';
 import moment from 'moment';
+import { push } from 'react-router-redux';
 
 function makeIssueData(jiraIssues) {
   if (jiraIssues.data.data === undefined) {
@@ -57,6 +60,11 @@ class JiraIssues extends Component {
     if (checked_num === this.props.issueData.length) {
       this.setState({
         selectAll: 1
+      })
+    }
+    else if (checked_num === 0) {
+      this.setState({
+        selectAll: 0
       })
     }
     else {
@@ -150,6 +158,11 @@ class JiraIssues extends Component {
     ]
   }
 
+  handleSubmitIssues = (e) => {
+    const { dispatch } = this.props;
+    dispatch(push(`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/invoice_entry`));
+  }
+
   render() {
     return (
       <ContentWrapper>
@@ -161,6 +174,16 @@ class JiraIssues extends Component {
           defaultPageSize={10}
           defaultSorted={[{ id: "issueId", desc: false }]}
         />
+        <div>
+          <Form onSubmit={this.handleSubmitIssues}>
+            {({ formProps }) => (
+              <form {...formProps} name="submit-issues-form">
+                <Button type="submit" appearance="primary">Fortsæt med valgte issues</Button>
+              </form>
+            )}
+          </Form>
+        </div>
+
       </ContentWrapper>
     );
   }

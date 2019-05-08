@@ -9,6 +9,7 @@ import Project from '../components/Project';
 import Invoice from '../components/Invoice';
 import InvoiceEntry from '../components/InvoiceEntry';
 import JiraIssues from '../components/JiraIssues';
+import InvoiceEntrySubmitter from '../components/InvoiceEntrySubmitter';
 
 export default class MainRouter extends Component {
   constructor() {
@@ -49,6 +50,7 @@ export default class MainRouter extends Component {
           <Route path="project/:projectId/entry/:invoiceEntryId" component={Project}/>
           <Route path="project/:projectId/:invoiceId" component={Invoice}/>
           <Route path="project/:projectId/:invoiceId/jiraIssues" component={JiraIssues}/>
+          <Route path="project/:projectId/:invoiceId/invoice_entry" component={InvoiceEntrySubmitter}/>
           <Route path="project/:projectId/:invoiceId/:invoiceEntryId" component={InvoiceEntry}/>
           <Route path="statistics" component={Statistics} />
           <Route path="planning" component={SprintPlanning} />
