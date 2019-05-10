@@ -6,28 +6,27 @@ import { Link } from 'react-router';
 import store from '../redux/store';
 import { fetchProject, fetchInvoices } from '../redux/actions';
 import PropTypes from 'prop-types';
-import Button from '@atlaskit/button';
-import Form, {Field} from '@atlaskit/form';
-import Spinner from '@atlaskit/spinner';
-import TextField from '@atlaskit/field-text';
 import rest from '../redux/utils/rest';
+
+const $ = require('jquery');
 
 class Project extends Component {
   constructor(props) {
     super(props);
-
     this.handleCreateSubmit = this.handleCreateSubmit.bind(this);
     this.state = { invoiceName: '' };
   }
   componentDidMount() {
-    const {dispatch} = this.props;
-    dispatch(rest.actions.getProject({id: `${this.props.params.projectId}`}));
-    dispatch(rest.actions.getInvoices({id: `${this.props.params.projectId}`}));
+    const { dispatch } = this.props;
+    dispatch(rest.actions.getProject({ id: `${this.props.params.projectId}` }));
+    dispatch(rest.actions.getInvoices({ id: `${this.props.params.projectId}` }));
   }
-  handleCreateSubmit = (e) => {
-    const {dispatch} = this.props;
+  handleCreateSubmit = (event) => {
+    event.preventDefault();
+    const { dispatch } = this.props;
     const projectId = this.props.params.projectId;
-    const name = e.invoiceName;
+    // @TODO: look into getting this value from the event instead
+    const name = $("#invoice-name").val();
     const invoiceData = {
       projectId,
       name
@@ -36,7 +35,7 @@ class Project extends Component {
       body: JSON.stringify(invoiceData)
     }));
   }
-  render () {
+  render() {
     if (this.props.project.data.name) {
       return (
         <ContentWrapper>
@@ -49,22 +48,25 @@ class Project extends Component {
           )}
           <div>Create new invoice</div>
           <div>
-            <Form onSubmit={this.handleCreateSubmit}>
-                {({ formProps }) => (
-                  <form {...formProps} name="submit-create-form">
-                    <Field name="invoiceName" defaultValue={this.state.invoiceName} label="Enter invoice name for new invoice" isRequired>
-                      {({ fieldProps}) => <TextField {...fieldProps} />}
-                    </Field>
-                    <Button type="submit" appearance="primary">Submit new invoice</Button>
-                  </form>
-                )}
-            </Form>
+            <form id="submitForm" onSubmit={this.handleCreateSubmit}>
+              <div id="formGroup" className="form-group">
+                <label htmlFor="input-new-invoice-name">Enter invoice name for new invoice</label>
+                <input type="text" name="invoiceName" className="form-control" id="invoice-name" aria-describedby="invoiceName" placeholder="Enter invoice name"></input>
+              </div>
+              <button type="submit" className="btn btn-primary" id="submit">Submit new invoice</button>
+            </form>
           </div>
         </ContentWrapper>
       );
     }
     else {
-      return (<ContentWrapper><Spinner size="large"/></ContentWrapper>);
+      return (
+      <ContentWrapper>
+        <div class="spinner-border" style={{width: '3rem', height: '3rem', role: 'status'}}>
+          <span class="sr-only">Loading...</span>
+        </div>
+      </ContentWrapper>
+      );
     }
   }
 }
