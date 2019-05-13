@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace Billing\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource()
- * @ORM\Entity(repositoryClass="App\Repository\InvoiceRepository")
+ * @ORM\Entity(repositoryClass="Billing\Repository\InvoiceRepository")
  */
 class Invoice
 {
@@ -26,13 +26,13 @@ class Invoice
     private $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Project", inversedBy="invoices")
+     * @ORM\ManyToOne(targetEntity="Billing\Entity\Project", inversedBy="invoices")
      * @ORM\JoinColumn(nullable=false)
      */
     private $project;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\InvoiceEntry", mappedBy="invoice", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="Billing\Entity\InvoiceEntry", mappedBy="invoice", orphanRemoval=true)
      */
     private $invoiceEntries;
 

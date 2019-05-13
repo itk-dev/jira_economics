@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace Billing\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -10,7 +10,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ApiResource()
- * @ORM\Entity(repositoryClass="App\Repository\ProjectRepository")
+ * @ORM\Entity(repositoryClass="Billing\Repository\ProjectRepository")
  * @UniqueEntity("jiraId")
  */
 class Project
@@ -28,7 +28,7 @@ class Project
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Invoice", mappedBy="project", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="Billing\Entity\Invoice", mappedBy="project", orphanRemoval=true)
      */
     private $invoices;
 
@@ -53,7 +53,7 @@ class Project
     private $avatarUrl;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\JiraIssue", mappedBy="project")
+     * @ORM\OneToMany(targetEntity="Billing\Entity\JiraIssue", mappedBy="project")
      */
     private $jiraIssues;
 

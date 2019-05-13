@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repository;
+namespace Billing\Repository;
 
-use App\Entity\JiraIssue;
+use Billing\Entity\JiraIssue;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 

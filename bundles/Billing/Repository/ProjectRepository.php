@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repository;
+namespace Billing\Repository;
 
-use App\Entity\Project;
+use Billing\Entity\Project;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 

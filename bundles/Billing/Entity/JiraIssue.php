@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Entity;
+namespace Billing\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ApiResource()
- * @ORM\Entity(repositoryClass="App\Repository\JiraIssueRepository")
+ * @ORM\Entity(repositoryClass="Billing\Repository\JiraIssueRepository")
  */
 class JiraIssue
 {
@@ -49,12 +49,12 @@ class JiraIssue
     private $timeSpent;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Project", inversedBy="jiraIssues")
+     * @ORM\ManyToOne(targetEntity="Billing\Entity\Project", inversedBy="jiraIssues")
      */
     private $project;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\InvoiceEntry", inversedBy="jiraIssues")
+     * @ORM\ManyToOne(targetEntity="Billing\Entity\InvoiceEntry", inversedBy="jiraIssues")
      */
     private $InvoiceEntryId;
 
