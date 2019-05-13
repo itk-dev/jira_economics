@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}JIRA Economics{% endblock %}
+
+{% block body %}
+  <div id="app-root"></div>
+{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+
+  {{ encore_entry_link_tags('billing') }}
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+
+  {{ encore_entry_script_tags('billing') }}
+{% endblock %}

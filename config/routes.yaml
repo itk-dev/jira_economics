@@ -12,3 +12,6 @@ hwi_oauth_login:
 
 jira_login:
     path: /login/check-jira
+
+billing:
+    resource: "@BillingBundle/Resources/config/routing.yaml"

@@ -7,12 +7,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class DefaultController extends Controller
 {
-    // @TODO find a nicer way to exclude routes that shouldn't be handled by React
     /**
-     * @Route("/{reactRouting}", name="index", defaults={"reactRouting": null}, requirements={"reactRouting"="^(?!api|login|connect|favicon|jira_api).+"})
+     * @Route("/", name="index")
      */
-    public function indexAction()
+    public function index()
     {
-        return $this->render('default/index.html.twig');
+        return $this->render('base.html.twig');
     }
 }
