@@ -43,7 +43,7 @@ class Navigation extends Component {
           <div className={className}>
             <GroupHeading>ITK Jira</GroupHeading>
 
-            <Link to={`/`}>
+            <Link to={`/billing`}>
               <Item
                 before={FolderFilledIcon}
                 text="Project List"
@@ -51,7 +51,7 @@ class Navigation extends Component {
               />
             </Link>
 
-            <Link to={`/statistics`}>
+            <Link to={`/billing/statistics`}>
               <Item
                 before={GraphLineIcon}
                 text="Statistics"
@@ -59,7 +59,7 @@ class Navigation extends Component {
               />
             </Link>
 
-            <Link to={`/planning`}>
+            <Link to={`/billing/planning`}>
               <Item
                 before={RoadmapIcon}
                 text="Planning"

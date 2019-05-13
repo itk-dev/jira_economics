@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * Class ApiController
  * @package App\Controller
  *
- * @Route("/jira_api")
+ * @Route("/billing/jira_api")
  */
 class ApiController extends Controller
 {
