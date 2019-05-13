@@ -2,3 +2,16 @@
 $primary: #0747A6;
 
 @import "~bootstrap/scss/bootstrap";
+
+html, body {
+  height: 100%;
+}
+
+.navbar-brand img {
+  width: 2rem;
+}
+
+.nav-link {
+  font-size: .6rem;
+  color: $white;
+}

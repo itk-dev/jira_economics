@@ -14,3 +14,7 @@ const $ = require('jquery');
 
 // Add Bootstrap to the mix
 require('bootstrap');
+
+// Add fontawesome
+require('@fortawesome/fontawesome-free/css/all.min.css');
+require('@fortawesome/fontawesome-free/js/all.js');

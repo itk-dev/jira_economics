@@ -16,6 +16,9 @@ Encore
   })
   .enableSassLoader()
   .enablePostCssLoader()
+  .copyFiles({
+    from: './assets/images',
+  })
 ;
 
 const appConfig = Encore.getWebpackConfig();
