@@ -48,7 +48,14 @@ export class InvoiceEntry extends Component {
             <form id="submitForm" onSubmit={this.handleEditSubmit}>
               <div id="formGroup" className="form-group">
                 <label htmlFor="input-invoiceEntry-name">Enter invoice entry name</label>
-                <input type="text" name="invoiceEntryName" className="form-control" id="invoice-entry-name" aria-describedby="invoiceEntryName" placeholder="Enter new invoice entry name"></input>
+                <input
+                  type="text"
+                  name="invoiceEntryName"
+                  className="form-control"
+                  id="invoice-entry-name"
+                  aria-describedby="invoiceEntryName"
+                  placeholder="Enter new invoice entry name">
+                </input>
               </div>
               <button type="submit" className="btn btn-primary" id="submit">Submit new invoice entry name</button>
             </form>

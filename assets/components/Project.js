@@ -35,6 +35,7 @@ class Project extends Component {
       body: JSON.stringify(invoiceData)
     }));
   }
+  // @TODO: Update list of invoices when state changes
   render() {
     if (this.props.project.data.name) {
       return (
@@ -51,7 +52,14 @@ class Project extends Component {
             <form id="submitForm" onSubmit={this.handleCreateSubmit}>
               <div id="formGroup" className="form-group">
                 <label htmlFor="input-new-invoice-name">Enter invoice name for new invoice</label>
-                <input type="text" name="invoiceName" className="form-control" id="invoice-name" aria-describedby="invoiceName" placeholder="Enter invoice name"></input>
+                <input
+                  type="text"
+                  name="invoiceName"
+                  className="form-control"
+                  id="invoice-name"
+                  aria-describedby="invoiceName"
+                  placeholder="Enter invoice name">
+                </input>
               </div>
               <button type="submit" className="btn btn-primary" id="submit">Submit new invoice</button>
             </form>
@@ -61,11 +69,11 @@ class Project extends Component {
     }
     else {
       return (
-      <ContentWrapper>
-        <div class="spinner-border" style={{width: '3rem', height: '3rem', role: 'status'}}>
-          <span class="sr-only">Loading...</span>
-        </div>
-      </ContentWrapper>
+        <ContentWrapper>
+          <div class="spinner-border" style={{ width: '3rem', height: '3rem', role: 'status' }}>
+            <span class="sr-only">Loading...</span>
+          </div>
+        </ContentWrapper>
       );
     }
   }
