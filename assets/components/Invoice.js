@@ -77,11 +77,11 @@ class Invoice extends Component {
     const {dispatch} = this.props;
     dispatch(rest.actions.deleteInvoice({id: `${this.props.params.invoiceId}`}));
     // @TODO: Check that deletion is successful before navigating back to project page
-    dispatch(push(`/project/${this.props.params.projectId}`));
+    dispatch(push(`/billing/project/${this.props.params.projectId}`));
   }
   handleAddFromJira = (e) => {
     const {dispatch} = this.props;
-    dispatch(push(`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/jiraIssues`));
+    dispatch(push(`/billing/project/${this.props.params.projectId}/${this.props.params.invoiceId}/jiraIssues`));
   }
   // @TODO: Remove form to create invoice_entry with only a name
   render () {
@@ -126,7 +126,7 @@ class Invoice extends Component {
           </div>
           <div>Invoice entries:</div>
           {this.props.invoiceEntries.data.data && this.props.invoiceEntries.data.data.map((item) =>
-            <div key={item.id}><Link to={`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/${item.id}`}>Link til {item.name}</Link></div>
+            <div key={item.id}><Link to={`/billing/project/${this.props.params.projectId}/${this.props.params.invoiceId}/${item.id}`}>Link til {item.name}</Link></div>
           )}
           <div>Create new invoice entry</div>
           <div>

@@ -160,7 +160,7 @@ class JiraIssues extends Component {
 
   handleSubmitIssues = (e) => {
     const { dispatch } = this.props;
-    dispatch(push(`/project/${this.props.params.projectId}/${this.props.params.invoiceId}/invoice_entry`));
+    dispatch(push(`/billing/project/${this.props.params.projectId}/${this.props.params.invoiceId}/invoice_entry`));
   }
 
   render() {
