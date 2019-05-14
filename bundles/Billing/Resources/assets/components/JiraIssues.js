@@ -5,8 +5,6 @@ import PageTitle from '../components/PageTitle';
 import store from '../redux/store';
 import { getJiraIssues } from '../redux/actions';
 import PropTypes from 'prop-types';
-import Button from '@atlaskit/button';
-import Form, {Field} from '@atlaskit/form';
 import 'moment-timezone';
 import rest from '../redux/utils/rest';
 import ReactTable from 'react-table';
@@ -158,34 +156,41 @@ class JiraIssues extends Component {
     ]
   }
 
-  handleSubmitIssues = (e) => {
+  handleSubmitIssues = (event) => {
+    event.preventDefault();
     const { dispatch } = this.props;
     dispatch(push(`/billing/project/${this.props.params.projectId}/${this.props.params.invoiceId}/invoice_entry`));
   }
 
   render() {
-    return (
-      <ContentWrapper>
-        <PageTitle>Jira Issues</PageTitle>
-        <div>Vælg issues fra Jira</div>
-        <ReactTable
-          data={this.props.issueData}
-          columns={this.createColumns()}
-          defaultPageSize={10}
-          defaultSorted={[{ id: "issueId", desc: false }]}
-        />
-        <div>
-          <Form onSubmit={this.handleSubmitIssues}>
-            {({ formProps }) => (
-              <form {...formProps} name="submit-issues-form">
-                <Button type="submit" appearance="primary">Fortsæt med valgte issues</Button>
-              </form>
-            )}
-          </Form>
-        </div>
-
-      </ContentWrapper>
-    );
+    if (this.props.jiraIssues.data.data) {
+      return (
+        <ContentWrapper>
+          <PageTitle>Jira Issues</PageTitle>
+          <div>Vælg issues fra Jira</div>
+          <ReactTable
+            data={this.props.issueData}
+            columns={this.createColumns()}
+            defaultPageSize={10}
+            defaultSorted={[{ id: "issueId", desc: false }]}
+          />
+          <div>
+            <form id="submitForm" onSubmit={this.handleSubmitIssues}>
+              <button type="submit" className="btn btn-primary" id="submit">Fortsæt med valgte issues</button>
+            </form>
+          </div>
+        </ContentWrapper>
+      );
+    }
+    else {
+      return (
+        <ContentWrapper>
+          <div className="spinner-border" style={{ width: '3rem', height: '3rem', role: 'status' }}>
+            <span className="sr-only">Loading...</span>
+          </div>
+        </ContentWrapper>
+      );
+    }
   }
 }
 

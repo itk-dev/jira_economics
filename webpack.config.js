@@ -1,18 +1,24 @@
 let Encore = require('@symfony/webpack-encore');
 
-Encore.setOutputPath('public/build/')
+Encore
+  .setOutputPath('public/build/')
   .setPublicPath('/build')
-  .enableReactPreset()
-  .enableSourceMaps()
-  .disableSingleRuntimeChunk()
+  .addEntry('app', './assets/js/app.js')
+  .addEntry('billing', './bundles/Billing/Resources/assets/index.js')
+  .splitEntryChunks()
+  .enableSingleRuntimeChunk()
   .cleanupOutputBeforeBuild()
+  .enableBuildNotifications()
+  .enableSourceMaps(!Encore.isProduction())
+  .enableVersioning(Encore.isProduction())
+  .enableSassLoader()
+  .enableReactPreset()
   .enableVersioning()
-  .addEntry('js/billing', './bundles/Billing/Resources/assets/index.js')
-  .enableSassLoader(function (options) {
-    options.includePaths = ['node_modules'];
+  .enablePostCssLoader()
+  .copyFiles({
+    from: './assets/images',
+    to: 'images/[path][name].[ext]'
   })
-  .configureCssLoader(options => {
-    options.modules = true;
-  });
+;
 
-module.exports = Encore.getWebpackConfig();
+module.exports = [Encore.getWebpackConfig()];

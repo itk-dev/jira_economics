@@ -6,9 +6,8 @@ import store from '../redux/store';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
 import { push } from 'react-router-redux';
-import Form, { Field } from '@atlaskit/form';
-import Spinner from '@atlaskit/spinner';
-import Button from '@atlaskit/button';
+
+const $ = require('jquery');
 
 export class InvoiceEntrySubmitter extends Component {
   constructor(props) {
@@ -29,7 +28,8 @@ export class InvoiceEntrySubmitter extends Component {
       body: JSON.stringify(invoiceEntryData)
     });
   }
-  handleSelectJiraIssues = (e) => {
+  handleSelectJiraIssues = (event) => {
+    event.preventDefault();
     const {dispatch} = this.props;
     dispatch(push(`/billing/project/${this.props.params.projectId}/${this.props.params.invoiceId}/jiraIssues`));
   }
@@ -41,19 +41,21 @@ export class InvoiceEntrySubmitter extends Component {
           <PageTitle>Tilføj oplysninger til fakturalinje fra Jira</PageTitle>
           <div>Issues valgt og total timer go here...</div>
           <div>
-            <Form onSubmit={this.handleSelectJiraIssues}>
-              {({ formProps }) => (
-                <form {...formProps} name="submit-select-jira-issues">
-                  <Button type="submit" appearance="primary">Rediger valg</Button>
-                </form>
-              )}
-            </Form>
+            <form id="submitForm" onSubmit={this.handleSelectJiraIssues}>
+              <button type="submit" className="btn btn-primary" id="submit">Rediger valg</button>
+            </form>
           </div>
         </ContentWrapper>
       );
     }
     else {
-      return (<ContentWrapper><Spinner size="large" /></ContentWrapper>);
+      return (
+      <ContentWrapper>
+        <div class="spinner-border" style={{width: '3rem', height: '3rem', role: 'status'}}>
+          <span class="sr-only">Loading...</span>
+        </div>
+      </ContentWrapper>
+      );
     }
   }
 }

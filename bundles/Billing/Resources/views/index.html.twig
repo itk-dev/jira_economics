@@ -2,14 +2,18 @@
 
 {% block title %}JIRA Economics{% endblock %}
 
-{% block body %}
+{% block content %}
   <div id="app-root"></div>
 {% endblock %}
 
 {% block stylesheets %}
-  <link href="{{ asset('build/js/billing.css') }}" rel="stylesheet">
+  {{ parent() }}
+
+  {{ encore_entry_link_tags('billing') }}
 {% endblock %}
 
 {% block javascripts %}
-  <script type="text/javascript" src="{{ asset('build/js/billing.js') }}"></script>
+  {{ parent() }}
+
+  {{ encore_entry_script_tags('billing') }}
 {% endblock %}
