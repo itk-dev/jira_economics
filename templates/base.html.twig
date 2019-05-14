@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8">
+        <meta charset="utf-8">
         <title>{% block title %}{{ 'common.title'|trans }}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         {% block stylesheets %}
@@ -28,24 +28,25 @@
         <meta name="msapplication-square150x150logo" content="{{ asset('images/mstile-150x150.png') }}" />
         <meta name="msapplication-wide310x150logo" content="{{ asset('images/mstile-310x150.png') }}" />
         <meta name="msapplication-square310x310logo" content="{{ asset('images/mstile-310x310.png') }}" />
-
     </head>
     <body>
-      <div class="d-flex flex-row flex-grow-1">
-        <div class="d-flex">
-          {% include "navigation/global-nav.html.twig" %}
-        </div>
+      {% block body %}
         <div class="d-flex flex-row flex-grow-1">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col-12">
-                {% block body %}
-                {% endblock %}
+          <div class="d-flex">
+            {% include "navigation/global-nav.html.twig" %}
+          </div>
+          <div class="d-flex flex-row flex-grow-1">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-12">
+                  {% block content %}
+                  {% endblock %}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      {% endblock %}
       {% block javascripts %}
         {{ encore_entry_script_tags('app') }}
       {% endblock %}

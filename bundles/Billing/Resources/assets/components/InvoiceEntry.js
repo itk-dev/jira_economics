@@ -2,74 +2,78 @@ import React, { Component } from 'react';
 import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from '../components/ContentWrapper';
 import PageTitle from '../components/PageTitle';
-import store from '../redux/store';
-import { fetchInvoiceEntry } from '../redux/actions';
 import PropTypes from 'prop-types';
-import Button from '@atlaskit/button';
-import Form, {Field} from '@atlaskit/form';
-import Spinner from '@atlaskit/spinner';
-import TextField from '@atlaskit/field-text';
 import rest from '../redux/utils/rest';
 import { push } from 'react-router-redux';
+
+const $ = require('jquery');
 
 export class InvoiceEntry extends Component {
   componentDidMount() {
     const {dispatch} = this.props;
-    dispatch(rest.actions.getInvoiceEntry({id: `${this.props.params.invoiceEntryId}`}));
+    dispatch(rest.actions.getInvoiceEntry({id: `${this.props.match.params.invoiceEntryId}`}));
   }
-  handleEditSubmit = (e) => {
+  handleEditSubmit = (event) => {
+    event.preventDefault();
     const {dispatch} = this.props;
-    const id = this.props.params.invoiceEntryId;
-    const name = e.invoiceEntryName;
+    const id = this.props.match.params.invoiceEntryId;
+    const name = $("#invoice-entry-name").val();
     const invoiceEntryData = {
       id,
       name
     }
-    dispatch(rest.actions.updateInvoiceEntry({id: `${this.props.params.invoiceEntryId}`}, {
+    dispatch(rest.actions.updateInvoiceEntry({id: `${this.props.match.params.invoiceEntryId}`}, {
       body: JSON.stringify(invoiceEntryData)
     }));
   }
-  handleDeleteSubmit = (e) => {
+  handleDeleteSubmit = (event) => {
+    event.preventDefault();
     const {dispatch} = this.props;
-    dispatch(rest.actions.deleteInvoiceEntry({id: `${this.props.params.invoiceEntryId}`}));
+    dispatch(rest.actions.deleteInvoiceEntry({id: `${this.props.match.params.invoiceEntryId}`}));
     // @TODO: Check that deletion is successful before navigating back to invoice page
-    dispatch(push(`/project/${this.props.params.projectId}/${this.props.params.invoiceId}`));
+    dispatch(push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`));
   }
   render () {
     if (this.props.invoiceEntry.data.name) {
       return (
         <ContentWrapper>
           <PageTitle>Invoice Entry</PageTitle>
-          <div>ProjectID: {this.props.params.projectId}</div>
-          <div>InvoiceID: {this.props.params.invoiceId}</div>
-          <div>InvoiceEntryID: {this.props.params.invoiceEntryId}</div>
+          <div>ProjectID: {this.props.match.params.projectId}</div>
+          <div>InvoiceID: {this.props.match.params.invoiceId}</div>
+          <div>InvoiceEntryID: {this.props.match.params.invoiceEntryId}</div>
           <div>InvoiceEntryName: {this.props.invoiceEntry.data.name}</div>
           <div>
-            <Form onSubmit={this.handleEditSubmit}>
-              {({ formProps }) => (
-                <form {...formProps} name="submit-edit-form">
-                  <Field name="invoiceEntryName" defaultValue={this.props.invoiceEntry.data.name} label="Enter invoice entry name" isRequired>
-                    {({ fieldProps}) => <TextField {...fieldProps} />}
-                  </Field>
-                  <Button type="submit" appearance="primary">Submit invoice entry name</Button>
-                </form>
-              )}
-            </Form>
+            <form id="submitForm" onSubmit={this.handleEditSubmit}>
+              <div id="formGroup" className="form-group">
+                <label htmlFor="input-invoiceEntry-name">Enter invoice entry name</label>
+                <input
+                  type="text"
+                  name="invoiceEntryName"
+                  className="form-control"
+                  id="invoice-entry-name"
+                  aria-describedby="invoiceEntryName"
+                  placeholder="Enter new invoice entry name">
+                </input>
+              </div>
+              <button type="submit" className="btn btn-primary" id="submit">Submit new invoice entry name</button>
+            </form>
           </div>
           <div>
-            <Form onSubmit={this.handleDeleteSubmit}>
-                {({ formProps }) => (
-                  <form {...formProps} name="submit-delete-form">
-                    <Button type="submit" appearance="danger">Delete invoice entry</Button>
-                  </form>
-                )}
-            </Form>
+            <form id="deleteForm" onSubmit={this.handleDeleteSubmit}>
+              <button type="submit" className="btn btn-danger" id="delete">Delete invoice entry</button>
+            </form>
           </div>
         </ContentWrapper>
       );
     }
     else {
-      return (<ContentWrapper><Spinner size="large"/></ContentWrapper>);
+      return (
+      <ContentWrapper>
+        <div className="spinner-border" style={{width: '3rem', height: '3rem', role: 'status'}}>
+          <span className="sr-only">Loading...</span>
+        </div>
+      </ContentWrapper>
+      );
     }
   }
 }

@@ -4,44 +4,20 @@ Encore
   .setOutputPath('public/build/')
   .setPublicPath('/build')
   .addEntry('app', './assets/js/app.js')
+  .addEntry('billing', './bundles/Billing/Resources/assets/index.js')
   .splitEntryChunks()
   .enableSingleRuntimeChunk()
   .cleanupOutputBeforeBuild()
   .enableBuildNotifications()
   .enableSourceMaps(!Encore.isProduction())
   .enableVersioning(Encore.isProduction())
-  .configureBabel(() => {}, {
-    useBuiltIns: 'usage',
-    corejs: 3
-  })
   .enableSassLoader()
+  .enableReactPreset()
+  .enableVersioning()
   .enablePostCssLoader()
   .copyFiles({
     from: './assets/images',
   })
 ;
 
-const appConfig = Encore.getWebpackConfig();
-appConfig.name = 'app';
-
-Encore.reset();
-
-Encore.setOutputPath('public/build/')
-  .setPublicPath('/build')
-  .enableReactPreset()
-  .enableSourceMaps()
-  .disableSingleRuntimeChunk()
-  .cleanupOutputBeforeBuild()
-  .enableVersioning()
-  .addEntry('js/billing', './bundles/Billing/Resources/assets/index.js')
-  .enableSassLoader(function (options) {
-    options.includePaths = ['node_modules'];
-  })
-  .configureCssLoader(options => {
-    options.modules = true;
-  });
-
-const billingConfig = Encore.getWebpackConfig();
-billingConfig.name = 'billing';
-
-module.exports = [appConfig, billingConfig];
+module.exports = [Encore.getWebpackConfig()];

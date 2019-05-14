@@ -1,10 +1,8 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Router, Route, browserHistory, IndexRoute } from 'react-router';
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import App from './App';
 import HomePage from '../pages/HomePage';
-import Statistics from '../pages/Statistics';
-import SprintPlanning from '../pages/SprintPlanning';
 import Project from '../components/Project';
 import Invoice from '../components/Invoice';
 import InvoiceEntry from '../components/InvoiceEntry';
@@ -43,18 +41,14 @@ export default class MainRouter extends Component {
 
   render() {
     return (
-      <Router history={browserHistory}>
-        <Route path="/billing" component={this.appWithPersistentNav()}>
-          <IndexRoute component={HomePage} />
-          <Route path="project/:projectId" component={Project} />
-          <Route path="project/:projectId/entry/:invoiceEntryId" component={Project}/>
-          <Route path="project/:projectId/:invoiceId" component={Invoice}/>
-          <Route path="project/:projectId/:invoiceId/jiraIssues" component={JiraIssues}/>
-          <Route path="project/:projectId/:invoiceId/invoice_entry" component={InvoiceEntrySubmitter}/>
-          <Route path="project/:projectId/:invoiceId/:invoiceEntryId" component={InvoiceEntry}/>
-          <Route path="statistics" component={Statistics} />
-          <Route path="planning" component={SprintPlanning} />
-        </Route>
+      <Router basename={"/billing"}>
+        <Route exact path="/" component={HomePage}/>
+        <Route exact path="/project/:projectId" component={Project} />
+        <Route exact path="/project/:projectId/entry/:invoiceEntryId" component={Project}/>
+        <Route exact path="/project/:projectId/:invoiceId" component={Invoice}/>
+        <Route exact path="/project/:projectId/:invoiceId/jiraIssues" component={JiraIssues}/>
+        <Route exact path="/project/:projectId/:invoiceId/invoice_entry" component={InvoiceEntrySubmitter}/>
+        <Route exact path="/project/:projectId/:invoiceId/:invoiceEntryId" component={InvoiceEntry}/>
       </Router>
     );
   }
