@@ -3,8 +3,14 @@ $primary: #0747A6;
 
 @import "~bootstrap/scss/bootstrap";
 
-html, body {
+html, body, .wrapper {
   height: 100%;
+}
+
+@include media-breakpoint-up(md) {
+  .navbar {
+    height: 100%;
+  }
 }
 
 .navbar-brand img {
@@ -12,6 +18,11 @@ html, body {
 }
 
 .nav-link {
-  font-size: .6rem;
+  @include media-breakpoint-up(md) {
+    text-align: center;
+    span {
+      font-size: .6rem;
+    }
+  }
   color: $white;
 }

@@ -31,7 +31,7 @@
 
     </head>
     <body>
-      <div class="d-flex flex-row flex-grow-1">
+      <div class="wrapper d-flex flex-column flex-md-row flex-grow-1">
         <div class="d-flex">
           {% include "navigation/global-nav.html.twig" %}
         </div>
@@ -40,6 +40,7 @@
             <div class="row">
               <div class="col-12">
                 {% block body %}
+                  <h1>Base content</h1>
                 {% endblock %}
               </div>
             </div>
