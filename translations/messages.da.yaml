@@ -1,7 +1,8 @@
 common:
   title: ITK Jira
 main:
-  title: ITK Jira - Apps
+  title: Vælg en opgave
+  bredcrumb: ITK Jira - Apps
   sidebar:
     shortcuts:
       title: Genveje
@@ -9,4 +10,3 @@ main:
       projects: Jira projektoversigt
       confluence: Confluence
       teams: Teams
-      slack: Slack
