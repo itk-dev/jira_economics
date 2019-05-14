@@ -1,2 +1,12 @@
 common:
   title: ITK Jira
+main:
+  title: ITK Jira - Apps
+  sidebar:
+    shortcuts:
+      title: Genveje
+      desc: Praktiske genveje til værktøjer
+      projects: Jira projektoversigt
+      confluence: Confluence
+      teams: Teams
+      slack: Slack

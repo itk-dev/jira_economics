@@ -1,12 +1,15 @@
 // customize Bootstrap variables
 $primary: #0747A6;
+$gray-200: #F4F5F7;
 
 @import "~bootstrap/scss/bootstrap";
 
-html, body, .wrapper {
+html, body, .wrapper, .main{
   height: 100%;
 }
 
+
+/* Navigation */
 @include media-breakpoint-up(md) {
   .navbar {
     height: 100%;
@@ -25,4 +28,14 @@ html, body, .wrapper {
     }
   }
   color: $white;
+}
+
+/* Main */
+.main-sidebar {
+  background-color: $gray-200;
+}
+@include media-breakpoint-up(md) {
+  .main-sidebar {
+    height: 100%;
+  }
 }
