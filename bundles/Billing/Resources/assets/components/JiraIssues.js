@@ -37,7 +37,7 @@ class JiraIssues extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    dispatch(rest.actions.getJiraIssues({ id: `${this.props.params.projectId}` }));
+    dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
   }
 
   // @TODO: consider simplifying logic here
@@ -159,7 +159,7 @@ class JiraIssues extends Component {
   handleSubmitIssues = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
-    dispatch(push(`/billing/project/${this.props.params.projectId}/${this.props.params.invoiceId}/invoice_entry`));
+    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`);
   }
 
   render() {

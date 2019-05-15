@@ -31,7 +31,7 @@ export class InvoiceEntrySubmitter extends Component {
   handleSelectJiraIssues = (event) => {
     event.preventDefault();
     const {dispatch} = this.props;
-    dispatch(push(`/billing/project/${this.props.params.projectId}/${this.props.params.invoiceId}/jiraIssues`));
+    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
   }
   render() {
     // @TODO: adjust boolean expression

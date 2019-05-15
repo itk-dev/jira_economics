@@ -31,7 +31,7 @@ export class InvoiceEntry extends Component {
     const {dispatch} = this.props;
     dispatch(rest.actions.deleteInvoiceEntry({id: `${this.props.match.params.invoiceEntryId}`}));
     // @TODO: Check that deletion is successful before navigating back to invoice page
-    dispatch(push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`));
+    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
   }
   render () {
     if (this.props.invoiceEntry.data.name) {
