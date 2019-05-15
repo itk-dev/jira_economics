@@ -90,9 +90,17 @@ class Invoice extends Component {
   };
   // @TODO: Remove form to create invoiceEntry with only a name
   // @TODO: Handle updating the list of invoiceEntries when a new invoiceEntry is submitted
-  // @TODO: Only show invoices related to the project identified by projectId
   render () {
-    if (this.props.invoice.data.name) {
+    if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId )  {
+      return (
+        <ContentWrapper>
+          <PageTitle>Invoice</PageTitle>
+          <div>Error: the requested invoice does not match the project specified in the URL</div>
+          <div>(URL contains projectId '{this.props.match.params.projectId}' but invoice with id '{this.props.match.params.invoiceId}' belongs to project with id '{this.props.invoice.data.jiraId}')</div>
+        </ContentWrapper>
+      );
+    }
+    else if (this.props.invoice.data.name) {
       return (
         <ContentWrapper>
           <PageTitle>Invoice</PageTitle>
