@@ -229,8 +229,11 @@ class BillingService
             throw new HttpException(404, 'InvoiceEntry with id ' . $invoiceEntryId . ' not found');
         }
 
-        return ['id'    => $invoiceEntry->getId(),
-            'name'  => $invoiceEntry->getName()];
+        return [
+            'id'         => $invoiceEntry->getId(),
+            'name'       => $invoiceEntry->getName(),
+            'invoiceId'  => $invoiceEntry->getInvoice()->getId()
+        ];
     }
 
     /**

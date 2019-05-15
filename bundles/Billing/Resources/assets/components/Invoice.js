@@ -96,7 +96,10 @@ class Invoice extends Component {
         <ContentWrapper>
           <PageTitle>Invoice</PageTitle>
           <div>Error: the requested invoice does not match the project specified in the URL</div>
-          <div>(URL contains projectId '{this.props.match.params.projectId}' but invoice with id '{this.props.match.params.invoiceId}' belongs to project with id '{this.props.invoice.data.jiraId}')</div>
+          <div>(URL contains projectId '{this.props.match.params.projectId}'
+           but invoice with id '{this.props.match.params.invoiceId}'
+            belongs to project with id '{this.props.invoice.data.jiraId}')
+          </div>
         </ContentWrapper>
       );
     }
