@@ -86,10 +86,11 @@ class Invoice extends Component {
   handleAddFromJira = (event) => {
     event.preventDefault();
     const {dispatch} = this.props;
-    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/jiraIssues`);
+    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
   };
   // @TODO: Remove form to create invoiceEntry with only a name
   // @TODO: Handle updating the list of invoiceEntries when a new invoiceEntry is submitted
+  // @TODO: Only show invoices related to the project identified by projectId
   render () {
     if (this.props.invoice.data.name) {
       return (
@@ -156,9 +157,12 @@ class Invoice extends Component {
                   placeholder="Enter invoiceEntry name">
                 </input>
               </div>
-              <button type="submit" className="btn btn-primary"
-                      id="add-from-jira">Submit new invoice entry
-              </button>
+              <button type="submit" className="btn btn-primary">Submit new invoice entry</button>
+            </form>
+          </div>
+          <div>
+            <form id="add-from-jira-form" onSubmit={this.handleAddFromJira}>
+              <button type="submit" className="btn btn-primary">Add line from Jira</button>
             </form>
           </div>
         </ContentWrapper>
