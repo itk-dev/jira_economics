@@ -108,7 +108,7 @@ class JiraService
      *
      * @return array
      */
-    public function getProjects()JE-12
+    public function getProjects()
     {
         $projects = [];
 
