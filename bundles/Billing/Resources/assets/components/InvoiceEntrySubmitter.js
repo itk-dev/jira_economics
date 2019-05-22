@@ -34,12 +34,23 @@ export class InvoiceEntrySubmitter extends Component {
     const {dispatch} = this.props;
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
   }
+  getTimeSpent() {
+    if (this.props.selectedIssues == undefined) {
+      return 0;
+    }
+    let timeSum = 0;
+    this.props.selectedIssues.selectedIssues.forEach(selectedIssue => {
+      timeSum += selectedIssue.timeSpent;
+    });
+    return timeSum;
+  }
   render() {
     if (this.props.selectedIssues) {
       return (
         <ContentWrapper>
           <PageTitle>Tilføj oplysninger til fakturalinje fra Jira</PageTitle>
           <div>{Object.values(this.props.selectedIssues.selectedIssues).length + " issue(s) valgt"}</div>
+          <div>{"Total timer valgt: " + this.getTimeSpent()}</div>
           <div>
             <form id="submitForm" onSubmit={this.handleSelectJiraIssues}>
               <button type="submit" className="btn btn-primary" id="submit">Rediger valg</button>
