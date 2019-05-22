@@ -3,7 +3,8 @@ import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from '../components/ContentWrapper';
 import PageTitle from '../components/PageTitle';
 import store from '../redux/store';
-import { getJiraIssues } from '../redux/actions';
+import { setSelectedIssues } from '../redux/actions';
+import reducers from '../redux/reducers';
 import PropTypes from 'prop-types';
 import 'moment-timezone';
 import rest from '../redux/utils/rest';
@@ -31,7 +32,7 @@ function makeIssueData(jiraIssues) {
 class JiraIssues extends Component {
   constructor(props) {
     super(props);
-    this.state = { selected: {}, selectAll: 0 };
+    this.state = { selected: {}, selectAll: 0, selectedIssues: {} };
     this.toggleRow = this.toggleRow.bind(this);
   }
 
@@ -159,6 +160,7 @@ class JiraIssues extends Component {
   handleSubmitIssues = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
+    dispatch(setSelectedIssues(this.state.selected));
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`);
   }
 
@@ -204,7 +206,8 @@ const mapStateToProps = state => {
 
   return {
     jiraIssues: state.jiraIssues,
-    issueData: issueData
+    issueData: issueData,
+    selectedIssues: state.selectedIssues
   };
 };
 

@@ -3,6 +3,7 @@ import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from './ContentWrapper';
 import PageTitle from './PageTitle';
 import store from '../redux/store';
+import reducers from '../redux/reducers';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
 import { push } from 'react-router-redux';
@@ -34,12 +35,11 @@ export class InvoiceEntrySubmitter extends Component {
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
   }
   render() {
-    // @TODO: adjust boolean expression
-    if (true) {
+    if (this.props.selectedIssues) {
       return (
         <ContentWrapper>
           <PageTitle>Tilføj oplysninger til fakturalinje fra Jira</PageTitle>
-          <div>Issues valgt og total timer go here...</div>
+          <div>{Object.values(this.props.selectedIssues.selectedIssues).length + " issue(s) valgt"}</div>
           <div>
             <form id="submitForm" onSubmit={this.handleSelectJiraIssues}>
               <button type="submit" className="btn btn-primary" id="submit">Rediger valg</button>
@@ -67,7 +67,8 @@ InvoiceEntrySubmitter.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    invoiceEntrySubmitter: state.invoiceEntrySubmitter
+    invoiceEntrySubmitter: state.invoiceEntrySubmitter,
+    selectedIssues: state.selectedIssues
   };
 };
 
