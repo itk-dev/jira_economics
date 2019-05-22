@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, withRouter } from "react-router-dom";
 import App from './App';
 import HomePage from '../pages/HomePage';
 import Project from '../components/Project';
@@ -46,9 +46,9 @@ export default class MainRouter extends Component {
         <Route exact path="/project/:projectId" component={Project} />
         <Route exact path="/project/:projectId/entry/:invoiceEntryId" component={Project}/>
         <Route exact path="/project/:projectId/:invoiceId" component={Invoice}/>
-        <Route exact path="/project/:projectId/:invoiceId/jiraIssues" component={JiraIssues}/>
-        <Route exact path="/project/:projectId/:invoiceId/invoice_entry" component={InvoiceEntrySubmitter}/>
+        <Route exact path="/project/:projectId/:invoiceId/invoice_entry/jira_issues" component={JiraIssues}/>
         <Route exact path="/project/:projectId/:invoiceId/:invoiceEntryId" component={InvoiceEntry}/>
+        <Route exact path="/project/:projectId/:invoiceId/submit/invoice_entry" component={InvoiceEntrySubmitter}/>
       </Router>
     );
   }

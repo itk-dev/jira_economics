@@ -81,12 +81,12 @@ class Invoice extends Component {
     const {dispatch} = this.props;
     dispatch(rest.actions.deleteInvoice({id: `${this.props.match.params.invoiceId}`}));
     // @TODO: Check that deletion is successful before navigating back to project page
-    dispatch(push(`/billing/project/${this.props.match.params.projectId}`));
+    this.props.history.push(`/project/${this.props.match.params.projectId}`);
   };
   handleAddFromJira = (event) => {
     event.preventDefault();
     const {dispatch} = this.props;
-    dispatch(push(`/billing/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/jiraIssues`));
+    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/jiraIssues`);
   };
   // @TODO: Remove form to create invoiceEntry with only a name
   // @TODO: Handle updating the list of invoiceEntries when a new invoiceEntry is submitted
