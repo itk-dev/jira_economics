@@ -9,31 +9,34 @@ html, body, .wrapper, .main{
 }
 
 
-/* Navigation */
-@include media-breakpoint-up(md) {
-  .navbar {
-    height: 100%;
-  }
-}
-
-.navbar-brand img {
-  width: 2rem;
-}
-
-.nav-link {
+/* Global Nav */
+.global-nav {
   @include media-breakpoint-up(md) {
-    text-align: center;
-    span {
-      font-size: .6rem;
+    .navbar {
+      height: 100%;
     }
   }
-  color: $white;
+
+  .navbar-brand img {
+    width: 2rem;
+  }
+
+  .nav-link {
+    @include media-breakpoint-up(md) {
+      text-align: center;
+      span {
+        font-size: .6rem;
+      }
+    }
+    color: $white;
+  }
 }
 
 /* Main */
 .main-sidebar {
   background-color: $gray-200;
 }
+
 @include media-breakpoint-up(md) {
   .main-sidebar {
     height: 100%;
