@@ -41,12 +41,16 @@
             <div class="d-flex flex-row flex-grow-1">
               <div class="container-fluid">
                 <div class="main row">
-                  {% block sidebar %}
-                    {% include "main/sidebar.html.twig" %}
-                  {% endblock %}
-                  {% block content %}
-                    {% include "main/index.html.twig" %}
-                  {% endblock %}
+                  <div class="main-sidebar col-12 col-md-3 col-lg-2 pt-md-3">
+                    {% block sidebar %}
+                      {% include "main/sidebar.html.twig" %}
+                    {% endblock %}
+                  </div>
+                  <div class="main-content col-12 col-md-9 col-lg-10 pt-md-3 pl-md-5">
+                    {% block content %}
+                      {% include "main/index.html.twig" %}
+                    {% endblock %}
+                  </div>
                 </div>
               </div>
             </div>

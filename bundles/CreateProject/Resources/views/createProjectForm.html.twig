@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% set page_header = 'Create new project'|trans %}
+
+{% block content %}
+  {{ form_start(form) }}
+  <div class="form-errors">
+    {{ form_errors(form) }}
+  </div>
+  <div class="form-group">
+    {{ form_row(form.project_name) }}
+  </div>
+  <div class="form-group">
+    {{ form_row(form.project_key) }}
+  </div>
+  <div class="form-group">
+    {{ form_row(form.description) }}
+  </div>
+  <div class="form-group">
+    {{ form_row(form.team) }}
+  </div>
+  <div class="form-group">
+    {{ form_row(form.account) }}
+    <div class="form-check">
+      {{ form_errors(form.new_account) }}
+      {{ form_widget(form.new_account) }}
+      {{ form_label(form.new_account) }}
+      {{ form_help(form.new_account) }}
+    </div>
+  </div>
+  <div class="form-group is-hidden toggle-account-group collapse">
+    {{ form_row(form.new_account_name) }}
+    {{ form_row(form.new_account_contact) }}
+    {{ form_row(form.new_account_customer) }}
+    <div class="form-check">
+      {{ form_errors(form.new_customer) }}
+      {{ form_widget(form.new_customer) }}
+      {{ form_label(form.new_customer) }}
+      {{ form_help(form.new_customer) }}
+    </div>
+    <div class="form-group is-hidden toggle-customer-group collapse">
+      {{ form_row(form.new_customer_name) }}
+    </div>
+  </div>
+  {{ form_end(form) }}
+{% endblock %}

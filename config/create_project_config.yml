@@ -1,0 +1,19 @@
+# Copy this file to create_project_config.local.yml
+parameters:
+    teamconfig:
+      ITK Dev:
+          team_lead:
+          price_table:
+          project_category:
+          issue_type_scheme:
+          workflow_scheme:
+          issue_type_screen_scheme:
+          permission_scheme:
+      ITK Lab:
+          team_lead:
+          price_table:
+          project_category:
+          issue_type_scheme:
+          workflow_scheme:
+          issue_type_screen_scheme:
+          permission_scheme:

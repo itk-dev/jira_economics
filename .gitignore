@@ -22,6 +22,7 @@ npm-debug.log
 /public/bundles/
 /var/
 /vendor/
+/config/create_project_config.local.yml
 ###< symfony/framework-bundle ###
 
 ###> symfony/webpack-encore-pack ###
