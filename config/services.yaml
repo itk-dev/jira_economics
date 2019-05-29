@@ -37,3 +37,7 @@ services:
             $pem_path: '%env(JIRA_OAUTH_PEM_PATH)%'
             $jira_url: '%env(JIRA_URL)%'
             $entity_manager: '@doctrine.orm.entity_manager'
+
+
+maker:
+    root_namespace: '%env(resolve:MAKER_NAMESPACE)%'
