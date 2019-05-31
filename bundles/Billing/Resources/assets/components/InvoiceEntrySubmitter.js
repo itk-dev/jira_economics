@@ -53,7 +53,7 @@ export class InvoiceEntrySubmitter extends Component {
     // @TODO: get these values from the event instead
     const description = $('#invoice-entry-description').val();
     const account = $('#invoice-entry-account').val();
-    const item = $('#invoice-entry-item').val();
+    const product = $('#invoice-entry-product').val();
     let jiraIssueIds = [];
     this.props.selectedIssues.selectedIssues.forEach(selectedIssue => {
       jiraIssueIds.push(selectedIssue.id);
@@ -63,7 +63,7 @@ export class InvoiceEntrySubmitter extends Component {
       name,
       description,
       account,
-      item,
+      product,
       jiraIssueIds
     };
     dispatch(rest.actions.createInvoiceEntry({}, {
@@ -103,7 +103,7 @@ export class InvoiceEntrySubmitter extends Component {
                   type="text"
                   name="enterVarenr"
                   className="form-control"
-                  id="invoice-entry-item-id"
+                  id="invoice-entry-product-id"
                   aria-describedby="enterVarenr"
                   placeholder="Varenavn">
                 </input>
