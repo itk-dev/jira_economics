@@ -36,6 +36,21 @@ class InvoiceEntry
      */
     private $jiraIssues;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $description;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $account;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $product;
+
     public function __construct()
     {
         $this->jiraIssues = new ArrayCollection();
@@ -97,6 +112,42 @@ class InvoiceEntry
                 $jiraIssue->setInvoiceEntryId(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getAccount(): ?string
+    {
+        return $this->account;
+    }
+
+    public function setAccount(string $account): self
+    {
+        $this->account = $account;
+
+        return $this;
+    }
+
+    public function getProduct(): ?string
+    {
+        return $this->product;
+    }
+
+    public function setProduct(?string $product): self
+    {
+        $this->product = $product;
 
         return $this;
     }

@@ -12,6 +12,7 @@ export class InvoiceEntry extends Component {
   componentDidMount() {
     const {dispatch} = this.props;
     dispatch(rest.actions.getInvoiceEntry({id: `${this.props.match.params.invoiceEntryId}`}));
+    dispatch(rest.actions.getInvoice({id: `${this.props.match.params.invoiceId}`}));
   }
   handleEditSubmit = (event) => {
     event.preventDefault();
@@ -34,7 +35,31 @@ export class InvoiceEntry extends Component {
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
   }
   render () {
-    if (this.props.invoiceEntry.data.name) {
+    if (this.props.invoiceEntry.data.invoiceId && this.props.invoiceEntry.data.invoiceId != this.props.match.params.invoiceId) {
+      return (
+        <ContentWrapper>
+          <PageTitle>Invoice Entry</PageTitle>
+            <div>Error: the requested invoiceEntry does not match the invoice specified in the URL</div>
+            <div>(URL contains invoiceId '{this.props.match.params.invoiceId}'
+             but invoiceEntry with id '{this.props.match.params.invoiceEntryId}'
+              belongs to invoice with id '{this.props.invoiceEntry.data.invoiceId}')
+            </div>
+        </ContentWrapper>
+      );
+    }
+    else if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId) {
+      return (
+        <ContentWrapper>
+          <PageTitle>Invoice Entry</PageTitle>
+            <div>Error: the requested invoiceEntry does not match the project specified in the URL</div>
+            <div>(URL contains projectId '{this.props.match.params.projectId}'
+             but invoiceEntry with id '{this.props.match.params.invoiceEntryId}'
+              belongs to an invoice that belongs to project with id '{this.props.invoice.data.jiraId}')
+            </div>
+        </ContentWrapper>
+      );
+    }
+    else if (this.props.invoiceEntry.data.name) {
       return (
         <ContentWrapper>
           <PageTitle>Invoice Entry</PageTitle>
@@ -79,12 +104,14 @@ export class InvoiceEntry extends Component {
 }
 
 InvoiceEntry.propTypes = {
-  invoiceEntry: PropTypes.object
+  invoiceEntry: PropTypes.object,
+  invoice: PropTypes.object
 };
 
 const mapStateToProps = state => {
   return {
-    invoiceEntry: state.invoiceEntry
+    invoiceEntry: state.invoiceEntry,
+    invoice: state.invoice
   };
 };
 

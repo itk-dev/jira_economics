@@ -229,8 +229,11 @@ class BillingService
             throw new HttpException(404, 'InvoiceEntry with id ' . $invoiceEntryId . ' not found');
         }
 
-        return ['id'    => $invoiceEntry->getId(),
-            'name'  => $invoiceEntry->getName()];
+        return [
+            'id'         => $invoiceEntry->getId(),
+            'name'       => $invoiceEntry->getName(),
+            'invoiceId'  => $invoiceEntry->getInvoice()->getId()
+        ];
     }
 
     /**
@@ -247,8 +250,8 @@ class BillingService
             throw new HttpException(400, "Missing 'name' for new invoice entry in request");
         }
 
-        $repository = $this->entityManager->getRepository(Invoice::class);
-        $invoice = $repository->findOneBy(['id' => $invoiceEntryData['invoiceId']]);
+        $invoiceRepository = $this->entityManager->getRepository(Invoice::class);
+        $invoice = $invoiceRepository->findOneBy(['id' => $invoiceEntryData['invoiceId']]);
 
         if (!$invoice) {
             throw new HttpException(400, "Invoice with id " . $invoiceEntryData['invoiceId'] . " not found");
@@ -256,15 +259,31 @@ class BillingService
 
         $invoiceEntry = new InvoiceEntry();
         $invoiceEntry->setName($invoiceEntryData['name']);
+        $invoiceEntry->setDescription($invoiceEntryData['description']);
+        $invoiceEntry->setAccount($invoiceEntryData['account']);
+        $invoiceEntry->setProduct($invoiceEntryData['product']);
         $invoiceEntry->setInvoice($invoice);
+
+        $jiraIssueRepository = $this->entityManager->getRepository(JiraIssue::class);
+
+        foreach ($invoiceEntryData['jiraIssueIds'] as $jiraIssueId) {
+            $jiraIssue = $jiraIssueRepository->findOneBy(['issueId' => $jiraIssueId]);
+            $invoiceEntry->addJiraIssue($jiraIssue);
+        }
 
         $this->entityManager->persist($invoiceEntry);
         $this->entityManager->flush();
 
-        return ['invoiceEntryId'    => $invoiceEntry->getId(),
+        return [
+            'invoiceEntryId'    => $invoiceEntry->getId(),
             'name'              => $invoiceEntry->getName(),
-            'jiraId'            => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
-            'invoiceId'         => $invoiceEntry->getInvoice()->getId()];
+            'jiraProjectId'     => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
+            'invoiceId'         => $invoiceEntry->getInvoice()->getId(),
+            'description'       => $invoiceEntry->getDescription(),
+            'account'           => $invoiceEntry->getAccount(),
+            'product'           => $invoiceEntry->getProduct(),
+            'jiraIssueIds'      => $invoiceEntryData['jiraIssueIds']
+        ];
     }
 
     /**

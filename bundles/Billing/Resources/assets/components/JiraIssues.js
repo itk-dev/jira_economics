@@ -3,7 +3,8 @@ import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from '../components/ContentWrapper';
 import PageTitle from '../components/PageTitle';
 import store from '../redux/store';
-import { getJiraIssues } from '../redux/actions';
+import { setSelectedIssues } from '../redux/actions';
+import reducers from '../redux/reducers';
 import PropTypes from 'prop-types';
 import 'moment-timezone';
 import rest from '../redux/utils/rest';
@@ -28,10 +29,25 @@ function makeIssueData(jiraIssues) {
   }));
 }
 
+const searchKeyValue = (data, key, value) => {
+  //if falsy or not an object/array return false
+  if (!data || typeof data !== 'object') {
+    return false;
+  }
+
+  //if the value of the key equals value return true
+  if (data[key] === value) {
+    return true;
+  }
+
+  //return the results of using searchKeyValue on all values of the object/array
+  return Object.values(data).some((data) => searchKeyValue(data, key, value));
+};
+
 class JiraIssues extends Component {
   constructor(props) {
     super(props);
-    this.state = { selected: {}, selectAll: 0 };
+    this.state = { selected: [], selectAll: 0, selectedIssues: {} };
     this.toggleRow = this.toggleRow.bind(this);
   }
 
@@ -41,26 +57,28 @@ class JiraIssues extends Component {
   }
 
   // @TODO: consider simplifying logic here
-  toggleRow(issueId) {
-    const newSelected = Object.assign({}, this.state.selected);
-    newSelected[issueId] = !this.state.selected[issueId];
-    let checked_iter = Object.values(newSelected).values()
-    let result = checked_iter.next()
-    let checked_num = 0
-    while (!result.done) {
-      let checked_val = result.value
-      if (checked_val === true) {
-        checked_num++;
+  toggleRow(issue) {
+    let newSelected = this.state.selected;
+    let selectedIssueIndex = -1;
+    for (var i = 0; i < newSelected.length; i++) {
+      if (newSelected[i] && newSelected[i]['id'] == issue.id) {
+        selectedIssueIndex = i;
       }
-      result = checked_iter.next()
     }
 
-    if (checked_num === this.props.issueData.length) {
+    if (selectedIssueIndex > -1) {
+      newSelected.splice(selectedIssueIndex, 1);
+    }
+    else {
+      newSelected.push(issue);
+    }
+
+    if (newSelected.length == this.props.issueData.length) {
       this.setState({
         selectAll: 1
       })
     }
-    else if (checked_num === 0) {
+    else if (newSelected.length == 0) {
       this.setState({
         selectAll: 0
       })
@@ -76,11 +94,11 @@ class JiraIssues extends Component {
   }
 
   toggleSelectAll() {
-    let newSelected = {};
+    let newSelected = [];
 
     if (this.state.selectAll === 0) {
-      this.props.issueData.forEach(x => {
-        newSelected[x.id] = true;
+      this.props.issueData.forEach(issue => {
+        newSelected.push(issue);
       });
     }
     this.setState({
@@ -99,8 +117,8 @@ class JiraIssues extends Component {
             <input
               type="checkbox"
               className="checkbox"
-              checked={this.state.selected[original.id] === true}
-              onChange={() => this.toggleRow(original.id)}
+              checked={searchKeyValue(this.state.selected, 'id', original.id)}
+              onChange={() => this.toggleRow(original)}
             />
           );
         },
@@ -159,6 +177,7 @@ class JiraIssues extends Component {
   handleSubmitIssues = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
+    dispatch(setSelectedIssues(this.state.selected));
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`);
   }
 
@@ -204,7 +223,8 @@ const mapStateToProps = state => {
 
   return {
     jiraIssues: state.jiraIssues,
-    issueData: issueData
+    issueData: issueData,
+    selectedIssues: state.selectedIssues
   };
 };
 
