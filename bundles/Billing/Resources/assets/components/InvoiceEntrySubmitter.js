@@ -18,17 +18,6 @@ export class InvoiceEntrySubmitter extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
   }
-  handleSubmitInvoiceEntry = (e) => {
-    const { dispatch } = this.props;
-    // @TODO: an InvoiceEntry should have one or more JiraIssues
-    const invoiceEntryData = {
-      id,
-      name
-    }
-    dispatch(rest.actions.createInvoiceEntry(), {
-      body: JSON.stringify(invoiceEntryData)
-    });
-  }
   handleSelectJiraIssues = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
