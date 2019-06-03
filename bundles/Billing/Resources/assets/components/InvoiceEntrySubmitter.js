@@ -3,6 +3,7 @@ import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from './ContentWrapper';
 import PageTitle from './PageTitle';
 import store from '../redux/store';
+import { setSelectedIssues } from '../redux/actions';
 import reducers from '../redux/reducers';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
@@ -13,16 +14,24 @@ const $ = require('jquery');
 export class InvoiceEntrySubmitter extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      account: 'Vælg PSP'
+    };
     this.handleSelectJiraIssues = this.handleSelectJiraIssues.bind(this);
+    this.onAccountChange = this.onAccountChange.bind(this);
   }
+
   componentDidMount() {
     const { dispatch } = this.props;
   }
+
   handleSelectJiraIssues = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
+    dispatch(setSelectedIssues(this.props.selectedIssues));
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
   }
+
   getTimeSpent() {
     if (this.props.selectedIssues == undefined) {
       return 0;
@@ -33,6 +42,23 @@ export class InvoiceEntrySubmitter extends Component {
     });
     return timeSum;
   }
+
+  getUnitPrice() {
+    // @TODO: replace with real data
+    const unitPrices = {"PSP1": 560, "PSP2": 760, "PSP3": 820};
+    let unitPrice = 0;
+    if ($('#invoice-entry-account').val()) {
+      unitPrice = unitPrices[$('#invoice-entry-account').val()];
+    }
+    return unitPrice;
+  }
+
+  onAccountChange(event) {
+    this.setState({
+      account: event.target.value
+    });
+  }
+
   handleCreateSubmit = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
@@ -61,11 +87,13 @@ export class InvoiceEntrySubmitter extends Component {
     // @TODO: check that a new invoiceEntry was successfully created before navigating to invoice page
     // @TODO: consider showing a modal dialog to confirm invoiceEntry creation
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
-  };
+  }
+
   handleCancelSubmit = (event) => {
     event.preventDefault();
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
-  };
+  }
+
   render() {
     if (this.props.selectedIssues) {
       return (
@@ -84,11 +112,14 @@ export class InvoiceEntrySubmitter extends Component {
                 Kontonr.
               </label>
               <div>
-                <select className="browser-default custom-select" defaultValue="Vælg PSP" id="invoice-entry-account">
+                <select className="browser-default custom-select"
+                  defaultValue={this.state.account}
+                  id="invoice-entry-account"
+                  onChange={this.onAccountChange}>
                   <option value="Vælg PSP" hidden>Vælg PSP</option>
-                  <option value="foo">foo</option>
-                  <option value="bar">bar</option>
-                  <option value="baz">baz</option>
+                  <option value="PSP1">PSP1</option>
+                  <option value="PSP2">PSP2</option>
+                  <option value="PSP3">PSP3</option>
                 </select>
               </div>
               <div>
@@ -135,7 +166,7 @@ export class InvoiceEntrySubmitter extends Component {
                   className="form-control"
                   id="invoice-entry-unit-price"
                   aria-describedby="enterUnitPrice"
-                  placeholder="42"
+                  placeholder={this.getUnitPrice()}
                   readOnly>
                 </input>
               </div>
