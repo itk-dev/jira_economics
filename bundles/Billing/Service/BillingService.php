@@ -264,26 +264,36 @@ class BillingService
         $invoiceEntry->setProduct($invoiceEntryData['product']);
         $invoiceEntry->setInvoice($invoice);
 
-        $jiraIssueRepository = $this->entityManager->getRepository(JiraIssue::class);
-
-        foreach ($invoiceEntryData['jiraIssueIds'] as $jiraIssueId) {
-            $jiraIssue = $jiraIssueRepository->findOneBy(['issueId' => $jiraIssueId]);
-            $invoiceEntry->addJiraIssue($jiraIssue);
-        }
-
-        $this->entityManager->persist($invoiceEntry);
-        $this->entityManager->flush();
-
-        return [
+        $response = [
             'invoiceEntryId'    => $invoiceEntry->getId(),
             'name'              => $invoiceEntry->getName(),
             'jiraProjectId'     => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
             'invoiceId'         => $invoiceEntry->getInvoice()->getId(),
             'description'       => $invoiceEntry->getDescription(),
             'account'           => $invoiceEntry->getAccount(),
-            'product'           => $invoiceEntry->getProduct(),
-            'jiraIssueIds'      => $invoiceEntryData['jiraIssueIds']
+            'product'           => $invoiceEntry->getProduct()
         ];
+
+        if (!empty($invoiceEntryData['jiraIssueIds'])) {
+            $jiraIssueRepository = $this->entityManager->getRepository(JiraIssue::class);
+
+            foreach ($invoiceEntryData['jiraIssueIds'] as $jiraIssueId) {
+                $jiraIssue = $jiraIssueRepository->findOneBy(['issueId' => $jiraIssueId]);
+
+                if (!$jiraIssue) {
+                    throw new HttpException(400, "JiraIssue with id " . $jiraIssueId . " not found");
+                }
+
+                $invoiceEntry->addJiraIssue($jiraIssue);
+            }
+
+            $response['jiraIssueIds'] = $invoiceEntryData['jiraIssueIds'];
+        }
+
+        $this->entityManager->persist($invoiceEntry);
+        $this->entityManager->flush();
+
+        return $response;
     }
 
     /**

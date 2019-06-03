@@ -188,6 +188,11 @@ class JiraIssues extends Component {
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`);
   }
 
+  handleCancelSubmit = (event) => {
+    event.preventDefault();
+    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
+  }
+
   render() {
     if (this.props.jiraIssues.data.data) {
       return (
@@ -203,6 +208,11 @@ class JiraIssues extends Component {
           <div>
             <form id="submitForm" onSubmit={this.handleSubmitIssues}>
               <button type="submit" className="btn btn-primary" id="submit">Fortsæt med valgte issues</button>
+            </form>
+          </div>
+          <div>
+            <form id="cancelForm" onSubmit={this.handleCancelSubmit}>
+              <button type="submit" className="btn btn-danger" id="cancel">Annuller</button>
             </form>
           </div>
         </ContentWrapper>

@@ -94,8 +94,97 @@ export class InvoiceEntrySubmitter extends Component {
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
   }
 
+  // @TODO: cleanup redundant HTML
   render() {
-    if (this.props.selectedIssues) {
+    if (this.props.selectedIssues &&
+        this.props.location &&
+        this.props.location.state &&
+        this.props.location.state.from ===
+        `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`) {
+      return (
+        <ContentWrapper>
+          <PageTitle>Opret fakturalinje manuelt</PageTitle>
+          <div>
+            <form id="create-invoice-entry-form">
+              <div>
+                <label htmlFor="kontonr">
+                  Kontonr.
+                </label>
+                <input
+                  type="text"
+                  name="enterKontonr"
+                  className="form-control"
+                  id="invoice-entry-account"
+                  aria-describedby="enterKontonr"
+                  placeholder="Kontonummer">
+                </input>
+              </div>
+              <div>
+                <label htmlFor="vare">
+                  Vare
+                </label>
+                <input
+                  type="text"
+                  name="enterVarenr"
+                  className="form-control"
+                  id="invoice-entry-product"
+                  aria-describedby="enterVarenr"
+                  placeholder="Varenavn">
+                </input>
+                <label htmlFor="beskrivelse">
+                  Beskrivelse
+                </label>
+                <input
+                  type="text"
+                  name="beskrivelse"
+                  className="form-control"
+                  id="invoice-entry-description"
+                  aria-describedby="enterBeskrivelse"
+                  placeholder="Varebeskrivelse">
+                </input>
+                <label htmlFor="antal">
+                  Antal
+                </label>
+                <input
+                  type="text"
+                  name="hoursSpent"
+                  className="form-control"
+                  id="invoice-entry-hours-spent"
+                  aria-describedby="enterHoursSpent"
+                  placeholder="Vareantal">
+                </input>
+                <label htmlFor="beskrivelse">
+                  Stk. pris
+                </label>
+                <input
+                  type="text"
+                  name="unitPrice"
+                  className="form-control"
+                  id="invoice-entry-unit-price"
+                  aria-describedby="enterUnitPrice"
+                  placeholder="0">
+                </input>
+              </div>
+            </form>
+            <form onSubmit={this.handleCreateSubmit}>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                id="create-invoice-entry">Overfør til faktura
+              </button>
+            </form>
+            <form onSubmit={this.handleCancelSubmit}>
+              <button
+                type="submit"
+                className="btn btn-danger"
+                id="cancel">Annuller
+              </button>
+            </form>
+          </div>
+        </ContentWrapper>
+      );
+    }
+    else if (this.props.selectedIssues) {
       return (
         <ContentWrapper>
           <PageTitle>Tilføj oplysninger til fakturalinje fra Jira</PageTitle>
