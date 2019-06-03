@@ -69,6 +69,13 @@ export class InvoiceEntrySubmitter extends Component {
     dispatch(rest.actions.createInvoiceEntry({}, {
       body: JSON.stringify(invoiceEntryData)
     }));
+    // @TODO: check that a new invoiceEntry was successfully created before navigating to invoice page
+    // @TODO: consider showing a modal dialog to confirm invoiceEntry creation
+    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
+  };
+  handleCancelSubmit = (event) => {
+    event.preventDefault();
+    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
   };
   render() {
     if (this.props.selectedIssues) {
@@ -88,7 +95,7 @@ export class InvoiceEntrySubmitter extends Component {
                 Kontonr.
               </label>
               <div>
-                <select className="browser-default custom-select" defaultValue="Vælg PSP">
+                <select className="browser-default custom-select" defaultValue="Vælg PSP" id="invoice-entry-account">
                   <option value="Vælg PSP" hidden>Vælg PSP</option>
                   <option value="foo">foo</option>
                   <option value="bar">bar</option>
@@ -103,7 +110,7 @@ export class InvoiceEntrySubmitter extends Component {
                   type="text"
                   name="enterVarenr"
                   className="form-control"
-                  id="invoice-entry-product-id"
+                  id="invoice-entry-product"
                   aria-describedby="enterVarenr"
                   placeholder="Varenavn">
                 </input>
