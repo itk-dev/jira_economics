@@ -8,12 +8,11 @@ import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Dropdown from 'react-bootstrap/Dropdown';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Tooltip from 'react-bootstrap/Tooltip';
 
 export default function HomePage(props) {
   return (
-    <ContentWrapper>
       <div className="row">
         <PageTitle className="col-sm-8">Fakturaer</PageTitle>
         <div className="col-sm-4">
@@ -27,79 +26,99 @@ export default function HomePage(props) {
             </Form.Group>
           </Form>
         </div>
+        <div className="col-12">
+          <Tabs defaultActiveKey="drafts" id="uncontrolled-tab-example">
+            <Tab eventKey="drafts" title="Kladder">
+              <Table responsive striped hover borderless>
+                <thead>
+                  <tr>
+                    <th>Faktura navn</th>
+                    <th>Faktura dato</th>
+                    <th>Beløb (DKK)</th>
+                    <th className="text-right">Funktion</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="/billing/project/"><strong>Udvikling sommer</strong></a></td>
+                    <td>30/09/2018</td>
+                    <td><strong>65.146</strong></td>
+                    <td className="text-right">
+                      <ButtonGroup size="sm" className="float-right" aria-label="Invoice functions">
+                        <OverlayTrigger
+                          key="edit"
+                          placement="top"
+                          overlay={
+                            <Tooltip id="tooltip-edit">
+                              Edit this invoice
+                            </Tooltip>
+                          }
+                        >
+                          <Button className="btn-primary">
+                            <i className="fas fa-edit mx-2"></i>
+                            <span className="sr-only">rediger</span>
+                          </Button>
+                        </OverlayTrigger>
+                        <OverlayTrigger
+                          key="delete"
+                          placement="top"
+                          overlay={
+                            <Tooltip id="tooltip-delete">
+                              Delete this invoice
+                            </Tooltip>
+                          }
+                        >
+                          <Button className="btn-danger">
+                            <i className="fas fa-trash-alt mx-2"></i>
+                            <span className="sr-only">slet</span>
+                          </Button>
+                        </OverlayTrigger>
+
+                      </ButtonGroup>
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+            </Tab>
+            <Tab eventKey="posted" title="Bogførte">
+              <Table responsive striped hover borderless>
+                <thead>
+                  <tr>
+                    <th>Faktura navn</th>
+                    <th>Faktura dato</th>
+                    <th>Beløb (DKK)</th>
+                    <th className="text-right">Funktion</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="/billing/project"><strong>Udvikling sommer</strong></a></td>
+                    <td>30/09/2018</td>
+                    <td><strong>65.146</strong></td>
+                    <td className="text-right">
+                      <ButtonGroup className="btn-group-sm float-right" aria-label="Invoice functions">
+                        <OverlayTrigger
+                          key="download-csv"
+                          placement="top"
+                          overlay={
+                            <Tooltip id="tooltip-download-csv">
+                              Download csv file
+                            </Tooltip>
+                          }
+                        >
+                          <Button>
+                            <i className="fas fa-file-csv mx-2"></i>
+                            <span className="sr-only">hent csv</span>
+                          </Button>
+                        </OverlayTrigger>
+                      </ButtonGroup>
+                    </td>
+                  </tr>
+                </tbody>
+              </Table>
+            </Tab>
+          </Tabs>
+        </div>
       </div>
-        <Tabs defaultActiveKey="drafts" id="uncontrolled-tab-example">
-          <Tab eventKey="drafts" title="Kladder">
-            <Table striped hover borderless>
-              <thead>
-                <tr>
-                  <th>Faktura navn</th>
-                  <th>Faktura dato</th>
-                  <th>Beløb (DKK)</th>
-                  <th className="float-right">Funktion</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>Udvikling sommer</strong></td>
-                  <td>30/09/2018</td>
-                  <td><strong>65.146</strong></td>
-                  <td className="float-right">
-                    <ButtonGroup size="sm" className="float-right" aria-label="Invoice functions">
-                      <Button className="btn-primary">rediger</Button>
-                      <Button className="btn-danger">slet</Button>
-                    </ButtonGroup>
-                  </td>
-                </tr>
-                <tr>
-                  <td><strong>Udvikling sommer</strong></td>
-                  <td>30/09/2018</td>
-                  <td><strong>65.146</strong></td>
-                  <td className="float-right">
-                    <ButtonGroup size="sm" className="float-right" aria-label="Invoice functions">
-                      <Button className="btn-primary">rediger</Button>
-                      <Button className="btn-danger">slet</Button>
-                    </ButtonGroup>
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-          </Tab>
-          <Tab eventKey="posted" title="Bogførte">
-            <Table striped hover borderless>
-              <thead>
-                <tr>
-                  <th>Faktura navn</th>
-                  <th>Faktura dato</th>
-                  <th>Beløb (DKK)</th>
-                  <th className="float-right">Funktion</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong>Udvikling sommer</strong></td>
-                  <td>30/09/2018</td>
-                  <td><strong>65.146</strong></td>
-                  <td className="float-right">
-                    <ButtonGroup className="btn-group-sm float-right" aria-label="Invoice functions">
-                      <Button className="btn-outline-primary">hent csv</Button>
-                    </ButtonGroup>
-                  </td>
-                </tr>
-                <tr>
-                  <td><strong>Udvikling sommer</strong></td>
-                  <td>30/09/2018</td>
-                  <td><strong>65.146</strong></td>
-                  <td className="float-right">
-                    <ButtonGroup className="btn-group-sm float-right" aria-label="Invoice functions">
-                      <Button className="btn-outline-primary">hent csv</Button>
-                    </ButtonGroup>
-                  </td>
-                </tr>
-              </tbody>
-            </Table>
-          </Tab>
-        </Tabs>
-    </ContentWrapper>
   )
 }
