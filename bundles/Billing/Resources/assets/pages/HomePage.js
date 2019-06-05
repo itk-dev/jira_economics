@@ -33,6 +33,7 @@ export default function HomePage(props) {
                 <thead>
                   <tr>
                     <th>Faktura navn</th>
+                    <th>Projekt</th>
                     <th>Faktura dato</th>
                     <th>Beløb (DKK)</th>
                     <th className="text-right">Funktion</th>
@@ -41,6 +42,7 @@ export default function HomePage(props) {
                 <tbody>
                   <tr>
                     <td><a href="/billing/project/"><strong>Udvikling sommer</strong></a></td>
+                    <td>AAKB</td>
                     <td>30/09/2018</td>
                     <td><strong>65.146</strong></td>
                     <td className="text-right">
@@ -85,6 +87,7 @@ export default function HomePage(props) {
                 <thead>
                   <tr>
                     <th>Faktura navn</th>
+                    <th>Projekt</th>
                     <th>Faktura dato</th>
                     <th>Beløb (DKK)</th>
                     <th className="text-right">Funktion</th>
@@ -93,6 +96,7 @@ export default function HomePage(props) {
                 <tbody>
                   <tr>
                     <td><a href="/billing/project"><strong>Udvikling sommer</strong></a></td>
+                    <td>AAKB</td>
                     <td>30/09/2018</td>
                     <td><strong>65.146</strong></td>
                     <td className="text-right">
