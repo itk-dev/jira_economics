@@ -8,6 +8,7 @@ export default function NewInvoice(props) {
     <ContentWrapper>
       <p className="text-muted">Ny faktura</p>
       <PageTitle>Vælg projekt</PageTitle>
+      <hr/>
       <ProjectList/>
     </ContentWrapper>
   )
