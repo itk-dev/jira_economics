@@ -1,48 +1,71 @@
 {% extends 'base.html.twig' %}
 
-{% set page_header = 'Create new project'|trans %}
 {% block title %}
-  <h1>{{ 'ABC'|trans }}</h1>
+  {{ 'create_project_form.title'|trans }}
 {% endblock %}
 {% block content %}
-  {{ form_start(form) }}
-  <div class="form-errors">
-    {{ form_errors(form) }}
-  </div>
-  <div class="form-group">
-    {{ form_row(form.project_name) }}
-  </div>
-  <div class="form-group">
-    {{ form_row(form.project_key) }}
-  </div>
-  <div class="form-group">
-    {{ form_row(form.description) }}
-  </div>
-  <div class="form-group">
-    {{ form_row(form.team) }}
-  </div>
-  <div class="form-group">
-    {{ form_row(form.account) }}
-    <div class="form-check">
-      {{ form_errors(form.new_account) }}
-      {{ form_widget(form.new_account) }}
-      {{ form_label(form.new_account) }}
-      {{ form_help(form.new_account) }}
+  <h1>{{ 'create_project_form.title'|trans }}</h1>
+  <div class="form" id="create-project-form" data-form-config="{{ formConfig }}">
+    {{ form_start(form) }}
+    <div class="form-errors">
+      {{ form_errors(form) }}
+    </div>
+    <div class="form-group create_project_form_project_name_wrapper">
+      {{ form_label(form.project_name) }}
+      <span class="invalid-feedback name-warning-message">
+        <span class="d-block">
+          <span class="form-error-icon badge badge-danger text-uppercase">{{ 'create_project_form.error'|trans }}</span>
+          <span class="form-error-message">{{ 'create_project_form.project_name.warning'|trans }}</span>
+        </span>
+      </span>
+      {{ form_errors(form.project_name) }}
+      {{ form_widget(form.project_name) }}
+      {{ form_help(form.project_name) }}
+    </div>
+    <div class="form-group create_project_form_project_key_wrapper">
+      {{ form_label(form.project_key) }}
+      <span class="invalid-feedback key-warning-message">
+        <span class="d-block">
+          <span class="form-error-icon badge badge-danger text-uppercase">{{ 'create_project_form.error'|trans }}</span>
+          <span class="form-error-message">{{ 'create_project_form.project_key.warning'|trans }}</span>
+        </span>
+      </span>
+      {{ form_errors(form.project_key) }}
+      {{ form_widget(form.project_key) }}
+      {{ form_help(form.project_key) }}
+    </div>
+    <div class="form-group">
+      {{ form_row(form.description) }}
+    </div>
+    <div class="form-group">
+      {{ form_row(form.team) }}
+    </div>
+    <div class="form-group">
+      {{ form_row(form.account) }}
+      {{ form_row(form.new_account) }}
+    </div>
+    <div class="form-group toggle-account-group collapse">
+      {{ form_row(form.new_account_name) }}
+      {{ form_row(form.new_account_key) }}
+      {{ form_row(form.new_account_contact) }}
+      {{ form_row(form.new_account_customer) }}
+      {{ form_row(form.new_customer) }}
+      <div class="form-group toggle-customer-group collapse">
+        {{ form_row(form.new_customer_name) }}
+        {{ form_row(form.new_customer_key) }}
+      </div>
+    </div>
+    {{ form_end(form) }}
+    <div id="create_project_form_save_text" style="display: none;">
+    <button class="btn btn-primary" type="button" disabled>
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      {{ 'create_project_form.save.progress_text'|trans }}
+    </button>
     </div>
   </div>
-  <div class="form-group is-hidden toggle-account-group collapse">
-    {{ form_row(form.new_account_name) }}
-    {{ form_row(form.new_account_contact) }}
-    {{ form_row(form.new_account_customer) }}
-    <div class="form-check">
-      {{ form_errors(form.new_customer) }}
-      {{ form_widget(form.new_customer) }}
-      {{ form_label(form.new_customer) }}
-      {{ form_help(form.new_customer) }}
-    </div>
-    <div class="form-group is-hidden toggle-customer-group collapse">
-      {{ form_row(form.new_customer_name) }}
-    </div>
-  </div>
-  {{ form_end(form) }}
+{% endblock %}
+
+{% block javascripts %}
+  {{ encore_entry_script_tags('app') }}
+  {{ encore_entry_script_tags('create_project') }}
 {% endblock %}

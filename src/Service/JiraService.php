@@ -188,6 +188,21 @@ class JiraService
     }
 
     /**
+     * Get project.
+     *
+     * @param $key
+     *   A project key or id.
+     *
+     * @return array
+     */
+    public function getProject($key)
+    {
+        $project = $this->get('/rest/api/2/project/' . $key);
+
+        return $project;
+    }
+
+    /**
      * Get all projects.
      *
      * @return array
@@ -271,7 +286,7 @@ class JiraService
      * @return mixed
      */
     public function getCurrentUser() {
-        $result = $this->get('/rest/api/3/myself');
+        $result = $this->get('/rest/api/2/myself');
 
         return $result;
     }
