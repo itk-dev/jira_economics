@@ -14,6 +14,7 @@ export class InvoiceEntry extends Component {
     dispatch(rest.actions.getInvoiceEntry({id: `${this.props.match.params.invoiceEntryId}`}));
     dispatch(rest.actions.getInvoice({id: `${this.props.match.params.invoiceId}`}));
   }
+
   handleEditSubmit = (event) => {
     event.preventDefault();
     const {dispatch} = this.props;
@@ -27,6 +28,7 @@ export class InvoiceEntry extends Component {
       body: JSON.stringify(invoiceEntryData)
     }));
   }
+
   handleDeleteSubmit = (event) => {
     event.preventDefault();
     const {dispatch} = this.props;
@@ -34,6 +36,7 @@ export class InvoiceEntry extends Component {
     // @TODO: Check that deletion is successful before navigating back to invoice page
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
   }
+
   render () {
     if (this.props.invoiceEntry.data.invoiceId && this.props.invoiceEntry.data.invoiceId != this.props.match.params.invoiceId) {
       return (

@@ -45,6 +45,7 @@ class Invoice extends Component {
       body: JSON.stringify(invoiceData)
     }));
   };
+
   handleRecordSubmit = (event) => {
     event.preventDefault();
     const {dispatch} = this.props;
@@ -62,6 +63,7 @@ class Invoice extends Component {
       body: JSON.stringify(invoiceData)
     }));
   };
+
   handleCreateSubmit = (event) => {
     event.preventDefault();
     const {dispatch} = this.props;
@@ -76,6 +78,7 @@ class Invoice extends Component {
       body: JSON.stringify(invoiceEntryData)
     }));
   };
+
   handleDeleteSubmit = (event) => {
     event.preventDefault();
     const {dispatch} = this.props;
@@ -83,11 +86,22 @@ class Invoice extends Component {
     // @TODO: Check that deletion is successful before navigating back to project page
     this.props.history.push(`/project/${this.props.match.params.projectId}`);
   };
+
   handleAddFromJira = (event) => {
     event.preventDefault();
     const {dispatch} = this.props;
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
   };
+
+  handleAddManually = (event) => {
+    event.preventDefault();
+    const {dispatch} = this.props;
+    this.props.history.push({
+      pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
+      state: {from: this.props.location.pathname}
+    });
+  };
+
   // @TODO: Remove form to create invoiceEntry with only a name
   // @TODO: Handle updating the list of invoiceEntries when a new invoiceEntry is submitted
   render () {
@@ -174,6 +188,11 @@ class Invoice extends Component {
           <div>
             <form id="add-from-jira-form" onSubmit={this.handleAddFromJira}>
               <button type="submit" className="btn btn-primary">Add line from Jira</button>
+            </form>
+          </div>
+          <div>
+            <form id="add-manual-invoice-entry" onSubmit={this.handleAddManually}>
+              <button type="submit" className="btn btn-primary">Add new invoice entry manually</button>
             </form>
           </div>
         </ContentWrapper>
