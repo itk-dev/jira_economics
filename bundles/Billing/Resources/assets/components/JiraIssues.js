@@ -190,7 +190,20 @@ class JiraIssues extends Component {
 
   handleCancelSubmit = (event) => {
     event.preventDefault();
+    const { dispatch } = this.props;
+    dispatch(setSelectedIssues({}));
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
+  }
+
+  getTimeSpent() {
+    if (this.state.selected == undefined) {
+      return 0;
+    }
+    let timeSum = 0;
+    this.state.selected.forEach(selectedIssue => {
+      timeSum += selectedIssue.timeSpent;
+    });
+    return timeSum;
   }
 
   render() {
@@ -205,16 +218,14 @@ class JiraIssues extends Component {
             defaultPageSize={10}
             defaultSorted={[{ id: "issueId", desc: false }]}
           />
-          <div>
-            <form id="submitForm" onSubmit={this.handleSubmitIssues}>
-              <button type="submit" className="btn btn-primary" id="submit">Fortsæt med valgte issues</button>
-            </form>
-          </div>
-          <div>
-            <form id="cancelForm" onSubmit={this.handleCancelSubmit}>
-              <button type="submit" className="btn btn-danger" id="cancel">Annuller</button>
-            </form>
-          </div>
+          <div>{Object.values(this.state.selected).length + " issue(s) valgt"}</div>
+          <div>{"Total timer valgt: " + this.getTimeSpent()}</div>
+          <form id="submitForm" onSubmit={this.handleSubmitIssues}>
+            <button type="submit" className="btn btn-primary" id="submit">Fortsæt med valgte issues</button>
+          </form>
+          <form id="cancelForm" onSubmit={this.handleCancelSubmit}>
+            <button type="submit" className="btn btn-danger" id="cancel">Annuller</button>
+          </form>
         </ContentWrapper>
       );
     }
