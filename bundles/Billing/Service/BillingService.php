@@ -517,5 +517,50 @@ class BillingService
         ];
     }
 
+    /**
+     * Post new customer, creating a new entity referenced by the returned id
+     * @return array customerData
+     */
+    public function postCustomer($customerData)
+    {
+        if (empty($customerData['name'])) {
+            throw new HttpException(400, "Expected 'name' in request");
+        }
+
+        else if (empty($customerData['att'])) {
+            throw new HttpException(400, "Expected 'att' in request");
+        }
+
+        else if (empty($customerData['cvr'])) {
+            throw new HttpException(400, "Expected 'cvr' in request");
+        }
+
+        else if (empty($customerData['ean'])) {
+            throw new HttpException(400, "Expected 'ean' in request");
+        }
+
+        else if (empty($customerData['debtor'])) {
+            throw new HttpException(400, "Expected 'debtor' in request");
+        }
+
+        $customer = new Customer();
+        $customer->setName($customerData['name']);
+        $customer->setAtt($customerData['att']);
+        $customer->setCVR($customerData['cvr']);
+        $customer->setEAN($customerData['ean']);
+        $customer->setDebtor($customerData['debtor']);
+
+        $this->entityManager->persist($invoice);
+        $this->entityManager->flush();
+
+        return [
+            'customerId' => $customer->getId(),
+            'name'       => $customer->getName(),
+            'att'        => $customer->getAtt(),
+            'cvr'        => $customer->getCVR(),
+            'ean'        => $customer->getEAN(),
+            'debtor'     => $customer->getDebtor()
+        ];
+    }
 
 }
