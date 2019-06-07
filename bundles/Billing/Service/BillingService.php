@@ -550,7 +550,7 @@ class BillingService
         $customer->setEAN($customerData['ean']);
         $customer->setDebtor($customerData['debtor']);
 
-        $this->entityManager->persist($invoice);
+        $this->entityManager->persist($customer);
         $this->entityManager->flush();
 
         return [

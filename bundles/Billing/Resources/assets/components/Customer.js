@@ -4,6 +4,7 @@ import ContentWrapper from '../components/ContentWrapper';
 import PageTitle from '../components/PageTitle';
 import PropTypes from 'prop-types';
 import { push } from 'react-router-redux';
+import rest from '../redux/utils/rest';
 
 const $ = require('jquery');
 
@@ -14,6 +15,26 @@ class Customer extends Component {
 
   componentDidMount () {
     const {dispatch} = this.props;
+  }
+
+  handleSubmitCustomer = (event) => {
+    event.preventDefault();
+    const { dispatch } = this.props;
+    const name = $('#customer-name').val();
+    const att = $('#customer-att').val();
+    const cvr = $('#customer-cvr').val();
+    const ean = $('#customer-ean').val();
+    const debtor = $('#customer-debtor').val();
+    const customerData = {
+      name,
+      att,
+      cvr,
+      ean,
+      debtor
+    };
+    dispatch(rest.actions.createCustomer({}, {
+      body: JSON.stringify(customerData)
+    }));
   }
 
   render() {
@@ -52,7 +73,7 @@ class Customer extends Component {
                 type="text"
                 name="enterKundeCvr"
                 className="form-control"
-                id="customer-att"
+                id="customer-cvr"
                 aria-describedby="enterKundeCvr"
                 placeholder="Kundens CVR.nr.">
               </input>
@@ -79,6 +100,9 @@ class Customer extends Component {
                 placeholder="Kundens EAN.nr.">
               </input>
             </div>
+          </form>
+          <form id="submitForm" onSubmit={this.handleSubmitCustomer}>
+            <button type="submit" className="btn btn-primary" id="submit">Opret kunde</button>
           </form>
         </div>
       </ContentWrapper>

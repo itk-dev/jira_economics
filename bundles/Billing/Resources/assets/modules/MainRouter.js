@@ -50,7 +50,7 @@ export default class MainRouter extends Component {
         <Route exact path="/project/:projectId/:invoiceId/invoice_entry/jira_issues" component={JiraIssues}/>
         <Route exact path="/project/:projectId/:invoiceId/:invoiceEntryId" component={InvoiceEntry}/>
         <Route exact path="/project/:projectId/:invoiceId/submit/invoice_entry" component={InvoiceEntrySubmitter}/>
-        <Route exact path="/customer/:customerId" component={Customer}/>
+        <Route exact path="/customer" component={Customer}/>
       </Router>
     );
   }
