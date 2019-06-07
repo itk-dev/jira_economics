@@ -45,6 +45,7 @@ class Invoice extends Component {
       body: JSON.stringify(invoiceData)
     }));
   };
+
   handleRecordSubmit = (event) => {
     event.preventDefault();
     const {dispatch} = this.props;
@@ -62,6 +63,7 @@ class Invoice extends Component {
       body: JSON.stringify(invoiceData)
     }));
   };
+
   handleCreateSubmit = (event) => {
     event.preventDefault();
     const {dispatch} = this.props;
@@ -76,6 +78,7 @@ class Invoice extends Component {
       body: JSON.stringify(invoiceEntryData)
     }));
   };
+
   handleDeleteSubmit = (event) => {
     event.preventDefault();
     const {dispatch} = this.props;
@@ -83,15 +86,38 @@ class Invoice extends Component {
     // @TODO: Check that deletion is successful before navigating back to project page
     this.props.history.push(`/project/${this.props.match.params.projectId}`);
   };
+
   handleAddFromJira = (event) => {
     event.preventDefault();
     const {dispatch} = this.props;
-    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/jiraIssues`);
+    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
   };
+
+  handleAddManually = (event) => {
+    event.preventDefault();
+    const {dispatch} = this.props;
+    this.props.history.push({
+      pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
+      state: {from: this.props.location.pathname}
+    });
+  };
+
   // @TODO: Remove form to create invoiceEntry with only a name
   // @TODO: Handle updating the list of invoiceEntries when a new invoiceEntry is submitted
   render () {
-    if (this.props.invoice.data.name) {
+    if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId )  {
+      return (
+        <ContentWrapper>
+          <PageTitle>Invoice</PageTitle>
+          <div>Error: the requested invoice does not match the project specified in the URL</div>
+          <div>(URL contains projectId '{this.props.match.params.projectId}'
+           but invoice with id '{this.props.match.params.invoiceId}'
+            belongs to project with id '{this.props.invoice.data.jiraId}')
+          </div>
+        </ContentWrapper>
+      );
+    }
+    else if (this.props.invoice.data.name) {
       return (
         <ContentWrapper>
           <PageTitle>Invoice</PageTitle>
@@ -136,8 +162,8 @@ class Invoice extends Component {
           </div>
           <div>Invoice entries:</div>
           {this.props.invoiceEntries.data.data && this.props.invoiceEntries.data.data.map((item) =>
-            <div key={item.id}><Link
-              to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.id}`}>Link til {item.name}</Link>
+            <div key={item.invoiceEntryId}><Link
+              to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.invoiceEntryId}`}>Link til {item.name}</Link>
             </div>
           )}
           <div>Create new invoice entry</div>
@@ -156,9 +182,17 @@ class Invoice extends Component {
                   placeholder="Enter invoiceEntry name">
                 </input>
               </div>
-              <button type="submit" className="btn btn-primary"
-                      id="add-from-jira">Submit new invoice entry
-              </button>
+              <button type="submit" className="btn btn-primary">Submit new invoice entry</button>
+            </form>
+          </div>
+          <div>
+            <form id="add-from-jira-form" onSubmit={this.handleAddFromJira}>
+              <button type="submit" className="btn btn-primary">Add line from Jira</button>
+            </form>
+          </div>
+          <div>
+            <form id="add-manual-invoice-entry" onSubmit={this.handleAddManually}>
+              <button type="submit" className="btn btn-primary">Add new invoice entry manually</button>
             </form>
           </div>
         </ContentWrapper>

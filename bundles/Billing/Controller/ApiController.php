@@ -37,12 +37,12 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/invoice/{jiraProjectId}", name="api_invoice_get", methods={"GET"})
-     * defaults={"jiraProjectId"="...."})
+     * @Route("/invoice/{invoiceId}", name="api_invoice_get", methods={"GET"})
+     * defaults={"invoiceId"="...."})
      */
     public function invoiceGetAction(BillingService $billingService, Request $request)
     {
-        $invoiceId = $request->get('jiraProjectId');
+        $invoiceId = $request->get('invoiceId');
         $result = $billingService->getInvoice($invoiceId);
         return new JsonResponse($result);
     }
@@ -57,8 +57,8 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/invoice/{jiraProjectId}", name="api_invoice_put", methods={"PUT"})
-     * defaults={"jiraProjectId"="...."})
+     * @Route("/invoice/{invoiceId}", name="api_invoice_put", methods={"PUT"})
+     * defaults={"invoiceId"="...."})
      */
     public function invoicePutAction(BillingService $billingService, Request $request)
     {
@@ -79,12 +79,12 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/invoices/{invoiceId}", name="api_invoices")
-     * defaults={"invoiceId"="...."})
+     * @Route("/invoices/{jiraProjectId}", name="api_invoices")
+     * defaults={"jiraProjectId"="...."})
     */
     public function invoicesAction(BillingService $billingService, Request $request)
     {
-        $jiraProjectId = $request->get('invoiceId');
+        $jiraProjectId = $request->get('jiraProjectId');
         $result = $billingService->getInvoices($jiraProjectId);
         return new JsonResponse($result);
     }
@@ -137,8 +137,8 @@ class ApiController extends Controller
     */
     public function invoiceEntriesAction(BillingService $billingService, Request $request)
     {
-        $jiraProjectId = $request->get('invoiceId');
-        $result = $billingService->getInvoiceEntries($jiraProjectId);
+        $invoiceId = $request->get('invoiceId');
+        $result = $billingService->getInvoiceEntries($invoiceId);
         return new JsonResponse($result);
     }
 
