@@ -1,0 +1,57 @@
+// ----------------------------
+// Create project form styling.
+// ----------------------------
+
+#create-project-form {
+  #create_project_form_project_key {
+    text-transform: uppercase;
+  }
+
+  .name-warning-message {
+    @extend %warning-message;
+  }
+
+  .key-warning-message {
+    @extend %warning-message;
+  }
+
+  .invalid-feedback {
+    margin-bottom: .5em;
+  }
+
+  .create_project_form_project_name_wrapper label .invalid-feedback,
+  .create_project_form_project_key_wrapper label .invalid-feedback {
+    display: none!important;
+  }
+
+  .select2-container {
+    max-width: 100%;
+    width:100%!important; // Override js.
+  }
+
+  .select2-selection--single {
+    height: calc(1.5em + 0.75rem + 2px);
+    border-color: #ced4da;
+  }
+
+  .select2-selection__arrow {
+    top: 7px;
+  }
+
+  .select2-selection__rendered {
+    vertical-align: middle;
+    height: calc(1.5em + 0.75rem + 2px);
+    line-height: calc(1.5em + 0.75rem + 2px);
+  }
+}
+
+// Extenders
+%warning-message {
+  color: $red;
+  display:none;
+  margin-bottom: 0.5rem;
+
+  &.show {
+    display: block;
+  }
+}
