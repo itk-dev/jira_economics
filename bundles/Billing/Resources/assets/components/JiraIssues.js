@@ -201,7 +201,9 @@ class JiraIssues extends Component {
     }
     let timeSum = 0;
     this.state.selected.forEach(selectedIssue => {
-      timeSum += selectedIssue.timeSpent;
+      if (parseFloat(selectedIssue.timeSpent)) {
+        timeSum += selectedIssue.timeSpent;
+    }
     });
     return timeSum;
   }
