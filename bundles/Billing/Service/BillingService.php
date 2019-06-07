@@ -49,8 +49,13 @@ class BillingService
         $invoicesJson = [];
 
         foreach ($invoices AS $invoice) {
-            $invoicesJson[] = ['id'   => $invoice->getId(),
-                'name' => $invoice->getName()];
+            $invoicesJson[] = [
+                'invoiceId' => $invoice->getId(),
+                'name'      => $invoice->getName(),
+                'jiraId'    => $invoice->getProject()->getJiraId(),
+                'recorded'  => $invoice->getRecorded(),
+                'created'   => $invoice->getCreated()
+            ];
         }
 
         return $invoicesJson;
@@ -81,10 +86,12 @@ class BillingService
             $recorded = false;
         }
 
-        return ['name'   => $invoice->getName(),
-            'jiraId' => $invoice->getProject()->getJiraId(),
+        return [
+            'name'     => $invoice->getName(),
+            'jiraId'   => $invoice->getProject()->getJiraId(),
             'recorded' => $recorded,
-            'created' => $invoice->getCreated()];
+            'created'  => $invoice->getCreated()
+        ];
     }
 
     /**
@@ -117,11 +124,13 @@ class BillingService
         $this->entityManager->persist($invoice);
         $this->entityManager->flush();
 
-        return ['invoiceId' => $invoice->getId(),
+        return [
+            'invoiceId' => $invoice->getId(),
             'name'      => $invoice->getName(),
             'jiraId'    => $invoice->getProject()->getJiraId(),
             'recorded'  => $invoice->getRecorded(),
-            'created'   => $invoice->getCreated()];
+            'created'   => $invoice->getCreated()
+        ];
     }
 
     /**
@@ -158,10 +167,12 @@ class BillingService
         $this->entityManager->persist($invoice);
         $this->entityManager->flush();
 
-        return ['name'      => $invoice->getName(),
+        return [
+            'name'      => $invoice->getName(),
             'jiraId'    => $invoice->getProject()->getJiraId(),
             'recorded'  => $invoice->getRecorded(),
-            'created'   => $invoice->getCreated()];
+            'created'   => $invoice->getCreated()
+        ];
     }
 
     /**
@@ -204,8 +215,14 @@ class BillingService
         $invoiceEntriesJson = [];
 
         foreach ($invoiceEntries AS $invoiceEntry) {
-            $invoiceEntriesJson[] = ['id'   => $invoiceEntry->getId(),
-                'name' => $invoiceEntry->getName()];
+            $invoiceEntriesJson[] = [
+                'invoiceEntryId' => $invoiceEntry->getId(),
+                'name'           => $invoiceEntry->getName(),
+                'invoiceId'      => $invoiceEntry->getInvoice()->getId(),
+                'description'    => $invoiceEntry->getDescription(),
+                'account'        => $invoiceEntry->getAccount(),
+                'product'        => $invoiceEntry->getProduct()
+            ];
         }
 
         return $invoiceEntriesJson;
@@ -230,10 +247,13 @@ class BillingService
         }
 
         return [
-            'id'         => $invoiceEntry->getId(),
-            'name'       => $invoiceEntry->getName(),
-            'invoiceId'  => $invoiceEntry->getInvoice()->getId()
+            'name'          => $invoiceEntry->getName(),
+            'invoiceId'     => $invoiceEntry->getInvoice()->getId(),
+            'description'   => $invoiceEntry->getDescription(),
+            'account'       => $invoiceEntry->getAccount(),
+            'product'       => $invoiceEntry->getProduct()
         ];
+
     }
 
     /**
@@ -321,9 +341,14 @@ class BillingService
         $this->entityManager->persist($invoiceEntry);
         $this->entityManager->flush();
 
-        return ['name'      => $invoiceEntry->getName(),
-            'jiraId'    => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
-            'invoiceId' => $invoiceEntry->getInvoice()->getId()];
+        return [
+            'name'          => $invoiceEntry->getName(),
+            'jiraId'        => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
+            'invoiceId'     => $invoiceEntry->getInvoice()->getId(),
+            'description'   => $invoiceEntry->getDescription(),
+            'account'       => $invoiceEntry->getAccount(),
+            'product'       => $invoiceEntry->getProduct()
+        ];
     }
 
     /**
@@ -386,11 +411,13 @@ class BillingService
         $this->entityManager->persist($project);
         $this->entityManager->flush();
 
-        return ['jiraId'    => $result->id,
+        return [
+            'jiraId'    => $result->id,
             'jiraKey'   => $result->key,
             'name'      => $result->name,
             'url'       => $result->self,
-            'avatarUrl' => $avatarUrl];
+            'avatarUrl' => $avatarUrl
+        ];
     }
 
     /**

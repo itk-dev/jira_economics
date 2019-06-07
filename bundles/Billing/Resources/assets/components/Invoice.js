@@ -162,8 +162,8 @@ class Invoice extends Component {
           </div>
           <div>Invoice entries:</div>
           {this.props.invoiceEntries.data.data && this.props.invoiceEntries.data.data.map((item) =>
-            <div key={item.id}><Link
-              to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.id}`}>Link til {item.name}</Link>
+            <div key={item.invoiceEntryId}><Link
+              to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.invoiceEntryId}`}>Link til {item.name}</Link>
             </div>
           )}
           <div>Create new invoice entry</div>

@@ -47,7 +47,7 @@ class Project extends Component {
           </PageTitle>
 
           {this.props.invoices.data.data && this.props.invoices.data.data.map((item) =>
-            <div key={item.id}><Link to={`/project/${this.props.match.params.projectId}/${item.id}`}>Link til {item.name}</Link></div>
+            <div key={item.jiraId}><Link to={`/project/${this.props.match.params.projectId}/${item.invoiceId}`}>Link til {item.name}</Link></div>
           )}
           <div>Create new invoice</div>
           <div>
