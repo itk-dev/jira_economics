@@ -143,6 +143,17 @@ class ApiController extends Controller
     }
 
     /**
+     * @Route("/customer/{customerId}", name="api_customer")
+     * defaults={"customerId"="...."}
+     */
+    public function customerAction(BillingService $billingService, Request $request)
+    {
+        $customerId = $request->get('customerId');
+        $result = $billingService->getCustomer($customerId);
+        return new JsonResponse($result);
+    }
+
+    /**
      * @Route("/current_user", name="api_current_user")
      */
     public function currentUserAction(JiraService $jiraService)

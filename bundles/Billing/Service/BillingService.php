@@ -3,6 +3,7 @@
 namespace Billing\Service;
 
 use App\Service\JiraService;
+use Billing\Entity\Customer;
 use Billing\Entity\Invoice;
 use Billing\Entity\InvoiceEntry;
 use Billing\Entity\JiraIssue;
@@ -489,5 +490,32 @@ class BillingService
 
         return $jiraIssues;
     }
+
+    /**
+     * Get specific customer by id
+     * @param customerId
+     * @return array
+     */
+    public function getCustomer($customerId) {
+        if (!intval($customerId)) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
+        $repository = $this->entityManager->getRepository(Customer::class);
+        $customer = $repository->findOneBy(['id' => $customerId]);
+
+        if (!$customer) {
+            throw new HttpException(404, 'Customer with id ' . $customerId . ' not found');
+        }
+
+        return [
+            'name'   => $customer->getName(),
+            'att'    => $customer->getAtt(),
+            'cvr'    => $customer->getCVR(),
+            'ean'    => $customer->getEAN(),
+            'debtor' => $customer->getDebtor()
+        ];
+    }
+
 
 }
