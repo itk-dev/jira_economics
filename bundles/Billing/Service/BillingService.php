@@ -134,8 +134,6 @@ class BillingService
         ];
     }
 
-    // @TODO: when Invoice attributes aren't present in the HTTP request, throw an exception
-
     /**
      * Put specific invoice, replacing the invoice referenced by the given id
      * @param invoiceData
@@ -319,8 +317,6 @@ class BillingService
         return $response;
     }
 
-    // @TODO: update invoiceEntry with remaining values sent
-
     /**
      * Put specific invoiceEntry, replacing the invoiceEntry referenced by the given id
      * @param invoiceEntryData
@@ -343,10 +339,19 @@ class BillingService
             $invoiceEntry->setName($invoiceEntryData['name']);
         }
 
-        $this->entityManager->persist($invoiceEntry);
-        $this->entityManager->flush();
+        if (!empty($invoiceEntryData['description'])) {
+            $invoiceEntry->setDescription($invoiceEntryData['description']);
+        }
 
-        return [
+        if (!empty($invoiceEntryData['account'])) {
+            $invoiceEntry->setAccount($invoiceEntryData['account']);
+        }
+
+        if (!empty($invoiceEntryData['product'])) {
+            $invoiceEntry->setProduct($invoiceEntryData['product']);
+        }
+
+        $response = [
             'name'          => $invoiceEntry->getName(),
             'jiraId'        => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
             'invoiceId'     => $invoiceEntry->getInvoice()->getId(),
@@ -354,6 +359,27 @@ class BillingService
             'account'       => $invoiceEntry->getAccount(),
             'product'       => $invoiceEntry->getProduct()
         ];
+
+        if (!empty($invoiceEntryData['jiraIssueIds'])) {
+            $jiraIssueRepository = $this->entityManager->getRepository(JiraIssue::class);
+
+            foreach ($invoiceEntryData['jiraIssueIds'] as $jiraIssueId) {
+                $jiraIssue = $jiraIssueRepository->findOneBy(['issueId' => $jiraIssueId]);
+
+                if (!$jiraIssue) {
+                    throw new HttpException(400, "JiraIssue with id " . $jiraIssueId . " not found");
+                }
+
+                $invoiceEntry->addJiraIssue($jiraIssue);
+            }
+
+            $response['jiraIssueIds'] = $invoiceEntryData['jiraIssueIds'];
+        }
+
+        $this->entityManager->persist($invoiceEntry);
+        $this->entityManager->flush();
+
+        return $response;
     }
 
     /**
@@ -471,17 +497,21 @@ class BillingService
                 $jiraIssue->setCreated(new \DateTime($jiraIssueResult->fields->created));
                 $jiraIssue->setFinished(new \DateTime($jiraIssueResult->fields->resolutiondate));
                 $jiraIssue->setSummary($jiraIssueResult->fields->summary);
+
                 // @TODO: should we add other users than the assignee?
                 if (!empty($jiraIssueResult->fields->assignee->key)) {
                     $jiraIssue->setJiraUsers([$jiraIssueResult->fields->assignee->key]);
                 }
-                $jiraIssues[] = ['issue_id'     => $jiraIssue->getIssueId(),
+
+                $jiraIssues[] = [
+                    'issue_id'     => $jiraIssue->getIssueId(),
                     'summary'      => $jiraIssue->getSummary(),
                     'created'      => $jiraIssue->getCreated(),
                     'finished'     => $jiraIssue->getFinished(),
                     'jira_users'   => $jiraIssue->getJiraUsers(),
                     'time_spent'   => $jiraIssue->getTimeSpent(),
-                    'project_id'   => $jiraIssue->getProject()->getId()];
+                    'project_id'   => $jiraIssue->getProject()->getId()
+                ];
 
                 $this->entityManager->persist($jiraIssue);
             }
