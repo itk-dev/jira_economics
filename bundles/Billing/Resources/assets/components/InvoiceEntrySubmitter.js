@@ -28,7 +28,7 @@ export class InvoiceEntrySubmitter extends Component {
   handleSelectJiraIssues = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
-    dispatch(setSelectedIssues(this.props.selectedIssues));
+    dispatch(setSelectedIssues(this.props.selectedIssues.selectedIssues));
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
   }
 
