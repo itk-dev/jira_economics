@@ -134,6 +134,8 @@ class BillingService
         ];
     }
 
+    // @TODO: when Invoice attributes aren't present in the HTTP request, throw an exception
+
     /**
      * Put specific invoice, replacing the invoice referenced by the given id
      * @param invoiceData
@@ -316,6 +318,8 @@ class BillingService
 
         return $response;
     }
+
+    // @TODO: update invoiceEntry with remaining values sent
 
     /**
      * Put specific invoiceEntry, replacing the invoiceEntry referenced by the given id
@@ -562,5 +566,78 @@ class BillingService
             'debtor'     => $customer->getDebtor()
         ];
     }
+
+    /**
+     * Put specific customer, replacing the customer referenced by the given id
+     * @return array customerData
+     */
+    public function putCustomer($customerData)
+    {
+        if (empty($customerData['name'])) {
+            throw new HttpException(400, "Expected 'name' in request");
+        }
+
+        else if (empty($customerData['att'])) {
+            throw new HttpException(400, "Expected 'att' in request");
+        }
+
+        else if (empty($customerData['cvr'])) {
+            throw new HttpException(400, "Expected 'cvr' in request");
+        }
+
+        else if (empty($customerData['ean'])) {
+            throw new HttpException(400, "Expected 'ean' in request");
+        }
+
+        else if (empty($customerData['debtor'])) {
+            throw new HttpException(400, "Expected 'debtor' in request");
+        }
+
+        $repository = $this->entityManager->getRepository(Customer::class);
+        $customer = $repository->findOneBy(['id' => $customerData['customerId']]);
+
+        if (!$customer) {
+            throw new HttpException(400, "Customer with id " . $customerData['customerId'] . " not found");
+        }
+
+        $customer->setName($customerData['name']);
+        $customer->setAtt($customerData['att']);
+        $customer->setCVR($customerData['cvr']);
+        $customer->setEAN($customerData['ean']);
+        $customer->setDebtor($customerData['debtor']);
+
+        $this->entityManager->persist($customer);
+        $this->entityManager->flush();
+
+        return [
+            'name'       => $customer->getName(),
+            'att'        => $customer->getAtt(),
+            'cvr'        => $customer->getCVR(),
+            'ean'        => $customer->getEAN(),
+            'debtor'     => $customer->getDebtor()
+        ];
+    }
+
+    /**
+     * Delete specific customer referenced by the given id
+     * @param customerId
+     */
+    public function deleteCustomer($customerId)
+    {
+        if (empty($customerId) || !intval($customerId)) {
+            throw new HttpException(400, 'Expected integer in request');
+        }
+
+        $repository = $this->entityManager->getRepository(Customer::class);
+        $customer = $repository->findOneBy(['id' => $customerId]);
+
+        if (!$customer) {
+            throw new HttpException(404, 'Customer with id ' . $customerId . ' did not exist');
+        }
+
+        $this->entityManager->remove($customer);
+        $this->entityManager->flush();
+    }
+
 
 }
