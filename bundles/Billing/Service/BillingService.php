@@ -472,7 +472,9 @@ class BillingService
                 $jiraIssue->setFinished(new \DateTime($jiraIssueResult->fields->resolutiondate));
                 $jiraIssue->setSummary($jiraIssueResult->fields->summary);
                 // @TODO: should we add other users than the assignee?
-                $jiraIssue->setJiraUsers([$jiraIssueResult->fields->assignee->key]);
+                if (!empty($jiraIssueResult->fields->assignee->key)) {
+                    $jiraIssue->setJiraUsers([$jiraIssueResult->fields->assignee->key]);
+                }
                 $jiraIssues[] = ['issue_id'     => $jiraIssue->getIssueId(),
                     'summary'      => $jiraIssue->getSummary(),
                     'created'      => $jiraIssue->getCreated(),
