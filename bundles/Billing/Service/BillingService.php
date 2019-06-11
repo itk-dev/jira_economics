@@ -433,21 +433,17 @@ class BillingService
         $project->setJiraKey($result->key);
         $project->setName($result->name);
         $project->setUrl($result->self);
-        $avatarUrls = $result->avatarUrls;
-        // @TODO: cleanup decode + encode
-        $avatarUrlsArr = json_decode(json_encode($avatarUrls, TRUE), TRUE);
-        $avatarUrl = $avatarUrlsArr['48x48'];
-        $project->setAvatarUrl($avatarUrl);
+        $project->setAvatarUrl($result->avatarUrls->{'48x48'});
 
         $this->entityManager->persist($project);
         $this->entityManager->flush();
 
         return [
-            'jiraId'    => $result->id,
-            'jiraKey'   => $result->key,
-            'name'      => $result->name,
-            'url'       => $result->self,
-            'avatarUrl' => $avatarUrl
+            'jiraId'    => $project->getJiraId(),
+            'jiraKey'   => $project->getJiraKey(),
+            'name'      => $project->getName(),
+            'url'       => $project->getUrl(),
+            'avatarUrl' => $project->getAvatarUrl()
         ];
     }
 
