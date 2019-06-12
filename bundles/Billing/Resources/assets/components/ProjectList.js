@@ -66,6 +66,7 @@ class ProjectList extends Component {
       );
     }
 
+    // TODO: Add spinner
     const fetching = this.props.isFetching ? 'Loading ...' : '';
 
     return (
