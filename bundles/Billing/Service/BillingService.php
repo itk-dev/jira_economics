@@ -267,10 +267,6 @@ class BillingService
             throw new HttpException(400, "Expected integer value for 'invoiceId' in request");
         }
 
-        if (empty($invoiceEntryData['name'])) {
-            throw new HttpException(400, "Missing 'name' for new invoice entry in request");
-        }
-
         $invoiceRepository = $this->entityManager->getRepository(Invoice::class);
         $invoice = $invoiceRepository->findOneBy(['id' => $invoiceEntryData['invoiceId']]);
 
@@ -279,11 +275,23 @@ class BillingService
         }
 
         $invoiceEntry = new InvoiceEntry();
-        $invoiceEntry->setName($invoiceEntryData['name']);
-        $invoiceEntry->setDescription($invoiceEntryData['description']);
-        $invoiceEntry->setAccount($invoiceEntryData['account']);
-        $invoiceEntry->setProduct($invoiceEntryData['product']);
         $invoiceEntry->setInvoice($invoice);
+
+        if (!empty($invoiceEntryData['name'])) {
+            $invoiceEntry->setName($invoiceEntryData['name']);
+        }
+
+        if (!empty($invoiceEntryData['description'])) {
+            $invoiceEntry->setDescription($invoiceEntryData['description']);
+        }
+
+        if (!empty($invoiceEntryData['account'])) {
+            $invoiceEntry->setAccount($invoiceEntryData['account']);
+        }
+
+        if (!empty($invoiceEntryData['product'])) {
+            $invoiceEntry->setProduct($invoiceEntryData['product']);
+        }
 
         $response = [
             'invoiceEntryId'    => $invoiceEntry->getId(),
