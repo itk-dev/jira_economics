@@ -111,7 +111,6 @@ class Invoice extends Component {
     });
   };
 
-  // @TODO: Remove form to create invoiceEntry with only a name
   // @TODO: Handle updating the list of invoiceEntries when a new invoiceEntry is submitted
   render () {
     if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId )  {
@@ -152,7 +151,7 @@ class Invoice extends Component {
               <div className="row mb-3">
                 <div className="col-md-6">
                     <Button variant="outline-success" type="submit" className="mr-3" onClick={this.handleAddFromJira}>Add entry from Jira</Button>
-                    <Button variant="outline-success" type="submit" onClick={this.handleCreateSubmit}>Add manual entry</Button>
+                    <Button variant="outline-success" type="submit" onClick={this.handleAddManually}>Add manual entry</Button>
                 </div>
                 <div className="col-md-6 text-right">
                   <ButtonGroup aria-label="Entry actions">
@@ -179,7 +178,7 @@ class Invoice extends Component {
                 </thead>
                 <tbody>
                   {this.props.invoiceEntries.data.data && this.props.invoiceEntries.data.data.map((item) =>
-                    <tr key={item.id}>
+                    <tr key={item.invoiceEntryId}>
                       <td><Form.Check aria-label="" /></td>
                       <td>{item.accountNumber}</td>
                       <td><Link to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.id}`}>{item.name}</Link></td>
