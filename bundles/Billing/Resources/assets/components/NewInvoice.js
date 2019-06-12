@@ -6,9 +6,9 @@ import ContentWrapper from '../components/ContentWrapper';
 export default function NewInvoice(props) {
   return (
     <ContentWrapper>
-      <p className="text-muted">Ny faktura</p>
-      <PageTitle>Vælg projekt</PageTitle>
-      <hr/>
+      <PageTitle breadcrumb='Ny faktura'>
+        Vælg projekt
+      </PageTitle>
       <ProjectList/>
     </ContentWrapper>
   )
