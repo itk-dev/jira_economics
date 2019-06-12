@@ -8,8 +8,6 @@ import rest from '../redux/utils/rest';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
-const $ = require('jquery');
-
 class Project extends Component {
   constructor(props) {
     super(props);
