@@ -8,6 +8,12 @@ import Moment from 'react-moment';
 import 'moment-timezone';
 import rest from '../redux/utils/rest';
 import { push } from 'react-router-redux';
+import ContentFooter from '../components/ContentFooter';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import Table from 'react-bootstrap/Table';
+import ListGroup from 'react-bootstrap/ListGroup';
 
 const $ = require('jquery');
 
@@ -120,81 +126,82 @@ class Invoice extends Component {
     else if (this.props.invoice.data.name) {
       return (
         <ContentWrapper>
-          <PageTitle>Invoice</PageTitle>
-          <div>ProjectID: {this.props.match.params.projectId}</div>
-          <div>InvoiceID: {this.props.match.params.invoiceId}</div>
-          <div>InvoiceName: {this.props.invoice.data.name}</div>
-          <div>InvoiceRecorded: {String(this.props.invoice.data.recorded)}</div>
-          <div>InvoiceCreated: <Moment
-            format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></div>
-          <div>
-            <form id="submit-edit-form" onSubmit={this.handleEditSubmit}>
-              <div id="edit-invoice-entry-form-group">
-                <label
-                  htmlFor="edit-invoice-entry-name">Enter invoice name</label>
-                <input
-                  type="text"
-                  name="editInvoiceEntryName"
-                  className="form-control"
-                  id="edit-invoice-entry-name"
-                  aria-describedby="editInvoiceEntryName"
-                  placeholder="changeme">
-                </input>
-              </div>
-              <button type="submit" className="btn btn-primary"
-                      id="edit-invoice-entry">Submit new invoice name
-              </button>
-            </form>
-          </div>
-          <div>
-            <form id="submit-recorded-form" onSubmit={this.handleRecordSubmit}>
-              <button type="submit" className="btn btn-primary"
-                      id="record-invoice">Record invoice
-              </button>
-            </form>
-          </div>
-          <div>
-            <form id="delete-form" onSubmit={this.handleDeleteSubmit}>
-              <button type="submit" className="btn btn-danger"
-                      id="delete">Delete invoice
-              </button>
-            </form>
-          </div>
-          <div>Invoice entries:</div>
-          {this.props.invoiceEntries.data.data && this.props.invoiceEntries.data.data.map((item) =>
-            <div key={item.invoiceEntryId}><Link
-              to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.invoiceEntryId}`}>Link til {item.name}</Link>
+          <PageTitle breadcrumb={"Invoice for project [Projectname] (" + this.props.match.params.projectId + ")"}>{this.props.invoice.data.name}</PageTitle>
+          <div className="row">
+            <div className="col-md-4">
+             <p>Invoicenumber: <strong className="pr-3">{this.props.match.params.invoiceId}</strong> Invoicedate: <strong>{String(this.props.invoice.data.recorded)}</strong></p>
+             <p>Invoice description TODO: save with invoice data</p>
             </div>
-          )}
-          <div>Create new invoice entry</div>
-          <div>
-            <form id="submit-invoice-entry-form"
-                  onSubmit={this.handleCreateSubmit}>
-              <div id="submit-invoice-entry-form-group">
-                <label
-                  htmlFor="input-new-invoice-entry-name">Enter invoiceEntry name for new invoiceEntry</label>
-                <input
-                  type="text"
-                  name="invoiceEntryName"
-                  className="form-control"
-                  id="invoice-entry-name"
-                  aria-describedby="invoiceEntryName"
-                  placeholder="Enter invoiceEntry name">
-                </input>
+            <div className="col-md-8 text-right">
+              <ButtonGroup aria-label="Invoice actions">
+                <Button variant="primary" type="submit" id="record-invoice" onClick={this.handleRecordSubmit}>
+                  Record invoice
+                </Button>
+                <Button variant="danger" type="submit" id="delete" onClick={this.handleDeleteSubmit}>
+                  Delete invoice
+                </Button>
+              </ButtonGroup>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-md-8">
+              <h2>Invoice entries</h2>
+              <div className="row mb-3">
+                <div className="col-md-6">
+                    <Button variant="outline-success" type="submit" className="mr-3" onClick={this.handleAddFromJira}>Add entry from Jira</Button>
+                    <Button variant="outline-success" type="submit" onClick={this.handleCreateSubmit}>Add manual entry</Button>
+                </div>
+                <div className="col-md-6 text-right">
+                  <ButtonGroup aria-label="Entry actions">
+                    <Button variant="primary" type="submit" id="editEntry" onClick={this.handleEntryEdit} disabled>
+                      Edit entry
+                    </Button>
+                    <Button variant="danger" type="submit" id="deleteEntry" onClick={this.handleEntryDelete} disabled>
+                      Delete entry
+                    </Button>
+                  </ButtonGroup>
+                </div>
               </div>
-              <button type="submit" className="btn btn-primary">Submit new invoice entry</button>
-            </form>
+              <Table responsive hover className="table-borderless bg-light">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Account number</th>
+                    <th>Item name</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Item price (DKK)</th>
+                    <th>Total price (DKK)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {this.props.invoiceEntries.data.data && this.props.invoiceEntries.data.data.map((item) =>
+                    <tr key={item.id}>
+                      <td><Form.Check aria-label="" /></td>
+                      <td>{item.accountNumber}</td>
+                      <td><Link to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.id}`}>{item.name}</Link></td>
+                      <td>{item.description}</td>
+                      <td>{item.amount}</td>
+                      <td>{item.itemPrice}</td>
+                      <td>{item.totalPrice}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
+            </div>
+            <div className="col-md-4">
+              <h4>Client information</h4>
+              <ListGroup>
+                <ListGroup.Item><span className="text-muted d-inline-block w-25">Name</span> Customer name</ListGroup.Item>
+                <ListGroup.Item><span className="text-muted d-inline-block w-25">Contact</span> Customer contact</ListGroup.Item>
+                <ListGroup.Item><span className="text-muted d-inline-block w-25">CVR</span> XXXXXXXX</ListGroup.Item>
+                <ListGroup.Item><span className="text-muted d-inline-block w-25">EAN</span> XXXXXXXXXX</ListGroup.Item>
+              </ListGroup>
+            </div>
           </div>
-          <div>
-            <form id="add-from-jira-form" onSubmit={this.handleAddFromJira}>
-              <button type="submit" className="btn btn-primary">Add line from Jira</button>
-            </form>
-          </div>
-          <div>
-            <form id="add-manual-invoice-entry" onSubmit={this.handleAddManually}>
-              <button type="submit" className="btn btn-primary">Add new invoice entry manually</button>
-            </form>
-          </div>
+          <ContentFooter>
+            Invoice created <strong><Moment format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></strong>
+          </ContentFooter>
         </ContentWrapper>
       );
     }
