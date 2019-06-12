@@ -46,7 +46,7 @@ class Project extends Component {
             Create new invoice
           </PageTitle>
           {this.props.invoices.data.data && this.props.invoices.data.data.map((item) =>
-            <div key={item.jiraId}><Link to={`/project/${this.props.match.params.projectId}/${item.invoiceId}`}>Link til {item.name}</Link></div>
+            <div key={item.invoiceId}><Link to={`/project/${this.props.match.params.projectId}/${item.invoiceId}`}>Link til {item.name}</Link></div>
           )}
 
           <Form id="submitForm" onSubmit={this.handleCreateSubmit}>

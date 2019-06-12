@@ -76,9 +76,12 @@ class Invoice extends Component {
     const invoiceId = this.props.match.params.invoiceId;
     // @TODO: look into getting this value from the event instead
     const name = $('#invoice-entry-name').val();
+    // @TODO: replace dummy account with a real one
+    const account = 123;
     const invoiceEntryData = {
       invoiceId,
-      name
+      name,
+      account
     };
     dispatch(rest.actions.createInvoiceEntry({}, {
       body: JSON.stringify(invoiceEntryData)
