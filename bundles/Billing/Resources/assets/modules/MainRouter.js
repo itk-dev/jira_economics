@@ -9,6 +9,8 @@ import Invoice from '../components/Invoice';
 import InvoiceEntry from '../components/InvoiceEntry';
 import JiraIssues from '../components/JiraIssues';
 import InvoiceEntrySubmitter from '../components/InvoiceEntrySubmitter';
+import NewInvoice from '../components/NewInvoice';
+import Statistics from '../components/Statistics';
 
 export default class MainRouter extends Component {
   constructor() {
@@ -44,6 +46,8 @@ export default class MainRouter extends Component {
     return (
       <Router basename={"/billing"}>
         <Route exact path="/" component={HomePage}/>
+        <Route exact path="/new" component={NewInvoice}/>
+        <Route exact path="/statistics" component={Statistics}/>
         <Route exact path="/project/:projectId" component={Project} />
         <Route exact path="/project/:projectId/:invoiceId" component={Invoice}/>
         <Route exact path="/project/:projectId/:invoiceId/invoice_entry/jira_issues" component={JiraIssues}/>
