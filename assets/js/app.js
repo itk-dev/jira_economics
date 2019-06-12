@@ -12,6 +12,9 @@ require('../scss/global.scss');
 // Need jQuery? Install it with "yarn add jquery", then uncomment to require it.
 const $ = require('jquery');
 
+// create global $ and jQuery variables. Added to avoid $ not defined when calling $ from page specific script
+global.$ = global.jQuery = $;
+
 // Add Bootstrap to the mix
 require('bootstrap');
 
