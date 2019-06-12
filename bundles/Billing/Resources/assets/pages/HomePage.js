@@ -13,22 +13,19 @@ import Tooltip from 'react-bootstrap/Tooltip';
 
 export default function HomePage(props) {
   return (
-      <div className="row">
-        <PageTitle className="col-sm-8">Fakturaer</PageTitle>
-        <div className="col-sm-4">
-          <Form className="float-right">
-            <Form.Group controlId="exampleForm.ControlSelect1">
-              <Form.Label>Sorter</Form.Label>
-              <Form.Control as="select">
-                <option>Nyeste først</option>
-                <option>Ældste først</option>
-              </Form.Control>
-            </Form.Group>
-          </Form>
-        </div>
-        <div className="col-12">
+      <ContentWrapper>
+        <PageTitle breadcrumb="">Fakturaer</PageTitle>
           <Tabs defaultActiveKey="drafts" id="uncontrolled-tab-example">
             <Tab eventKey="drafts" title="Kladder">
+              <Form className="mt-3 mb-1 w-25">
+                <Form.Group controlId="exampleForm.ControlSelect1" className="mb-0">
+                  <Form.Label className="sr-only">Sorter</Form.Label>
+                  <Form.Control size="sm" as="select">
+                    <option>Nyeste først</option>
+                    <option>Ældste først</option>
+                  </Form.Control>
+                </Form.Group>
+              </Form>
               <Table responsive striped hover borderless>
                 <thead>
                   <tr>
@@ -83,6 +80,15 @@ export default function HomePage(props) {
               </Table>
             </Tab>
             <Tab eventKey="posted" title="Bogførte">
+              <Form className="float-right">
+                <Form.Group controlId="exampleForm.ControlSelect1">
+                  <Form.Label>Sorter</Form.Label>
+                  <Form.Control as="select">
+                    <option>Nyeste først</option>
+                    <option>Ældste først</option>
+                  </Form.Control>
+                </Form.Group>
+              </Form>
               <Table responsive striped hover borderless>
                 <thead>
                   <tr>
@@ -122,7 +128,6 @@ export default function HomePage(props) {
               </Table>
             </Tab>
           </Tabs>
-        </div>
-      </div>
+      </ContentWrapper>
   )
 }
