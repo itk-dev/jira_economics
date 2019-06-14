@@ -18,16 +18,15 @@ import ListGroup from 'react-bootstrap/ListGroup';
 class Invoice extends Component {
   constructor (props) {
     super(props);
-
     this.handleRecordSubmit = this.handleRecordSubmit.bind(this);
     this.handleEditSubmit = this.handleEditSubmit.bind(this);
-    this.state = {invoiceEntryName: ''};
   }
 
   componentDidMount () {
     const {dispatch} = this.props;
     dispatch(rest.actions.getInvoice({id: `${this.props.match.params.invoiceId}`}));
     dispatch(rest.actions.getInvoiceEntries({id: `${this.props.match.params.invoiceId}`}));
+    dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
   }
 
   // @TODO: consider cleaning up redundancy
@@ -90,8 +89,8 @@ class Invoice extends Component {
     event.preventDefault();
     const {dispatch} = this.props;
     dispatch(rest.actions.deleteInvoice({id: `${this.props.match.params.invoiceId}`}));
-    // @TODO: Check that deletion is successful before navigating back to project page
-    this.props.history.push(`/project/${this.props.match.params.projectId}`);
+    // @TODO: Check that deletion is successful before navigating back to main billing page
+    this.props.history.push(`/`);
   };
 
   handleAddFromJira = (event) => {
@@ -107,6 +106,35 @@ class Invoice extends Component {
       pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
       state: {from: this.props.location.pathname}
     });
+  };
+
+  getTimeSpent(invoiceEntryId) {
+    if (this.props.jiraIssues.data.data == undefined) {
+      return 0;
+    }
+    let timeSum = 0;
+    this.props.jiraIssues.data.data.forEach(jiraIssue => {
+      if (jiraIssue.invoiceEntryId != invoiceEntryId) {
+        return;
+      }
+      if (parseFloat(jiraIssue.time_spent)) {
+        timeSum += jiraIssue.time_spent;
+    }
+    });
+    if (timeSum > 0) {
+      timeSum /= 3600;
+    }
+    return timeSum;
+  };
+
+  getUnitPrice() {
+    // @TODO: replace with real data
+    const unitPrices = {"PSP1": 560, "PSP2": 760, "PSP3": 820};
+    let unitPrice = 0;
+    if ($('#invoice-entry-account').val()) {
+      unitPrice = unitPrices[$('#invoice-entry-account').val()];
+    }
+    return unitPrice;
   };
 
   // @TODO: Handle updating the list of invoiceEntries when a new invoiceEntry is submitted
@@ -179,9 +207,9 @@ class Invoice extends Component {
                     <tr key={item.invoiceEntryId}>
                       <td><Form.Check aria-label="" /></td>
                       <td>{item.accountNumber}</td>
-                      <td><Link to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.id}`}>{item.name}</Link></td>
+                      <td><Link to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.invoiceEntryId}`}>{item.name}</Link></td>
                       <td>{item.description}</td>
-                      <td>{item.amount}</td>
+                      <td>{this.getTimeSpent(item.invoiceEntryId)}</td>
                       <td>{item.itemPrice}</td>
                       <td>{item.totalPrice}</td>
                     </tr>
@@ -222,6 +250,7 @@ Invoice.propTypes = {
   invoice: PropTypes.object,
   createdAt: PropTypes.string,
   invoiceEntries: PropTypes.object,
+  jiraIssues: PropTypes.object,
   dispatch: PropTypes.func.isRequired
 };
 
@@ -231,7 +260,8 @@ const mapStateToProps = state => {
   return {
     invoice: state.invoice,
     createdAt: createdAt,
-    invoiceEntries: state.invoiceEntries
+    invoiceEntries: state.invoiceEntries,
+    jiraIssues: state.jiraIssues
   };
 };
 
