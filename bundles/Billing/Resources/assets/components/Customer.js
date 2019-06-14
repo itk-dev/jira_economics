@@ -6,8 +6,6 @@ import PropTypes from 'prop-types';
 import { push } from 'react-router-redux';
 import rest from '../redux/utils/rest';
 
-const $ = require('jquery');
-
 class Customer extends Component {
   constructor (props) {
     super(props);

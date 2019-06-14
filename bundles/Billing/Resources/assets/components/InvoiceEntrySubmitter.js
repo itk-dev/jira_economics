@@ -9,8 +9,6 @@ import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
 import { push } from 'react-router-redux';
 
-const $ = require('jquery');
-
 export class InvoiceEntrySubmitter extends Component {
   constructor(props) {
     super(props);

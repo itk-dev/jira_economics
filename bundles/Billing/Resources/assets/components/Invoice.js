@@ -15,8 +15,6 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Table from 'react-bootstrap/Table';
 import ListGroup from 'react-bootstrap/ListGroup';
 
-const $ = require('jquery');
-
 class Invoice extends Component {
   constructor (props) {
     super(props);
