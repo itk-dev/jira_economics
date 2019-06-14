@@ -11,6 +11,8 @@ use Billing\Entity\Project;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 
+// @TODO: consistent snake_case or camelCase
+
 class BillingService
 {
     private $entityManager;
@@ -507,16 +509,25 @@ class BillingService
                     $jiraIssue->setJiraUsers([$jiraIssueResult->fields->assignee->key]);
                 }
 
-                $jiraIssues[] = [
-                    'issue_id'     => $jiraIssue->getIssueId(),
-                    'summary'      => $jiraIssue->getSummary(),
-                    'created'      => $jiraIssue->getCreated(),
-                    'finished'     => $jiraIssue->getFinished(),
-                    'jira_users'   => $jiraIssue->getJiraUsers(),
-                    'time_spent'   => $jiraIssue->getTimeSpent(),
-                    'project_id'   => $jiraIssue->getProject()->getId()
+                $issue = [
+                    'issue_id'          => $jiraIssue->getIssueId(),
+                    'summary'           => $jiraIssue->getSummary(),
+                    'created'           => $jiraIssue->getCreated(),
+                    'finished'          => $jiraIssue->getFinished(),
+                    'jira_users'        => $jiraIssue->getJiraUsers(),
+                    'time_spent'        => $jiraIssue->getTimeSpent(),
+                    'project_id'        => $jiraIssue->getProject()->getId()
                 ];
 
+                if ($jiraIssue->getInvoiceEntryId() !== NULL) {
+                    // @TODO: fix misleading getInvoiceEntryId naming - the function actually returns an InvoiceEntry object
+                    $issue['invoiceEntryId'] = $jiraIssue->getInvoiceEntryId()->getId();
+                }
+                else {
+                    $issue['invoiceEntryId'] = NULL;
+                }
+
+                $jiraIssues[] = $issue;
                 $this->entityManager->persist($jiraIssue);
             }
 
