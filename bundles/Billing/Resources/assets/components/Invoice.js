@@ -24,6 +24,7 @@ class Invoice extends Component {
 
   componentDidMount () {
     const {dispatch} = this.props;
+    dispatch(rest.actions.getProject({id: `${this.props.match.params.projectId}`}));
     dispatch(rest.actions.getInvoice({id: `${this.props.match.params.invoiceId}`}));
     dispatch(rest.actions.getInvoiceEntries({id: `${this.props.match.params.invoiceId}`}));
     dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
@@ -154,7 +155,7 @@ class Invoice extends Component {
     else if (this.props.invoice.data.name) {
       return (
         <ContentWrapper>
-          <PageTitle breadcrumb={"Invoice for project [Projectname] (" + this.props.match.params.projectId + ")"}>{this.props.invoice.data.name}</PageTitle>
+          <PageTitle breadcrumb={"Invoice for project [" + this.props.project.data.name + "] (" + this.props.match.params.projectId + ")"}>{this.props.invoice.data.name}</PageTitle>
           <div className="row">
             <div className="col-md-4">
              <p>Invoicenumber: <strong className="pr-3">{this.props.match.params.invoiceId}</strong> Invoicedate: <strong>{String(this.props.invoice.data.recorded)}</strong></p>
@@ -251,6 +252,7 @@ Invoice.propTypes = {
   createdAt: PropTypes.string,
   invoiceEntries: PropTypes.object,
   jiraIssues: PropTypes.object,
+  project: PropTypes.object,
   dispatch: PropTypes.func.isRequired
 };
 
@@ -261,7 +263,8 @@ const mapStateToProps = state => {
     invoice: state.invoice,
     createdAt: createdAt,
     invoiceEntries: state.invoiceEntries,
-    jiraIssues: state.jiraIssues
+    jiraIssues: state.jiraIssues,
+    project: state.project
   };
 };
 
