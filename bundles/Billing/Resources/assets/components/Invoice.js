@@ -15,6 +15,41 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Table from 'react-bootstrap/Table';
 import ListGroup from 'react-bootstrap/ListGroup';
 
+function makePriceData(invoiceEntries, jiraIssues) {
+  if (invoiceEntries.data.data === undefined) {
+    return [];
+  }
+  if (jiraIssues.data.data === undefined) {
+    return [];
+  }
+  let priceData = [];
+  // @TODO: replace with real customer data
+  const unitPrices = [560, 760, 820];
+
+  invoiceEntries.data.data.forEach(invoiceEntry => {
+    let key = `row-${invoiceEntry.invoiceEntryId}`;
+    let timeSum = 0;
+
+    jiraIssues.data.data.forEach(jiraIssue => {
+      if (jiraIssue.invoiceEntryId != invoiceEntry.invoiceEntryId) {
+        return;
+      }
+      if (parseFloat(jiraIssue.time_spent)) {
+        timeSum += jiraIssue.time_spent;
+      }
+    });
+    if (timeSum > 0) {
+      timeSum /= 3600;
+    }
+
+    const unitPrice = unitPrices[Math.floor(Math.random() * unitPrices.length)];
+    const totalPrice = timeSum * unitPrice;
+    priceData.push(key, unitPrice, timeSum, totalPrice);
+  });
+
+  return priceData;
+};
+
 class Invoice extends Component {
   constructor (props) {
     super(props);
@@ -109,33 +144,22 @@ class Invoice extends Component {
     });
   };
 
-  getTimeSpent(invoiceEntryId) {
-    if (this.props.jiraIssues.data.data == undefined) {
-      return 0;
-    }
-    let timeSum = 0;
-    this.props.jiraIssues.data.data.forEach(jiraIssue => {
-      if (jiraIssue.invoiceEntryId != invoiceEntryId) {
-        return;
-      }
-      if (parseFloat(jiraIssue.time_spent)) {
-        timeSum += jiraIssue.time_spent;
-    }
-    });
-    if (timeSum > 0) {
-      timeSum /= 3600;
-    }
-    return timeSum;
+  getUnitPrice() {
+    // @TODO: replace with real customer data
+    const unitPrices = [560, 760, 820];
+    return unitPrices[Math.floor(Math.random() * unitPrices.length)];
   };
 
-  getUnitPrice() {
-    // @TODO: replace with real data
-    const unitPrices = {"PSP1": 560, "PSP2": 760, "PSP3": 820};
-    let unitPrice = 0;
-    if ($('#invoice-entry-account').val()) {
-      unitPrice = unitPrices[$('#invoice-entry-account').val()];
+  getTotalPrice(invoiceEntryId) {
+    const tdTimeSpent = '#tdTimeSpent-' + invoiceEntryId;
+    const tdUnitPrice = '#tdUnitPrice-' + invoiceEntryId;
+    console.log($(tdTimeSpent).text());
+    if ( (!$(tdTimeSpent).text()) || (!$(tdUnitPrice).text()) ) {
+      return 0;
     }
-    return unitPrice;
+    if ( ($(tdTimeSpent).text()) && ($(tdUnitPrice).text()) ) {
+      return $(tdTimeSpent).text() * $(tdUnitPrice).text();
+    }
   };
 
   // @TODO: Handle updating the list of invoiceEntries when a new invoiceEntry is submitted
@@ -210,9 +234,9 @@ class Invoice extends Component {
                       <td>{item.accountNumber}</td>
                       <td><Link to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.invoiceEntryId}`}>{item.name}</Link></td>
                       <td>{item.description}</td>
-                      <td>{this.getTimeSpent(item.invoiceEntryId)}</td>
-                      <td>{item.itemPrice}</td>
-                      <td>{item.totalPrice}</td>
+                      <td></td>
+                      <td id={`tdUnitPrice-${item.invoiceEntryId}`}>{this.getUnitPrice()}</td>
+                      <td>{this.getTotalPrice(item.invoiceEntryId)}</td>
                     </tr>
                   )}
                 </tbody>
@@ -258,13 +282,15 @@ Invoice.propTypes = {
 
 const mapStateToProps = state => {
   let createdAt = state.invoice.data.created ? state.invoice.data.created.date : '';
+  let priceData = makePriceData(state.invoiceEntries, state.jiraIssues);
 
   return {
     invoice: state.invoice,
     createdAt: createdAt,
     invoiceEntries: state.invoiceEntries,
     jiraIssues: state.jiraIssues,
-    project: state.project
+    project: state.project,
+    priceData: priceData
   };
 };
 
