@@ -44,7 +44,7 @@ function makePriceData(invoiceEntries, jiraIssues) {
 
     const unitPrice = unitPrices[Math.floor(Math.random() * unitPrices.length)];
     const totalPrice = timeSum * unitPrice;
-    priceData.push(key, unitPrice, timeSum, totalPrice);
+    priceData[key] = {unitPrice: unitPrice, timeSum: timeSum, totalPrice: totalPrice};
   });
 
   return priceData;
@@ -144,21 +144,12 @@ class Invoice extends Component {
     });
   };
 
-  getUnitPrice() {
-    // @TODO: replace with real customer data
-    const unitPrices = [560, 760, 820];
-    return unitPrices[Math.floor(Math.random() * unitPrices.length)];
-  };
-
-  getTotalPrice(invoiceEntryId) {
-    const tdTimeSpent = '#tdTimeSpent-' + invoiceEntryId;
-    const tdUnitPrice = '#tdUnitPrice-' + invoiceEntryId;
-    console.log($(tdTimeSpent).text());
-    if ( (!$(tdTimeSpent).text()) || (!$(tdUnitPrice).text()) ) {
-      return 0;
+  getPriceData(invoiceEntryId, key) {
+    if (this.props.priceData[`row-${invoiceEntryId}`] && this.props.priceData[`row-${invoiceEntryId}`][key]) {
+      return this.props.priceData[`row-${invoiceEntryId}`][key];
     }
-    if ( ($(tdTimeSpent).text()) && ($(tdUnitPrice).text()) ) {
-      return $(tdTimeSpent).text() * $(tdUnitPrice).text();
+    else {
+      return 0;
     }
   };
 
@@ -176,7 +167,7 @@ class Invoice extends Component {
         </ContentWrapper>
       );
     }
-    else if (this.props.invoice.data.name) {
+    else if (this.props.invoice.data.name && this.props.priceData) {
       return (
         <ContentWrapper>
           <PageTitle breadcrumb={"Invoice for project [" + this.props.project.data.name + "] (" + this.props.match.params.projectId + ")"}>{this.props.invoice.data.name}</PageTitle>
@@ -234,9 +225,9 @@ class Invoice extends Component {
                       <td>{item.accountNumber}</td>
                       <td><Link to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.invoiceEntryId}`}>{item.name}</Link></td>
                       <td>{item.description}</td>
-                      <td></td>
-                      <td id={`tdUnitPrice-${item.invoiceEntryId}`}>{this.getUnitPrice()}</td>
-                      <td>{this.getTotalPrice(item.invoiceEntryId)}</td>
+                      <td>{this.getPriceData(item.invoiceEntryId, 'timeSum')}</td>
+                      <td>{this.getPriceData(item.invoiceEntryId, 'unitPrice')}</td>
+                      <td>{this.getPriceData(item.invoiceEntryId, 'totalPrice')}</td>
                     </tr>
                   )}
                 </tbody>
