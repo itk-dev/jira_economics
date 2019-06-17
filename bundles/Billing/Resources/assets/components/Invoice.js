@@ -14,6 +14,7 @@ import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Table from 'react-bootstrap/Table';
 import ListGroup from 'react-bootstrap/ListGroup';
+import Modal from 'react-bootstrap/Modal';
 
 function makePriceData(invoiceEntries, jiraIssues) {
   if (invoiceEntries.data.data === undefined) {
@@ -55,7 +56,9 @@ class Invoice extends Component {
     super(props);
     this.handleRecordSubmit = this.handleRecordSubmit.bind(this);
     this.handleEditSubmit = this.handleEditSubmit.bind(this);
-    this.state = { checkedEntries: {} };
+    this.handleModalShow = this.handleModalShow.bind(this);
+    this.handleModalClose = this.handleModalClose.bind(this);
+    this.state = { checkedEntries: {}, showModal: false };
   }
 
   componentDidMount () {
@@ -159,27 +162,37 @@ class Invoice extends Component {
 
   handleEntryEdit = (event) => {
     event.preventDefault();
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     let isManualEntry = true;
 
-    // @TODO: several entries may be selected, show an error if this is the case
+    let checkedCount = 0;
+    let selectedInvoiceEntryId = false;
+
     for (let [invoiceEntryId, checked] of Object.entries(this.state.checkedEntries)) {
       if (checked) {
-        this.props.jiraIssues.data.data.forEach(jiraIssue => {
-          // InvoiceEntry with Jira issues?
-          if (jiraIssue.invoiceEntryId == invoiceEntryId) {
-            isManualEntry = false;
-            this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
-          }
-        });
-        // InvoiceEntry without Jira issues?
-        if (isManualEntry) {
-          this.props.history.push({
-            pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
-            state: {from: this.props.location.pathname}
-          });
-        }
+        checkedCount++;
+        selectedInvoiceEntryId = invoiceEntryId;
       }
+    }
+
+    if (checkedCount > 1) {
+      this.handleModalShow();
+      return;
+    }
+
+    this.props.jiraIssues.data.data.forEach(jiraIssue => {
+      // InvoiceEntry with Jira issues?
+      if (jiraIssue.invoiceEntryId == selectedInvoiceEntryId) {
+        isManualEntry = false;
+        this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
+      }
+    });
+    // InvoiceEntry without Jira issues?
+    if (isManualEntry) {
+      this.props.history.push({
+        pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
+        state: { from: this.props.location.pathname }
+      });
     }
   };
 
@@ -197,6 +210,14 @@ class Invoice extends Component {
     else {
       return 0;
     }
+  };
+
+  handleModalClose() {
+    this.setState({ showModal: false });
+  };
+
+  handleModalShow() {
+    this.setState({ showModal: true });
   };
 
   // @TODO: Handle updating the list of invoiceEntries when a new invoiceEntry is submitted or deleted
@@ -292,6 +313,17 @@ class Invoice extends Component {
           <ContentFooter>
             Invoice created <strong><Moment format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></strong>
           </ContentFooter>
+          <Modal show={this.state.showModal} onHide={this.handleModalClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Error</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>Cannot edit more than one InvoiceEntry at a time!</Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={this.handleModalClose}>
+                Ok
+            </Button>
+            </Modal.Footer>
+          </Modal>
         </ContentWrapper>
       );
     }
