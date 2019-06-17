@@ -184,15 +184,15 @@ class Invoice extends Component {
       // InvoiceEntry with Jira issues?
       if (jiraIssue.invoiceEntryId == selectedInvoiceEntryId) {
         isManualEntry = false;
-        this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
+        this.props.history.push({
+          pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`,
+          state: { existingInvoiceEntryId: selectedInvoiceEntryId}
+        });
       }
     });
     // InvoiceEntry without Jira issues?
     if (isManualEntry) {
-      this.props.history.push({
-        pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
-        state: { from: this.props.location.pathname }
-      });
+      this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`);
     }
   };
 

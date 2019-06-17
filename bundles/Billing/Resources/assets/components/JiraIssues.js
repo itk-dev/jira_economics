@@ -20,6 +20,7 @@ function makeIssueData(jiraIssues) {
   return jiraIssues.data.data.map((item, i) => ({
     key: `row-${i}`,
     id: item.issue_id,
+    invoiceEntryId: item.invoiceEntryId ? item.invoiceEntryId : null,
     summary: item.summary,
     created: item.created.date,
     finished: item.finished.date,
@@ -57,6 +58,13 @@ class JiraIssues extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
+    if (this.props.location.state.existingInvoiceEntryId) {
+      this.props.issueData.forEach(issue => {
+        if (issue.invoiceEntryId == this.props.location.state.existingInvoiceEntryId) {
+          this.toggleRow(issue);
+        }
+      });
+    }
   }
 
   // @TODO: consider simplifying logic here
