@@ -55,6 +55,7 @@ class Invoice extends Component {
     super(props);
     this.handleRecordSubmit = this.handleRecordSubmit.bind(this);
     this.handleEditSubmit = this.handleEditSubmit.bind(this);
+    this.state = { checkedEntries: {} };
   }
 
   componentDidMount () {
@@ -144,6 +145,25 @@ class Invoice extends Component {
     });
   };
 
+  handleEntryDelete = (event) => {
+    event.preventDefault();
+    const {dispatch} = this.props;
+
+    for (let [invoiceEntryId, checked] of Object.entries(this.state.checkedEntries)) {
+      if (checked) {
+        dispatch(rest.actions.deleteInvoiceEntry({id: `${invoiceEntryId}`}));
+        // @TODO: Check that each deletion is successful
+      }
+    }
+  };
+
+  handleCheckboxChange = (event) => {
+    const target = event.target;
+    let stateCopy = Object.assign({}, this.state);
+    stateCopy.checkedEntries[target.id] = target.checked;
+    this.setState(stateCopy);
+  };
+
   getPriceData(invoiceEntryId, key) {
     if (this.props.priceData[`row-${invoiceEntryId}`] && this.props.priceData[`row-${invoiceEntryId}`][key]) {
       return this.props.priceData[`row-${invoiceEntryId}`][key];
@@ -153,7 +173,7 @@ class Invoice extends Component {
     }
   };
 
-  // @TODO: Handle updating the list of invoiceEntries when a new invoiceEntry is submitted
+  // @TODO: Handle updating the list of invoiceEntries when a new invoiceEntry is submitted or deleted
   render () {
     if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId )  {
       return (
@@ -173,7 +193,7 @@ class Invoice extends Component {
           <PageTitle breadcrumb={"Invoice for project [" + this.props.project.data.name + "] (" + this.props.match.params.projectId + ")"}>{this.props.invoice.data.name}</PageTitle>
           <div className="row">
             <div className="col-md-4">
-             <p>Invoicenumber: <strong className="pr-3">{this.props.match.params.invoiceId}</strong> Invoicedate: <strong>{String(this.props.invoice.data.recorded)}</strong></p>
+             <p>Invoicenumber: <strong className="pr-3">{this.props.match.params.invoiceId}</strong> Invoice recorded: <strong>{String(this.props.invoice.data.recorded)}</strong></p>
              <p>Invoice description TODO: save with invoice data</p>
             </div>
             <div className="col-md-8 text-right">
@@ -200,7 +220,7 @@ class Invoice extends Component {
                     <Button variant="primary" type="submit" id="editEntry" onClick={this.handleEntryEdit} disabled>
                       Edit entry
                     </Button>
-                    <Button variant="danger" type="submit" id="deleteEntry" onClick={this.handleEntryDelete} disabled>
+                    <Button variant="danger" type="submit" id="deleteEntry" onClick={this.handleEntryDelete}>
                       Delete entry
                     </Button>
                   </ButtonGroup>
@@ -221,7 +241,7 @@ class Invoice extends Component {
                 <tbody>
                   {this.props.invoiceEntries.data.data && this.props.invoiceEntries.data.data.map((item) =>
                     <tr key={item.invoiceEntryId}>
-                      <td><Form.Check aria-label="" /></td>
+                      <td><Form.Check aria-label="" id={item.invoiceEntryId} onChange={this.handleCheckboxChange}/></td>
                       <td>{item.accountNumber}</td>
                       <td><Link to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.invoiceEntryId}`}>{item.name}</Link></td>
                       <td>{item.description}</td>
