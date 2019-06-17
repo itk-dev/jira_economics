@@ -157,6 +157,32 @@ class Invoice extends Component {
     }
   };
 
+  handleEntryEdit = (event) => {
+    event.preventDefault();
+    const {dispatch} = this.props;
+    let isManualEntry = true;
+
+    // @TODO: several entries may be selected, show an error if this is the case
+    for (let [invoiceEntryId, checked] of Object.entries(this.state.checkedEntries)) {
+      if (checked) {
+        this.props.jiraIssues.data.data.forEach(jiraIssue => {
+          // InvoiceEntry with Jira issues?
+          if (jiraIssue.invoiceEntryId == invoiceEntryId) {
+            isManualEntry = false;
+            this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
+          }
+        });
+        // InvoiceEntry without Jira issues?
+        if (isManualEntry) {
+          this.props.history.push({
+            pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
+            state: {from: this.props.location.pathname}
+          });
+        }
+      }
+    }
+  };
+
   handleCheckboxChange = (event) => {
     const target = event.target;
     let stateCopy = Object.assign({}, this.state);
@@ -217,7 +243,7 @@ class Invoice extends Component {
                 </div>
                 <div className="col-md-6 text-right">
                   <ButtonGroup aria-label="Entry actions">
-                    <Button variant="primary" type="submit" id="editEntry" onClick={this.handleEntryEdit} disabled>
+                    <Button variant="primary" type="submit" id="editEntry" onClick={this.handleEntryEdit}>
                       Edit entry
                     </Button>
                     <Button variant="danger" type="submit" id="deleteEntry" onClick={this.handleEntryDelete}>
