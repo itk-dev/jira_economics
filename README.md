@@ -16,6 +16,21 @@ yarn watch # start webpack encore from stripts in package.json
 bin/console server:run # start PHP's built-in web server
 ```
 
+### Using the docker setup (recommended)
+The repository comes with a complete docker compose setup to run the project.
+
+```bash
+docker-compose up -d
+docker-compose exec phpfpm composer install
+docker-compose run yarn install
+docker-compose run yarn watch
+```
+
+Find the port to access the project:
+````bash
+echo "http://0.0.0.0:$(docker-compose port reverse-proxy 80 | cut -d: -f2)"
+````
+
 # Connect to Jira
 
 ## Create the key
