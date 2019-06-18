@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import Spinner from 'react-bootstrap/Spinner';
 
 class Project extends Component {
   constructor(props) {
@@ -49,7 +50,7 @@ class Project extends Component {
             <div key={item.invoiceId}><Link to={`/project/${this.props.match.params.projectId}/${item.invoiceId}`}>Link til {item.name}</Link></div>
           )}
 
-          <Form id="submitForm" onSubmit={this.handleCreateSubmit}>
+          <Form id="invoice-name" onSubmit={this.handleCreateSubmit}>
             <Form.Group controlId="submitForm" >
               <Form.Label>Invoice name</Form.Label>
               <Form.Control type="text" placeholder="Enter name for invoice" />
@@ -68,9 +69,9 @@ class Project extends Component {
     else {
       return (
         <ContentWrapper>
-          <div className="spinner-border" style={{ width: '3rem', height: '3rem', role: 'status' }}>
+          <Spinner animation="border" role="status">
             <span className="sr-only">Loading...</span>
-          </div>
+          </Spinner>
         </ContentWrapper>
       );
     }
