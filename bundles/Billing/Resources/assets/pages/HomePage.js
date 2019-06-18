@@ -80,10 +80,10 @@ export default function HomePage(props) {
               </Table>
             </Tab>
             <Tab eventKey="posted" title="Bogførte">
-              <Form className="float-right">
-                <Form.Group controlId="exampleForm.ControlSelect1">
-                  <Form.Label>Sorter</Form.Label>
-                  <Form.Control as="select">
+            <Form className="mt-3 mb-1 w-25">
+                <Form.Group controlId="exampleForm.ControlSelect1" className="mb-0">
+                  <Form.Label className="sr-only">Sorter</Form.Label>
+                  <Form.Control size="sm" as="select">
                     <option>Nyeste først</option>
                     <option>Ældste først</option>
                   </Form.Control>
