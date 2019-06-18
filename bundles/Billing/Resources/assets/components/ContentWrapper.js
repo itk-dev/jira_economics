@@ -1,9 +1,11 @@
 import React from 'react';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 export default ({children}) => (
-  <div className="row">
-    <div className="col-12">
+  <Row>
+    <Col>
       {children}
-    </div>
-  </div>
+    </Col>
+  </Row>
 )
