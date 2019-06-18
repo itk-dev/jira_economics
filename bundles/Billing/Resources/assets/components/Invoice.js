@@ -14,8 +14,11 @@ import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Table from 'react-bootstrap/Table';
 import ListGroup from 'react-bootstrap/ListGroup';
-
-const $ = require('jquery');
+import Alert from 'react-bootstrap/Alert';
+import Spinner from 'react-bootstrap/Spinner';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import InputGroup from 'react-bootstrap/InputGroup';
 
 class Invoice extends Component {
   constructor (props) {
@@ -118,53 +121,76 @@ class Invoice extends Component {
       return (
         <ContentWrapper>
           <PageTitle>Invoice</PageTitle>
-          <div>Error: the requested invoice does not match the project specified in the URL</div>
-          <div>(URL contains projectId '{this.props.match.params.projectId}'
+          <Alert variant="warning">Error: the requested invoice does not match the project specified in the URL</Alert>
+          <p>(URL contains projectId '{this.props.match.params.projectId}'
            but invoice with id '{this.props.match.params.invoiceId}'
             belongs to project with id '{this.props.invoice.data.jiraId}')
-          </div>
+          </p>
         </ContentWrapper>
       );
     }
     else if (this.props.invoice.data.name) {
       return (
         <ContentWrapper>
-          <PageTitle breadcrumb={"Invoice for project [Projectname] (" + this.props.match.params.projectId + ")"}>{this.props.invoice.data.name}</PageTitle>
-          <div className="row">
-            <div className="col-md-4">
-             <p>Invoicenumber: <strong className="pr-3">{this.props.match.params.invoiceId}</strong> Invoicedate: <strong>{String(this.props.invoice.data.recorded)}</strong></p>
-             <p>Invoice description TODO: save with invoice data</p>
-            </div>
-            <div className="col-md-8 text-right">
-              <ButtonGroup aria-label="Invoice actions">
-                <Button variant="primary" type="submit" id="record-invoice" onClick={this.handleRecordSubmit}>
-                  Record invoice
-                </Button>
-                <Button variant="danger" type="submit" id="delete" onClick={this.handleDeleteSubmit}>
-                  Delete invoice
-                </Button>
-              </ButtonGroup>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-md-8">
+          <Row>
+            <Col>
+              <p className="small text-muted">Invoice for project {this.props.match.params.name}({this.props.match.params.projectId})</p>
+              <p>Invoicenumber: <strong className="pr-3">{this.props.match.params.invoiceId}</strong> Invoicedate: <strong>{String(this.props.invoice.data.recorded)}</strong></p>
+            </Col>
+            <Col className="text-right">
+              <Button variant="success" type="submit" id="record-invoice" className="mr-3" onClick={this.saveInvoice}>
+                Save invoice
+              </Button>
+              <Button variant="primary" type="submit" id="record-invoice" className="mr-3" onClick={this.handleRecordSubmit}>
+                Record invoice
+              </Button>
+              <Button variant="danger" type="submit" id="delete" onClick={this.handleDeleteSubmit}>
+                Delete invoice
+              </Button>
+            </Col>
+          </Row>
+          <hr/>
+          <Row>
+            <Col md={9}>
+              <Form>
+                <Form.Row>
+                  <Col>
+                    <Form.Group controlId="invoiceName" >
+                      <Form.Label>Title</Form.Label>
+                      <Form.Control type="text" placeholder="Enter name for invoice" defaultValue={this.props.invoice.data.name}/>
+                      <Form.Text className="text-muted">
+                        The title should help you identify this Invoice later on.
+                      </Form.Text>
+                    </Form.Group>
+                  </Col>
+                  <Col>
+                    <Form.Group controlId="invoiceDescription" >
+                      <Form.Label>Description</Form.Label>
+                      <Form.Control type="text" placeholder="Enter a short description" defaultValue="Invoice description TODO: save with invoice data" />
+                      <Form.Text className="text-muted">
+                        Give a short description to help your customer understand what this Invoice is about.
+                      </Form.Text>
+                    </Form.Group>
+                  </Col>
+                </Form.Row>
+              </Form>
               <h2>Invoice entries</h2>
-              <div className="row mb-3">
-                <div className="col-md-6">
-                    <Button variant="outline-success" type="submit" className="mr-3" onClick={this.handleAddFromJira}>Add entry from Jira</Button>
-                    <Button variant="outline-success" type="submit" onClick={this.handleCreateSubmit}>Add manual entry</Button>
-                </div>
-                <div className="col-md-6 text-right">
+              <Row className="mb-3">
+                <Col md={6}>
+                    <Button variant="outline-success" size="sm" type="submit" className="mr-3" onClick={this.handleAddFromJira}>Add entry from Jira</Button>
+                    <Button variant="outline-success" size="sm" type="submit" onClick={this.handleCreateSubmit}>Add manual entry</Button>
+                </Col>
+                <Col md={6} className="text-right">
                   <ButtonGroup aria-label="Entry actions">
-                    <Button variant="primary" type="submit" id="editEntry" onClick={this.handleEntryEdit} disabled>
+                    <Button variant="primary" size="sm" type="submit" id="editEntry" onClick={this.handleEntryEdit} disabled>
                       Edit entry
                     </Button>
-                    <Button variant="danger" type="submit" id="deleteEntry" onClick={this.handleEntryDelete} disabled>
+                    <Button variant="danger" size="sm" type="submit" id="deleteEntry" onClick={this.handleEntryDelete} disabled>
                       Delete entry
                     </Button>
                   </ButtonGroup>
-                </div>
-              </div>
+                </Col>
+              </Row>
               <Table responsive hover className="table-borderless bg-light">
                 <thead>
                   <tr>
@@ -191,17 +217,25 @@ class Invoice extends Component {
                   )}
                 </tbody>
               </Table>
-            </div>
-            <div className="col-md-4">
-              <h4>Client information</h4>
+            </Col>
+            <Col md={3}>
+              <Row>
+                <Col><h3>Client</h3></Col>
+                <Col><Button size="sm" variant="outline-secondary" className="float-right">Change</Button></Col>
+              </Row>
               <ListGroup>
-                <ListGroup.Item><span className="text-muted d-inline-block w-25">Name</span> Customer name</ListGroup.Item>
-                <ListGroup.Item><span className="text-muted d-inline-block w-25">Contact</span> Customer contact</ListGroup.Item>
-                <ListGroup.Item><span className="text-muted d-inline-block w-25">CVR</span> XXXXXXXX</ListGroup.Item>
-                <ListGroup.Item><span className="text-muted d-inline-block w-25">EAN</span> XXXXXXXXXX</ListGroup.Item>
+                {[
+                  {title: 'Name', content: 'Customer name'},
+                  {title: 'Contact', content: 'Customer contact'},
+                  {title: 'Account', content: 'XXXX'},
+                  {title: 'CVR', content: 'XXXXXXXX'},
+                  {title: 'EAN', content: 'XXXXXXXXXX'}
+                ].map(({title, content}) => {
+                  return (<ListGroup.Item key={title} className="small"><span className="text-muted d-inline-block w-25">{title}</span>{content}</ListGroup.Item>);
+                })}
               </ListGroup>
-            </div>
-          </div>
+            </Col>
+          </Row>
           <ContentFooter>
             Invoice created <strong><Moment format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></strong>
           </ContentFooter>
@@ -211,10 +245,9 @@ class Invoice extends Component {
     else {
       return (
         <ContentWrapper>
-          <div className="spinner-border"
-               style={{width: '3rem', height: '3rem', role: 'status'}}>
+          <Spinner animation="border" role="status">
             <span className="sr-only">Loading...</span>
-          </div>
+          </Spinner>
         </ContentWrapper>
       );
     }
