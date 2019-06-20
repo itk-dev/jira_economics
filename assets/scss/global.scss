@@ -5,6 +5,7 @@ $gray-200: #F4F5F7;
 @import "~bootstrap/scss/bootstrap";
 @import "~select2/src/scss/core";
 @import "../../bundles/CreateProject/Resources/assets/createProject";
+@import "../../bundles/GraphicServiceOrder/Resources/assets/graphicServiceOrder";
 
 html, body, .wrapper, .main{
   height: 100%;
@@ -43,4 +44,16 @@ html, body, .wrapper, .main{
   .main-sidebar {
     height: 100%;
   }
+}
+
+// https://dusted.codes/making-font-awesome-awesome-using-icons-without-i-tags
+.icon::before {
+  display: inline-block;
+  margin-right: .5em;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translate(0, 0);
 }

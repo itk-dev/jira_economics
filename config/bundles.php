@@ -21,4 +21,5 @@ return [
     Symfony\WebpackEncoreBundle\WebpackEncoreBundle::class => ['all' => true],
     Billing\BillingBundle::class => ['all' => true],
     CreateProject\CreateProjectBundle::class => ['all' => true],
+    GraphicServiceOrder\GraphicServiceOrderBundle::class => ['all' => true],
 ];
