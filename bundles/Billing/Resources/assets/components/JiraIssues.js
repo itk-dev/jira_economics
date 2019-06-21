@@ -58,7 +58,7 @@ class JiraIssues extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
-    if (this.props.location.state.existingInvoiceEntryId) {
+    if (this.props.location.state && this.props.location.state.existingInvoiceEntryId) {
       this.props.issueData.forEach(issue => {
         if (issue.invoiceEntryId == this.props.location.state.existingInvoiceEntryId) {
           this.toggleRow(issue);
