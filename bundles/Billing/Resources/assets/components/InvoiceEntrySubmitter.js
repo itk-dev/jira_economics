@@ -59,7 +59,7 @@ export class InvoiceEntrySubmitter extends Component {
     });
   }
 
-  handleCreateSubmit = (event) => {
+  handleSubmit = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
     const invoiceId = this.props.match.params.invoiceId;
@@ -73,7 +73,7 @@ export class InvoiceEntrySubmitter extends Component {
     this.props.selectedIssues.selectedIssues.forEach(selectedIssue => {
       jiraIssueIds.push(selectedIssue.id);
     });
-    const invoiceEntryData = {
+    let invoiceEntryData = {
       invoiceId,
       name,
       description,
@@ -81,9 +81,18 @@ export class InvoiceEntrySubmitter extends Component {
       product,
       jiraIssueIds
     };
-    dispatch(rest.actions.createInvoiceEntry({}, {
-      body: JSON.stringify(invoiceEntryData)
-    }));
+    const invoiceEntryId = this.props.location.state.existingInvoiceEntryId;
+    if (invoiceEntryId) {
+      invoiceEntryData.id = invoiceEntryId;
+      dispatch(rest.actions.updateInvoiceEntry({id: invoiceEntryId}, {
+        body: JSON.stringify(invoiceEntryData)
+      }));
+    }
+    else {
+      dispatch(rest.actions.createInvoiceEntry({}, {
+        body: JSON.stringify(invoiceEntryData)
+      }));
+    }
     // @TODO: check that a new invoiceEntry was successfully created before navigating to invoice page
     // @TODO: consider showing a modal dialog to confirm invoiceEntry creation
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
@@ -167,7 +176,7 @@ export class InvoiceEntrySubmitter extends Component {
                   </input>
                 </div>
               </form>
-              <form onSubmit={this.handleCreateSubmit}>
+              <form onSubmit={this.handleSubmit}>
                 <button
                   type="submit"
                   className="btn btn-primary"
@@ -252,7 +261,7 @@ export class InvoiceEntrySubmitter extends Component {
                   </input>
                 </div>
               </form>
-              <form onSubmit={this.handleCreateSubmit}>
+              <form onSubmit={this.handleSubmit}>
                 <button
                   type="submit"
                   className="btn btn-primary"
@@ -352,7 +361,7 @@ export class InvoiceEntrySubmitter extends Component {
                   </input>
                 </div>
               </form>
-              <form onSubmit={this.handleCreateSubmit}>
+              <form onSubmit={this.handleSubmit}>
                 <button
                   type="submit"
                   className="btn btn-primary"
@@ -447,7 +456,7 @@ export class InvoiceEntrySubmitter extends Component {
                   </input>
                 </div>
               </form>
-              <form onSubmit={this.handleCreateSubmit}>
+              <form onSubmit={this.handleSubmit}>
                 <button
                   type="submit"
                   className="btn btn-primary"
