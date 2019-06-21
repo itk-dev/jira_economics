@@ -55,7 +55,6 @@ class Invoice extends Component {
   constructor (props) {
     super(props);
     this.handleRecordSubmit = this.handleRecordSubmit.bind(this);
-    this.handleEditSubmit = this.handleEditSubmit.bind(this);
     this.handleModalShow = this.handleModalShow.bind(this);
     this.handleModalClose = this.handleModalClose.bind(this);
     this.state = { checkedEntries: {}, showModal: false };
@@ -68,26 +67,6 @@ class Invoice extends Component {
     dispatch(rest.actions.getInvoiceEntries({id: `${this.props.match.params.invoiceId}`}));
     dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
   }
-
-  // @TODO: consider cleaning up redundancy
-  handleEditSubmit = (event) => {
-    event.preventDefault();
-    const {dispatch} = this.props;
-    const id = this.props.match.params.invoiceId;
-    // @TODO: look into getting this value from the event instead
-    const name = $('#edit-invoice-entry-name').val();
-    const recorded = this.props.invoice.data.recorded;
-    const created = this.props.createdAt;
-    const invoiceData = {
-      id,
-      name,
-      recorded,
-      created
-    };
-    dispatch(rest.actions.updateInvoice({id: `${this.props.match.params.invoiceId}`}, {
-      body: JSON.stringify(invoiceData)
-    }));
-  };
 
   handleRecordSubmit = (event) => {
     event.preventDefault();
@@ -104,24 +83,6 @@ class Invoice extends Component {
     };
     dispatch(rest.actions.updateInvoice({id: `${this.props.match.params.invoiceId}`}, {
       body: JSON.stringify(invoiceData)
-    }));
-  };
-
-  handleCreateSubmit = (event) => {
-    event.preventDefault();
-    const {dispatch} = this.props;
-    const invoiceId = this.props.match.params.invoiceId;
-    // @TODO: look into getting this value from the event instead
-    const name = $('#invoice-entry-name').val();
-    // @TODO: replace dummy account with a real one
-    const account = 123;
-    const invoiceEntryData = {
-      invoiceId,
-      name,
-      account
-    };
-    dispatch(rest.actions.createInvoiceEntry({}, {
-      body: JSON.stringify(invoiceEntryData)
     }));
   };
 
