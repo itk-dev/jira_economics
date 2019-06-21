@@ -52,20 +52,24 @@ function makePriceData(invoiceEntries, jiraIssues) {
 };
 
 class Invoice extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.handleRecordSubmit = this.handleRecordSubmit.bind(this);
     this.handleModalShow = this.handleModalShow.bind(this);
     this.handleModalClose = this.handleModalClose.bind(this);
-    this.state = { checkedEntries: {}, showModal: false, checkedCount: 0 };
-  }
+    this.state = { checkedEntries: {}, showModal: false, checkedCount: 0, invoiceEntries: {} };
+  };
 
   componentDidMount () {
     const {dispatch} = this.props;
     dispatch(rest.actions.getProject({id: `${this.props.match.params.projectId}`}));
+    dispatch(rest.actions.getJiraIssues({id: `${this.props.match.params.projectId}`}));
     dispatch(rest.actions.getInvoice({id: `${this.props.match.params.invoiceId}`}));
-    dispatch(rest.actions.getInvoiceEntries({id: `${this.props.match.params.invoiceId}`}));
-    dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
+    dispatch(rest.actions.getInvoiceEntries({id: `${this.props.match.params.invoiceId}`}))
+    .then((response) => {
+      this.setState({invoiceEntries: response});
+    })
+    .catch((reason) => console.log('isCanceled', reason.isCanceled));
   }
 
   handleRecordSubmit = (event) => {
@@ -117,9 +121,17 @@ class Invoice extends Component {
       if (checked) {
         dispatch(rest.actions.deleteInvoiceEntry({id: `${invoiceEntryId}`}));
         // @TODO: Check that each deletion is successful
+        //this.removeInvoiceEntry(invoiceEntryId);
+        // @TODO: Remove InvoiceEntry from state.invoiceEntries to trigger a re-render
       }
     }
   };
+
+  removeInvoiceEntry(invoiceEntryId) {
+    this.setState({invoiceEntries: this.state.invoiceEntries.data.filter((invoiceEntry) => {
+      return invoiceEntry.invoiceEntryId != invoiceEntryId;
+    })});
+  }
 
   handleEntryEdit = (event) => {
     event.preventDefault();
@@ -198,7 +210,7 @@ class Invoice extends Component {
         </ContentWrapper>
       );
     }
-    else if (this.props.invoice.data.name && this.props.priceData) {
+    else if (this.props.invoice.data.name && this.props.priceData && this.state.invoiceEntries && this.state.invoiceEntries.data) {
       return (
         <ContentWrapper>
           <PageTitle breadcrumb={"Invoice for project [" + this.props.project.data.name + "] (" + this.props.match.params.projectId + ")"}>{this.props.invoice.data.name}</PageTitle>
@@ -250,7 +262,7 @@ class Invoice extends Component {
                   </tr>
                 </thead>
                 <tbody>
-                  {this.props.invoiceEntries.data.data && this.props.invoiceEntries.data.data.map((item) =>
+                  {this.state.invoiceEntries.data && this.state.invoiceEntries.data.map((item) =>
                     <tr key={item.invoiceEntryId}>
                       <td><Form.Check aria-label="" id={item.invoiceEntryId} onChange={this.handleCheckboxChange}/></td>
                       <td>{item.accountNumber}</td>
