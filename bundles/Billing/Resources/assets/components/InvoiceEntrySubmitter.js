@@ -31,7 +31,7 @@ export class InvoiceEntrySubmitter extends Component {
   }
 
   getTimeSpent() {
-    if (this.props.selectedIssues == undefined) {
+    if (this.props.selectedIssues == undefined || this.props.selectedIssues.selectedIssues == undefined) {
       return 0;
     }
     let timeSum = 0;
