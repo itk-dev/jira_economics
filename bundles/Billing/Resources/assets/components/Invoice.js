@@ -57,7 +57,7 @@ class Invoice extends Component {
     this.handleRecordSubmit = this.handleRecordSubmit.bind(this);
     this.handleModalShow = this.handleModalShow.bind(this);
     this.handleModalClose = this.handleModalClose.bind(this);
-    this.state = { checkedEntries: {}, showModal: false };
+    this.state = { checkedEntries: {}, showModal: false, checkedCount: 0 };
   }
 
   componentDidMount () {
@@ -136,8 +136,8 @@ class Invoice extends Component {
       }
     }
 
-    if (checkedCount > 1) {
-      this.handleModalShow();
+    if (checkedCount !== 1) {
+      this.handleModalShow(checkedCount);
       return;
     }
 
@@ -177,8 +177,8 @@ class Invoice extends Component {
     this.setState({ showModal: false });
   };
 
-  handleModalShow() {
-    this.setState({ showModal: true });
+  handleModalShow(checkedCount) {
+    this.setState({ showModal: true, checkedCount: checkedCount });
   };
 
   // @TODO: Handle updating the list of invoiceEntries when a new invoiceEntry is submitted or deleted
@@ -278,7 +278,12 @@ class Invoice extends Component {
             <Modal.Header closeButton>
               <Modal.Title>Error</Modal.Title>
             </Modal.Header>
-            <Modal.Body>Cannot edit more than one InvoiceEntry at a time!</Modal.Body>
+            {this.state.checkedCount > 1 &&
+              <Modal.Body>Cannot edit more than one InvoiceEntry at a time!</Modal.Body>
+            }
+            {this.state.checkedCount == 0 &&
+              <Modal.Body>Please select an InvoiceEntry for editing</Modal.Body>
+            }
             <Modal.Footer>
               <Button variant="secondary" onClick={this.handleModalClose}>
                 Ok
