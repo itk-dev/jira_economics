@@ -153,7 +153,10 @@ class Invoice extends Component {
     });
     // InvoiceEntry without Jira issues?
     if (isManualEntry) {
-      this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`);
+      this.props.history.push({
+        pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
+        state: { from: this.props.location.pathname, existingInvoiceEntryId: selectedInvoiceEntryId }
+      });
     }
   };
 

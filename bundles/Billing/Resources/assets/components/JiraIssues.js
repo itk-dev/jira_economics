@@ -189,7 +189,19 @@ class JiraIssues extends Component {
     event.preventDefault();
     const { dispatch } = this.props;
     dispatch(setSelectedIssues(this.state.selected));
-    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`);
+    if (this.props.location.state &&
+      this.props.location.state.existingInvoiceEntryId) {
+      this.props.history.push({
+        pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
+        state: { from: this.props.location.pathname, existingInvoiceEntryId: this.props.location.state.existingInvoiceEntryId }
+      })
+    }
+    else {
+      this.props.history.push({
+        pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
+        state: { from: this.props.location.pathname }
+      });
+    }
   }
 
   handleCancelSubmit = (event) => {
