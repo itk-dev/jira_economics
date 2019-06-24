@@ -22,4 +22,5 @@ return [
     Billing\BillingBundle::class => ['all' => true],
     CreateProject\CreateProjectBundle::class => ['all' => true],
     GraphicServiceOrder\GraphicServiceOrderBundle::class => ['all' => true],
+    Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],
 ];

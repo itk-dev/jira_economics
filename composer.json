@@ -33,7 +33,8 @@
         "symfony/web-link": "4.2.*",
         "symfony/webpack-encore-bundle": "^1.5",
         "symfony/webpack-encore-pack": "^1.0",
-        "symfony/yaml": "4.2.*"
+        "symfony/yaml": "4.2.*",
+        "vich/uploader-bundle": "^1.9"
     },
     "require-dev": {
         "symfony/debug-pack": "*",

@@ -67,7 +67,7 @@
 
   <div class="mb-2">
     <span class="label"><strong>{{ 'service_order_form.job_delivery.date.label'|trans }}:</strong></span>
-    {#<span class="value">{{ form_data.form.date }}</span>#}
+    <span class="value">{{ form_data.form.date|date('d-m-Y') }}</span>
   </div>
 
   <div class="mb-2">
