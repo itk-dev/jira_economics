@@ -116,21 +116,26 @@ class Invoice extends Component {
   handleEntryDelete = (event) => {
     event.preventDefault();
     const {dispatch} = this.props;
+    let checkedInvoiceEntryIds = [];
 
     for (let [invoiceEntryId, checked] of Object.entries(this.state.checkedEntries)) {
       if (checked) {
+        checkedInvoiceEntryIds.push(parseInt(invoiceEntryId));
+        // @TODO: Fix Promise issue when deleting multiple invoiceEntries at once
         dispatch(rest.actions.deleteInvoiceEntry({id: `${invoiceEntryId}`}));
         // @TODO: Check that each deletion is successful
-        //this.removeInvoiceEntry(invoiceEntryId);
-        // @TODO: Remove InvoiceEntry from state.invoiceEntries to trigger a re-render
       }
     }
+    this.removeInvoiceEntries(checkedInvoiceEntryIds);
   };
 
-  removeInvoiceEntry(invoiceEntryId) {
-    this.setState({invoiceEntries: this.state.invoiceEntries.data.filter((invoiceEntry) => {
-      return invoiceEntry.invoiceEntryId != invoiceEntryId;
-    })});
+  removeInvoiceEntries(checkedInvoiceEntryIds) {
+    let filteredInvoiceEntries = this.state.invoiceEntries.data.filter((invoiceEntry) => {
+      return !checkedInvoiceEntryIds.includes(invoiceEntry.invoiceEntryId);
+    });
+    let newInvoiceEntries = { "data": filteredInvoiceEntries };
+    this.setState({ invoiceEntries: newInvoiceEntries });
+    this.setState( {checkedEntries: {}} );
   }
 
   handleEntryEdit = (event) => {
