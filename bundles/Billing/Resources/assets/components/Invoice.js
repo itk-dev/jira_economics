@@ -121,10 +121,17 @@ class Invoice extends Component {
     for (let [invoiceEntryId, checked] of Object.entries(this.state.checkedEntries)) {
       if (checked) {
         checkedInvoiceEntryIds.push(parseInt(invoiceEntryId));
-        // @TODO: Fix Promise issue when deleting multiple invoiceEntries at once
-        dispatch(rest.actions.deleteInvoiceEntry({id: `${invoiceEntryId}`}));
-        // @TODO: Check that each deletion is successful
       }
+    }
+
+    for (let i = 0, p = Promise.resolve(); i < checkedInvoiceEntryIds.length; i++) {
+      p = p.then(_ => new Promise(resolve =>
+          setTimeout(function () {
+              // @TODO: Check that each deletion is successful and chain API calls
+              dispatch(rest.actions.deleteInvoiceEntry({id: `${checkedInvoiceEntryIds[i]}`}));
+              resolve();
+          }, 5000)
+      ));
     }
     this.removeInvoiceEntries(checkedInvoiceEntryIds);
   };
