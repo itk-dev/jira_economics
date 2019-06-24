@@ -8,19 +8,21 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        secured_area:
+        jira_secured_area:
+            pattern: ^/jira
             anonymous: ~
             oauth:
                 resource_owners:
-                    jira:          "/login/check-jira"
-                login_path:        /login
+                    jira:          /jira/login/check
+                login_path:        /jira/login
+                check_path:        /jira/login/check
                 use_forward:       false
-                failure_path:      /login
+                failure_path:      /jira/login
                 oauth_user_provider:
                     service: hwi_oauth.user.provider
 
+
     access_control:
-        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/login/check-jira, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/connect, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/jira/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/jira/connect, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/, roles: ROLE_USER }

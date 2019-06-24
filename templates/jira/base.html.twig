@@ -36,7 +36,7 @@
         <div class="wrapper d-flex flex-column flex-md-row flex-grow-1">
           {% block globalNav %}
             <div class="d-flex">
-              {% include "portal/navigation/global-nav.html.twig" %}
+              {% include template_path ~ 'navigation/global-nav.html.twig' %}
             </div>
           {% endblock %}
           {% block main %}
@@ -62,7 +62,7 @@
                           {% endfor %}
                       {% endblock %}
                     {% block content %}
-                      {% include "portal/main/index.html.twig" %}
+                      {% include template_path ~ 'main/index.html.twig' %}
                     {% endblock %}
                   </div>
                 </div>
