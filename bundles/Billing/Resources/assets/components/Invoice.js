@@ -124,19 +124,18 @@ class Invoice extends Component {
       }
     }
 
-    for (let i = 0, p = Promise.resolve(); i < checkedInvoiceEntryIds.length; i++) {
-      p = p.then(_ => new Promise(resolve =>
-          setTimeout(function () {
-              // @TODO: Check that each deletion is successful and chain API calls
-              dispatch(rest.actions.deleteInvoiceEntry({id: `${checkedInvoiceEntryIds[i]}`}));
-              resolve();
-          }, 5000)
-      ));
-    }
-    this.removeInvoiceEntries(checkedInvoiceEntryIds);
+    this.deleteInvoiceEntries(checkedInvoiceEntryIds);
+    this.removeInvoiceEntriesFromState(checkedInvoiceEntryIds);
   };
 
-  removeInvoiceEntries(checkedInvoiceEntryIds) {
+  async deleteInvoiceEntries(invoiceEntryIds) {
+    const {dispatch} = this.props;
+    for (let i = 0; i < invoiceEntryIds.length; i++) {
+      let result = await dispatch(rest.actions.deleteInvoiceEntry({id: `${invoiceEntryIds[i]}`}));
+    }
+  }
+
+  removeInvoiceEntriesFromState(checkedInvoiceEntryIds) {
     let filteredInvoiceEntries = this.state.invoiceEntries.data.filter((invoiceEntry) => {
       return !checkedInvoiceEntryIds.includes(invoiceEntry.invoiceEntryId);
     });
