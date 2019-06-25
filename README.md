@@ -19,7 +19,6 @@ docker-compose run yarn watch # or docker-compose run yarn build for production 
 ````bash
 cp .env .env.local
 docker-compose exec phpfpm bin/console doctrine:migrations:migrate
-
 ````
 
 ###
@@ -31,8 +30,8 @@ echo "http://0.0.0.0:$(docker-compose port reverse-proxy 80 | cut -d: -f2)"
 # Production build
 
 ````bash
-composer install --no-dev
-yarn build
+docker-compose exec phpfpm composer install --no-dev -o
+docker-compose run yarn build
 ```` 
 
 ### Without docker
