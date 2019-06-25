@@ -84,6 +84,16 @@ class GsOrder
      */
     private $deliveryDescription;
 
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private $ownCloudSharedFiles = [];
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $orderStatus;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -231,5 +241,29 @@ class GsOrder
         $this->deliveryDescription = $deliveryDescription;
 
         return $this;
+    }
+
+    public function getOwnCloudSharedFiles(): ?array
+    {
+      return $this->ownCloudSharedFiles;
+    }
+
+    public function setOwnCloudSharedFiles(?array $ownCloudSharedFiles): self
+    {
+      $this->ownCloudSharedFiles = $ownCloudSharedFiles;
+
+      return $this;
+    }
+
+    public function getOrderStatus(): ?string
+    {
+      return $this->orderStatus;
+    }
+
+    public function setOrderStatus(?string $orderStatus): self
+    {
+      $this->orderStatus = $orderStatus;
+
+      return $this;
     }
 }
