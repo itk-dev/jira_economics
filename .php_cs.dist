@@ -1,0 +1,20 @@
+<?php
+
+$finder = PhpCsFixer\Finder::create()
+     ->exclude('Migrations')
+     ->notPath('Kernel.php')
+     ->in(__DIR__.'/{src,tests}')
+;
+
+return PhpCsFixer\Config::create()
+    ->setRiskyAllowed(true)
+    ->setRules([
+        '@Symfony' => true,
+        '@Symfony:risky' => true,
+        'array_syntax' => ['syntax' => 'short'],
+        'list_syntax' => ['syntax' => 'short'],
+        'method_argument_space' => ['on_multiline' => 'ensure_fully_multiline'],
+        'strict_comparison' => true,
+    ])
+    ->setFinder($finder)
+;
