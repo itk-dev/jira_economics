@@ -18,6 +18,7 @@ Encore
   .enableReactPreset()
   .enableVersioning()
   .enablePostCssLoader()
+  .autoProvidejQuery()
   .copyFiles({
     from: './assets/images',
     to: 'images/[path][name].[ext]'

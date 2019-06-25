@@ -55,6 +55,7 @@ class JiraIssue
 
     /**
      * @ORM\ManyToOne(targetEntity="Billing\Entity\InvoiceEntry", inversedBy="jiraIssues")
+     * @ORM\JoinColumn(name="invoiceEntryId", referencedColumnName="id", nullable=true, onDelete="SET NULL")
      */
     private $InvoiceEntryId;
 

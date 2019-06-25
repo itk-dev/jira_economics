@@ -1,0 +1,6 @@
+sidebar:
+  title: Faktura
+  btn:
+    new: Ny faktura
+    invoices: Fakturaer
+    statistics: Statestik

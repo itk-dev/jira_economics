@@ -44,6 +44,21 @@ html, body, .wrapper, .main{
   .main-sidebar {
     height: 100%;
   }
+  .main-content {
+    height: 100vh;
+    overflow: auto;
+  }
+}
+
+@include media-breakpoint-up(md) {
+  table.table tr td div.btn-group {
+    opacity: 0;
+    transition: opacity .2s ease-in;
+  }
+  table.table tr:hover td div.btn-group {
+    opacity: 1;
+    transition: opacity .4s ease-in-out;
+  }
 }
 
 // https://dusted.codes/making-font-awesome-awesome-using-icons-without-i-tags

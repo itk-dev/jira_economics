@@ -5,8 +5,8 @@ import connect from 'react-redux/es/connect/connect';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
-
-const $ = require('jquery');
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 
 class Project extends Component {
   constructor(props) {
@@ -42,30 +42,26 @@ class Project extends Component {
     if (this.props.project.data.name) {
       return (
         <ContentWrapper>
-          <PageTitle>
-            {this.props.project.data.name + ' (' + this.props.project.data.jiraId + ')'}
+          <PageTitle breadcrumb={this.props.project.data.name + ' (' + this.props.project.data.jiraId + ')'}>
+            Create new invoice
           </PageTitle>
-
           {this.props.invoices.data.data && this.props.invoices.data.data.map((item) =>
-            <div key={item.jiraId}><Link to={`/project/${this.props.match.params.projectId}/${item.invoiceId}`}>Link til {item.name}</Link></div>
+            <div key={item.invoiceId}><Link to={`/project/${this.props.match.params.projectId}/${item.invoiceId}`}>Link til {item.name}</Link></div>
           )}
-          <div>Create new invoice</div>
-          <div>
-            <form id="submitForm" onSubmit={this.handleCreateSubmit}>
-              <div id="formGroup" className="form-group">
-                <label htmlFor="input-new-invoice-name">Enter invoice name for new invoice</label>
-                <input
-                  type="text"
-                  name="invoiceName"
-                  className="form-control"
-                  id="invoice-name"
-                  aria-describedby="invoiceName"
-                  placeholder="Enter invoice name">
-                </input>
-              </div>
-              <button type="submit" className="btn btn-primary" id="submit">Submit new invoice</button>
-            </form>
-          </div>
+
+          <Form id="submitForm" onSubmit={this.handleCreateSubmit}>
+            <Form.Group controlId="submitForm" >
+              <Form.Label>Invoice name</Form.Label>
+              <Form.Control type="text" placeholder="Enter name for invoice" />
+              <Form.Text className="text-muted">
+                The name should help you identify this Invoice later on.
+              </Form.Text>
+            </Form.Group>
+            <Button variant="primary" type="submit" id="submit">
+              Create new invoice
+            </Button>
+          </Form>
+
         </ContentWrapper>
       );
     }
