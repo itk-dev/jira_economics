@@ -143,6 +143,47 @@ class ApiController extends Controller
     }
 
     /**
+     * @Route("/customer/{customerId}", name="api_customer")
+     * defaults={"customerId"="...."}
+     */
+    public function customerGetAction(BillingService $billingService, Request $request)
+    {
+        $customerId = $request->get('customerId');
+        $result = $billingService->getCustomer($customerId);
+        return new JsonResponse($result);
+    }
+
+    /**
+     * @Route("/customer", name="api_customer_post", methods={"POST"})
+     */
+    public function customerPostAction(BillingService $billingService, Request $request)
+    {
+        $customerData = json_decode($request->getContent(), true);
+        $result = $billingService->postCustomer($customerData);
+        return new JsonResponse($result);
+    }
+
+    /**
+     * @Route("/customer/{customerId}", name="api_customer_put", methods={"PUT"})
+     */
+    public function customerPutAction(BillingService $billingService, Request $request)
+    {
+        $customerData = json_decode($request->getContent(), true);
+        $result = $billingService->putCustomer($customerData);
+        return new JsonResponse($result);
+    }
+
+    /**
+     * @Route("/customer/{customerId}", name="api_customer_delete", methods={"DELETE"})
+     */
+    public function customerDeleteAction(BillingService $billingService, Request $request)
+    {
+        $customerId = $request->get('customerId');
+        $result = $billingService->deleteCustomer($customerId);
+        return new JsonResponse($result);
+    }
+
+    /**
      * @Route("/current_user", name="api_current_user")
      */
     public function currentUserAction(JiraService $jiraService)

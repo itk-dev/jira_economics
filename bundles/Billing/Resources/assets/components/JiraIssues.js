@@ -48,12 +48,8 @@ class JiraIssues extends Component {
   constructor(props) {
     super(props);
     this.state = { selected: [], selectAll: 0, selectedIssues: {} };
-    // @TODO: fix this messy nesting
-    if (this.props.selectedIssues &&
-        this.props.selectedIssues.selectedIssues &&
-        this.props.selectedIssues.selectedIssues.selectedIssues &&
-        this.props.selectedIssues.selectedIssues.selectedIssues.length > 0) {
-          this.state.selected = this.props.selectedIssues.selectedIssues.selectedIssues;
+    if (this.props.selectedIssues.selectedIssues && this.props.selectedIssues.selectedIssues.length > 0) {
+          this.state.selected = this.props.selectedIssues.selectedIssues;
     }
     this.toggleRow = this.toggleRow.bind(this);
   }
@@ -201,7 +197,9 @@ class JiraIssues extends Component {
     }
     let timeSum = 0;
     this.state.selected.forEach(selectedIssue => {
-      timeSum += selectedIssue.timeSpent;
+      if (parseFloat(selectedIssue.timeSpent)) {
+        timeSum += selectedIssue.timeSpent;
+    }
     });
     return timeSum;
   }

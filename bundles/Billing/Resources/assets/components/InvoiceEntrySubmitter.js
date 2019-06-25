@@ -28,7 +28,7 @@ export class InvoiceEntrySubmitter extends Component {
   handleSelectJiraIssues = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
-    dispatch(setSelectedIssues(this.props.selectedIssues));
+    dispatch(setSelectedIssues(this.props.selectedIssues.selectedIssues));
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
   }
 
@@ -38,7 +38,9 @@ export class InvoiceEntrySubmitter extends Component {
     }
     let timeSum = 0;
     this.props.selectedIssues.selectedIssues.forEach(selectedIssue => {
-      timeSum += selectedIssue.timeSpent;
+      if (parseFloat(selectedIssue.timeSpent)) {
+        timeSum += selectedIssue.timeSpent;
+    }
     });
     return timeSum;
   }

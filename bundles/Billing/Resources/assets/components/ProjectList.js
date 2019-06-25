@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import connect from 'react-redux/es/connect/connect';
 import rest from '../redux/utils/rest';
-import { Link } from 'react-router-dom';
+import ListGroup from 'react-bootstrap/ListGroup';
+import Form from 'react-bootstrap/Form';
 
 const createRows = (projects) => {
   if (projects.data.data === undefined) {
@@ -16,18 +16,13 @@ const createRows = (projects) => {
     key: project.key,
     id: project.id,
     avatar: <img src={project.avatarUrls['16x16']} style={imageStyle}/>,
-    link: <Link to={`/project/${project.id}`}>{project.name}</Link>
+    linkUrl: `/billing/project/${project.id}`
   }));
 };
 
 const imageStyle = {
   maxWidth: '20px'
 };
-
-const InputWrapper = styled.div`
-  width: 50%;
-  margin-bottom: 20px;
-`;
 
 class ProjectList extends Component {
   constructor(){
@@ -63,31 +58,34 @@ class ProjectList extends Component {
 
     for (const [index, project] of Object.entries(projects)) {
       items.push(
-        <li key={project.rowKey}>
-          {project.avatar}
-          {project.key}
-          {project.id}
-          {project.link}
-        </li>
+        <ListGroup.Item key={project.rowKey} id={project.id} action href={project.linkUrl}>
+          <span className="mr-2">{project.avatar}</span>
+          <span className="mr-2 lead d-inline">{project.name}</span>
+          <span className="text-muted">{project.key}</span>
+        </ListGroup.Item>
       );
     }
 
-    const fetching = this.props.isFetching ? '...' : '';
+    // TODO: Add spinner
+    const fetching = this.props.isFetching ? 'Loading ...' : '';
 
     return (
       <div>
-        <InputWrapper>
-          <input
-            type="text"
-            placeholder="Enter the name of a project"
-            value={this.state.inputFilter}
-            onChange={this.onFilterChange}
-          />
-        </InputWrapper>
+        <Form>
+          <Form.Group controlId="formBasicEmail">
+            <Form.Label className="sr-only">Project filter</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Find project"
+              value={this.state.inputFilter}
+              onChange={this.onFilterChange}
+            />
+          </Form.Group>
+        </Form>
 
-        <ul>
+        <ListGroup>
         {items}
-        </ul>
+        </ListGroup>
 
         {fetching}
       </div>
