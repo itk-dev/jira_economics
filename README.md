@@ -31,6 +31,7 @@ echo "http://0.0.0.0:$(docker-compose port reverse-proxy 80 | cut -d: -f2)"
 
 ````bash
 docker-compose exec phpfpm composer install --no-dev -o
+docker-compose run yarn install
 docker-compose run yarn build
 ```` 
 
