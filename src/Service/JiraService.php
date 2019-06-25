@@ -123,7 +123,7 @@ class JiraService
      */
     public function put($path, $data)
     {
-        $stack = HandlerStack::create();
+        $stack = HandlerStack::create();    
         $token = $this->token_storage->getToken();
 
         if ($token instanceof AnonymousToken) {

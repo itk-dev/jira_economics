@@ -6,6 +6,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "api-platform/api-pack": "^1.2",
+        "gedmo/doctrine-extensions": "^2.4",
         "guzzlehttp/oauth-subscriber": "^0.3.0",
         "guzzlehttp/psr7": "^1.5",
         "hwi/oauth-bundle": "^0.6.3",
@@ -32,7 +33,9 @@
         "symfony/validator": "4.2.*",
         "symfony/web-link": "4.2.*",
         "symfony/webpack-encore-bundle": "^1.5",
-        "symfony/yaml": "4.2.*"
+        "symfony/webpack-encore-pack": "^1.0",
+        "symfony/yaml": "4.2.*",
+        "vich/uploader-bundle": "^1.9"
     },
     "require-dev": {
         "symfony/debug-pack": "*",
@@ -51,7 +54,8 @@
         "psr-4": {
             "App\\": "src/",
             "Billing\\":"bundles/Billing",
-            "CreateProject\\":"bundles/CreateProject"
+            "CreateProject\\":"bundles/CreateProject",
+            "GraphicServiceOrder\\":"bundles/GraphicServiceOrder"
         }
     },
     "autoload-dev": {
