@@ -1,0 +1,18 @@
+create_project_form:
+  project_key:
+    constraint:
+      regex: Kun bogstaver tilladt
+      min: Min. 2 bogstaver
+      max: Max. 7 bogstaver
+  team:
+    constraint:
+      not_blank: Vælg et team
+  account:
+    constraint:
+      not_null: Vælg konto eller opret ny konto
+  new_account_customer:
+    constraint:
+      not_null: Vælg kunde eller opret ny kunde
+  new_customer_key:
+    constraint:
+      regex: Enten 4 eller 13 cifre

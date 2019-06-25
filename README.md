@@ -45,3 +45,37 @@ JIRA_OAUTH_PEM_PATH=[PATH TO PRIVATE KEY]
 JIRA_URL='https://[SITE].atlassian.net'
 JIRA_DEFAULT_BOARD=[TEAM BOARD ID]
 ```
+
+#Setup Database
+DATABASE_URL=""
+
+#Setup bundles/CreateProject
+Set values in .env.local:
+
+```
+# The default lead for new accounts being created
+CPB_ACCOUNT_MANAGER="[A Jira username]"
+```
+
+Define the config
+- Copy config/create_project_config.yml to config/create_project_config.local.yml
+- Define each team config.
+
+
+#Setup bundles/GraphicServiceOrder
+Set values in .env.local:
+
+```
+# Form configuration
+FORM_FILE_GS_UPLOAD_SIZE=100M
+```
+
+Set values for owncloudservice:
+
+```
+###> ownCloudService ###
+OWNCLOUD_HOST=""
+OWNCLOUD_USERNAME=""
+OWNCLOUD_PASSWORD=""
+###< ownCloudService ###
+```

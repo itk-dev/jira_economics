@@ -1,0 +1,4 @@
+controllers:
+    resource: "@GraphicServiceOrderBundle/Controller"
+    type: annotation
+    prefix: /create-graphic-service-order
