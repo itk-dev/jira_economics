@@ -15,3 +15,9 @@ jira_login:
 
 billing:
     resource: "@BillingBundle/Resources/config/routing.yaml"
+
+create-project:
+    resource: "@CreateProjectBundle/Resources/config/routing.yaml"
+
+create-graphic-service-order:
+    resource: "@GraphicServiceOrderBundle/Resources/config/routing.yaml"

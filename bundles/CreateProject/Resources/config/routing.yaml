@@ -1,0 +1,4 @@
+controllers:
+    resource: "@CreateProjectBundle/Controller"
+    type: annotation
+    prefix: /create-project

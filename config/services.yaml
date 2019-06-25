@@ -1,6 +1,9 @@
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
 
+imports:
+    - { resource: create_project_config.local.yml, ignore_errors: true }
+
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
@@ -37,3 +40,8 @@ services:
             $pem_path: '%env(JIRA_OAUTH_PEM_PATH)%'
             $jira_url: '%env(JIRA_URL)%'
             $entity_manager: '@doctrine.orm.entity_manager'
+    App\Service\ownCloudService:
+        arguments:
+            $host: '%env(OWNCLOUD_HOST)%'
+            $username: '%env(OWNCLOUD_USERNAME)%'
+            $password: '%env(OWNCLOUD_PASSWORD)%'
