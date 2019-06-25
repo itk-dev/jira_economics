@@ -49,30 +49,24 @@ pipeline {
                 }
             }
         }
-        stage('Deployment develop') {
-            when {
-                branch 'develop'
-            }
-            steps {
-                // Update git repos.
-                sh "ansible srvitkphp72stg -m shell -a 'cd /home/deploy/www/economics_srvitkphp72stg_itkdev_dk/htdocs; git clean -d --force'"
-                sh "ansible srvitkphp72stg -m shell -a 'cd /home/deploy/www/economics_srvitkphp72stg_itkdev_dk/htdocs; git checkout ${BRANCH_NAME}'"
-                sh "ansible srvitkphp72stg -m shell -a 'cd /home/deploy/www/economics_srvitkphp72stg_itkdev_dk/htdocs; git fetch'"
-                sh "ansible srvitkphp72stg -m shell -a 'cd /home/deploy/www/economics_srvitkphp72stg_itkdev_dk/htdocs; git reset origin/${BRANCH_NAME} --hard'"
-
-                // Run composer.
-                sh "ansible srvitkphp72stg -m shell -a 'cd /home/deploy/www/economics_srvitkphp72stg_itkdev_dk/htdocs; composer install --no-dev -o'"
-
-                // Copy encore assets.
-                sh "ansible srvitkphp72stg -m synchronize -a 'src=${WORKSPACE}/public/build/ dest=/home/deploy/www/economics_srvitkphp72stg_itkdev_dk/htdocs/public/build'"
-            }
-        }
         stage('Deployment staging') {
             when {
                 branch 'release'
             }
             steps {
-                sh 'echo "DEPLOY"'
+                steps {
+                // Update git repos.
+                sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; git clean -d --force'"
+                sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; git checkout ${BRANCH_NAME}'"
+                sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; git fetch'"
+                sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; git reset origin/${BRANCH_NAME} --hard'"
+
+                // Run composer.
+                sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; composer install --no-dev -o'"
+
+                // Copy encore assets.
+                sh "ansible srvitkphp72stg -m synchronize -a 'src=${WORKSPACE}/public/build/ dest=/data/www/economics_srvitkphp72stg_itkdev_dk/htdocs/public/build'"
+            }
             }
         }
         stage('Deployment production') {
@@ -83,9 +77,19 @@ pipeline {
                 timeout(time: 30, unit: 'MINUTES') {
                     input 'Should the site be deployed?'
                 }
-                // Update git repos.
-                sh "ansible srvitkphp72 -m shell -a 'cd /home/deploy/www/b7_itkdev_dk/htdocs; git clean -d --force'"
-                
+                steps {
+                    // Update git repos.
+                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; git clean -d --force'"
+                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; git checkout ${BRANCH_NAME}'"
+                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; git fetch'"
+                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; git reset origin/${BRANCH_NAME} --hard'"
+
+                    // Run composer.
+                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; composer install --no-dev -o'"
+
+                    // Copy encore assets.
+                    sh "ansible srvitkeconomics -m synchronize -a 'src=${WORKSPACE}/public/build/ dest=/data/www/economics_itkdev_dk/htdocs/public/build'"
+                }
             }
         }
     }
