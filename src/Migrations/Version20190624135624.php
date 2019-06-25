@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * This file is part of aakb/kontrolgruppen.
+ * This file is part of aakb/jira_economics.
  *
  * (c) 2019 ITK Development
  *

@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of aakb/jira_economics.
+ *
+ * (c) 2019 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace GraphicServiceOrder\Form;
 
 use App\Service\JiraService;
@@ -9,44 +17,39 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\All;
 
-
 class GraphicServiceOrderForm extends AbstractType
 {
-  private $jiraService;
+    private $jiraService;
 
-  public function __construct(JiraService $jiraService, array $options = [])
-  {
-    $this->jiraService = $jiraService;
-    $resolver = new OptionsResolver();
-    $this->configureOptions($resolver);
-  }
+    public function __construct(JiraService $jiraService, array $options = [])
+    {
+        $this->jiraService = $jiraService;
+        $resolver = new OptionsResolver();
+        $this->configureOptions($resolver);
+    }
 
-  /**
-   * Build the form.
-   *
-   * @param \Symfony\Component\Form\FormBuilderInterface $builder
-   *   The form builder.
-   * @param array $options
-   *   Options related to the form.
-   */
-  public function buildForm(FormBuilderInterface $builder, array $options) {
-    $builder
+    /**
+     * Build the form.
+     *
+     * @param \Symfony\Component\Form\FormBuilderInterface $builder
+     *                                                              The form builder
+     * @param array                                        $options
+     *                                                              Options related to the form
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
       ->add('job_title', TextType::class, [
         'label' => 'service_order_form.job_description.title.label',
         'constraints' => [
@@ -76,19 +79,19 @@ class GraphicServiceOrderForm extends AbstractType
       ->add('files', FileType::class, [
         'label' => 'service_order_form.job_description.files.label',
         'constraints' => [
-          new All(array(
+          new All([
             new Image(),
             new File([
               'maxSize' => getenv('FORM_FILE_GS_UPLOAD_SIZE'),
-            ])
-          ))
+            ]),
+          ]),
         ],
         'attr' => ['class' => 'form-control', 'jquery_filer' => 'filer_input'],
         'help_attr' => ['class' => 'form-text text-muted'],
         'help' => 'service_order_form.job_description.files.help',
         'required' => 0,
         'multiple' => true,
-        'mapped' => false
+        'mapped' => false,
       ])
       ->add('debitor', TextType::class, [
         'label' => 'service_order_form.job_payment.debitor.label',
@@ -164,22 +167,21 @@ class GraphicServiceOrderForm extends AbstractType
         'label' => 'service_order_form.save.label',
         'attr' => ['class' => 'btn btn-primary'],
       ]);
-  }
+    }
 
-
-  /**
-   * Perform validation in groups based on choices during submit.
-   *
-   * @param \Symfony\Component\OptionsResolver\OptionsResolver $resolver
-   *   Options related to form.
-   */
-  public function configureOptions(OptionsResolver $resolver)
-  {
-    $resolver->setDefaults([
+    /**
+     * Perform validation in groups based on choices during submit.
+     *
+     * @param \Symfony\Component\OptionsResolver\OptionsResolver $resolver
+     *                                                                     Options related to form
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
       'data_class' => GsOrder::class,
       'validation_groups' => function (FormInterface $form) {
-        return ['Default', 'base'];
-      }
+          return ['Default', 'base'];
+      },
     ]);
-  }
+    }
 }
