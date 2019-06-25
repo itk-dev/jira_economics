@@ -6,13 +6,11 @@ use Gedmo\Sluggable\Util\Urlizer;
 use App\Service\JiraService;
 use Doctrine\ORM\EntityManagerInterface;
 use GraphicServiceOrder\Entity\GsOrder;
-use App\Service\ownCloudService;
+use App\Service\OwnCloudService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use GraphicServiceOrder\Form\GraphicServiceOrderForm;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Class GraphicServiceOrderController
@@ -23,7 +21,7 @@ class GraphicServiceOrderController extends AbstractController
   private $ownCloudService;
   private $formData;
 
-  public function __construct(JiraService $jiraService, ownCloudService $ownCloudService)
+  public function __construct(JiraService $jiraService, OwnCloudService $ownCloudService)
   {
     $this->jiraService = $jiraService;
     $this->ownCloudService = $ownCloudService;

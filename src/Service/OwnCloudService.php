@@ -1,11 +1,19 @@
 <?php
 
+/*
+ * This file is part of aakb/kontrolgruppen.
+ *
+ * (c) 2019 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace App\Service;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
-class ownCloudService
+class OwnCloudService
 {
     protected $client;
     protected $host;
@@ -15,7 +23,7 @@ class ownCloudService
     /**
      * Constructor.
      */
-    public function __construct($host, $username, $password, $config = array())
+    public function __construct($host, $username, $password, $config = [])
     {
         $this->host = $host;
         $this->username = $username;
@@ -26,14 +34,15 @@ class ownCloudService
      * Get from Own Cloud.
      *
      * @param $path
+     *
      * @return mixed
      */
     public function get($path)
     {
         $client = new Client(
-          [
+            [
             'base_uri' => $this->host,
-          ]
+            ]
         );
         try {
             $response = $client->get($path, ['auth' => [$this->username, $this->password]]);
@@ -46,5 +55,3 @@ class ownCloudService
         }
     }
 }
-
-
