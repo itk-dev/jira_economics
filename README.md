@@ -46,6 +46,9 @@ JIRA_URL='https://[SITE].atlassian.net'
 JIRA_DEFAULT_BOARD=[TEAM BOARD ID]
 ```
 
+#Setup Database
+DATABASE_URL=""
+
 #Setup bundles/CreateProject
 Set values in .env.local:
 

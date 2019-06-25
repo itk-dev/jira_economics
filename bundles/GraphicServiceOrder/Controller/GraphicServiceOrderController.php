@@ -2,17 +2,22 @@
 
 namespace GraphicServiceOrder\Controller;
 
+use Gedmo\Sluggable\Util\Urlizer;
 use App\Service\JiraService;
+use Doctrine\ORM\EntityManagerInterface;
+use GraphicServiceOrder\Entity\GsOrder;
 use App\Service\ownCloudService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use GraphicServiceOrder\Form\GraphicServiceOrderForm;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Class GraphicServiceOrderController
  */
-class GraphicServiceOrderController extends Controller
+class GraphicServiceOrderController extends AbstractController
 {
   private $jiraService;
   private $ownCloudService;
@@ -29,10 +34,10 @@ class GraphicServiceOrderController extends Controller
    *
    * @Route("/new", name="graphic_service_order_form")
    */
-  public function createOrder(Request $request)
+  public function createOrder(EntityManagerInterface $entitityManagerInterface, Request $request)
   {
-    $form = $this->createForm(GraphicServiceOrderForm::class);
-    $form->handleRequest($request);
+    $gsOrder = new GsOrder();
+    $form = $this->createForm(GraphicServiceOrderForm::class, $gsOrder);
 
     $this->formData = [
       'form' => $form->getData(),
@@ -40,17 +45,22 @@ class GraphicServiceOrderController extends Controller
       'user' => $this->jiraService->getCurrentUser(),
     ];
 
+    $form->handleRequest($request);
+
     if ($form->isSubmitted() && $form->isValid()) {
       // Do stuff on submission.
+      $gsOrder = $this->storeFile($entitityManagerInterface, $form, $gsOrder);
 
+      $entitityManagerInterface->persist($gsOrder);
+      $entitityManagerInterface->flush();
       // Save a file to Own Cloud.
-      $ownCloudPath = $this->storeFile();
+      //$ownCloudPath = $this->storeFile();
 
       // Create a task on a jira project.
       //$this->createOrderTask($ownCloudPath);
 
       // Set variable for receipt page and email.
-      $_SESSION['form_data'] = $this->prepareReceiptPage($this->formData);
+      //$_SESSION['form_data'] = $this->prepareReceiptPage($this->formData);
 
       // Send receipt email.
       //$this->sendReceiptEmail($_SESSION['form_data']);
@@ -73,11 +83,11 @@ class GraphicServiceOrderController extends Controller
   public function createOrderSubmitted(JiraService $jiraService, Request $request)
   {
     return $this->render('@GraphicServiceOrderBundle/createOrderSubmitted.html.twig', [
-      'form_data' => $_SESSION['form_data'],
+      'form_data' => '',
     ]);
   }
 
-  private function storeFile() {
+  private function shareFile() {
     $capabilities = $this->ownCloudService->get('owncloud/ocs/v1.php/cloud/capabilities?format=json');
     $shared_with_me = $this->ownCloudService->get('owncloud/ocs/v1.php/apps/files_sharing/api/v1/shares?shared_with_me=true&format=json');
     $shares = $this->ownCloudService->get('owncloud/ocs/v1.php/apps/files_sharing/api/v1/shares?path=/Grafisk Design&subfiles=true&shared_with_me=true&format=json');
@@ -121,7 +131,7 @@ class GraphicServiceOrderController extends Controller
         $formData['files'][] = $_FILES['graphic_service_order_form']['name']['files'][$key];
       }
     }
-    unset($formData['form']['files']);
+    unset($formData['form']->files);
     return $formData;
   }
 
@@ -161,5 +171,27 @@ class GraphicServiceOrderController extends Controller
     $description .= $formSubmissions['delivery_description'];
 
     return $description;
+  }
+
+  /**
+   * Store files locally.
+   */
+  private function storeFile($entitityManagerInterface, $form, $gsOrder) {
+    $uploadedFiles = $form['files']->getData();
+    $newFilenames = [];
+    foreach ($uploadedFiles as $file) {
+      $destination = $this->getParameter('kernel.project_dir') . '/private/files/gs';
+      $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+      $newFilename = Urlizer::urlize($originalFilename).'-'.uniqid().'.'.$file->guessExtension();
+      $file->move(
+        $destination,
+        $newFilename
+      );
+      $newFilenames[] = $newFilename;
+    }
+
+    $gsOrder->setFiles($newFilenames);
+
+    return $gsOrder;
   }
 }

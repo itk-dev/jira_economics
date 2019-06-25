@@ -3,6 +3,7 @@
 namespace GraphicServiceOrder\Form;
 
 use App\Service\JiraService;
+use GraphicServiceOrder\Entity\GsOrder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -86,7 +87,8 @@ class GraphicServiceOrderForm extends AbstractType
         'help_attr' => ['class' => 'form-text text-muted'],
         'help' => 'service_order_form.job_description.files.help',
         'required' => 0,
-        'multiple' => true
+        'multiple' => true,
+        'mapped' => false
       ])
       ->add('debitor', TextType::class, [
         'label' => 'service_order_form.job_payment.debitor.label',
@@ -174,6 +176,7 @@ class GraphicServiceOrderForm extends AbstractType
   public function configureOptions(OptionsResolver $resolver)
   {
     $resolver->setDefaults([
+      'data_class' => GsOrder::class,
       'validation_groups' => function (FormInterface $form) {
         return ['Default', 'base'];
       }
