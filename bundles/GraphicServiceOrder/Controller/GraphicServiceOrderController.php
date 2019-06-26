@@ -197,8 +197,8 @@ class GraphicServiceOrderController extends AbstractController
             $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
             $newFilename = Urlizer::urlize($originalFilename).'-'.uniqid().'.'.$file->guessExtension();
             $file->move(
-          $destination,
-          $newFilename
+                $destination,
+                $newFilename
       );
             $newFilenames[] = $newFilename;
         }
