@@ -59,47 +59,45 @@ class HomePage extends Component {
                 </tr>
               </thead>
               <tbody>
-                {this.state.allInvoices.data && this.state.allInvoices.data.map((item) =>
-                  <tr key={item.invoiceId}>
-                    <td><a href="/billing/project/"><strong>Udvikling sommer</strong></a></td>
-                    <td>AAKB</td>
-                    <td>30/09/2018</td>
-                    <td><strong>65.146</strong></td>
-                    <td className="text-right">
-                      <ButtonGroup size="sm" className="float-right" aria-label="Invoice functions">
-                        <OverlayTrigger
-                          key="edit"
-                          placement="top"
-                          overlay={
-                            <Tooltip id="tooltip-edit">
-                              Edit this invoice
+                <tr>
+                  <td><a href="/billing/project/"><strong>Udvikling sommer</strong></a></td>
+                  <td>AAKB</td>
+                  <td>30/09/2018</td>
+                  <td><strong>65.146</strong></td>
+                  <td className="text-right">
+                    <ButtonGroup size="sm" className="float-right" aria-label="Invoice functions">
+                      <OverlayTrigger
+                        key="edit"
+                        placement="top"
+                        overlay={
+                          <Tooltip id="tooltip-edit">
+                            Edit this invoice
                             </Tooltip>
-                          }
-                        >
-                          <Button className="btn-primary">
-                            <i className="fas fa-edit mx-2"></i>
-                            <span className="sr-only">rediger</span>
-                          </Button>
-                        </OverlayTrigger>
-                        <OverlayTrigger
-                          key="delete"
-                          placement="top"
-                          overlay={
-                            <Tooltip id="tooltip-delete">
-                              Delete this invoice
+                        }
+                      >
+                        <Button className="btn-primary">
+                          <i className="fas fa-edit mx-2"></i>
+                          <span className="sr-only">rediger</span>
+                        </Button>
+                      </OverlayTrigger>
+                      <OverlayTrigger
+                        key="delete"
+                        placement="top"
+                        overlay={
+                          <Tooltip id="tooltip-delete">
+                            Delete this invoice
                             </Tooltip>
-                          }
-                        >
-                          <Button className="btn-danger">
-                            <i className="fas fa-trash-alt mx-2"></i>
-                            <span className="sr-only">slet</span>
-                          </Button>
-                        </OverlayTrigger>
+                        }
+                      >
+                        <Button className="btn-danger">
+                          <i className="fas fa-trash-alt mx-2"></i>
+                          <span className="sr-only">slet</span>
+                        </Button>
+                      </OverlayTrigger>
 
-                      </ButtonGroup>
-                    </td>
-                  </tr>
-                )}
+                    </ButtonGroup>
+                  </td>
+                </tr>
               </tbody>
             </Table>
           </Tab>
