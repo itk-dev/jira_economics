@@ -57,3 +57,11 @@ services:
             $host: '%env(OWNCLOUD_HOST)%'
             $username: '%env(OWNCLOUD_USERNAME)%'
             $password: '%env(OWNCLOUD_PASSWORD)%'
+
+    App\Form\RegistrationFormType:
+        arguments:
+            $class: App\Entity\User
+
+    App\Form\ProfileFormType:
+        arguments:
+            $class: App\Entity\User

@@ -36,7 +36,7 @@
     <div class="wrapper d-flex flex-column flex-md-row flex-grow-1">
         {% block globalNav %}
             <div class="d-flex">
-                {% include "navigation/global-nav.html.twig" %}
+              {% include template_path ~ "navigation/global-nav.html.twig" %}
             </div>
         {% endblock %}
         {% block main %}
@@ -62,7 +62,21 @@
                             {% block content %}
                             {% endblock %}
                         </div>
-                    </div>
+                    {% endif %}
+                  <div class="main-content col-12 col-md-10 py-md-3 px-md-5 order-0 order-md-1">
+                      {% block flash_messages %}
+                          {% for label, messages in app.flashes %}
+                              {% for message in messages %}
+                                  <div class="alert alert-{{ label }}">
+                                      {{ message }}
+                                  </div>
+                              {% endfor %}
+                          {% endfor %}
+                      {% endblock %}
+                    {% block content %}
+                      {% include template_path ~ "main/index.html.twig" %}
+                    {% endblock %}
+                  </div>
                 </div>
             </div>
         {% endblock %}
