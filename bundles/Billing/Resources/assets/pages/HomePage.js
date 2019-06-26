@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import connect from 'react-redux/es/connect/connect';
 import ProjectList from '../components/ProjectList';
 import PageTitle from '../components/PageTitle';
+import PropTypes from 'prop-types';
+import rest from '../redux/utils/rest';
 import ContentWrapper from '../components/ContentWrapper';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
@@ -16,8 +18,20 @@ class HomePage extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { invoices: {} };
+    this.state = { allInvoices: {} };
   };
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch(rest.actions.getAllInvoices())
+      .then((response) => {
+        this.setState({ allInvoices: response });
+      })
+      .catch((reason) => console.log('isCanceled', reason.isCanceled));
+  }
+
+  // @TODO: Need to build data structure where each row contains invoice name, project name, invoice date, and total cost
+  // Invoices should be split in two sets - drafts and recorded
 
   render() {
     return (
@@ -45,45 +59,47 @@ class HomePage extends Component {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td><a href="/billing/project/"><strong>Udvikling sommer</strong></a></td>
-                  <td>AAKB</td>
-                  <td>30/09/2018</td>
-                  <td><strong>65.146</strong></td>
-                  <td className="text-right">
-                    <ButtonGroup size="sm" className="float-right" aria-label="Invoice functions">
-                      <OverlayTrigger
-                        key="edit"
-                        placement="top"
-                        overlay={
-                          <Tooltip id="tooltip-edit">
-                            Edit this invoice
+                {this.state.allInvoices.data && this.state.allInvoices.data.map((item) =>
+                  <tr key={item.invoiceId}>
+                    <td><a href="/billing/project/"><strong>Udvikling sommer</strong></a></td>
+                    <td>AAKB</td>
+                    <td>30/09/2018</td>
+                    <td><strong>65.146</strong></td>
+                    <td className="text-right">
+                      <ButtonGroup size="sm" className="float-right" aria-label="Invoice functions">
+                        <OverlayTrigger
+                          key="edit"
+                          placement="top"
+                          overlay={
+                            <Tooltip id="tooltip-edit">
+                              Edit this invoice
                             </Tooltip>
-                        }
-                      >
-                        <Button className="btn-primary">
-                          <i className="fas fa-edit mx-2"></i>
-                          <span className="sr-only">rediger</span>
-                        </Button>
-                      </OverlayTrigger>
-                      <OverlayTrigger
-                        key="delete"
-                        placement="top"
-                        overlay={
-                          <Tooltip id="tooltip-delete">
-                            Delete this invoice
+                          }
+                        >
+                          <Button className="btn-primary">
+                            <i className="fas fa-edit mx-2"></i>
+                            <span className="sr-only">rediger</span>
+                          </Button>
+                        </OverlayTrigger>
+                        <OverlayTrigger
+                          key="delete"
+                          placement="top"
+                          overlay={
+                            <Tooltip id="tooltip-delete">
+                              Delete this invoice
                             </Tooltip>
-                        }
-                      >
-                        <Button className="btn-danger">
-                          <i className="fas fa-trash-alt mx-2"></i>
-                          <span className="sr-only">slet</span>
-                        </Button>
-                      </OverlayTrigger>
+                          }
+                        >
+                          <Button className="btn-danger">
+                            <i className="fas fa-trash-alt mx-2"></i>
+                            <span className="sr-only">slet</span>
+                          </Button>
+                        </OverlayTrigger>
 
-                    </ButtonGroup>
-                  </td>
-                </tr>
+                      </ButtonGroup>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </Table>
           </Tab>
@@ -140,6 +156,10 @@ class HomePage extends Component {
     )
   }
 }
+
+HomePage.propTypes = {
+  allInvoices: PropTypes.object
+};
 
 const mapStateToProps = state => {
   return {};
