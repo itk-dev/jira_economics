@@ -49,6 +49,11 @@ services:
       - "1025"
       - "8025"
 
+  yarn:
+    image: itkdev/yarn:latest
+    volumes:
+      - .:/app:delegated
+
   reverse-proxy:
     image: traefik  # The official Traefik docker image
     command: --api --docker  # Enables the web UI and tells Traefik to listen to docker

@@ -5,6 +5,6 @@
         <span>{{ error }}</span>
     {% endif %}
     {% for owner in hwi_oauth_resource_owners() %}
-    <a class="btn btn-primary" href="{{ hwi_oauth_login_url(owner) }}">{{ 'login.jira' | trans }}</a> <br />
+    <a class="btn btn-primary" href="{{ hwi_oauth_login_url(owner) }}">{{ 'login.jira'|trans }}</a> <br />
     {% endfor %}
 {% endblock hwi_oauth_content %}

@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of aakb/jira_economics.
+ *
+ * (c) 2019 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace CreateProject\Form;
 
 use App\Service\JiraService;
@@ -11,35 +19,33 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-
 class CreateProjectForm extends AbstractType
 {
-  private $jiraService;
+    private $jiraService;
 
-  public function __construct(JiraService $jiraService, array $options = [])
-  {
-    $this->jiraService = $jiraService;
-    $resolver = new OptionsResolver();
-    $this->configureOptions($resolver);
-  }
+    public function __construct(JiraService $jiraService, array $options = [])
+    {
+        $this->jiraService = $jiraService;
+        $resolver = new OptionsResolver();
+        $this->configureOptions($resolver);
+    }
 
-  /**
-   * Build the form.
-   *
-   * @param \Symfony\Component\Form\FormBuilderInterface $builder
-   *   The form builder.
-   * @param array $options
-   *   Options related to the form.
-   */
-  public function buildForm(FormBuilderInterface $builder, array $options) {
-    $builder
+    /**
+     * Build the form.
+     *
+     * @param \Symfony\Component\Form\FormBuilderInterface $builder
+     *                                                              The form builder
+     * @param array                                        $options
+     *                                                              Options related to the form
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
       ->add('project_name', TextType::class, [
         'label' => 'create_project_form.project_name.label',
         'constraints' => [
@@ -64,7 +70,7 @@ class CreateProjectForm extends AbstractType
             'minMessage' => 'create_project_form.project_key.constraint.min',
             'max' => 7,
             'maxMessage' => 'create_project_form.project_key.constraint.max',
-          ])
+          ]),
         ],
         'attr' => ['class' => 'form-control'],
         'help_attr' => ['class' => 'form-text text-muted'],
@@ -85,22 +91,22 @@ class CreateProjectForm extends AbstractType
 
       ->add('team', ChoiceType::class, [
         'label' => 'create_project_form.team.label',
-        'choices'  => $this->getTeamChoices(),
+        'choices' => $this->getTeamChoices(),
         'choice_translation_domain' => false,
         'constraints' => [
           new NotNull([
             'message' => 'create_project_form.team.constraint.not_blank',
-            'groups' => 'base'
+            'groups' => 'base',
           ]),
         ],
         'attr' => ['class' => 'form-control'],
         'help_attr' => ['class' => 'form-text text-muted'],
-        'help' => 'create_project_form.team.help'
+        'help' => 'create_project_form.team.help',
       ])
 
       ->add('account', ChoiceType::class, [
         'label' => 'create_project_form.account.label',
-        'choices'  => $this->getAccountChoices(),
+        'choices' => $this->getAccountChoices(),
         'choice_translation_domain' => false,
         'attr' => ['class' => 'form-control js-select2'],
         'help_attr' => ['class' => 'form-text text-muted'],
@@ -108,7 +114,7 @@ class CreateProjectForm extends AbstractType
         'constraints' => [
           new NotNull([
             'groups' => 'select_account',
-            'message' => 'create_project_form.account.constraint.not_null'
+            'message' => 'create_project_form.account.constraint.not_null',
           ]),
         ],
       ])
@@ -162,7 +168,7 @@ class CreateProjectForm extends AbstractType
 
       ->add('new_account_customer', ChoiceType::class, [
         'label' => 'create_project_form.new_account_customer.label',
-        'choices'  => $this->getCustomerChoices(),
+        'choices' => $this->getCustomerChoices(),
         'choice_translation_domain' => false,
         'required' => false,
         'attr' => ['class' => 'form-control js-select2'],
@@ -171,7 +177,7 @@ class CreateProjectForm extends AbstractType
         'constraints' => [
           new NotNull([
             'groups' => 'select_customer',
-            'message' => 'create_project_form.new_account_customer.constraint.not_null'
+            'message' => 'create_project_form.new_account_customer.constraint.not_null',
           ]),
         ],
       ])
@@ -189,7 +195,7 @@ class CreateProjectForm extends AbstractType
         'help' => 'create_project_form.new_customer.help',
         'validation_groups' => ['customer'],
       ])
-      
+
       ->add('new_customer_name', TextType::class, [
         'label' => 'create_project_form.new_customer_name.label',
         'attr' => ['class' => 'form-control'],
@@ -221,75 +227,83 @@ class CreateProjectForm extends AbstractType
         'label' => 'create_project_form.save.label',
         'attr' => ['class' => 'btn btn-primary'],
       ]);
-  }
-
-  /**
-   * Generate an array of teams from project categories.
-   *
-   * @return array
-   *   A list of teams and their id.
-   */
-  private function getTeamChoices() {
-    $projectCategories = $this->jiraService->getAllProjectCategories();
-    $teams = [];
-    foreach ($projectCategories as $team) {
-      $teams[$team->name] = $team->id;
     }
-    $teams = ['-- Select --' => null] + $teams;
-    return $teams;
-  }
 
-  /**
-   * Generate an array of accounts from tempo accounts.
-   *
-   * @return array
-   *   A list of tempo accounts and their key.
-   */
-  private function getAccountChoices() {
-    $accounts = $this->jiraService->getAllAccounts();
-    $optionalAccounts = [];
-    foreach ($accounts as $account) {
-      $optionalAccounts[$account->name . ' (' . $account->key . ')'] = $account->key;
-    }
-    $optionalAccounts = ['-- Select --' => null] + $optionalAccounts;
-    return $optionalAccounts;
-  }
-
-  /**
-   * Generate an array of customers from tempo customers
-   *
-   * @return array
-   *   A list of tempo customers and their key.
-   */
-  private function getCustomerChoices() {
-    $customers = $this->jiraService->getAllCustomers();
-    $optionalCustomerChoices = [];
-    foreach ($customers  as $customer) {
-      $optionalCustomerChoices[$customer->name . ' (' . $customer->key . ')'] = $customer->key;
-    }
-    $optionalCustomerChoices = ['-- Select --' => null] + $optionalCustomerChoices;
-    return $optionalCustomerChoices;
-  }
-
-  /**
-   * Perform validation in groups based on choices during submit.
-   *
-   * @param \Symfony\Component\OptionsResolver\OptionsResolver $resolver
-   *   Options related to form.
-   */
-  public function configureOptions(OptionsResolver $resolver)
-  {
-    $resolver->setDefaults([
-      'validation_groups' => function (FormInterface $form) {
-        $data = $form->getData();
-        if ($data['new_account'] == true) {
-          if ($data['new_customer'] == true) {
-            return ['Default', 'base', 'account', 'customer'];
-          }
-          return ['Default', 'base', 'account', 'select_customer'];
+    /**
+     * Generate an array of teams from project categories.
+     *
+     * @return array
+     *               A list of teams and their id
+     */
+    private function getTeamChoices()
+    {
+        $projectCategories = $this->jiraService->getAllProjectCategories();
+        $teams = [];
+        foreach ($projectCategories as $team) {
+            $teams[$team->name] = $team->id;
         }
-        return ['Default', 'base', 'select_account'];
+        $teams = ['-- Select --' => null] + $teams;
+
+        return $teams;
+    }
+
+    /**
+     * Generate an array of accounts from tempo accounts.
+     *
+     * @return array
+     *               A list of tempo accounts and their key
+     */
+    private function getAccountChoices()
+    {
+        $accounts = $this->jiraService->getAllAccounts();
+        $optionalAccounts = [];
+        foreach ($accounts as $account) {
+            $optionalAccounts[$account->name.' ('.$account->key.')'] = $account->key;
+        }
+        $optionalAccounts = ['-- Select --' => null] + $optionalAccounts;
+
+        return $optionalAccounts;
+    }
+
+    /**
+     * Generate an array of customers from tempo customers.
+     *
+     * @return array
+     *               A list of tempo customers and their key
+     */
+    private function getCustomerChoices()
+    {
+        $customers = $this->jiraService->getAllCustomers();
+        $optionalCustomerChoices = [];
+        foreach ($customers  as $customer) {
+            $optionalCustomerChoices[$customer->name.' ('.$customer->key.')'] = $customer->key;
+        }
+        $optionalCustomerChoices = ['-- Select --' => null] + $optionalCustomerChoices;
+
+        return $optionalCustomerChoices;
+    }
+
+    /**
+     * Perform validation in groups based on choices during submit.
+     *
+     * @param \Symfony\Component\OptionsResolver\OptionsResolver $resolver
+     *                                                                     Options related to form
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+      'validation_groups' => function (FormInterface $form) {
+          $data = $form->getData();
+          if (true === $data['new_account']) {
+              if (true === $data['new_customer']) {
+                  return ['Default', 'base', 'account', 'customer'];
+              }
+
+              return ['Default', 'base', 'account', 'select_customer'];
+          }
+
+          return ['Default', 'base', 'select_account'];
       },
     ]);
-  }
+    }
 }

@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of aakb/jira_economics.
+ *
+ * (c) 2019 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace Billing\Controller;
 
 use App\Service\JiraService;
@@ -10,8 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Billing\Service\BillingService;
 
 /**
- * Class ApiController
- * @package Billing\Controller
+ * Class ApiController.
  *
  * @Route("/jira_api")
  */
@@ -25,6 +32,7 @@ class ApiController extends Controller
     {
         $jiraProjectId = $request->get('jiraProjectId');
         $result = $billingService->getProject($jiraProjectId);
+
         return new JsonResponse($result);
     }
 
@@ -44,15 +52,18 @@ class ApiController extends Controller
     {
         $invoiceId = $request->get('invoiceId');
         $result = $billingService->getInvoice($invoiceId);
+
         return new JsonResponse($result);
     }
 
     /**
      * @Route("/invoice", name="api_invoice_post", methods={"POST"})
      */
-    public function invoicePostAction(BillingService $billingService, Request $request) {
+    public function invoicePostAction(BillingService $billingService, Request $request)
+    {
         $invoiceData = json_decode($request->getContent(), true);
         $result = $billingService->postInvoice($invoiceData);
+
         return new JsonResponse($result);
     }
 
@@ -64,6 +75,7 @@ class ApiController extends Controller
     {
         $invoiceData = json_decode($request->getContent(), true);
         $result = $billingService->putInvoice($invoiceData);
+
         return new JsonResponse($result);
     }
 
@@ -75,37 +87,42 @@ class ApiController extends Controller
     {
         $invoiceId = $request->get('invoiceId');
         $result = $billingService->deleteInvoice($invoiceId);
+
         return new JsonResponse($result);
     }
 
     /**
      * @Route("/invoices/{jiraProjectId}", name="api_invoices")
      * defaults={"jiraProjectId"="...."})
-    */
+     */
     public function invoicesAction(BillingService $billingService, Request $request)
     {
         $jiraProjectId = $request->get('jiraProjectId');
         $result = $billingService->getInvoices($jiraProjectId);
+
         return new JsonResponse($result);
     }
 
     /**
      * @Route("/invoice_entry/{invoiceEntryId}", name="api_invoice_entry_get", methods={"GET"})
      * defaults={"invoiceEntryId"="...."})
-    */
+     */
     public function invoiceEntryGetAction(BillingService $billingService, Request $request)
     {
         $invoiceEntryId = $request->get('invoiceEntryId');
         $result = $billingService->getInvoiceEntry($invoiceEntryId);
+
         return new JsonResponse($result);
     }
 
     /**
      * @Route("/invoice_entry", name="api_invoice_entry_post", methods={"POST"})
      */
-    public function invoiceEntryPostAction(BillingService $billingService, Request $request) {
+    public function invoiceEntryPostAction(BillingService $billingService, Request $request)
+    {
         $invoiceEntryData = json_decode($request->getContent(), true);
         $result = $billingService->postInvoiceEntry($invoiceEntryData);
+
         return new JsonResponse($result);
     }
 
@@ -117,6 +134,7 @@ class ApiController extends Controller
     {
         $invoiceEntryData = json_decode($request->getContent(), true);
         $result = $billingService->putInvoiceEntry($invoiceEntryData);
+
         return new JsonResponse($result);
     }
 
@@ -128,17 +146,19 @@ class ApiController extends Controller
     {
         $invoiceEntryId = $request->get('invoiceEntryId');
         $result = $billingService->deleteInvoiceEntry($invoiceEntryId);
+
         return new JsonResponse($result);
     }
 
     /**
      * @Route("/invoice_entries/{invoiceId}", name="api_invoice_entries")
      * defaults={"invoiceId"="...."})
-    */
+     */
     public function invoiceEntriesAction(BillingService $billingService, Request $request)
     {
         $invoiceId = $request->get('invoiceId');
         $result = $billingService->getInvoiceEntries($invoiceId);
+
         return new JsonResponse($result);
     }
 
@@ -150,6 +170,7 @@ class ApiController extends Controller
     {
         $customerId = $request->get('customerId');
         $result = $billingService->getCustomer($customerId);
+
         return new JsonResponse($result);
     }
 
@@ -160,6 +181,7 @@ class ApiController extends Controller
     {
         $customerData = json_decode($request->getContent(), true);
         $result = $billingService->postCustomer($customerData);
+
         return new JsonResponse($result);
     }
 
@@ -170,6 +192,7 @@ class ApiController extends Controller
     {
         $customerData = json_decode($request->getContent(), true);
         $result = $billingService->putCustomer($customerData);
+
         return new JsonResponse($result);
     }
 
@@ -180,6 +203,7 @@ class ApiController extends Controller
     {
         $customerId = $request->get('customerId');
         $result = $billingService->deleteCustomer($customerId);
+
         return new JsonResponse($result);
     }
 
@@ -199,6 +223,7 @@ class ApiController extends Controller
     {
         $jiraProjectId = $request->get('jiraProjectId');
         $result = $billingService->getJiraIssues($jiraProjectId);
+
         return new JsonResponse($result);
     }
 }

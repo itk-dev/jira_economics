@@ -1,10 +1,10 @@
-{% set appItems = {
-    faktura:    { title: "Faktura", desc: "Opret og rediger fakturaer baseret på tasks i Jira", icon: "fa-file-invoice", path: "/billing", btnTxt: "Lav en Faktura" },
-    taskWizard:    { title: "Task wizard", desc: "Opret mange tasks på en gang.", icon: "fa-tasks", path: "/", btnTxt: "Bliv Task wizard" },
-    ordre:    { title: "Ordre", desc: "Opret ordrepakker ud fra tasks i Jira", icon: "fa-box-open", path: "/", btnTxt: "Pak en Ordre" },
-    sprintplan:    { title: "Sprintplan", desc: "Planlægningsoversigt og sprintrapporter baseret på tasks i Jira", icon: "fa-braille", path: "/", btnTxt: "Se Sprintplan" },
-    nytProjekt:    { title: "Nyt projekt", desc: "Opret et nyt Jira-projekt ud fra en skabelon", icon: "fa-project-diagram", path: "/create-project/new", btnTxt: "Opret Nyt projekt" },
-    udgift:    { title: "Udgift", desc: "Opret udgifter i forbindelse med projekter og tasks", icon: "fa-credit-card", path: "/", btnTxt: "Tilføj en Udgift" },
+{% set app_items = {
+    faktura: { title: "Faktura", desc: "Opret og rediger fakturaer baseret på tasks i Jira", icon: "fa-file-invoice", path: "/billing", btnTxt: "Lav en Faktura" },
+    taskWizard: { title: "Task wizard", desc: "Opret mange tasks på en gang.", icon: "fa-tasks", path: "/", btnTxt: "Bliv Task wizard" },
+    ordre: { title: "Ordre", desc: "Opret ordrepakker ud fra tasks i Jira", icon: "fa-box-open", path: "/", btnTxt: "Pak en Ordre" },
+    sprintplan: { title: "Sprintplan", desc: "Planlægningsoversigt og sprintrapporter baseret på tasks i Jira", icon: "fa-braille", path: "/", btnTxt: "Se Sprintplan" },
+    nytProjekt: { title: "Nyt projekt", desc: "Opret et nyt Jira-projekt ud fra en skabelon", icon: "fa-project-diagram", path: "/create-project/new", btnTxt: "Opret Nyt projekt" },
+    udgift: { title: "Udgift", desc: "Opret udgifter i forbindelse med projekter og tasks", icon: "fa-credit-card", path: "/", btnTxt: "Tilføj en Udgift" },
 } %}
 
 {% block bredcrumb %}
@@ -16,7 +16,7 @@
 <hr>
 {% block content %}
   <div class="row">
-    {% for app in appItems %}
+    {% for app in app_items %}
       <div class="col-md-4 mb-3">
         <div class="card h-100">
           <div class="row no-gutters flex-grow-1">
