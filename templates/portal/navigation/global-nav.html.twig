@@ -22,8 +22,8 @@
     </button>
     <div class="collapse navbar-collapse align-items-start" id="collapsibleNavId">
       <ul class="navbar-nav flex-md-column">
-        {% if global_menu_items is defined %}
-          {% for globalMenuItem in global_menu_items %}
+        {% if globalMenuItems is defined %}
+          {% for globalMenuItem in globalMenuItems %}
             <li class="nav-item">
               <a class="nav-link{{ globalMenuItem.active ? ' active' : '' }} pl-0 pr-0" href="{{ jira_path_prefix }}{{ globalMenuItem.path }}" data-toggle="tooltip" data-placement="right" title="{{ globalMenuItem.desc }}">
                 <i class="fas {{ globalMenuItem.icon }} fa-fw" ></i><span class="d-md-block ml-3 ml-md-0">{{ globalMenuItem.title }}</span>
