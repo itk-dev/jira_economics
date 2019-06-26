@@ -29,6 +29,9 @@ pipeline {
                                 sh 'vendor/bin/phpcs --standard=phpcs.xml.dist'
                                 sh 'vendor/bin/php-cs-fixer --config=.php_cs.dist fix --dry-run --verbose'
                                 sh 'vendor/bin/twigcs lint templates'
+                                sh 'vendor/bin/twigcs lint bundles/Billing/Resources/views',
+                                sh 'vendor/bin/twigcs lint bundles/CreateProject/Resources/views',
+                                sh 'vendor/bin/twigcs lint bundles/GraphicServiceOrder/Resources/views'
                             }
                         }
                     }
