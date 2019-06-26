@@ -2,14 +2,6 @@ hwi_oauth:
     # list of names of the firewalls in which this bundle is active, this setting MUST be set
     firewall_names: [jira_secured_area]
 
-    connect:
-        account_connector: App\Security\UserProvider
-
-    fosub:
-        username_iterations: 30
-        properties:
-            jira:    jira_id
-
     # https://github.com/hwi/HWIOAuthBundle/blob/master/Resources/doc/2-configuring_resource_owners.md
     resource_owners:
         jira:
