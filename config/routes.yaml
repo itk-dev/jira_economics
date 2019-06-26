@@ -1,24 +1,22 @@
 hwi_oauth_redirect:
     resource: "@HWIOAuthBundle/Resources/config/routing/redirect_41.xml"
-    prefix:   /jira/connect
+    prefix:   /connect
 
 hwi_oauth_connect:
     resource: "@HWIOAuthBundle/Resources/config/routing/connect_41.xml"
-    prefix:   /jira/connect
+    prefix:   /connect
 
 hwi_oauth_login:
     resource: "@HWIOAuthBundle/Resources/config/routing/login_41.xml"
-    prefix:   /jira/login
+    prefix:   /login
 
 jira_login:
-    path: /jira/login/check
+    path: /login/check-jira
 
 billing:
-    prefix: /jira
     resource: "@BillingBundle/Resources/config/routing.yaml"
 
 create-project:
-    prefix: /jira
     resource: "@CreateProjectBundle/Resources/config/routing.yaml"
 
 create-graphic-service-order:

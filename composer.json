@@ -7,8 +7,6 @@
         "ext-iconv": "*",
         "ext-json": "*",
         "api-platform/api-pack": "^1.2",
-        "easycorp/easyadmin-bundle": "^2.2",
-        "friendsofsymfony/user-bundle": "^2.1",
         "gedmo/doctrine-extensions": "^2.4",
         "guzzlehttp/oauth-subscriber": "^0.3.0",
         "guzzlehttp/psr7": "^1.5",

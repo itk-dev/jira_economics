@@ -5,9 +5,7 @@
     ordre:    { title: "Ordre", desc: "Opret ordrepakker ud fra tasks i Jira", icon: "fa-box-open", path: "/", active: false },
     sprintplan:    { title: "Sprintplan", desc: "Planlægningsoversigt og sprintrapporter baseret på tasks i Jira", icon: "fa-braille", path: "/", active: false },
     nytProjekt:    { title: "Nyt projekt", desc: "Opret et nyt Jira-projekt ud fra en skabelon", icon: "fa-project-diagram", path: "/create-project/new", active: false },
-    udgift:    { title: "Udgift", desc: "Opret udgifter i forbindelse med projekter og tasks", icon: "fa-credit-card", path: "/", active: false },
-    portal:    { title: "Portal", desc: "Portal", icon: "fa-cog", path: "/../portal", active: false },
-    admin:    { title: "Admin", desc: "Admin", icon: "fa-cog", path: "/../admin", active: false },
+    udgift:    { title: "Udgift", desc: "Opret udgifter i forbindelse med projekter og tasks", icon: "fa-credit-card", path: "/", active: false }
 } %}
 
 <div class="global-nav flex-grow-1">
@@ -24,7 +22,7 @@
         {% if globalMenuItems is defined %}
           {% for globalMenuItem in globalMenuItems %}
             <li class="nav-item">
-              <a class="nav-link{{ globalMenuItem.active ? ' active' : '' }} pl-0 pr-0" href="{{ jira_path_prefix }}{{ globalMenuItem.path }}" data-toggle="tooltip" data-placement="right" title="{{ globalMenuItem.desc }}">
+              <a class="nav-link{{ globalMenuItem.active ? ' active' : '' }} pl-0 pr-0" href="{{ globalMenuItem.path }}" data-toggle="tooltip" data-placement="right" title="{{ globalMenuItem.desc }}">
                 <i class="fas {{ globalMenuItem.icon }} fa-fw" ></i><span class="d-md-block ml-3 ml-md-0">{{ globalMenuItem.title }}</span>
               </a>
             </li>

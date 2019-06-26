@@ -34,7 +34,7 @@
         <div class="wrapper d-flex flex-column flex-md-row flex-grow-1">
           {% block globalNav %}
             <div class="d-flex">
-              {% include "portal/navigation/global-nav.html.twig" %}
+              {% include "navigation/global-nav.html.twig" %}
             </div>
           {% endblock %}
           {% block main %}
@@ -43,12 +43,12 @@
                 <div class="main row">
                   <div class="main-sidebar col-12 col-md-2 pt-md-3 order-1 order-md-0">
                     {% block sidebar %}
-                      {% include "portal/main/sidebar.html.twig" %}
+                      {% include "main/sidebar.html.twig" %}
                     {% endblock %}
                   </div>
                   <div class="main-content col-12 col-md-10 py-md-3 px-md-5 order-0 order-md-1">
                     {% block content %}
-                      {% include "portal/main/index.html.twig" %}
+                      {% include "main/index.html.twig" %}
                     {% endblock %}
                   </div>
                 </div>
