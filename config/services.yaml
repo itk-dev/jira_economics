@@ -40,7 +40,8 @@ services:
             $pem_path: '%env(JIRA_OAUTH_PEM_PATH)%'
             $jira_url: '%env(JIRA_URL)%'
             $entity_manager: '@doctrine.orm.entity_manager'
-    App\Service\ownCloudService:
+
+    App\Service\OwnCloudService:
         arguments:
             $host: '%env(OWNCLOUD_HOST)%'
             $username: '%env(OWNCLOUD_USERNAME)%'
