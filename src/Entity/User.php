@@ -26,6 +26,11 @@ class User extends BaseUser
 
   private $jiraAccessToken;
 
+  /**
+   * @ORM\Column(type="json")
+   */
+  private $portals = [];
+
   public function __construct()
   {
     parent::__construct();
@@ -77,5 +82,17 @@ class User extends BaseUser
     $this->jiraAccessToken = $jiraAccessToken;
 
     return $this;
+  }
+
+  public function getPortals(): ?array
+  {
+      return $this->portals;
+  }
+
+  public function setPortals(array $portals): self
+  {
+      $this->portals = $portals;
+
+      return $this;
   }
 }
