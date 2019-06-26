@@ -15,12 +15,15 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
+import Modal from 'react-bootstrap/Modal';
 
 class HomePage extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { allInvoices: {} };
+    this.handleModalShow = this.handleModalShow.bind(this);
+    this.handleModalClose = this.handleModalClose.bind(this);
+    this.state = { allInvoices: {}, showModal: false };
   };
 
   componentDidMount() {
@@ -30,7 +33,32 @@ class HomePage extends Component {
         this.setState({ allInvoices: response });
       })
       .catch((reason) => console.log('isCanceled', reason.isCanceled));
-  }
+  };
+
+  handleModalClose = (event) => {
+    event.preventDefault();
+    const { dispatch } = this.props;
+    //console.log(event.target);
+    //if (shouldDelete) {
+    //  console.log("Deleting invoice");
+      //dispatch(rest.actions.deleteInvoice({id: `${this.props.match.params.invoiceId}`}));
+      // @TODO: Check that deletion is successful
+    //}
+    //else {
+    //  console.log("Not deleting invoice");
+    //}
+    this.setState({ showModal: false });
+  };
+
+  handleInvoiceDelete = (invoiceId) => {
+    event.preventDefault();
+    //console.log(invoiceId);
+    this.handleModalShow(invoiceId);
+  };
+
+  handleModalShow() {
+    this.setState({ showModal: true });
+  };
 
   render() {
     return (
@@ -93,7 +121,7 @@ class HomePage extends Component {
                             </Tooltip>
                             }
                           >
-                            <Button className="btn-danger">
+                            <Button className="btn-danger" onClick={this.handleInvoiceDelete.bind(this, item.invoiceId)}>
                               <i className="fas fa-trash-alt mx-2"></i>
                               <span className="sr-only">slet</span>
                             </Button>
@@ -161,6 +189,20 @@ class HomePage extends Component {
             </Table>
           </Tab>
         </Tabs>
+        <Modal show={this.state.showModal} onHide={this.handleModalClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm deletion</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>Are you sure you want to delete this invoice?</Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={this.handleModalClose}>
+              Cancel
+            </Button>
+            <Button variant="secondary" onClick={this.handleModalClose}>
+              Delete
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </ContentWrapper>
     )
   }
