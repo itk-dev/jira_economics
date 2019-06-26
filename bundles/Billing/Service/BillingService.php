@@ -543,12 +543,11 @@ class BillingService
                     'project_id' => $jiraIssue->getProject()->getId(),
                 ];
 
-                if ($jiraIssue->getInvoiceEntryId() !== NULL) {
+                if (null !== $jiraIssue->getInvoiceEntryId()) {
                     // @TODO: fix misleading getInvoiceEntryId naming - the function actually returns an InvoiceEntry object
                     $issue['invoiceEntryId'] = $jiraIssue->getInvoiceEntryId()->getId();
-                }
-                else {
-                    $issue['invoiceEntryId'] = NULL;
+                } else {
+                    $issue['invoiceEntryId'] = null;
                 }
 
                 $jiraIssues[] = $issue;
