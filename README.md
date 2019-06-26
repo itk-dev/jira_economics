@@ -4,6 +4,38 @@ Apps to make life with Jira easier.
 
 ## Getting started
 
+### Using the docker setup (recommended)
+The repository comes with a complete docker compose setup to run the project.
+
+```bash
+docker-compose up -d
+docker-compose exec phpfpm composer install
+docker-compose run yarn install
+docker-compose run yarn watch # or docker-compose run yarn build for production build
+```
+
+### Project installation.
+
+````bash
+cp .env .env.local
+docker-compose exec phpfpm bin/console doctrine:migrations:migrate
+````
+
+###
+Find the port to access the project:
+````bash
+echo "http://0.0.0.0:$(docker-compose port reverse-proxy 80 | cut -d: -f2)"
+````
+
+# Production build
+
+````bash
+docker-compose exec phpfpm composer install --no-dev -o
+docker-compose run yarn install
+docker-compose run yarn build
+```` 
+
+### Without docker
 Please make sure you have [node](https://nodejs.org/en/download/) and [yarn](https://yarnpkg.com/en/docs/install) installed in your system.
 
 Then run the following commands to clone the project, install dependencies and start the application.
@@ -15,6 +47,7 @@ composer install  # install dependencies
 yarn watch # start webpack encore from stripts in package.json
 bin/console server:run # start PHP's built-in web server
 ```
+
 
 # Connect to Jira
 
