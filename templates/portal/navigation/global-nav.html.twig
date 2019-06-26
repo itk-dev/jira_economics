@@ -6,6 +6,7 @@
   {%
     set globalMenuItems = globalMenuItems|merge({
       jira:    { title: "jira", desc: "jira", icon: "fa-th-large", path: '/..'~path('jira_index'), active: false },
+      admin:    { title: "Admin", desc: "Admin", icon: "fa-cog", path: '/..'~path('easyadmin'), active: false },
     })
   %}
 {% endif %}
