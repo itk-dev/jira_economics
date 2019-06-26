@@ -75,6 +75,35 @@ class BillingService
     }
 
     /**
+     * Get all invoices.
+     *
+     * @return array
+     */
+    public function getAllInvoices()
+    {
+        $repository = $this->entityManager->getRepository(Invoice::class);
+        $invoices = $repository->findAll();
+
+        if (!$invoices) {
+            throw new HttpException(404, 'No invoices found');
+        }
+
+        $invoicesJson = [];
+
+        foreach ($invoices AS $invoice) {
+            $invoicesJson[] = [
+                'invoiceId' => $invoice->getId(),
+                'name' => $invoice->getName(),
+                'jiraProjectId' => $invoice->getProject()->getJiraId(),
+                'recorded' => $invoice->getRecorded(),
+                'created' => $invoice->getCreated()
+            ];
+        }
+
+        return $invoicesJson;
+    }
+
+    /**
      * Get specific invoice by id.
      *
      * @param invoiceId

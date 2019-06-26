@@ -65,6 +65,10 @@ export default reduxApi({
         reducerName: "invoices",
         url: "/billing/jira_api/invoices/:id",
     },
+    getAllInvoices: {
+        reducerName: "allInvoices",
+        url: "/billing/jira_api/invoices_all"
+    },
     getInvoiceEntries: {
         reducerName: "invoiceEntries",
         url: "/billing/jira_api/invoice_entries/:id",
