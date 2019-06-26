@@ -245,25 +245,25 @@ class GsOrder
 
     public function getOwnCloudSharedFiles(): ?array
     {
-      return $this->ownCloudSharedFiles;
+        return $this->ownCloudSharedFiles;
     }
 
     public function setOwnCloudSharedFiles(?array $ownCloudSharedFiles): self
     {
-      $this->ownCloudSharedFiles = $ownCloudSharedFiles;
+        $this->ownCloudSharedFiles = $ownCloudSharedFiles;
 
-      return $this;
+        return $this;
     }
 
     public function getOrderStatus(): ?string
     {
-      return $this->orderStatus;
+        return $this->orderStatus;
     }
 
     public function setOrderStatus(?string $orderStatus): self
     {
-      $this->orderStatus = $orderStatus;
+        $this->orderStatus = $orderStatus;
 
-      return $this;
+        return $this;
     }
 }
