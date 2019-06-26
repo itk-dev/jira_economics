@@ -58,7 +58,6 @@ class BillingService
         }
 
         $invoices = $project->getInvoices();
-
         $invoicesJson = [];
 
         foreach ($invoices as $invoice) {
@@ -93,8 +92,9 @@ class BillingService
         foreach ($invoices as $invoice) {
             $invoicesJson[] = [
                 'invoiceId' => $invoice->getId(),
-                'name' => $invoice->getName(),
+                'invoiceName' => $invoice->getName(),
                 'jiraProjectId' => $invoice->getProject()->getJiraId(),
+                'jiraProjectName' => $invoice->getProject()->getName(),
                 'recorded' => $invoice->getRecorded(),
                 'created' => $invoice->getCreated(),
             ];

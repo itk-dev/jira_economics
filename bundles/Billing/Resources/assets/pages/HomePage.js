@@ -3,6 +3,8 @@ import connect from 'react-redux/es/connect/connect';
 import ProjectList from '../components/ProjectList';
 import PageTitle from '../components/PageTitle';
 import PropTypes from 'prop-types';
+import Moment from 'react-moment';
+import 'moment-timezone';
 import rest from '../redux/utils/rest';
 import ContentWrapper from '../components/ContentWrapper';
 import Tabs from 'react-bootstrap/Tabs';
@@ -30,9 +32,6 @@ class HomePage extends Component {
       .catch((reason) => console.log('isCanceled', reason.isCanceled));
   }
 
-  // @TODO: Need to build data structure where each row contains invoice name, project name, invoice date, and total cost
-  // Invoices should be split in two sets - drafts and recorded
-
   render() {
     return (
       <ContentWrapper>
@@ -51,53 +50,59 @@ class HomePage extends Component {
             <Table responsive striped hover borderless>
               <thead>
                 <tr>
-                  <th>Faktura navn</th>
+                  <th>Fakturanavn</th>
                   <th>Projekt</th>
-                  <th>Faktura dato</th>
+                  <th>Fakturadato</th>
                   <th>Beløb (DKK)</th>
                   <th className="text-right">Funktion</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td><a href="/billing/project/"><strong>Udvikling sommer</strong></a></td>
-                  <td>AAKB</td>
-                  <td>30/09/2018</td>
-                  <td><strong>65.146</strong></td>
-                  <td className="text-right">
-                    <ButtonGroup size="sm" className="float-right" aria-label="Invoice functions">
-                      <OverlayTrigger
-                        key="edit"
-                        placement="top"
-                        overlay={
-                          <Tooltip id="tooltip-edit">
-                            Edit this invoice
+                {this.state.allInvoices.data && this.state.allInvoices.data
+                  .filter((item) => {
+                    return item.recorded === false;
+                  })
+                  .map((item) =>
+                    <tr key={item.invoiceId}>
+                      <td><a href={"/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}><strong>{item.invoiceName}</strong></a></td>
+                      <td>{item.jiraProjectName}</td>
+                      <td><Moment format="DD-MM-YYYY">{item.created.date}</Moment></td>
+                      <td><strong>65.146</strong></td>
+                      <td className="text-right">
+                        <ButtonGroup size="sm" className="float-right" aria-label="Invoice functions">
+                          <OverlayTrigger
+                            key="edit"
+                            placement="top"
+                            overlay={
+                              <Tooltip id="tooltip-edit">
+                                Edit this invoice
                             </Tooltip>
-                        }
-                      >
-                        <Button className="btn-primary">
-                          <i className="fas fa-edit mx-2"></i>
-                          <span className="sr-only">rediger</span>
-                        </Button>
-                      </OverlayTrigger>
-                      <OverlayTrigger
-                        key="delete"
-                        placement="top"
-                        overlay={
-                          <Tooltip id="tooltip-delete">
-                            Delete this invoice
+                            }
+                          >
+                            <Button className="btn-primary" href={"/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}>
+                              <i className="fas fa-edit mx-2"></i>
+                              <span className="sr-only">rediger</span>
+                            </Button>
+                          </OverlayTrigger>
+                          <OverlayTrigger
+                            key="delete"
+                            placement="top"
+                            overlay={
+                              <Tooltip id="tooltip-delete">
+                                Delete this invoice
                             </Tooltip>
-                        }
-                      >
-                        <Button className="btn-danger">
-                          <i className="fas fa-trash-alt mx-2"></i>
-                          <span className="sr-only">slet</span>
-                        </Button>
-                      </OverlayTrigger>
+                            }
+                          >
+                            <Button className="btn-danger">
+                              <i className="fas fa-trash-alt mx-2"></i>
+                              <span className="sr-only">slet</span>
+                            </Button>
+                          </OverlayTrigger>
 
-                    </ButtonGroup>
-                  </td>
-                </tr>
+                        </ButtonGroup>
+                      </td>
+                    </tr>
+                  )}
               </tbody>
             </Table>
           </Tab>
@@ -114,38 +119,44 @@ class HomePage extends Component {
             <Table responsive striped hover borderless>
               <thead>
                 <tr>
-                  <th>Faktura navn</th>
+                  <th>Fakturanavn</th>
                   <th>Projekt</th>
-                  <th>Faktura dato</th>
+                  <th>Fakturadato</th>
                   <th>Beløb (DKK)</th>
                   <th className="text-right">Funktion</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td><a href="/billing/project"><strong>Udvikling sommer</strong></a></td>
-                  <td>AAKB</td>
-                  <td>30/09/2018</td>
-                  <td><strong>65.146</strong></td>
-                  <td className="text-right">
-                    <ButtonGroup className="btn-group-sm float-right" aria-label="Invoice functions">
-                      <OverlayTrigger
-                        key="download-csv"
-                        placement="top"
-                        overlay={
-                          <Tooltip id="tooltip-download-csv">
-                            Download csv file
+                {this.state.allInvoices.data && this.state.allInvoices.data
+                  .filter((item) => {
+                    return item.recorded === true;
+                  })
+                  .map((item) =>
+                    <tr key={item.invoiceId}>
+                      <td><a href={"/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}><strong>{item.invoiceName}</strong></a></td>
+                      <td>{item.jiraProjectName}</td>
+                      <td><Moment format="DD-MM-YYYY">{item.created.date}</Moment></td>
+                      <td><strong>65.146</strong></td>
+                      <td className="text-right">
+                        <ButtonGroup className="btn-group-sm float-right" aria-label="Invoice functions">
+                          <OverlayTrigger
+                            key="download-csv"
+                            placement="top"
+                            overlay={
+                              <Tooltip id="tooltip-download-csv">
+                                Download csv file
                             </Tooltip>
-                        }
-                      >
-                        <Button>
-                          <i className="fas fa-file-csv mx-2"></i>
-                          <span className="sr-only">hent csv</span>
-                        </Button>
-                      </OverlayTrigger>
-                    </ButtonGroup>
-                  </td>
-                </tr>
+                            }
+                          >
+                            <Button>
+                              <i className="fas fa-file-csv mx-2"></i>
+                              <span className="sr-only">hent csv</span>
+                            </Button>
+                          </OverlayTrigger>
+                        </ButtonGroup>
+                      </td>
+                    </tr>
+                  )}
               </tbody>
             </Table>
           </Tab>
@@ -160,7 +171,9 @@ HomePage.propTypes = {
 };
 
 const mapStateToProps = state => {
-  return {};
+  return {
+    allInvoices: state.allInvoices
+  };
 };
 
 export default connect(
