@@ -33,9 +33,6 @@ security:
             anonymous: ~
             form_login:
                 provider: fos_userbundle
-                csrf_token_generator: security.csrf.token_manager
-                # login_path:        /portal/login
-                # check_path:        /portal/login/check
             logout: ~
 
     access_control:
