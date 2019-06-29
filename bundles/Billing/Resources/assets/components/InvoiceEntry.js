@@ -6,8 +6,6 @@ import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
 import { push } from 'react-router-redux';
 
-const $ = require('jquery');
-
 export class InvoiceEntry extends Component {
   componentDidMount() {
     const {dispatch} = this.props;

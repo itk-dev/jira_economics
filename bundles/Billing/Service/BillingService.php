@@ -19,6 +19,8 @@ use Billing\Entity\Project;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 
+// @TODO: consistent snake_case or camelCase
+
 class BillingService
 {
     private $entityManager;
@@ -64,6 +66,35 @@ class BillingService
                 'invoiceId' => $invoice->getId(),
                 'name' => $invoice->getName(),
                 'jiraId' => $invoice->getProject()->getJiraId(),
+                'recorded' => $invoice->getRecorded(),
+                'created' => $invoice->getCreated(),
+            ];
+        }
+
+        return $invoicesJson;
+    }
+
+    /**
+     * Get all invoices.
+     *
+     * @return array
+     */
+    public function getAllInvoices()
+    {
+        $repository = $this->entityManager->getRepository(Invoice::class);
+        $invoices = $repository->findAll();
+
+        if (!$invoices) {
+            throw new HttpException(404, 'No invoices found');
+        }
+
+        $invoicesJson = [];
+
+        foreach ($invoices as $invoice) {
+            $invoicesJson[] = [
+                'invoiceId' => $invoice->getId(),
+                'name' => $invoice->getName(),
+                'jiraProjectId' => $invoice->getProject()->getJiraId(),
                 'recorded' => $invoice->getRecorded(),
                 'created' => $invoice->getCreated(),
             ];
@@ -541,6 +572,14 @@ class BillingService
                     'project_id' => $jiraIssue->getProject()->getId(),
                 ];
 
+                if (null !== $jiraIssue->getInvoiceEntryId()) {
+                    // @TODO: fix misleading getInvoiceEntryId naming - the function actually returns an InvoiceEntry object
+                    $issue['invoiceEntryId'] = $jiraIssue->getInvoiceEntryId()->getId();
+                } else {
+                    $issue['invoiceEntryId'] = null;
+                }
+
+                $jiraIssues[] = $issue;
                 $this->entityManager->persist($jiraIssue);
             }
 
