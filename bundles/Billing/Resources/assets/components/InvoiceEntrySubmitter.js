@@ -9,8 +9,6 @@ import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
 import { push } from 'react-router-redux';
 
-const $ = require('jquery');
-
 export class InvoiceEntrySubmitter extends Component {
   constructor(props) {
     super(props);
@@ -33,7 +31,7 @@ export class InvoiceEntrySubmitter extends Component {
   }
 
   getTimeSpent() {
-    if (this.props.selectedIssues == undefined) {
+    if (this.props.selectedIssues == undefined || this.props.selectedIssues.selectedIssues == undefined) {
       return 0;
     }
     let timeSum = 0;
@@ -61,7 +59,7 @@ export class InvoiceEntrySubmitter extends Component {
     });
   }
 
-  handleCreateSubmit = (event) => {
+  handleSubmit = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
     const invoiceId = this.props.match.params.invoiceId;
@@ -75,7 +73,7 @@ export class InvoiceEntrySubmitter extends Component {
     this.props.selectedIssues.selectedIssues.forEach(selectedIssue => {
       jiraIssueIds.push(selectedIssue.id);
     });
-    const invoiceEntryData = {
+    let invoiceEntryData = {
       invoiceId,
       name,
       description,
@@ -83,9 +81,18 @@ export class InvoiceEntrySubmitter extends Component {
       product,
       jiraIssueIds
     };
-    dispatch(rest.actions.createInvoiceEntry({}, {
-      body: JSON.stringify(invoiceEntryData)
-    }));
+    const invoiceEntryId = this.props.location.state.existingInvoiceEntryId;
+    if (invoiceEntryId) {
+      invoiceEntryData.id = invoiceEntryId;
+      dispatch(rest.actions.updateInvoiceEntry({id: invoiceEntryId}, {
+        body: JSON.stringify(invoiceEntryData)
+      }));
+    }
+    else {
+      dispatch(rest.actions.createInvoiceEntry({}, {
+        body: JSON.stringify(invoiceEntryData)
+      }));
+    }
     // @TODO: check that a new invoiceEntry was successfully created before navigating to invoice page
     // @TODO: consider showing a modal dialog to confirm invoiceEntry creation
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
@@ -98,193 +105,381 @@ export class InvoiceEntrySubmitter extends Component {
 
   // @TODO: cleanup redundant HTML
   render() {
-    if (this.props.selectedIssues &&
-        this.props.location &&
-        this.props.location.state &&
-        this.props.location.state.from ===
-        `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`) {
-      return (
-        <ContentWrapper>
-          <PageTitle>Opret fakturalinje manuelt</PageTitle>
-          <div>
-            <form id="create-invoice-entry-form">
-              <div>
+    // InvoiceEntry without JiraIssues?
+    if (this.props.location.state &&
+      this.props.location.state.from ===
+      `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`) {
+      // Editing an existing InvoiceEntry?
+      if (this.props.location.state.existingInvoiceEntryId) {
+        return (
+          <ContentWrapper>
+            <PageTitle>Rediger manuel fakturalinje</PageTitle>
+            <div>
+              <form id="create-invoice-entry-form">
+                <div>
+                  <label htmlFor="kontonr">
+                    Kontonr.
+                </label>
+                  <input
+                    type="text"
+                    name="enterKontonr"
+                    className="form-control"
+                    id="invoice-entry-account"
+                    aria-describedby="enterKontonr"
+                    placeholder="Kontonummer">
+                  </input>
+                </div>
+                <div>
+                  <label htmlFor="vare">
+                    Vare
+                </label>
+                  <input
+                    type="text"
+                    name="enterVarenr"
+                    className="form-control"
+                    id="invoice-entry-product"
+                    aria-describedby="enterVarenr"
+                    placeholder="Varenavn">
+                  </input>
+                  <label htmlFor="beskrivelse">
+                    Beskrivelse
+                </label>
+                  <input
+                    type="text"
+                    name="beskrivelse"
+                    className="form-control"
+                    id="invoice-entry-description"
+                    aria-describedby="enterBeskrivelse"
+                    placeholder="Varebeskrivelse">
+                  </input>
+                  <label htmlFor="antal">
+                    Antal
+                </label>
+                  <input
+                    type="text"
+                    name="hoursSpent"
+                    className="form-control"
+                    id="invoice-entry-hours-spent"
+                    aria-describedby="enterHoursSpent"
+                    placeholder="Vareantal">
+                  </input>
+                  <label htmlFor="beskrivelse">
+                    Stk. pris
+                </label>
+                  <input
+                    type="text"
+                    name="unitPrice"
+                    className="form-control"
+                    id="invoice-entry-unit-price"
+                    aria-describedby="enterUnitPrice"
+                    placeholder="0">
+                  </input>
+                </div>
+              </form>
+              <form onSubmit={this.handleSubmit}>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  id="create-invoice-entry">Overfør til faktura
+              </button>
+              </form>
+              <form onSubmit={this.handleCancelSubmit}>
+                <button
+                  type="submit"
+                  className="btn btn-danger"
+                  id="cancel">Annuller
+              </button>
+              </form>
+            </div>
+          </ContentWrapper>
+        );
+      }
+      // Creating a new InvoiceEntry?
+      else {
+        return (
+          <ContentWrapper>
+            <PageTitle>Opret fakturalinje manuelt</PageTitle>
+            <div>
+              <form id="create-invoice-entry-form">
+                <div>
+                  <label htmlFor="kontonr">
+                    Kontonr.
+                  </label>
+                  <input
+                    type="text"
+                    name="enterKontonr"
+                    className="form-control"
+                    id="invoice-entry-account"
+                    aria-describedby="enterKontonr"
+                    placeholder="Kontonummer">
+                  </input>
+                </div>
+                <div>
+                  <label htmlFor="vare">
+                    Vare
+                  </label>
+                  <input
+                    type="text"
+                    name="enterVarenr"
+                    className="form-control"
+                    id="invoice-entry-product"
+                    aria-describedby="enterVarenr"
+                    placeholder="Varenavn">
+                  </input>
+                  <label htmlFor="beskrivelse">
+                    Beskrivelse
+                  </label>
+                  <input
+                    type="text"
+                    name="beskrivelse"
+                    className="form-control"
+                    id="invoice-entry-description"
+                    aria-describedby="enterBeskrivelse"
+                    placeholder="Varebeskrivelse">
+                  </input>
+                  <label htmlFor="antal">
+                    Antal
+                  </label>
+                  <input
+                    type="text"
+                    name="hoursSpent"
+                    className="form-control"
+                    id="invoice-entry-hours-spent"
+                    aria-describedby="enterHoursSpent"
+                    placeholder="Vareantal">
+                  </input>
+                  <label htmlFor="beskrivelse">
+                    Stk. pris
+                  </label>
+                  <input
+                    type="text"
+                    name="unitPrice"
+                    className="form-control"
+                    id="invoice-entry-unit-price"
+                    aria-describedby="enterUnitPrice"
+                    placeholder="0">
+                  </input>
+                </div>
+              </form>
+              <form onSubmit={this.handleSubmit}>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  id="create-invoice-entry">Overfør til faktura
+                </button>
+              </form>
+              <form onSubmit={this.handleCancelSubmit}>
+                <button
+                  type="submit"
+                  className="btn btn-danger"
+                  id="cancel">Annuller
+                </button>
+              </form>
+            </div>
+          </ContentWrapper>
+        );
+      }
+    }
+    // InvoiceEntry with JiraIssues?
+    else if (this.props.location.state &&
+      this.props.location.state.from !==
+      `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`) {
+      // Editing an existing InvoiceEntry?
+      if (this.props.location.state.existingInvoiceEntryId) {
+        return (
+          <ContentWrapper>
+            <PageTitle>Rediger eksisterende fakturalinje</PageTitle>
+            <div>{Object.values(this.props.selectedIssues.selectedIssues).length + " issue(s) valgt"}</div>
+            <div>{"Total timer valgt: " + this.getTimeSpent()}</div>
+            <div>
+              <form id="submitForm" onSubmit={this.handleSelectJiraIssues}>
+                <button type="submit" className="btn btn-primary" id="submit">Rediger valg</button>
+              </form>
+            </div>
+            <div>
+              <form id="create-invoice-entry-form">
                 <label htmlFor="kontonr">
                   Kontonr.
-                </label>
-                <input
-                  type="text"
-                  name="enterKontonr"
-                  className="form-control"
-                  id="invoice-entry-account"
-                  aria-describedby="enterKontonr"
-                  placeholder="Kontonummer">
-                </input>
-              </div>
-              <div>
-                <label htmlFor="vare">
-                  Vare
-                </label>
-                <input
-                  type="text"
-                  name="enterVarenr"
-                  className="form-control"
-                  id="invoice-entry-product"
-                  aria-describedby="enterVarenr"
-                  placeholder="Varenavn">
-                </input>
-                <label htmlFor="beskrivelse">
-                  Beskrivelse
-                </label>
-                <input
-                  type="text"
-                  name="beskrivelse"
-                  className="form-control"
-                  id="invoice-entry-description"
-                  aria-describedby="enterBeskrivelse"
-                  placeholder="Varebeskrivelse">
-                </input>
-                <label htmlFor="antal">
-                  Antal
-                </label>
-                <input
-                  type="text"
-                  name="hoursSpent"
-                  className="form-control"
-                  id="invoice-entry-hours-spent"
-                  aria-describedby="enterHoursSpent"
-                  placeholder="Vareantal">
-                </input>
-                <label htmlFor="beskrivelse">
-                  Stk. pris
-                </label>
-                <input
-                  type="text"
-                  name="unitPrice"
-                  className="form-control"
-                  id="invoice-entry-unit-price"
-                  aria-describedby="enterUnitPrice"
-                  placeholder="0">
-                </input>
-              </div>
-            </form>
-            <form onSubmit={this.handleCreateSubmit}>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                id="create-invoice-entry">Overfør til faktura
-              </button>
-            </form>
-            <form onSubmit={this.handleCancelSubmit}>
-              <button
-                type="submit"
-                className="btn btn-danger"
-                id="cancel">Annuller
-              </button>
-            </form>
-          </div>
-        </ContentWrapper>
-      );
-    }
-    else if (this.props.selectedIssues) {
-      return (
-        <ContentWrapper>
-          <PageTitle>Tilføj oplysninger til fakturalinje fra Jira</PageTitle>
-          <div>{Object.values(this.props.selectedIssues.selectedIssues).length + " issue(s) valgt"}</div>
-          <div>{"Total timer valgt: " + this.getTimeSpent()}</div>
-          <div>
-            <form id="submitForm" onSubmit={this.handleSelectJiraIssues}>
-              <button type="submit" className="btn btn-primary" id="submit">Rediger valg</button>
-            </form>
-          </div>
-          <div>
-            <form id="create-invoice-entry-form">
-              <label htmlFor="kontonr">
-                Kontonr.
+            </label>
+                <div>
+                  <select className="browser-default custom-select"
+                    defaultValue={this.state.account}
+                    id="invoice-entry-account"
+                    onChange={this.onAccountChange}>
+                    <option value="Vælg PSP" hidden>Vælg PSP</option>
+                    <option value="PSP1">PSP1</option>
+                    <option value="PSP2">PSP2</option>
+                    <option value="PSP3">PSP3</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="vare">
+                    Vare
               </label>
-              <div>
-                <select className="browser-default custom-select"
-                  defaultValue={this.state.account}
-                  id="invoice-entry-account"
-                  onChange={this.onAccountChange}>
-                  <option value="Vælg PSP" hidden>Vælg PSP</option>
-                  <option value="PSP1">PSP1</option>
-                  <option value="PSP2">PSP2</option>
-                  <option value="PSP3">PSP3</option>
-                </select>
-              </div>
-              <div>
-                <label htmlFor="vare">
-                  Vare
+                  <input
+                    type="text"
+                    name="enterVarenr"
+                    className="form-control"
+                    id="invoice-entry-product"
+                    aria-describedby="enterVarenr"
+                    placeholder="Varenavn">
+                  </input>
+                  <label htmlFor="beskrivelse">
+                    Beskrivelse
+              </label>
+                  <input
+                    type="text"
+                    name="beskrivelse"
+                    className="form-control"
+                    id="invoice-entry-description"
+                    aria-describedby="enterBeskrivelse"
+                    placeholder="Varebeskrivelse">
+                  </input>
+                  <label htmlFor="antal">
+                    Timer
+              </label>
+                  <input
+                    type="text"
+                    name="hoursSpent"
+                    className="form-control"
+                    id="invoice-entry-hours-spent"
+                    aria-describedby="enterHoursSpent"
+                    placeholder={this.getTimeSpent()}
+                    readOnly>
+                  </input>
+                  <label htmlFor="beskrivelse">
+                    Stk. pris
+              </label>
+                  <input
+                    type="text"
+                    name="unitPrice"
+                    className="form-control"
+                    id="invoice-entry-unit-price"
+                    aria-describedby="enterUnitPrice"
+                    placeholder={this.getUnitPrice()}
+                    readOnly>
+                  </input>
+                </div>
+              </form>
+              <form onSubmit={this.handleSubmit}>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  id="create-invoice-entry">Overfør til faktura
+            </button>
+              </form>
+              <form onSubmit={this.handleCancelSubmit}>
+                <button
+                  type="submit"
+                  className="btn btn-danger"
+                  id="cancel">Annuller
+            </button>
+              </form>
+            </div>
+          </ContentWrapper>
+        );
+      }
+      // Creating a new InvoiceEntry with JiraIssues?
+      else {
+        return (
+          <ContentWrapper>
+            <PageTitle>Opret fakturalinje med issues fra Jira</PageTitle>
+            <div>{Object.values(this.props.selectedIssues.selectedIssues).length + " issue(s) valgt"}</div>
+            <div>{"Total timer valgt: " + this.getTimeSpent()}</div>
+            <div>
+              <form id="submitForm" onSubmit={this.handleSelectJiraIssues}>
+                <button type="submit" className="btn btn-primary" id="submit">Rediger valg</button>
+              </form>
+            </div>
+            <div>
+              <form id="create-invoice-entry-form">
+                <label htmlFor="kontonr">
+                  Kontonr.
+              </label>
+                <div>
+                  <select className="browser-default custom-select"
+                    defaultValue={this.state.account}
+                    id="invoice-entry-account"
+                    onChange={this.onAccountChange}>
+                    <option value="Vælg PSP" hidden>Vælg PSP</option>
+                    <option value="PSP1">PSP1</option>
+                    <option value="PSP2">PSP2</option>
+                    <option value="PSP3">PSP3</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="vare">
+                    Vare
                 </label>
-                <input
-                  type="text"
-                  name="enterVarenr"
-                  className="form-control"
-                  id="invoice-entry-product"
-                  aria-describedby="enterVarenr"
-                  placeholder="Varenavn">
-                </input>
-                <label htmlFor="beskrivelse">
-                  Beskrivelse
+                  <input
+                    type="text"
+                    name="enterVarenr"
+                    className="form-control"
+                    id="invoice-entry-product"
+                    aria-describedby="enterVarenr"
+                    placeholder="Varenavn">
+                  </input>
+                  <label htmlFor="beskrivelse">
+                    Beskrivelse
                 </label>
-                <input
-                  type="text"
-                  name="beskrivelse"
-                  className="form-control"
-                  id="invoice-entry-description"
-                  aria-describedby="enterBeskrivelse"
-                  placeholder="Varebeskrivelse">
-                </input>
-                <label htmlFor="antal">
-                  Timer
+                  <input
+                    type="text"
+                    name="beskrivelse"
+                    className="form-control"
+                    id="invoice-entry-description"
+                    aria-describedby="enterBeskrivelse"
+                    placeholder="Varebeskrivelse">
+                  </input>
+                  <label htmlFor="antal">
+                    Timer
                 </label>
-                <input
-                  type="text"
-                  name="hoursSpent"
-                  className="form-control"
-                  id="invoice-entry-hours-spent"
-                  aria-describedby="enterHoursSpent"
-                  placeholder={this.getTimeSpent()}
-                  readOnly>
-                </input>
-                <label htmlFor="beskrivelse">
-                  Stk. pris
+                  <input
+                    type="text"
+                    name="hoursSpent"
+                    className="form-control"
+                    id="invoice-entry-hours-spent"
+                    aria-describedby="enterHoursSpent"
+                    placeholder={this.getTimeSpent()}
+                    readOnly>
+                  </input>
+                  <label htmlFor="beskrivelse">
+                    Stk. pris
                 </label>
-                <input
-                  type="text"
-                  name="unitPrice"
-                  className="form-control"
-                  id="invoice-entry-unit-price"
-                  aria-describedby="enterUnitPrice"
-                  placeholder={this.getUnitPrice()}
-                  readOnly>
-                </input>
-              </div>
-            </form>
-            <form onSubmit={this.handleCreateSubmit}>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                id="create-invoice-entry">Overfør til faktura
+                  <input
+                    type="text"
+                    name="unitPrice"
+                    className="form-control"
+                    id="invoice-entry-unit-price"
+                    aria-describedby="enterUnitPrice"
+                    placeholder={this.getUnitPrice()}
+                    readOnly>
+                  </input>
+                </div>
+              </form>
+              <form onSubmit={this.handleSubmit}>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  id="create-invoice-entry">Overfør til faktura
               </button>
-            </form>
-            <form onSubmit={this.handleCancelSubmit}>
-              <button
-                type="submit"
-                className="btn btn-danger"
-                id="cancel">Annuller
+              </form>
+              <form onSubmit={this.handleCancelSubmit}>
+                <button
+                  type="submit"
+                  className="btn btn-danger"
+                  id="cancel">Annuller
               </button>
-            </form>
-          </div>
-        </ContentWrapper>
-      );
+              </form>
+            </div>
+          </ContentWrapper>
+        );
+      }
     }
     else {
       return (
         <ContentWrapper>
-          <div class="spinner-border" style={{ width: '3rem', height: '3rem', role: 'status' }}>
-            <span class="sr-only">Loading...</span>
+          <div className="spinner-border" style={{ width: '3rem', height: '3rem', role: 'status' }}>
+            <span className="sr-only">Loading...</span>
           </div>
         </ContentWrapper>
       );

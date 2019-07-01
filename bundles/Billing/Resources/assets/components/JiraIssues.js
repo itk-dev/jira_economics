@@ -20,6 +20,7 @@ function makeIssueData(jiraIssues) {
   return jiraIssues.data.data.map((item, i) => ({
     key: `row-${i}`,
     id: item.issue_id,
+    invoiceEntryId: item.invoiceEntryId ? item.invoiceEntryId : null,
     summary: item.summary,
     created: item.created.date,
     finished: item.finished.date,
@@ -57,6 +58,13 @@ class JiraIssues extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
+    if (this.props.location.state && this.props.location.state.existingInvoiceEntryId) {
+      this.props.issueData.forEach(issue => {
+        if (issue.invoiceEntryId == this.props.location.state.existingInvoiceEntryId) {
+          this.toggleRow(issue);
+        }
+      });
+    }
   }
 
   // @TODO: consider simplifying logic here
@@ -181,7 +189,19 @@ class JiraIssues extends Component {
     event.preventDefault();
     const { dispatch } = this.props;
     dispatch(setSelectedIssues(this.state.selected));
-    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`);
+    if (this.props.location.state &&
+      this.props.location.state.existingInvoiceEntryId) {
+      this.props.history.push({
+        pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
+        state: { from: this.props.location.pathname, existingInvoiceEntryId: this.props.location.state.existingInvoiceEntryId }
+      })
+    }
+    else {
+      this.props.history.push({
+        pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
+        state: { from: this.props.location.pathname }
+      });
+    }
   }
 
   handleCancelSubmit = (event) => {

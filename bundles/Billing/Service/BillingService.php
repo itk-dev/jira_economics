@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of aakb/jira_economics.
+ *
+ * (c) 2019 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace Billing\Service;
 
 use App\Service\JiraService;
@@ -10,6 +18,8 @@ use Billing\Entity\JiraIssue;
 use Billing\Entity\Project;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
+
+// @TODO: consistent snake_case or camelCase
 
 class BillingService
 {
@@ -28,13 +38,15 @@ class BillingService
     }
 
     /**
-     * Get invoices for specific Jira project
+     * Get invoices for specific Jira project.
+     *
      * @param jira_id
+     *
      * @return array
      */
     public function getInvoices($jiraProjectId)
     {
-        if (!intval($jiraProjectId)) {
+        if (!(int) $jiraProjectId) {
             throw new HttpException(400, 'Expected integer in request');
         }
 
@@ -42,20 +54,20 @@ class BillingService
         $project = $repository->findOneBy(['jiraId' => $jiraProjectId]);
 
         if (!$project) {
-            throw new HttpException(404, 'Project with id ' . $jiraProjectId . ' not found');
+            throw new HttpException(404, 'Project with id '.$jiraProjectId.' not found');
         }
 
         $invoices = $project->getInvoices();
 
         $invoicesJson = [];
 
-        foreach ($invoices AS $invoice) {
+        foreach ($invoices as $invoice) {
             $invoicesJson[] = [
                 'invoiceId' => $invoice->getId(),
-                'name'      => $invoice->getName(),
-                'jiraId'    => $invoice->getProject()->getJiraId(),
-                'recorded'  => $invoice->getRecorded(),
-                'created'   => $invoice->getCreated()
+                'name' => $invoice->getName(),
+                'jiraId' => $invoice->getProject()->getJiraId(),
+                'recorded' => $invoice->getRecorded(),
+                'created' => $invoice->getCreated(),
             ];
         }
 
@@ -63,13 +75,44 @@ class BillingService
     }
 
     /**
-     * Get specific invoice by id
+     * Get all invoices.
+     *
+     * @return array
+     */
+    public function getAllInvoices()
+    {
+        $repository = $this->entityManager->getRepository(Invoice::class);
+        $invoices = $repository->findAll();
+
+        if (!$invoices) {
+            throw new HttpException(404, 'No invoices found');
+        }
+
+        $invoicesJson = [];
+
+        foreach ($invoices as $invoice) {
+            $invoicesJson[] = [
+                'invoiceId' => $invoice->getId(),
+                'name' => $invoice->getName(),
+                'jiraProjectId' => $invoice->getProject()->getJiraId(),
+                'recorded' => $invoice->getRecorded(),
+                'created' => $invoice->getCreated(),
+            ];
+        }
+
+        return $invoicesJson;
+    }
+
+    /**
+     * Get specific invoice by id.
+     *
      * @param invoiceId
+     *
      * @return array
      */
     public function getInvoice($invoiceId)
     {
-        if (!intval($invoiceId)) {
+        if (!(int) $invoiceId) {
             throw new HttpException(400, 'Expected integer in request');
         }
 
@@ -77,31 +120,31 @@ class BillingService
         $invoice = $repository->findOneBy(['id' => $invoiceId]);
 
         if (!$invoice) {
-            throw new HttpException(404, 'Invoice with id ' . $invoiceId . ' not found');
+            throw new HttpException(404, 'Invoice with id '.$invoiceId.' not found');
         }
 
-        if ($invoice->getRecorded() == "1") {
+        if ('1' === $invoice->getRecorded()) {
             $recorded = true;
-        }
-        else {
+        } else {
             $recorded = false;
         }
 
         return [
-            'name'     => $invoice->getName(),
-            'jiraId'   => $invoice->getProject()->getJiraId(),
+            'name' => $invoice->getName(),
+            'jiraId' => $invoice->getProject()->getJiraId(),
             'recorded' => $recorded,
-            'created'  => $invoice->getCreated()
+            'created' => $invoice->getCreated(),
         ];
     }
 
     /**
-     * Post new invoice, creating a new entity referenced by the returned id
+     * Post new invoice, creating a new entity referenced by the returned id.
+     *
      * @return array invoiceData
      */
     public function postInvoice($invoiceData)
     {
-        if (empty($invoiceData['projectId']) || !intval($invoiceData['projectId'])) {
+        if (empty($invoiceData['projectId']) || !(int) ($invoiceData['projectId'])) {
             throw new HttpException(400, "Expected integer value for 'projectId' in request");
         }
 
@@ -113,39 +156,41 @@ class BillingService
         $project = $repository->findOneBy(['jiraId' => $invoiceData['projectId']]);
 
         if (!$project) {
-            throw new HttpException(404, "Project with id " . $invoiceData['projectId'] . " not found");
+            throw new HttpException(404, 'Project with id '.$invoiceData['projectId'].' not found');
         }
 
         $invoice = new Invoice();
         $invoice->setName($invoiceData['name']);
         $invoice->setProject($project);
         $invoice->setRecorded(false);
-        $invoice->setCreated(new \DateTime("now"));
+        $invoice->setCreated(new \DateTime('now'));
 
         $this->entityManager->persist($invoice);
         $this->entityManager->flush();
 
         return [
             'invoiceId' => $invoice->getId(),
-            'name'      => $invoice->getName(),
-            'jiraId'    => $invoice->getProject()->getJiraId(),
-            'recorded'  => $invoice->getRecorded(),
-            'created'   => $invoice->getCreated()
+            'name' => $invoice->getName(),
+            'jiraId' => $invoice->getProject()->getJiraId(),
+            'recorded' => $invoice->getRecorded(),
+            'created' => $invoice->getCreated(),
         ];
     }
 
     /**
-     * Put specific invoice, replacing the invoice referenced by the given id
+     * Put specific invoice, replacing the invoice referenced by the given id.
+     *
      * @param invoiceData
+     *
      * @return array
      */
     public function putInvoice($invoiceData)
     {
-        if (empty($invoiceData['id']) || !intval($invoiceData['id'])) {
+        if (empty($invoiceData['id']) || !(int) ($invoiceData['id'])) {
             throw new HttpException(400, "Expected integer value for 'id' in request");
         }
 
-        if (isset($invoiceData['recorded']) && !in_array($invoiceData['recorded'], [true, false])) {
+        if (isset($invoiceData['recorded']) && !\in_array($invoiceData['recorded'], [true, false])) {
             throw new HttpException(400, "Expected boolean value for 'recorded' in request");
         }
 
@@ -153,7 +198,7 @@ class BillingService
         $invoice = $repository->findOneBy(['id' => $invoiceData['id']]);
 
         if (!$invoice) {
-            throw new HttpException(404, 'Unable to update invoice with id ' . $invoiceData['id'] . ' as it does not already exist');
+            throw new HttpException(404, 'Unable to update invoice with id '.$invoiceData['id'].' as it does not already exist');
         }
 
         if (!empty($invoiceData['name'])) {
@@ -169,20 +214,21 @@ class BillingService
         $this->entityManager->flush();
 
         return [
-            'name'      => $invoice->getName(),
-            'jiraId'    => $invoice->getProject()->getJiraId(),
-            'recorded'  => $invoice->getRecorded(),
-            'created'   => $invoice->getCreated()
+            'name' => $invoice->getName(),
+            'jiraId' => $invoice->getProject()->getJiraId(),
+            'recorded' => $invoice->getRecorded(),
+            'created' => $invoice->getCreated(),
         ];
     }
 
     /**
-     * Delete specific invoice referenced by the given id
+     * Delete specific invoice referenced by the given id.
+     *
      * @param invoiceId
      */
     public function deleteInvoice($invoiceId)
     {
-        if (empty($invoiceId) || !intval($invoiceId)) {
+        if (empty($invoiceId) || !(int) $invoiceId) {
             throw new HttpException(400, 'Expected integer in request');
         }
 
@@ -190,7 +236,7 @@ class BillingService
         $invoice = $repository->findOneBy(['id' => $invoiceId]);
 
         if (!$invoice) {
-            throw new HttpException(404, 'Invoice with id ' . $invoiceId . ' did not exist');
+            throw new HttpException(404, 'Invoice with id '.$invoiceId.' did not exist');
         }
 
         $this->entityManager->remove($invoice);
@@ -198,13 +244,15 @@ class BillingService
     }
 
     /**
-     * Get invoiceEntries for specific invoice
+     * Get invoiceEntries for specific invoice.
+     *
      * @param invoice_id
+     *
      * @return array
      */
     public function getInvoiceEntries($invoiceId)
     {
-        if (!intval($invoiceId)) {
+        if (!(int) $invoiceId) {
             throw new HttpException(400, 'Expected integer in request');
         }
 
@@ -215,14 +263,14 @@ class BillingService
 
         $invoiceEntriesJson = [];
 
-        foreach ($invoiceEntries AS $invoiceEntry) {
+        foreach ($invoiceEntries as $invoiceEntry) {
             $invoiceEntriesJson[] = [
                 'invoiceEntryId' => $invoiceEntry->getId(),
-                'name'           => $invoiceEntry->getName(),
-                'invoiceId'      => $invoiceEntry->getInvoice()->getId(),
-                'description'    => $invoiceEntry->getDescription(),
-                'account'        => $invoiceEntry->getAccount(),
-                'product'        => $invoiceEntry->getProduct()
+                'name' => $invoiceEntry->getName(),
+                'invoiceId' => $invoiceEntry->getInvoice()->getId(),
+                'description' => $invoiceEntry->getDescription(),
+                'account' => $invoiceEntry->getAccount(),
+                'product' => $invoiceEntry->getProduct(),
             ];
         }
 
@@ -230,13 +278,15 @@ class BillingService
     }
 
     /**
-     * Get specific invoiceEntry by id
+     * Get specific invoiceEntry by id.
+     *
      * @param invoice_entry_id
+     *
      * @return array
      */
     public function getInvoiceEntry($invoiceEntryId)
     {
-        if (!intval($invoiceEntryId)) {
+        if (!(int) $invoiceEntryId) {
             throw new HttpException(400, 'Expected integer in request');
         }
 
@@ -244,26 +294,26 @@ class BillingService
         $invoiceEntry = $repository->findOneBy(['id' => $invoiceEntryId]);
 
         if (!$invoiceEntry) {
-            throw new HttpException(404, 'InvoiceEntry with id ' . $invoiceEntryId . ' not found');
+            throw new HttpException(404, 'InvoiceEntry with id '.$invoiceEntryId.' not found');
         }
 
         return [
-            'name'          => $invoiceEntry->getName(),
-            'invoiceId'     => $invoiceEntry->getInvoice()->getId(),
-            'description'   => $invoiceEntry->getDescription(),
-            'account'       => $invoiceEntry->getAccount(),
-            'product'       => $invoiceEntry->getProduct()
+            'name' => $invoiceEntry->getName(),
+            'invoiceId' => $invoiceEntry->getInvoice()->getId(),
+            'description' => $invoiceEntry->getDescription(),
+            'account' => $invoiceEntry->getAccount(),
+            'product' => $invoiceEntry->getProduct(),
         ];
-
     }
 
     /**
-     * Post new invoiceEntry, creating a new entity referenced by the returned id
+     * Post new invoiceEntry, creating a new entity referenced by the returned id.
+     *
      * @return array invoiceEntryData
      */
     public function postInvoiceEntry($invoiceEntryData)
     {
-        if (empty($invoiceEntryData['invoiceId']) || !intval($invoiceEntryData['invoiceId'])) {
+        if (empty($invoiceEntryData['invoiceId']) || !(int) ($invoiceEntryData['invoiceId'])) {
             throw new HttpException(400, "Expected integer value for 'invoiceId' in request");
         }
 
@@ -271,7 +321,7 @@ class BillingService
         $invoice = $invoiceRepository->findOneBy(['id' => $invoiceEntryData['invoiceId']]);
 
         if (!$invoice) {
-            throw new HttpException(400, "Invoice with id " . $invoiceEntryData['invoiceId'] . " not found");
+            throw new HttpException(400, 'Invoice with id '.$invoiceEntryData['invoiceId'].' not found');
         }
 
         $invoiceEntry = new InvoiceEntry();
@@ -294,13 +344,13 @@ class BillingService
         }
 
         $response = [
-            'invoiceEntryId'    => $invoiceEntry->getId(),
-            'name'              => $invoiceEntry->getName(),
-            'jiraProjectId'     => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
-            'invoiceId'         => $invoiceEntry->getInvoice()->getId(),
-            'description'       => $invoiceEntry->getDescription(),
-            'account'           => $invoiceEntry->getAccount(),
-            'product'           => $invoiceEntry->getProduct()
+            'invoiceEntryId' => $invoiceEntry->getId(),
+            'name' => $invoiceEntry->getName(),
+            'jiraProjectId' => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
+            'invoiceId' => $invoiceEntry->getInvoice()->getId(),
+            'description' => $invoiceEntry->getDescription(),
+            'account' => $invoiceEntry->getAccount(),
+            'product' => $invoiceEntry->getProduct(),
         ];
 
         if (!empty($invoiceEntryData['jiraIssueIds'])) {
@@ -310,7 +360,7 @@ class BillingService
                 $jiraIssue = $jiraIssueRepository->findOneBy(['issueId' => $jiraIssueId]);
 
                 if (!$jiraIssue) {
-                    throw new HttpException(400, "JiraIssue with id " . $jiraIssueId . " not found");
+                    throw new HttpException(400, 'JiraIssue with id '.$jiraIssueId.' not found');
                 }
 
                 $invoiceEntry->addJiraIssue($jiraIssue);
@@ -326,13 +376,15 @@ class BillingService
     }
 
     /**
-     * Put specific invoiceEntry, replacing the invoiceEntry referenced by the given id
+     * Put specific invoiceEntry, replacing the invoiceEntry referenced by the given id.
+     *
      * @param invoiceEntryData
+     *
      * @return array
      */
     public function putInvoiceEntry($invoiceEntryData)
     {
-        if (empty($invoiceEntryData['id']) || !intval($invoiceEntryData['id'])) {
+        if (empty($invoiceEntryData['id']) || !(int) ($invoiceEntryData['id'])) {
             throw new HttpException(400, "Expected integer value for 'id' in request");
         }
 
@@ -340,7 +392,7 @@ class BillingService
         $invoiceEntry = $repository->findOneBy(['id' => $invoiceEntryData['id']]);
 
         if (!$invoiceEntry) {
-            throw new HttpException(404, 'Unable to update invoiceEntry with id ' . $invoiceEntryData['id'] . ' as it does not already exist');
+            throw new HttpException(404, 'Unable to update invoiceEntry with id '.$invoiceEntryData['id'].' as it does not already exist');
         }
 
         if (!empty($invoiceEntryData['name'])) {
@@ -360,12 +412,12 @@ class BillingService
         }
 
         $response = [
-            'name'          => $invoiceEntry->getName(),
-            'jiraId'        => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
-            'invoiceId'     => $invoiceEntry->getInvoice()->getId(),
-            'description'   => $invoiceEntry->getDescription(),
-            'account'       => $invoiceEntry->getAccount(),
-            'product'       => $invoiceEntry->getProduct()
+            'name' => $invoiceEntry->getName(),
+            'jiraId' => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
+            'invoiceId' => $invoiceEntry->getInvoice()->getId(),
+            'description' => $invoiceEntry->getDescription(),
+            'account' => $invoiceEntry->getAccount(),
+            'product' => $invoiceEntry->getProduct(),
         ];
 
         if (!empty($invoiceEntryData['jiraIssueIds'])) {
@@ -375,7 +427,7 @@ class BillingService
                 $jiraIssue = $jiraIssueRepository->findOneBy(['issueId' => $jiraIssueId]);
 
                 if (!$jiraIssue) {
-                    throw new HttpException(400, "JiraIssue with id " . $jiraIssueId . " not found");
+                    throw new HttpException(400, 'JiraIssue with id '.$jiraIssueId.' not found');
                 }
 
                 $invoiceEntry->addJiraIssue($jiraIssue);
@@ -391,12 +443,13 @@ class BillingService
     }
 
     /**
-     * Delete specific invoice entry referenced by the given id
+     * Delete specific invoice entry referenced by the given id.
+     *
      * @param invoiceEntryId
      */
     public function deleteInvoiceEntry($invoiceEntryId)
     {
-        if (empty($invoiceEntryId) || !intval($invoiceEntryId)) {
+        if (empty($invoiceEntryId) || !(int) $invoiceEntryId) {
             throw new HttpException(400, 'Expected integer in request');
         }
 
@@ -404,7 +457,7 @@ class BillingService
         $invoiceEntry = $repository->findOneBy(['id' => $invoiceEntryId]);
 
         if (!$invoiceEntry) {
-            throw new HttpException(404, 'InvoiceEntry with id ' . $invoiceEntryId . ' did not exist');
+            throw new HttpException(404, 'InvoiceEntry with id '.$invoiceEntryId.' did not exist');
         }
 
         $this->entityManager->remove($invoiceEntry);
@@ -412,21 +465,21 @@ class BillingService
     }
 
     /**
-     * Get specific project by Jira project ID
+     * Get specific project by Jira project ID.
      *
      * @param $jira_id
+     *
      * @return array
      */
     public function getProject($jiraProjectId)
     {
-        if (!intval($jiraProjectId)) {
+        if (!(int) $jiraProjectId) {
             throw new HttpException(400, 'Expected integer in request');
         }
 
         try {
-            $result = $this->jiraService->get('/rest/api/3/project/' . $jiraProjectId);
-        }
-        catch (HttpException $e) {
+            $result = $this->jiraService->get('/rest/api/3/project/'.$jiraProjectId);
+        } catch (HttpException $e) {
             throw $e;
         }
 
@@ -447,23 +500,26 @@ class BillingService
         $this->entityManager->flush();
 
         return [
-            'jiraId'    => $project->getJiraId(),
-            'jiraKey'   => $project->getJiraKey(),
-            'name'      => $project->getName(),
-            'url'       => $project->getUrl(),
-            'avatarUrl' => $project->getAvatarUrl()
+            'jiraId' => $project->getJiraId(),
+            'jiraKey' => $project->getJiraKey(),
+            'name' => $project->getName(),
+            'url' => $project->getUrl(),
+            'avatarUrl' => $project->getAvatarUrl(),
         ];
     }
 
     /**
-     * Get jiraIssues for project
+     * Get jiraIssues for project.
+     *
      * @param $jira_id
+     *
      * @return array
      */
-    public function getJiraIssues($jiraProjectId) {
+    public function getJiraIssues($jiraProjectId)
+    {
         $jiraIssues = [];
 
-        if (!intval($jiraProjectId)) {
+        if (!(int) $jiraProjectId) {
             throw new HttpException(400, 'Expected integer in request');
         }
 
@@ -471,16 +527,15 @@ class BillingService
         $project = $repository->findOneBy(['jiraId' => $jiraProjectId]);
 
         if (!$project) {
-            throw new HttpException(404, 'Project with id ' . $jiraProjectId . ' not found');
+            throw new HttpException(404, 'Project with id '.$jiraProjectId.' not found');
         }
 
         $start = 0;
 
         while (true) {
             try {
-                $results = $this->jiraService->get('rest/api/3/search?jql=project=' . $jiraProjectId . '&maxResults=1000&startAt=' . $start);
-            }
-            catch (HttpException $e) {
+                $results = $this->jiraService->get('rest/api/3/search?jql=project='.$jiraProjectId.'&maxResults=1000&startAt='.$start);
+            } catch (HttpException $e) {
                 throw $e;
             }
             foreach ($results->issues as $jiraIssueResult) {
@@ -508,15 +563,23 @@ class BillingService
                 }
 
                 $jiraIssues[] = [
-                    'issue_id'     => $jiraIssue->getIssueId(),
-                    'summary'      => $jiraIssue->getSummary(),
-                    'created'      => $jiraIssue->getCreated(),
-                    'finished'     => $jiraIssue->getFinished(),
-                    'jira_users'   => $jiraIssue->getJiraUsers(),
-                    'time_spent'   => $jiraIssue->getTimeSpent(),
-                    'project_id'   => $jiraIssue->getProject()->getId()
+                    'issue_id' => $jiraIssue->getIssueId(),
+                    'summary' => $jiraIssue->getSummary(),
+                    'created' => $jiraIssue->getCreated(),
+                    'finished' => $jiraIssue->getFinished(),
+                    'jira_users' => $jiraIssue->getJiraUsers(),
+                    'time_spent' => $jiraIssue->getTimeSpent(),
+                    'project_id' => $jiraIssue->getProject()->getId(),
                 ];
 
+                if (null !== $jiraIssue->getInvoiceEntryId()) {
+                    // @TODO: fix misleading getInvoiceEntryId naming - the function actually returns an InvoiceEntry object
+                    $issue['invoiceEntryId'] = $jiraIssue->getInvoiceEntryId()->getId();
+                } else {
+                    $issue['invoiceEntryId'] = null;
+                }
+
+                $jiraIssues[] = $issue;
                 $this->entityManager->persist($jiraIssue);
             }
 
@@ -532,12 +595,15 @@ class BillingService
     }
 
     /**
-     * Get specific customer by id
+     * Get specific customer by id.
+     *
      * @param customerId
+     *
      * @return array
      */
-    public function getCustomer($customerId) {
-        if (!intval($customerId)) {
+    public function getCustomer($customerId)
+    {
+        if (!(int) $customerId) {
             throw new HttpException(400, 'Expected integer in request');
         }
 
@@ -545,41 +611,34 @@ class BillingService
         $customer = $repository->findOneBy(['id' => $customerId]);
 
         if (!$customer) {
-            throw new HttpException(404, 'Customer with id ' . $customerId . ' not found');
+            throw new HttpException(404, 'Customer with id '.$customerId.' not found');
         }
 
         return [
-            'name'   => $customer->getName(),
-            'att'    => $customer->getAtt(),
-            'cvr'    => $customer->getCVR(),
-            'ean'    => $customer->getEAN(),
-            'debtor' => $customer->getDebtor()
+            'name' => $customer->getName(),
+            'att' => $customer->getAtt(),
+            'cvr' => $customer->getCVR(),
+            'ean' => $customer->getEAN(),
+            'debtor' => $customer->getDebtor(),
         ];
     }
 
     /**
-     * Post new customer, creating a new entity referenced by the returned id
+     * Post new customer, creating a new entity referenced by the returned id.
+     *
      * @return array customerData
      */
     public function postCustomer($customerData)
     {
         if (empty($customerData['name'])) {
             throw new HttpException(400, "Expected 'name' in request");
-        }
-
-        else if (empty($customerData['att'])) {
+        } elseif (empty($customerData['att'])) {
             throw new HttpException(400, "Expected 'att' in request");
-        }
-
-        else if (empty($customerData['cvr'])) {
+        } elseif (empty($customerData['cvr'])) {
             throw new HttpException(400, "Expected 'cvr' in request");
-        }
-
-        else if (empty($customerData['ean'])) {
+        } elseif (empty($customerData['ean'])) {
             throw new HttpException(400, "Expected 'ean' in request");
-        }
-
-        else if (empty($customerData['debtor'])) {
+        } elseif (empty($customerData['debtor'])) {
             throw new HttpException(400, "Expected 'debtor' in request");
         }
 
@@ -595,37 +654,30 @@ class BillingService
 
         return [
             'customerId' => $customer->getId(),
-            'name'       => $customer->getName(),
-            'att'        => $customer->getAtt(),
-            'cvr'        => $customer->getCVR(),
-            'ean'        => $customer->getEAN(),
-            'debtor'     => $customer->getDebtor()
+            'name' => $customer->getName(),
+            'att' => $customer->getAtt(),
+            'cvr' => $customer->getCVR(),
+            'ean' => $customer->getEAN(),
+            'debtor' => $customer->getDebtor(),
         ];
     }
 
     /**
-     * Put specific customer, replacing the customer referenced by the given id
+     * Put specific customer, replacing the customer referenced by the given id.
+     *
      * @return array customerData
      */
     public function putCustomer($customerData)
     {
         if (empty($customerData['name'])) {
             throw new HttpException(400, "Expected 'name' in request");
-        }
-
-        else if (empty($customerData['att'])) {
+        } elseif (empty($customerData['att'])) {
             throw new HttpException(400, "Expected 'att' in request");
-        }
-
-        else if (empty($customerData['cvr'])) {
+        } elseif (empty($customerData['cvr'])) {
             throw new HttpException(400, "Expected 'cvr' in request");
-        }
-
-        else if (empty($customerData['ean'])) {
+        } elseif (empty($customerData['ean'])) {
             throw new HttpException(400, "Expected 'ean' in request");
-        }
-
-        else if (empty($customerData['debtor'])) {
+        } elseif (empty($customerData['debtor'])) {
             throw new HttpException(400, "Expected 'debtor' in request");
         }
 
@@ -633,7 +685,7 @@ class BillingService
         $customer = $repository->findOneBy(['id' => $customerData['customerId']]);
 
         if (!$customer) {
-            throw new HttpException(400, "Customer with id " . $customerData['customerId'] . " not found");
+            throw new HttpException(400, 'Customer with id '.$customerData['customerId'].' not found');
         }
 
         $customer->setName($customerData['name']);
@@ -646,21 +698,22 @@ class BillingService
         $this->entityManager->flush();
 
         return [
-            'name'       => $customer->getName(),
-            'att'        => $customer->getAtt(),
-            'cvr'        => $customer->getCVR(),
-            'ean'        => $customer->getEAN(),
-            'debtor'     => $customer->getDebtor()
+            'name' => $customer->getName(),
+            'att' => $customer->getAtt(),
+            'cvr' => $customer->getCVR(),
+            'ean' => $customer->getEAN(),
+            'debtor' => $customer->getDebtor(),
         ];
     }
 
     /**
-     * Delete specific customer referenced by the given id
+     * Delete specific customer referenced by the given id.
+     *
      * @param customerId
      */
     public function deleteCustomer($customerId)
     {
-        if (empty($customerId) || !intval($customerId)) {
+        if (empty($customerId) || !(int) $customerId) {
             throw new HttpException(400, 'Expected integer in request');
         }
 
@@ -668,12 +721,10 @@ class BillingService
         $customer = $repository->findOneBy(['id' => $customerId]);
 
         if (!$customer) {
-            throw new HttpException(404, 'Customer with id ' . $customerId . ' did not exist');
+            throw new HttpException(404, 'Customer with id '.$customerId.' did not exist');
         }
 
         $this->entityManager->remove($customer);
         $this->entityManager->flush();
     }
-
-
 }

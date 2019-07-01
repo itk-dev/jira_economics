@@ -1,0 +1,12 @@
+services:
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    CreateProject\:
+        resource: '../../*'
+        exclude: '../../{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    CreateProject\Controller\:
+        resource: '../../Controller'
+        tags: ['controller.service_arguments']

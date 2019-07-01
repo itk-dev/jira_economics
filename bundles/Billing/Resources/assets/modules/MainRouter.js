@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Route, withRouter } from "react-router-dom";
 import App from './App';
 import HomePage from '../pages/HomePage';
 import Customer from '../components/Customer';
-import Project from '../components/Project';
 import Invoice from '../components/Invoice';
 import InvoiceEntry from '../components/InvoiceEntry';
 import JiraIssues from '../components/JiraIssues';
@@ -48,7 +47,6 @@ export default class MainRouter extends Component {
         <Route exact path="/" component={HomePage}/>
         <Route exact path="/new" component={NewInvoice}/>
         <Route exact path="/statistics" component={Statistics}/>
-        <Route exact path="/project/:projectId" component={Project} />
         <Route exact path="/project/:projectId/:invoiceId" component={Invoice}/>
         <Route exact path="/project/:projectId/:invoiceId/invoice_entry/jira_issues" component={JiraIssues}/>
         <Route exact path="/project/:projectId/:invoiceId/:invoiceEntryId" component={InvoiceEntry}/>

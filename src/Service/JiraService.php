@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of aakb/jira_economics.
+ *
+ * (c) 2019 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace App\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,6 +47,7 @@ class JiraService
      * Get from Jira.
      *
      * @param $path
+     *
      * @return mixed
      */
     public function get($path)
@@ -74,9 +83,100 @@ class JiraService
     }
 
     /**
-     * Set OAuth token
+     * Post to Jira.
+     *
+     * @param $path
+     *
+     * @return mixed
+     */
+    public function post($path, $data)
+    {
+        $stack = HandlerStack::create();
+        $token = $this->token_storage->getToken();
+
+        if ($token instanceof AnonymousToken) {
+            throw new HttpException(401, 'unauthorized');
+        }
+
+        $middleware = $this->setOauth($token);
+
+        $stack->push($middleware);
+
+        $client = new Client(
+            [
+            'base_uri' => $this->jira_url,
+            'handler' => $stack,
+            ]
+        );
+
+        // Set the "auth" request option to "oauth" to sign using oauth
+        try {
+            $response = $client->post(
+                $path,
+                [
+                'auth' => 'oauth',
+                'json' => $data,
+                ]
+            );
+
+            if ($body = $response->getBody()) {
+                return json_decode($body);
+            }
+        } catch (RequestException $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Post to Jira.
+     *
+     * @param $path
+     *
+     * @return mixed
+     */
+    public function put($path, $data)
+    {
+        $stack = HandlerStack::create();
+        $token = $this->token_storage->getToken();
+
+        if ($token instanceof AnonymousToken) {
+            throw new HttpException(401, 'unauthorized');
+        }
+
+        $middleware = $this->setOauth($token);
+
+        $stack->push($middleware);
+
+        $client = new Client(
+            [
+            'base_uri' => $this->jira_url,
+            'handler' => $stack,
+            ]
+        );
+
+        // Set the "auth" request option to "oauth" to sign using oauth
+        try {
+            $response = $client->put(
+                $path,
+                [
+                'auth' => 'oauth',
+                'json' => $data,
+                ]
+            );
+
+            if ($body = $response->getBody()) {
+                return json_decode($body);
+            }
+        } catch (RequestException $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Set OAuth token.
      *
      * @param $token
+     *
      * @return \GuzzleHttp\Subscriber\Oauth\Oauth1
      */
     public function setOauth($token)
@@ -104,6 +204,21 @@ class JiraService
     }
 
     /**
+     * Get project.
+     *
+     * @param $key
+     *   A project key or id
+     *
+     * @return array
+     */
+    public function getProject($key)
+    {
+        $project = $this->get('/rest/api/2/project/'.$key);
+
+        return $project;
+    }
+
+    /**
      * Get all projects.
      *
      * @return array
@@ -116,8 +231,8 @@ class JiraService
         while (true) {
             $results = $this->get('/rest/api/3/project/search?startAt='.$start);
             foreach ($results->values as $result) {
-                if (!isset($result->projectCategory) || $result->projectCategory->name != 'Lukket') {
-                    $result->url = parse_url($result->self, PHP_URL_SCHEME) . '://' . parse_url($result->self, PHP_URL_HOST) . '/browse/' . $result->key;
+                if (!isset($result->projectCategory) || 'Lukket' !== $result->projectCategory->name) {
+                    $result->url = parse_url($result->self, PHP_URL_SCHEME).'://'.parse_url($result->self, PHP_URL_HOST).'/browse/'.$result->key;
 
                     $projects[] = $result;
                 }
@@ -134,12 +249,61 @@ class JiraService
     }
 
     /**
+     * Get all projects, including archived.
+     *
+     * @return array
+     */
+    public function getAllProjects()
+    {
+        $projects = $this->get('/rest/api/2/project');
+
+        return $projects;
+    }
+
+    /**
+     * Get project categories.
+     *
+     * @return array
+     */
+    public function getAllProjectCategories()
+    {
+        $projectCategories = $this->get('/rest/api/2/projectCategory');
+
+        return $projectCategories;
+    }
+
+    /**
+     * Get all accounts.
+     *
+     * @return array
+     */
+    public function getAllAccounts()
+    {
+        $accounts = $this->get('/rest/tempo-accounts/1/account/');
+
+        return $accounts;
+    }
+
+    /**
+     * Get all accounts.
+     *
+     * @return array
+     */
+    public function getAllCustomers()
+    {
+        $accounts = $this->get('/rest/tempo-accounts/1/customer/');
+
+        return $accounts;
+    }
+
+    /**
      * Get current user.
      *
      * @return mixed
      */
-    public function getCurrentUser() {
-        $result = $this->get('/rest/api/3/myself');
+    public function getCurrentUser()
+    {
+        $result = $this->get('/rest/api/2/myself');
 
         return $result;
     }
