@@ -227,22 +227,13 @@ class JiraService
     {
         $projects = [];
 
-        $start = 0;
-        while (true) {
-            $results = $this->get('/rest/api/3/project/search?startAt='.$start);
-            foreach ($results->values as $result) {
-                if (!isset($result->projectCategory) || 'Lukket' !== $result->projectCategory->name) {
-                    $result->url = parse_url($result->self, PHP_URL_SCHEME).'://'.parse_url($result->self, PHP_URL_HOST).'/browse/'.$result->key;
+        $results = $this->get('/rest/api/2/project');
 
-                    $projects[] = $result;
-                }
+        foreach ($results as $result) {
+            if (!isset($result->projectCategory) || 'Lukket' !== $result->projectCategory->name) {
+                $result->url = parse_url($result->self, PHP_URL_SCHEME).'://'.parse_url($result->self, PHP_URL_HOST).'/browse/'.$result->key;
+                $projects[] = $result;
             }
-
-            if ($results->isLast) {
-                break;
-            }
-
-            $start = $start + 50;
         }
 
         return $projects;
