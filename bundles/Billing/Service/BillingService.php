@@ -478,7 +478,7 @@ class BillingService
         }
 
         try {
-            $result = $this->jiraService->get('/rest/api/3/project/'.$jiraProjectId);
+            $result = $this->jiraService->get('/rest/api/2/project/'.$jiraProjectId);
         } catch (HttpException $e) {
             throw $e;
         }
@@ -534,7 +534,7 @@ class BillingService
 
         while (true) {
             try {
-                $results = $this->jiraService->get('rest/api/3/search?jql=project='.$jiraProjectId.'&maxResults=1000&startAt='.$start);
+                $results = $this->jiraService->get('rest/api/2/search?jql=project='.$jiraProjectId.'&maxResults=1000&startAt='.$start);
             } catch (HttpException $e) {
                 throw $e;
             }
