@@ -7,7 +7,6 @@ import PropTypes from 'prop-types';
 import Moment from 'react-moment';
 import 'moment-timezone';
 import rest from '../redux/utils/rest';
-import { push } from 'react-router-redux';
 import ContentFooter from '../components/ContentFooter';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';

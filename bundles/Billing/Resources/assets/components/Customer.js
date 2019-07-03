@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from '../components/ContentWrapper';
 import PageTitle from '../components/PageTitle';
-import PropTypes from 'prop-types';
-import { push } from 'react-router-redux';
 import rest from '../redux/utils/rest';
 
 class Customer extends Component {

@@ -2,16 +2,13 @@ import React, { Component } from 'react';
 import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from '../components/ContentWrapper';
 import PageTitle from '../components/PageTitle';
-import store from '../redux/store';
 import { setSelectedIssues } from '../redux/actions';
-import reducers from '../redux/reducers';
 import PropTypes from 'prop-types';
 import 'moment-timezone';
 import rest from '../redux/utils/rest';
 import ReactTable from 'react-table';
 import '!style-loader!css-loader!react-table/react-table.css';
 import moment from 'moment';
-import { push } from 'react-router-redux';
 
 function makeIssueData(jiraIssues) {
   if (jiraIssues.data.data === undefined) {

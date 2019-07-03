@@ -2,12 +2,9 @@ import React, { Component } from 'react';
 import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from './ContentWrapper';
 import PageTitle from './PageTitle';
-import store from '../redux/store';
 import { setSelectedIssues } from '../redux/actions';
-import reducers from '../redux/reducers';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
-import { push } from 'react-router-redux';
 
 export class InvoiceEntrySubmitter extends Component {
   constructor(props) {

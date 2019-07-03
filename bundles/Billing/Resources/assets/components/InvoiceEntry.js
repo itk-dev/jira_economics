@@ -4,7 +4,6 @@ import ContentWrapper from '../components/ContentWrapper';
 import PageTitle from '../components/PageTitle';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
-import { push } from 'react-router-redux';
 
 export class InvoiceEntry extends Component {
   componentDidMount() {

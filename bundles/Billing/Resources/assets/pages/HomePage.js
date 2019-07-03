@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import connect from 'react-redux/es/connect/connect';
-import ProjectList from '../components/ProjectList';
 import PageTitle from '../components/PageTitle';
 import PropTypes from 'prop-types';
 import Moment from 'react-moment';
