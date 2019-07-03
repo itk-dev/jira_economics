@@ -534,7 +534,7 @@ class BillingService
 
         while (true) {
             try {
-                $results = $this->jiraService->get('rest/api/2/search?jql=project='.$jiraProjectId.'&maxResults=1000&startAt='.$start);
+                $results = $this->jiraService->get('rest/api/2/search?jql=project='.$jiraProjectId.'&startAt='.$start);
             } catch (HttpException $e) {
                 throw $e;
             }
@@ -562,7 +562,7 @@ class BillingService
                     $jiraIssue->setJiraUsers([$jiraIssueResult->fields->assignee->key]);
                 }
 
-                $jiraIssues[] = [
+                $issue = [
                     'issue_id' => $jiraIssue->getIssueId(),
                     'summary' => $jiraIssue->getSummary(),
                     'created' => $jiraIssue->getCreated(),
