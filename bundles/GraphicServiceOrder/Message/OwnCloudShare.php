@@ -4,15 +4,15 @@ namespace GraphicServiceOrder\Message;
 
 class OwnCloudShare
 {
-  private $content;
+  private $orderId;
 
-  public function __construct(string $content)
+  public function __construct(int $orderId)
   {
-    $this->content = $content;
+    $this->orderId = $orderId;
   }
 
-  public function getContent(): string
+  public function getOrderId(): string
   {
-    return $this->content;
+    return $this->orderId;
   }
 }

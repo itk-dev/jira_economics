@@ -12,6 +12,11 @@ namespace App\Service;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\RequestOptions;
+use GuzzleHttp\HandlerStack;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+
 
 class OwnCloudService
 {
@@ -45,13 +50,118 @@ class OwnCloudService
             ]
         );
         try {
-            $response = $client->get($path, ['auth' => [$this->username, $this->password]]);
+            $response = $client->get(
+              $path,
+              [
+                'auth' => [$this->username, $this->password]
+              ]
+            );
 
-            if ($body = $response->getBody()) {
+            if ($body = $response->getBody()->getContents()) {
                 return json_decode($body);
             }
         } catch (RequestException $e) {
             throw $e;
         }
     }
+
+  /**
+   * Post to OwnCloudService.
+   *
+   * @param $path
+   *
+   * @return mixed
+   */
+  public function post($path, $data)
+  {
+    $client = new Client(
+      [
+        'base_uri' => $this->host,
+      ]
+    );
+
+    // Set the "auth" request option to "oauth" to sign using oauth
+    try {
+      $response = $client->post(
+        $path,
+        [
+          'auth' => [$this->username, $this->password],
+          'json' => $data,
+        ]
+      );
+
+      if ($body = $response->getBody()->getContents()) {
+        return json_decode($body);
+      }
+    } catch (RequestException $e) {
+      throw $e;
+    }
+  }
+
+  /**
+   * Create new folder in OwnCloud.
+   *
+   * @param $path
+   *  The path of the folder
+   * @return mixed
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function mkCol($path)
+  {
+    $client = new Client(
+      [
+        'base_uri' => $this->host,
+      ]
+    );
+
+    // Set the "auth" request option to "oauth" to sign using oauth
+    try {
+      $response = $client->request(
+        'MKCOL',
+        $path,
+        [
+          'auth' => [$this->username, $this->password],
+        ]
+      );
+
+      if ($body = $response->getBody()->getContents()) {
+        return json_decode($body);
+      }
+    } catch (RequestException $e) {
+      throw $e;
+    }
+  }
+
+  /**
+   * Upload a file to owncloud.
+   *
+   * @param $path
+   * @return mixed
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function sendFile($path, $file)
+  {
+    $client = new Client(
+      [
+        'base_uri' => $this->host,
+      ]
+    );
+
+    // Set the "auth" request option to "oauth" to sign using oauth
+    try {
+      $response = $client->put(
+        $path,
+        [
+          'auth' => [$this->username, $this->password],
+          'body' => $file,
+        ]
+      );
+
+      if ($body = $response->getBody()) {
+        return json_decode($body);
+      }
+    } catch (RequestException $e) {
+      throw $e;
+    }
+  }
 }
