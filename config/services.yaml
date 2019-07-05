@@ -12,6 +12,8 @@ parameters:
     env(JIRA_OAUTH_PEM_PATH): null
     env(JIRA_URL): null
     env(JIRA_DEFAULT_BOARD): null
+    env(JIRA_USER): null
+    env(JIRA_TOKEN): null
 
 services:
     # default configuration for services in *this* file
@@ -35,11 +37,16 @@ services:
     # please note that last definitions always *replace* previous ones
     App\Service\JiraService:
         arguments:
-            $token_storage: '@security.token_storage'
-            $customer_key: '%env(JIRA_OAUTH_CUSTOMER_KEY)%'
-            $pem_path: '%env(JIRA_OAUTH_PEM_PATH)%'
-            $jira_url: '%env(JIRA_URL)%'
-            $entity_manager: '@doctrine.orm.entity_manager'
+            $jiraUrl: '%env(JIRA_URL)%'
+            $tokenStorage: '@security.token_storage'
+            $customerKey: '%env(JIRA_OAUTH_CUSTOMER_KEY)%'
+            $pemPath: '%env(JIRA_OAUTH_PEM_PATH)%'
+
+    App\Service\HammerService:
+        arguments:
+            $jiraUrl: '%env(JIRA_URL)%'
+            $apiUser: '%env(JIRA_USER)%'
+            $apiPass: '%env(JIRA_PASS)%'
 
     App\Service\OwnCloudService:
         arguments:
