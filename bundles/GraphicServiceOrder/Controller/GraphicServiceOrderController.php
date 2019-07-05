@@ -1,5 +1,5 @@
-<?php
 
+<?php
 /*
  * This file is part of aakb/jira_economics.
  *
@@ -7,9 +7,7 @@
  *
  * This source file is subject to the MIT license.
  */
-
 namespace GraphicServiceOrder\Controller;
-
 use App\Service\JiraService;
 use Doctrine\ORM\EntityManagerInterface;
 use GraphicServiceOrder\Entity\GsOrder;
@@ -22,7 +20,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use GraphicServiceOrder\Repository\GsOrderRepository;
-
 /**
  * Class GraphicServiceOrderController.
  */
@@ -33,7 +30,6 @@ class GraphicServiceOrderController extends AbstractController
   private $formData;
   private $gsOrderRepository;
   private $appKernel;
-
   public function __construct(JiraService $jiraService, OwnCloudService $ownCloudService, GsOrderRepository $gsOrderRepository, KernelInterface $appKernel)
   {
     $this->jiraService = $jiraService;
@@ -41,7 +37,6 @@ class GraphicServiceOrderController extends AbstractController
     $this->gsOrderRepository = $gsOrderRepository;
     $this->appKernel = $appKernel;
   }
-
   /**
    * Create a service order.
    *
@@ -51,33 +46,25 @@ class GraphicServiceOrderController extends AbstractController
   {
     $gsOrder = new GsOrder();
     $form = $this->createForm(GraphicServiceOrderForm::class, $gsOrder);
-
     $this->formData = [
       'form' => $form->getData(),
       'accounts' => $this->jiraService->getAllAccounts(),
       'user' => $this->jiraService->getCurrentUser(),
     ];
-
     $form->handleRequest($request);
-
     if ($form->isSubmitted() && $form->isValid()) {
       // Do stuff on submission.
-
       // Create a task on a jira project.
       $taskCreated = $this->createOrderTask();
-
       // Add task values to order entity.
       $gsOrder->setIssueId($taskCreated->id);
       $gsOrder->setIssueKey($taskCreated->key);
-
       // Store file locally.
       $uploadedFiles = $form->get('files_uploaded')->getData();
       $gsOrder = $this->storeFile($entitityManagerInterface, $form, $gsOrder, $uploadedFiles);
       $gsOrder->setOrderStatus('new');
-
       $entitityManagerInterface->persist($gsOrder);
       $entitityManagerInterface->flush();
-
       // --- @todo Move this to messenger  and cleanup -- //
       $newOrders = $this->gsOrderRepository->findBy(['orderStatus' => 'new']);
       // Loop through all orders with unchanged status.
@@ -89,7 +76,6 @@ class GraphicServiceOrderController extends AbstractController
         } else {
           // Create a folder with issue key as name.
           $this->createFolder($order->getIssueKey());
-
           // Get all files on the order that have already been shared.
           $sharedFiles = $order->getOwnCloudSharedFiles();
           foreach ($files as $file) {
@@ -106,7 +92,6 @@ class GraphicServiceOrderController extends AbstractController
             }
           }
         }
-
         // If all files are considered shared change status to "received".
         $diff = array_diff($files, $order->getOwnCloudSharedFiles());
         if (empty($diff)) {
@@ -121,23 +106,18 @@ class GraphicServiceOrderController extends AbstractController
         $entitityManagerInterface->flush();
         // --- Move this to message END -- //
       }
-
       // Notify messenger of new job.
       // $this->dispatchMessage(new OwnCloudShare($gsOrder->getId()));
-
       // Send notification mails
       // @todo
-
       // Go to form submitted page.
       return $this->redirectToRoute('graphic_service_order_submitted');
     }
-
     // The initial form build.
     return $this->render('@GraphicServiceOrderBundle/createOrderForm.html.twig', [
       'form' => $form->createView(),
     ]);
   }
-
   /**
    * Receipt page displayed when an order was created.
    *
@@ -149,7 +129,6 @@ class GraphicServiceOrderController extends AbstractController
       'form_data' => '',
     ]);
   }
-
   /**
    * Create folder if none exists.
    *
@@ -167,7 +146,6 @@ class GraphicServiceOrderController extends AbstractController
       $this->ownCloudService->mkCol('owncloud/remote.php/dav/files/'.$_ENV['OWNCLOUD_USER_SHARED_DIR'].$order_key.'/_Materiale');
     }
   }
-
   /**
    * Share file in owncloud.
    *
@@ -182,10 +160,8 @@ class GraphicServiceOrderController extends AbstractController
     $ocFilename = $order_id.'-'.$fileName;
     $file = file_get_contents('/app/private/files/gs/'.$fileName);
     $response = $this->ownCloudService->sendFile('owncloud/remote.php/dav/files/'.$ownCloudPath.$ocFilename, $file);
-
     return $response;
   }
-
   /**
    * Create a Jira task from a form submission.
    *
@@ -208,10 +184,8 @@ class GraphicServiceOrderController extends AbstractController
       ],
     ];
     $response = $this->jiraService->post('/rest/api/2/issue', $data);
-
     return $response;
   }
-
   /**
    * Prepare variables for the receipt page.
    *
@@ -227,10 +201,8 @@ class GraphicServiceOrderController extends AbstractController
       }
     }
     unset($formData['form']->files);
-
     return $formData;
   }
-
   /**
    * Create description for task.
    *
@@ -239,7 +211,6 @@ class GraphicServiceOrderController extends AbstractController
   private function getDescription()
   {
     $formSubmissions = $this->formData['form'];
-
     // Create task description.
     $description = '*Opgavebeskrivelse* \\\\ ';
     foreach ($formSubmissions->getOrderLines() as $order) {
@@ -249,7 +220,6 @@ class GraphicServiceOrderController extends AbstractController
     $description .= ' \\\\ ';
     $description .= '[Åbn filer i OwnCloud|https://itkboks.eteket.dk/owncloud/index.php/apps/files/?dir=/Nye%20Ordrer] \\\\ ';
     $description .= ' \\\\ ';
-
     // Create payment description.
     $description .= '*Hvem skal betale?* \\\\ ';
     if ($formSubmissions->getMarketingAccount()) {
@@ -258,7 +228,6 @@ class GraphicServiceOrderController extends AbstractController
       $description .= 'Debitor: '.$formSubmissions->getDebitor().'\\\\ ';
     }
     $description .= ' \\\\ ';
-
     // Create delivery description.
     $description .= '*Hvor skal ordren leveres?* \\\\ ';
     $description .= $formSubmissions->getDepartment().' \\\\ ';
@@ -266,10 +235,8 @@ class GraphicServiceOrderController extends AbstractController
     $description .= $formSubmissions->getPostalcode().' '.$formSubmissions->getCity().'\\\\ ';
     $description .= 'Dato: '.$formSubmissions->getDate()->format('d-m-Y').'\\\\ ';
     $description .= $formSubmissions->getDeliveryDescription();
-
     return $description;
   }
-
   /**
    *  Store files locally.
    *
@@ -288,7 +255,6 @@ class GraphicServiceOrderController extends AbstractController
       }
     }
     $gsOrder->setFiles($uploadedFiles);
-
     return $gsOrder;
   }
 }
