@@ -44,7 +44,7 @@ function makePriceData(invoiceEntries, jiraIssues) {
 
     const unitPrice = unitPrices[Math.floor(Math.random() * unitPrices.length)];
     const totalPrice = timeSum * unitPrice;
-    priceData[key] = {unitPrice: unitPrice, timeSum: timeSum, totalPrice: totalPrice};
+    priceData[key] = { unitPrice: unitPrice, timeSum: timeSum, totalPrice: totalPrice };
   });
 
   return priceData;
@@ -59,21 +59,24 @@ class Invoice extends Component {
     this.state = { checkedEntries: {}, showModal: false, checkedCount: 0, invoiceEntries: {} };
   };
 
-  componentDidMount () {
-    const {dispatch} = this.props;
-    dispatch(rest.actions.getProject({id: `${this.props.match.params.projectId}`}));
-    dispatch(rest.actions.getJiraIssues({id: `${this.props.match.params.projectId}`}));
-    dispatch(rest.actions.getInvoice({id: `${this.props.match.params.invoiceId}`}));
-    dispatch(rest.actions.getInvoiceEntries({id: `${this.props.match.params.invoiceId}`}))
-    .then((response) => {
-      this.setState({invoiceEntries: response});
-    })
-    .catch((reason) => console.log('isCanceled', reason.isCanceled));
-  }
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch(rest.actions.getProject({ id: `${this.props.match.params.projectId}` }));
+
+    if (this.props.match.params.invoiceId != 'new') {
+      dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
+      dispatch(rest.actions.getInvoice({ id: `${this.props.match.params.invoiceId}` }));
+      dispatch(rest.actions.getInvoiceEntries({ id: `${this.props.match.params.invoiceId}` }))
+        .then((response) => {
+          this.setState({ invoiceEntries: response });
+        })
+        .catch((reason) => console.log('isCanceled', reason.isCanceled));
+    }
+  };
 
   handleRecordSubmit = (event) => {
     event.preventDefault();
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     const id = this.props.match.params.invoiceId;
     const name = this.props.invoice.data.name;
     const recorded = true;
@@ -84,15 +87,15 @@ class Invoice extends Component {
       recorded,
       created
     };
-    dispatch(rest.actions.updateInvoice({id: `${this.props.match.params.invoiceId}`}, {
+    dispatch(rest.actions.updateInvoice({ id: `${this.props.match.params.invoiceId}` }, {
       body: JSON.stringify(invoiceData)
     }));
   };
 
   handleDeleteSubmit = (event) => {
     event.preventDefault();
-    const {dispatch} = this.props;
-    dispatch(rest.actions.deleteInvoice({id: `${this.props.match.params.invoiceId}`}));
+    const { dispatch } = this.props;
+    dispatch(rest.actions.deleteInvoice({ id: `${this.props.match.params.invoiceId}` }));
     // @TODO: Check that deletion is successful before navigating back to main billing page
     this.props.history.push(`/`);
   };
@@ -106,7 +109,7 @@ class Invoice extends Component {
     event.preventDefault();
     this.props.history.push({
       pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
-      state: {from: this.props.location.pathname}
+      state: { from: this.props.location.pathname }
     });
   };
 
@@ -125,9 +128,9 @@ class Invoice extends Component {
   };
 
   async deleteInvoiceEntries(invoiceEntryIds) {
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     for (let i = 0; i < invoiceEntryIds.length; i++) {
-      let result = await dispatch(rest.actions.deleteInvoiceEntry({id: `${invoiceEntryIds[i]}`}));
+      let result = await dispatch(rest.actions.deleteInvoiceEntry({ id: `${invoiceEntryIds[i]}` }));
     }
   }
 
@@ -137,7 +140,7 @@ class Invoice extends Component {
     });
     let newInvoiceEntries = { "data": filteredInvoiceEntries };
     this.setState({ invoiceEntries: newInvoiceEntries });
-    this.setState( {checkedEntries: {}} );
+    this.setState({ checkedEntries: {} });
   }
 
   handleEntryEdit = (event) => {
@@ -165,7 +168,7 @@ class Invoice extends Component {
         isManualEntry = false;
         this.props.history.push({
           pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`,
-          state: { existingInvoiceEntryId: selectedInvoiceEntryId}
+          state: { existingInvoiceEntryId: selectedInvoiceEntryId }
         });
       }
     });
@@ -202,9 +205,40 @@ class Invoice extends Component {
     this.setState({ showModal: true, checkedCount: checkedCount });
   };
 
-  // @TODO: Handle updating the list of invoiceEntries when a new invoiceEntry is submitted or deleted
-  render () {
-    if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId )  {
+  renderPageTitle() {
+    return (
+      <PageTitle breadcrumb={"Invoice for project [" + this.props.project.data.name + "] (" + this.props.match.params.projectId + ")"}>
+        {this.props.invoice.data.name && this.props.invoice.data.name}
+        {!this.props.invoice.data.name && 'New Invoice'}
+      </PageTitle>
+    )
+  };
+
+  renderInvoiceData() {
+    return (
+      <div className="col-md-4">
+        <p>
+          Invoicenumber: <strong className="pr-3">{this.props.match.params.invoiceId}</strong>
+          Invoice recorded: <strong>
+            {String(this.props.invoice.data.recorded) && this.props.invoice.data.recorded}
+            {String(!this.props.invoice.data.recorded) && 'false'}
+          </strong>
+        </p>
+        <p>Invoice description TODO: save with invoice data</p>
+      </div>
+    )
+  };
+
+  render() {
+    //if (this.props.match.params.invoiceId == 'new') {
+    //  return (
+    //    <ContentWrapper>
+    //      <PageTitle>Invoice</PageTitle>
+    //      <div>TODO: New invoice</div>
+    //    </ContentWrapper>
+    //  );
+    //}
+    if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId) {
       return (
         <ContentWrapper>
           <PageTitle>Invoice</PageTitle>
@@ -216,21 +250,21 @@ class Invoice extends Component {
         </ContentWrapper>
       );
     }
-    else if (this.props.invoice.data.name && this.props.priceData && this.state.invoiceEntries && this.state.invoiceEntries.data) {
+    else if (this.props.project.data.name) {
       return (
         <ContentWrapper>
-          <PageTitle breadcrumb={"Invoice for project [" + this.props.project.data.name + "] (" + this.props.match.params.projectId + ")"}>{this.props.invoice.data.name}</PageTitle>
+          {this.renderPageTitle()}
           <div className="row">
-            <div className="col-md-4">
-             <p>Invoicenumber: <strong className="pr-3">{this.props.match.params.invoiceId}</strong> Invoice recorded: <strong>{String(this.props.invoice.data.recorded)}</strong></p>
-             <p>Invoice description TODO: save with invoice data</p>
-            </div>
+            {this.renderInvoiceData()}
             <div className="col-md-8 text-right">
               <ButtonGroup aria-label="Invoice actions">
-                <Button variant="primary" type="submit" id="record-invoice" onClick={this.handleRecordSubmit}>
+                <Button variant="success" type="submit" id="record-invoice" className="mr-3" onClick={this.saveInvoice}>
+                  Save invoice
+                </Button>
+                <Button variant="primary" type="submit" id="record-invoice" className="mr-3" onClick={this.handleRecordSubmit}>
                   Record invoice
                 </Button>
-                <Button variant="danger" type="submit" id="delete" onClick={this.handleDeleteSubmit}>
+                <Button variant="danger" type="submit" id="delete" className="mr-3" onClick={this.handleDeleteSubmit}>
                   Delete invoice
                 </Button>
               </ButtonGroup>
@@ -241,8 +275,8 @@ class Invoice extends Component {
               <h2>Invoice entries</h2>
               <div className="row mb-3">
                 <div className="col-md-6">
-                    <Button variant="outline-success" type="submit" className="mr-3" onClick={this.handleAddFromJira}>Add entry from Jira</Button>
-                    <Button variant="outline-success" type="submit" onClick={this.handleAddManually}>Add manual entry</Button>
+                  <Button variant="outline-success" type="submit" className="mr-3" onClick={this.handleAddFromJira}>Add entry from Jira</Button>
+                  <Button variant="outline-success" type="submit" onClick={this.handleAddManually}>Add manual entry</Button>
                 </div>
                 <div className="col-md-6 text-right">
                   <ButtonGroup aria-label="Entry actions">
@@ -270,9 +304,10 @@ class Invoice extends Component {
                 <tbody>
                   {this.state.invoiceEntries.data && this.state.invoiceEntries.data.map((item) =>
                     <tr key={item.invoiceEntryId}>
-                      <td><Form.Check aria-label="" id={item.invoiceEntryId} onChange={this.handleCheckboxChange}/></td>
+                      <td><Form.Check aria-label="" id={item.invoiceEntryId} onChange={this.handleCheckboxChange} /></td>
                       <td>{item.accountNumber}</td>
-                      <td><Link to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.invoiceEntryId}`}>{item.name}</Link></td>
+                      <td><Link to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}
+                      /${item.invoiceEntryId}`}>{item.name}</Link></td>
                       <td>{item.description}</td>
                       <td>{this.getPriceData(item.invoiceEntryId, 'timeSum')}</td>
                       <td>{this.getPriceData(item.invoiceEntryId, 'unitPrice')}</td>
@@ -318,7 +353,7 @@ class Invoice extends Component {
       return (
         <ContentWrapper>
           <div className="spinner-border"
-               style={{width: '3rem', height: '3rem', role: 'status'}}>
+            style={{ width: '3rem', height: '3rem', role: 'status' }}>
             <span className="sr-only">Loading...</span>
           </div>
         </ContentWrapper>
