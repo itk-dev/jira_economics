@@ -22,7 +22,7 @@ class HomePage extends Component {
     super(props);
     this.handleModalShow = this.handleModalShow.bind(this);
     this.handleModalClose = this.handleModalClose.bind(this);
-    this.state = { allInvoices: {}, showModal: false };
+    this.state = { allInvoices: {}, showModal: false, invoiceIdToDelete: -1 };
   };
 
   componentDidMount() {
@@ -36,23 +36,18 @@ class HomePage extends Component {
 
   handleModalClose = (event) => {
     event.preventDefault();
-    const { dispatch } = this.props;
-    //console.log(event.target);
-    //if (shouldDelete) {
-    //  console.log("Deleting invoice");
-      //dispatch(rest.actions.deleteInvoice({id: `${this.props.match.params.invoiceId}`}));
+    if (event.target.id == "delete-btn") {
+      const { dispatch } = this.props;
+      dispatch(rest.actions.deleteInvoice({ id: this.state.invoiceIdToDelete }));
       // @TODO: Check that deletion is successful
-    //}
-    //else {
-    //  console.log("Not deleting invoice");
-    //}
-    this.setState({ showModal: false });
+    }
+    this.setState({ showModal: false, invoiceIdToDelete: -1 });
   };
 
   handleInvoiceDelete = (invoiceId) => {
     event.preventDefault();
-    //console.log(invoiceId);
-    this.handleModalShow(invoiceId);
+    this.setState({ invoiceIdToDelete: invoiceId });
+    this.handleModalShow();
   };
 
   handleModalShow() {
@@ -197,7 +192,7 @@ class HomePage extends Component {
             <Button variant="secondary" onClick={this.handleModalClose}>
               Cancel
             </Button>
-            <Button variant="secondary" onClick={this.handleModalClose}>
+            <Button id="delete-btn" variant="secondary" onClick={this.handleModalClose}>
               Delete
             </Button>
           </Modal.Footer>
