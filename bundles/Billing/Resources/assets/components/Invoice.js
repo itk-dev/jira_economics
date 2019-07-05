@@ -99,13 +99,11 @@ class Invoice extends Component {
 
   handleAddFromJira = (event) => {
     event.preventDefault();
-    const {dispatch} = this.props;
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
   };
 
   handleAddManually = (event) => {
     event.preventDefault();
-    const {dispatch} = this.props;
     this.props.history.push({
       pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
       state: {from: this.props.location.pathname}
@@ -114,7 +112,6 @@ class Invoice extends Component {
 
   handleEntryDelete = (event) => {
     event.preventDefault();
-    const {dispatch} = this.props;
     let checkedInvoiceEntryIds = [];
 
     for (let [invoiceEntryId, checked] of Object.entries(this.state.checkedEntries)) {
@@ -145,7 +142,6 @@ class Invoice extends Component {
 
   handleEntryEdit = (event) => {
     event.preventDefault();
-    const { dispatch } = this.props;
     let isManualEntry = true;
 
     let checkedCount = 0;

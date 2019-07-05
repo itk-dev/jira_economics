@@ -9,10 +9,6 @@ class Customer extends Component {
     super(props);
   }
 
-  componentDidMount () {
-    const {dispatch} = this.props;
-  }
-
   handleSubmitCustomer = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;

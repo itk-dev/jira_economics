@@ -16,10 +16,6 @@ export class InvoiceEntrySubmitter extends Component {
     this.onAccountChange = this.onAccountChange.bind(this);
   }
 
-  componentDidMount() {
-    const { dispatch } = this.props;
-  }
-
   handleSelectJiraIssues = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
