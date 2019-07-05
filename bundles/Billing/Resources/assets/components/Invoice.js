@@ -54,6 +54,7 @@ class Invoice extends Component {
   constructor(props) {
     super(props);
     this.handleRecordSubmit = this.handleRecordSubmit.bind(this);
+    this.saveInvoice = this.saveInvoice.bind(this);
     this.handleModalShow = this.handleModalShow.bind(this);
     this.handleModalClose = this.handleModalClose.bind(this);
     this.state = { checkedEntries: {}, showModal: false, checkedCount: 0, invoiceEntries: {} };
@@ -72,6 +73,24 @@ class Invoice extends Component {
         })
         .catch((reason) => console.log('isCanceled', reason.isCanceled));
     }
+  };
+
+  saveInvoice = (event) => {
+    event.preventDefault();
+    const { dispatch } = this.props;
+    // @TODO: replace with real invoice name
+    const name = "dummy";
+    const projectId = this.props.match.params.projectId;
+    const created = this.props.createdAt;
+    const invoiceData = {
+      name,
+      projectId,
+      created
+    };
+    dispatch(rest.actions.createInvoice({}, {
+      body: JSON.stringify(invoiceData)
+    }));
+    // @TODO: redirect to /project/<projectId>/<invoiceId> after new invoice has been succesfully created
   };
 
   handleRecordSubmit = (event) => {
