@@ -36,9 +36,14 @@ class HomePage extends Component {
 
   handleModalClose = (event) => {
     event.preventDefault();
+    var invoiceId = this.state.invoiceIdToDelete;
     if (event.target.id == "delete-btn") {
       const { dispatch } = this.props;
-      dispatch(rest.actions.deleteInvoice({ id: this.state.invoiceIdToDelete }));
+      dispatch(rest.actions.deleteInvoice({ id: invoiceId }))
+      .then(() => {
+        this.removeInvoiceFromState(invoiceId);
+      })
+      .catch((reason) => console.log('isCanceled', reason.isCanceled));
       // @TODO: Check that deletion is successful
     }
     this.setState({ showModal: false, invoiceIdToDelete: -1 });
@@ -52,6 +57,14 @@ class HomePage extends Component {
 
   handleModalShow() {
     this.setState({ showModal: true });
+  };
+
+  removeInvoiceFromState(invoiceId) {
+    let filteredInvoices = this.state.allInvoices.data.filter((invoice) => {
+      return invoiceId != invoice.invoiceId;
+    });
+    let remainingInvoices = { "data": filteredInvoices };
+    this.setState({ allInvoices: remainingInvoices });
   };
 
   render() {
