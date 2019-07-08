@@ -297,13 +297,27 @@ class BillingService
             throw new HttpException(404, 'InvoiceEntry with id '.$invoiceEntryId.' not found');
         }
 
-        return [
+        $jiraIssueIds = [];
+
+        $jiraIssues = $invoiceEntry->getJiraIssues();
+
+        foreach ($jiraIssues as $jiraIssue) {
+            $jiraIssueIds[] = $jiraIssue->getIssueId();
+        }
+
+        $invoiceEntry = [
             'name' => $invoiceEntry->getName(),
             'invoiceId' => $invoiceEntry->getInvoice()->getId(),
             'description' => $invoiceEntry->getDescription(),
             'account' => $invoiceEntry->getAccount(),
             'product' => $invoiceEntry->getProduct(),
         ];
+
+        if (sizeof($jiraIssueIds) > 0) {
+            $invoiceEntry['jiraIssueIds'] = $jiraIssueIds;
+        }
+
+        return $invoiceEntry;
     }
 
     /**
