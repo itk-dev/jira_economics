@@ -6,6 +6,8 @@ import { setSelectedIssues } from '../redux/actions';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
 
+// @TODO: each invoiceEntry should be persisted with the total cost
+
 export class InvoiceEntrySubmitter extends Component {
   constructor(props) {
     super(props);

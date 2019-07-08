@@ -164,7 +164,6 @@ class Invoice extends Component {
 
   handleEntryEdit = (event) => {
     event.preventDefault();
-    let isManualEntry = true;
 
     let checkedCount = 0;
     let selectedInvoiceEntryId = false;
@@ -181,18 +180,19 @@ class Invoice extends Component {
       return;
     }
 
-    this.props.jiraIssues.data.data.forEach(jiraIssue => {
-      // InvoiceEntry with Jira issues?
-      if (jiraIssue.invoiceEntryId == selectedInvoiceEntryId) {
-        isManualEntry = false;
-        this.props.history.push({
-          pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`,
-          state: { existingInvoiceEntryId: selectedInvoiceEntryId }
-        });
-      }
-    });
-    // InvoiceEntry without Jira issues?
-    if (isManualEntry) {
+    let invoiceEntry = this.props.invoiceEntries.data.data.filter(obj => {
+      return obj.invoiceEntryId == selectedInvoiceEntryId;
+    }).pop();
+
+    // InvoiceEntry with Jira issues?
+    if (invoiceEntry.jiraIssueIds) {
+      this.props.history.push({
+        pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`,
+        state: { existingInvoiceEntryId: selectedInvoiceEntryId }
+      });
+    }
+    // InvoiceEntry without Jira issues
+    else {
       this.props.history.push({
         pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
         state: { from: this.props.location.pathname, existingInvoiceEntryId: selectedInvoiceEntryId }
@@ -400,7 +400,7 @@ Invoice.propTypes = {
 
 const mapStateToProps = state => {
   let priceData = makePriceData(state.invoiceEntries, state.jiraIssues);
-  let createdAt = false;
+  let createdAt = '';
   if (state.invoice.data.created && state.invoice.data.created.date) {
     createdAt = state.invoice.data.created.date;
   }

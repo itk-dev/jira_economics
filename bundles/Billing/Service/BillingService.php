@@ -264,7 +264,14 @@ class BillingService
         $invoiceEntriesJson = [];
 
         foreach ($invoiceEntries as $invoiceEntry) {
-            $invoiceEntriesJson[] = [
+            $jiraIssueIds = [];
+            $jiraIssues = $invoiceEntry->getJiraIssues();
+
+            foreach ($jiraIssues as $jiraIssue) {
+                $jiraIssueIds[] = $jiraIssue->getIssueId();
+            }
+
+            $invoiceEntry = [
                 'invoiceEntryId' => $invoiceEntry->getId(),
                 'name' => $invoiceEntry->getName(),
                 'invoiceId' => $invoiceEntry->getInvoice()->getId(),
@@ -272,6 +279,12 @@ class BillingService
                 'account' => $invoiceEntry->getAccount(),
                 'product' => $invoiceEntry->getProduct(),
             ];
+
+            if (count($jiraIssueIds) > 0) {
+                $invoiceEntry['jiraIssueIds'] = $jiraIssueIds;
+            }
+
+            $invoiceEntriesJson[] = $invoiceEntry;
         }
 
         return $invoiceEntriesJson;
@@ -298,7 +311,6 @@ class BillingService
         }
 
         $jiraIssueIds = [];
-
         $jiraIssues = $invoiceEntry->getJiraIssues();
 
         foreach ($jiraIssues as $jiraIssue) {
@@ -313,7 +325,7 @@ class BillingService
             'product' => $invoiceEntry->getProduct(),
         ];
 
-        if (sizeof($jiraIssueIds) > 0) {
+        if (count($jiraIssueIds) > 0) {
             $invoiceEntry['jiraIssueIds'] = $jiraIssueIds;
         }
 
