@@ -90,7 +90,9 @@ class Invoice extends Component {
     dispatch(rest.actions.createInvoice({}, {
       body: JSON.stringify(invoiceData)
     }));
-    // @TODO: redirect to /project/<projectId>/<invoiceId> after new invoice has been succesfully created
+
+    // @TODO: persist InvoiceEntries after Invoice has been saved successfully
+    // @TODO: if not already there, redirect to /project/<projectId>/<invoiceId> after new invoice has been succesfully created
   };
 
   handleRecordSubmit = (event) => {
@@ -281,14 +283,6 @@ class Invoice extends Component {
   };
 
   render() {
-    //if (this.props.match.params.invoiceId == 'new') {
-    //  return (
-    //    <ContentWrapper>
-    //      <PageTitle>Invoice</PageTitle>
-    //      <div>TODO: New invoice</div>
-    //    </ContentWrapper>
-    //  );
-    //}
     if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId) {
       return (
         <ContentWrapper>

@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import rest from "./utils/rest";
 
-import { SET_ISSUES } from './actions';
+import { SET_ISSUES, SET_INVOICE_ENTRIES } from './actions';
 
 function selectedIssues (state = {
   selectedIssues: []
@@ -13,6 +13,19 @@ function selectedIssues (state = {
       });
     default:
       return state;
+  }
+}
+
+function invoiceEntries (state = {
+  invoiceEntries: []
+}, action) {
+  switch (action.type) {
+    case SET_INVOICE_ENTRIES:
+      return Object.assign({}, state, {
+        invoiceEntries: action.invoiceEntries
+      });
+      default:
+        return state;
   }
 }
 

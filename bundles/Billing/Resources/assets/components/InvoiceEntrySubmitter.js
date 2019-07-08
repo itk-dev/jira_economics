@@ -2,9 +2,8 @@ import React, { Component } from 'react';
 import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from './ContentWrapper';
 import PageTitle from './PageTitle';
-import { setSelectedIssues } from '../redux/actions';
+import { setSelectedIssues, setInvoiceEntries } from '../redux/actions';
 import PropTypes from 'prop-types';
-import rest from '../redux/utils/rest';
 
 // @TODO: each invoiceEntry should be persisted with the total cost
 
