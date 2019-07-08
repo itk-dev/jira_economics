@@ -248,6 +248,28 @@ class Invoice extends Component {
     )
   };
 
+  renderInvoiceButtons() {
+    return (
+      <div className="col-md-8 text-right">
+        <ButtonGroup aria-label="Invoice actions">
+          <Button variant="success" type="submit" id="record-invoice" className="mr-3" onClick={this.saveInvoice}>
+            Save invoice
+          </Button>
+          {this.props.match.params.invoiceId != 'new' &&
+            <Button variant="primary" type="submit" id="record-invoice" className="mr-3" onClick={this.handleRecordSubmit}>
+              Record invoice
+            </Button>
+          }
+          {this.props.match.params.invoiceId != 'new' &&
+            <Button variant="danger" type="submit" id="delete" className="mr-3" onClick={this.handleDeleteSubmit}>
+              Delete invoice
+            </Button>
+          }
+        </ButtonGroup>
+      </div>
+    );
+  };
+
   renderFooter() {
     if (this.props.createdAt) {
       return (
@@ -285,19 +307,7 @@ class Invoice extends Component {
           {this.renderPageTitle()}
           <div className="row">
             {this.renderInvoiceData()}
-            <div className="col-md-8 text-right">
-              <ButtonGroup aria-label="Invoice actions">
-                <Button variant="success" type="submit" id="record-invoice" className="mr-3" onClick={this.saveInvoice}>
-                  Save invoice
-                </Button>
-                <Button variant="primary" type="submit" id="record-invoice" className="mr-3" onClick={this.handleRecordSubmit}>
-                  Record invoice
-                </Button>
-                <Button variant="danger" type="submit" id="delete" className="mr-3" onClick={this.handleDeleteSubmit}>
-                  Delete invoice
-                </Button>
-              </ButtonGroup>
-            </div>
+            {this.renderInvoiceButtons()}
           </div>
           <div className="row">
             <div className="col-md-8">
