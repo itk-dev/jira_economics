@@ -16,8 +16,7 @@ const createRows = (projects) => {
     key: project.key,
     id: project.id,
     avatar: <img src={project.avatarUrls['16x16']} style={imageStyle}/>,
-    // @TODO: replace hardcoded invoice id
-    linkUrl: `/billing/project/${project.id}/1`
+    linkUrl: `/billing/project/${project.id}/new`
   }));
 };
 

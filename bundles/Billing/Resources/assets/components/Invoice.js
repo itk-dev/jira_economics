@@ -237,7 +237,7 @@ class Invoice extends Component {
     return (
       <div className="col-md-4">
         <p>
-          Invoicenumber: <strong className="pr-3">{this.props.match.params.invoiceId}</strong>
+          Invoice number: <strong className="pr-3">{this.props.match.params.invoiceId}</strong>
           Invoice recorded: <strong>
             {String(this.props.invoice.data.recorded) && this.props.invoice.data.recorded}
             {String(!this.props.invoice.data.recorded) && 'false'}
@@ -246,6 +246,16 @@ class Invoice extends Component {
         <p>Invoice description TODO: save with invoice data</p>
       </div>
     )
+  };
+
+  renderFooter() {
+    if (this.props.createdAt) {
+      return (
+        <ContentFooter>
+          Invoice created <strong><Moment format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></strong>
+        </ContentFooter>
+      )
+    }
   };
 
   render() {
@@ -346,9 +356,7 @@ class Invoice extends Component {
               </ListGroup>
             </div>
           </div>
-          <ContentFooter>
-            Invoice created <strong><Moment format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></strong>
-          </ContentFooter>
+          {this.renderFooter()}
           <Modal show={this.state.showModal} onHide={this.handleModalClose}>
             <Modal.Header closeButton>
               <Modal.Title>Error</Modal.Title>
@@ -391,8 +399,11 @@ Invoice.propTypes = {
 };
 
 const mapStateToProps = state => {
-  let createdAt = state.invoice.data.created ? state.invoice.data.created.date : '';
   let priceData = makePriceData(state.invoiceEntries, state.jiraIssues);
+  let createdAt = false;
+  if (state.invoice.data.created && state.invoice.data.created.date) {
+    createdAt = state.invoice.data.created.date;
+  }
 
   return {
     invoice: state.invoice,
