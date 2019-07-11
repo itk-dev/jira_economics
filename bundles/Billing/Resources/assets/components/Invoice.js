@@ -14,6 +14,11 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Table from 'react-bootstrap/Table';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Modal from 'react-bootstrap/Modal';
+import { addUserActions } from '../redux/actions';
+
+// @TODO: When the user clicks "Save invoice", persist both the Invoice and any InvoiceEntries that have not yet been persisted.
+// @TODO: Consider building a map with all create, update, and delete operations that the user has done locally.
+// Parse this map when "Save invoice" is clicked.
 
 function makePriceData(invoiceEntries, jiraIssues) {
   if (invoiceEntries.data.data === undefined) {
@@ -296,6 +301,7 @@ class Invoice extends Component {
       );
     }
     else if (this.props.project.data.name) {
+      // @TODO: show spinner unless both saved and unsaved invoice entries have been fully rendered
       return (
         <ContentWrapper>
           {this.renderPageTitle()}
