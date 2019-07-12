@@ -16,14 +16,14 @@ function makeIssueData(jiraIssues) {
   }
   return jiraIssues.data.data.map((item, i) => ({
     key: `row-${i}`,
-    id: item.issue_id,
+    id: item.issueId,
     invoiceEntryId: item.invoiceEntryId ? item.invoiceEntryId : null,
     summary: item.summary,
     created: item.created.date,
     finished: item.finished.date,
     invoiceStatus: "?",
-    jiraUsers: item.jira_users,
-    timeSpent: item.time_spent ? (item.time_spent / 3600) : "N/A"
+    jiraUsers: item.jiraUsers,
+    timeSpent: item.timeSpent ? (item.timeSpent / 3600) : "N/A"
   }));
 }
 

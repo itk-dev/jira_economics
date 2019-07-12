@@ -39,8 +39,8 @@ function makePriceData(invoiceEntries, jiraIssues) {
       if (jiraIssue.invoiceEntryId != invoiceEntry.invoiceEntryId) {
         return;
       }
-      if (parseFloat(jiraIssue.time_spent)) {
-        timeSum += jiraIssue.time_spent;
+      if (parseFloat(jiraIssue.timeSpent)) {
+        timeSum += jiraIssue.timeSpent;
       }
     });
     if (timeSum > 0) {

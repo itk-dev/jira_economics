@@ -19,8 +19,6 @@ use Billing\Entity\Project;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 
-// @TODO: consistent snake_case or camelCase
-
 class BillingService
 {
     private $entityManager;
@@ -589,13 +587,12 @@ class BillingService
                 }
 
                 $issue = [
-                    'issue_id' => $jiraIssue->getIssueId(),
+                    'issueId' => $jiraIssue->getIssueId(),
                     'summary' => $jiraIssue->getSummary(),
                     'created' => $jiraIssue->getCreated(),
                     'finished' => $jiraIssue->getFinished(),
-                    'jira_users' => $jiraIssue->getJiraUsers(),
-                    'time_spent' => $jiraIssue->getTimeSpent(),
-                    'project_id' => $jiraIssue->getProject()->getId(),
+                    'jiraUsers' => $jiraIssue->getJiraUsers(),
+                    'timeSpent' => $jiraIssue->getTimeSpent(),
                 ];
 
                 if (null !== $jiraIssue->getInvoiceEntryId()) {
