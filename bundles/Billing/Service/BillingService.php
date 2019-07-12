@@ -40,7 +40,7 @@ class BillingService
     /**
      * Get invoices for specific Jira project.
      *
-     * @param jira_id
+     * @param jiraId
      *
      * @return array
      */
@@ -246,7 +246,7 @@ class BillingService
     /**
      * Get invoiceEntries for specific invoice.
      *
-     * @param invoice_id
+     * @param invoiceId
      *
      * @return array
      */
@@ -293,7 +293,7 @@ class BillingService
     /**
      * Get specific invoiceEntry by id.
      *
-     * @param invoice_entry_id
+     * @param invoiceEntryId
      *
      * @return array
      */
@@ -493,7 +493,7 @@ class BillingService
     /**
      * Get specific project by Jira project ID.
      *
-     * @param $jira_id
+     * @param $jiraId
      *
      * @return array
      */
@@ -537,7 +537,7 @@ class BillingService
     /**
      * Get jiraIssues for project.
      *
-     * @param $jira_id
+     * @param $jiraId
      *
      * @return array
      */
