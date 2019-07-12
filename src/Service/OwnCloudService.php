@@ -12,6 +12,8 @@ namespace App\Service;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Serializer;
 
 class OwnCloudService
 {
@@ -127,6 +129,54 @@ class OwnCloudService
         } catch (RequestException $e) {
             throw $e;
         }
+    }
+
+    /**
+     * Get properties of a folder.
+     *
+     * @param $path
+     *  The path of the folder
+     *
+     * @return mixed
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function propFind($path)
+    {
+
+      $encoders = [new XmlEncoder()];
+      $normalizers = [];
+
+      $serializer = new Serializer($normalizers, $encoders);
+      $client = new Client(
+        [
+          'base_uri' => $this->host,
+        ]
+      );
+
+      // Set the "auth" request option to "oauth" to sign using oauth
+      try {
+        $response = $client->request(
+          'PROPFIND',
+          $path,
+          [
+            'auth' => [$this->username, $this->password],
+          ]
+        );
+
+        if ($body = $response->getBody()->getContents()) {
+          $folders = [];
+          $content = $serializer->decode($body, 'xml');
+          foreach ($content['d:response'] as $folder) {
+            if (is_array($folder) && array_key_exists('d:href', $folder)) {
+              $folders[] = str_replace($path, '', $folder['d:href']);
+            }
+          }
+          return $folders;
+        }
+      } catch (RequestException $e) {
+        throw $e;
+      }
     }
 
     /**

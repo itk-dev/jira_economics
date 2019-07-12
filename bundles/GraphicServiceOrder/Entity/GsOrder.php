@@ -25,6 +25,16 @@ class GsOrder
     private $id;
 
     /**
+     * @ORM\Column(type="integer")
+     */
+    private $issueId;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $issueKey;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $jobTitle;
@@ -97,6 +107,30 @@ class GsOrder
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getIssueId(): ?int
+    {
+      return $this->issueId;
+    }
+
+    public function setIssueId(int $issueId): self
+    {
+      $this->issueId = $issueId;
+
+      return $this;
+    }
+
+    public function getIssueKey(): ?string
+    {
+      return $this->issueKey;
+    }
+
+    public function setIssueKey(string $issueKey): self
+    {
+      $this->issueKey = $issueKey;
+
+      return $this;
     }
 
     public function getJobTitle(): ?string

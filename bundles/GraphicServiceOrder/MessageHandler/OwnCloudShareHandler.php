@@ -26,7 +26,6 @@ class OwnCloudShareHandler implements MessageHandlerInterface
     public function __invoke(OwnCloudShare $order)
     {
         $order = $this->gsOrderRepository->find($order->getOrderId());
-        $a = 1;
         // ... do some work - like sending an SMS message!
     //print '---' . $order->getOrderId() . '---';
     }
