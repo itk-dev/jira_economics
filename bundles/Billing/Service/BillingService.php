@@ -270,7 +270,7 @@ class BillingService
             }
 
             $invoiceEntry = [
-                'invoiceEntryId' => $invoiceEntry->getId(),
+                'id' => $invoiceEntry->getId(),
                 'name' => $invoiceEntry->getName(),
                 'invoiceId' => $invoiceEntry->getInvoice()->getId(),
                 'description' => $invoiceEntry->getDescription(),
@@ -368,7 +368,7 @@ class BillingService
         }
 
         $response = [
-            'invoiceEntryId' => $invoiceEntry->getId(),
+            'id' => $invoiceEntry->getId(),
             'name' => $invoiceEntry->getName(),
             'jiraProjectId' => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
             'invoiceId' => $invoiceEntry->getInvoice()->getId(),

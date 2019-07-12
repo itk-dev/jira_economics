@@ -11,10 +11,20 @@ export class InvoiceEntrySubmitter extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      account: 'Vælg PSP'
+      account: 'Vælg PSP',
+      userActions: [],
+      newInvoiceEntries: {}
     };
     this.handleSelectJiraIssues = this.handleSelectJiraIssues.bind(this);
     this.onAccountChange = this.onAccountChange.bind(this);
+
+    if (this.props.newInvoiceEntries && this.props.newInvoiceEntries.newInvoiceEntries) {
+      this.state.newInvoiceEntries = this.props.newInvoiceEntries.newInvoiceEntries;
+    }
+
+    if (this.props.userActions) {
+      this.state.userActions = this.props.userActions;
+    }
   }
 
   handleSelectJiraIssues = (event) => {
@@ -64,31 +74,39 @@ export class InvoiceEntrySubmitter extends Component {
     const account = $('#invoice-entry-account').val();
     const product = $('#invoice-entry-product').val();
     let jiraIssueIds = [];
-    this.props.selectedIssues.selectedIssues.forEach(selectedIssue => {
-      jiraIssueIds.push(selectedIssue.id);
-    });
+    if (this.props.selectedIssues && this.props.selectedIssues.selectedIssues && this.props.selectedIssues.selectedIssues.length > 0) {
+      this.props.selectedIssues.selectedIssues.forEach(selectedIssue => {
+        jiraIssueIds.push(selectedIssue.id);
+      });
+    }
     let invoiceEntryData = {
-      invoiceId,
       name,
+      invoiceId,
       description,
       account,
       product,
       jiraIssueIds
     };
-    const invoiceEntryId = this.props.location.state.existingInvoiceEntryId;
-    if (invoiceEntryId) {
-      invoiceEntryData.id = invoiceEntryId;
-      dispatch(rest.actions.updateInvoiceEntry({id: invoiceEntryId}, {
-        body: JSON.stringify(invoiceEntryData)
-      }));
+    const existingInvoiceEntryId = this.props.location.state.existingInvoiceEntryId;
+    if (existingInvoiceEntryId) {
+      invoiceEntryData.id = existingInvoiceEntryId;
+      dispatch(addUserActions({ "UPDATE": invoiceEntryData }));
+      // dispatch(rest.actions.updateInvoiceEntry({id: invoiceEntryId}, {
+      //   body: JSON.stringify(invoiceEntryData)
+      // }));
     }
     else {
-      dispatch(rest.actions.createInvoiceEntry({}, {
-        body: JSON.stringify(invoiceEntryData)
-      }));
+      let newInvoiceEntryId = this.state.newInvoiceEntries.length + 1;
+      invoiceEntryData.id = "new-" + newInvoiceEntryId;
+      dispatch(addUserActions({ "CREATE": invoiceEntryData }));
+      // dispatch(rest.actions.createInvoiceEntry({}, {
+      //   body: JSON.stringify(invoiceEntryData)
+      // }));
     }
     // @TODO: check that a new invoiceEntry was successfully created before navigating to invoice page
     // @TODO: consider showing a modal dialog to confirm invoiceEntry creation
+    dispatch(setInvoiceEntries(this.state.newInvoiceEntries.concat([invoiceEntryData])));
+    dispatch(setSelectedIssues({}));
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
   }
 
@@ -483,13 +501,20 @@ export class InvoiceEntrySubmitter extends Component {
 
 InvoiceEntrySubmitter.propTypes = {
   invoiceEntrySubmitter: PropTypes.object,
-  dispatch: PropTypes.func.isRequired
+  dispatch: PropTypes.func.isRequired,
+  selectedIssues: PropTypes.object,
+  invoiceEntries: PropTypes.object,
+  newInvoiceEntries: PropTypes.object,
+  userActions: PropTypes.object
 };
 
 const mapStateToProps = state => {
   return {
     invoiceEntrySubmitter: state.invoiceEntrySubmitter,
-    selectedIssues: state.selectedIssues
+    selectedIssues: state.selectedIssues,
+    invoiceEntries: state.invoiceEntries,
+    newInvoiceEntries: state.newInvoiceEntries,
+    userActions: state.userActions
   };
 };
 

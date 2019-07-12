@@ -32,11 +32,11 @@ function makePriceData(invoiceEntries, jiraIssues) {
   const unitPrices = [560, 760, 820];
 
   invoiceEntries.data.data.forEach(invoiceEntry => {
-    let key = `row-${invoiceEntry.invoiceEntryId}`;
+    let key = `row-${invoiceEntry.id}`;
     let timeSum = 0;
 
     jiraIssues.data.data.forEach(jiraIssue => {
-      if (jiraIssue.invoiceEntryId != invoiceEntry.invoiceEntryId) {
+      if (jiraIssue.invoiceEntryId != invoiceEntry.id) {
         return;
       }
       if (parseFloat(jiraIssue.timeSpent)) {
@@ -62,7 +62,22 @@ class Invoice extends Component {
     this.saveInvoice = this.saveInvoice.bind(this);
     this.handleModalShow = this.handleModalShow.bind(this);
     this.handleModalClose = this.handleModalClose.bind(this);
-    this.state = { checkedEntries: {}, showModal: false, checkedCount: 0, invoiceEntries: {} };
+    this.state = {
+       checkedEntries: {},
+       showModal: false,
+       checkedCount: 0,
+       invoiceEntries: {},
+       newInvoiceEntries: {},
+       userActions: []
+    };
+
+    if (this.props.newInvoiceEntries && this.props.newInvoiceEntries.newInvoiceEntries) {
+      this.state.newInvoiceEntries = this.props.newInvoiceEntries.newInvoiceEntries;
+    }
+
+    if (this.props.userActions) {
+      this.state.userActions = this.props.userActions;
+    }
   };
 
   componentDidMount() {
@@ -73,10 +88,10 @@ class Invoice extends Component {
       dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
       dispatch(rest.actions.getInvoice({ id: `${this.props.match.params.invoiceId}` }));
       dispatch(rest.actions.getInvoiceEntries({ id: `${this.props.match.params.invoiceId}` }))
-        .then((response) => {
-          this.setState({ invoiceEntries: response });
-        })
-        .catch((reason) => console.log('isCanceled', reason.isCanceled));
+      .then((response) => {
+        this.setState({ invoiceEntries: response });
+      })
+      .catch((reason) => console.log('isCanceled', reason.isCanceled));
     }
   };
 
@@ -84,7 +99,7 @@ class Invoice extends Component {
     event.preventDefault();
     const { dispatch } = this.props;
     // @TODO: replace with real invoice name
-    const name = "dummy";
+    const name = "New Invoice";
     const projectId = this.props.match.params.projectId;
     const created = this.props.createdAt;
     const invoiceData = {
@@ -92,12 +107,49 @@ class Invoice extends Component {
       projectId,
       created
     };
-    dispatch(rest.actions.createInvoice({}, {
-      body: JSON.stringify(invoiceData)
-    }));
+    const invoiceId = this.props.match.params.invoiceId;
+    // New invoice?
+    if (invoiceId == "new") {
+      dispatch(rest.actions.createInvoice({}, { body: JSON.stringify(invoiceData) }))
+      .then(() => {
+        this.persistInvoiceEntries();
+        // @TODO: Persist InvoiceEntries after Invoice has been saved successfully
+      })
+      .then(() => {
+        this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.invoice.data.invoiceId}`);
+      })
+      //.catch((reason) => console.log('isCanceled', reason.isCanceled));
+    }
+    // Existing invoice
+    else {
+      invoiceData.id = invoiceId
+      dispatch(rest.actions.updateInvoice({ id: invoiceId }, {
+        body: JSON.stringify(invoiceData)
+      }));
+    }
+  };
 
-    // @TODO: persist InvoiceEntries after Invoice has been saved successfully
-    // @TODO: if not already there, redirect to /project/<projectId>/<invoiceId> after new invoice has been succesfully created
+  persistInvoiceEntries = (event) => {
+    const { dispatch } = this.props;
+
+    if (this.state.userActions && this.state.userActions.userActions && this.state.userActions.userActions.length > 0) {
+      this.state.userActions.userActions.forEach(userAction => {
+        switch(Object.keys(userAction).pop()) {
+          case 'CREATE':
+            console.log("Create event");
+            break;
+          case 'UPDATE':
+            console.log("Update event");
+            break;
+          case 'DELETE':
+            console.log("Delete event");
+            break;
+          default:
+            console.log("Unknown event");
+            break;
+        }
+      });
+    }
   };
 
   handleRecordSubmit = (event) => {
@@ -141,16 +193,19 @@ class Invoice extends Component {
 
   handleEntryDelete = (event) => {
     event.preventDefault();
+    const { dispatch } = this.props;
     let checkedInvoiceEntryIds = [];
+    let userActions = [];
 
     for (let [invoiceEntryId, checked] of Object.entries(this.state.checkedEntries)) {
       if (checked) {
         checkedInvoiceEntryIds.push(parseInt(invoiceEntryId));
+        userActions.push({ 'DELETE': invoiceEntryId});
       }
     }
 
-    this.deleteInvoiceEntries(checkedInvoiceEntryIds);
     this.removeInvoiceEntriesFromState(checkedInvoiceEntryIds);
+    dispatch(addUserActions(userActions));
   };
 
   async deleteInvoiceEntries(invoiceEntryIds) {
@@ -161,11 +216,22 @@ class Invoice extends Component {
   }
 
   removeInvoiceEntriesFromState(checkedInvoiceEntryIds) {
-    let filteredInvoiceEntries = this.state.invoiceEntries.data.filter((invoiceEntry) => {
-      return !checkedInvoiceEntryIds.includes(invoiceEntry.invoiceEntryId);
-    });
-    let newInvoiceEntries = { "data": filteredInvoiceEntries };
-    this.setState({ invoiceEntries: newInvoiceEntries });
+    if (this.state.invoiceEntries.data && this.state.invoiceEntries.data.length > 0) {
+      let filteredInvoiceEntries = this.state.invoiceEntries.data.filter((invoiceEntry) => {
+        return !checkedInvoiceEntryIds.includes(invoiceEntry.id);
+      });
+      let updatedInvoiceEntries = { "data": filteredInvoiceEntries };
+      this.setState({ invoiceEntries: updatedInvoiceEntries });
+    }
+
+    if (this.state.newInvoiceEntries && this.state.newInvoiceEntries.length > 0) {
+      let newFilteredInvoiceEntries = this.state.newInvoiceEntries.filter((invoiceEntry) => {
+        return !checkedInvoiceEntryIds.includes(invoiceEntry.id)
+      });
+      let newUpdatedInvoiceEntries = { "newInvoiceEntries": newFilteredInvoiceEntries };
+      this.setState({ newInvoiceEntries: newUpdatedInvoiceEntries });
+    }
+
     this.setState({ checkedEntries: {} });
   }
 
@@ -187,9 +253,21 @@ class Invoice extends Component {
       return;
     }
 
-    let invoiceEntry = this.props.invoiceEntries.data.data.filter(obj => {
-      return obj.invoiceEntryId == selectedInvoiceEntryId;
-    }).pop();
+    let invoiceEntry = {};
+
+    // Persisted InvoiceEntry?
+    if (this.props.invoiceEntries.data && this.props.invoiceEntries.data.data) {
+      invoiceEntry = this.props.invoiceEntries.data.data.filter(obj => {
+        return obj.id == selectedInvoiceEntryId;
+      }).pop();
+    }
+
+    // Unsaved InvoiceEntry?
+    if (this.props.newInvoiceEntries && this.props.newInvoiceEntries.newInvoiceEntries) {
+      invoiceEntry = this.props.newInvoiceEntries.newInvoiceEntries.filter(obj => {
+        return obj.id == selectedInvoiceEntryId;
+      }).pop();
+    }
 
     // InvoiceEntry with Jira issues?
     if (invoiceEntry.jiraIssueIds) {
@@ -342,15 +420,27 @@ class Invoice extends Component {
                 </thead>
                 <tbody>
                   {this.state.invoiceEntries.data && this.state.invoiceEntries.data.map((item) =>
-                    <tr key={item.invoiceEntryId}>
-                      <td><Form.Check aria-label="" id={item.invoiceEntryId} onChange={this.handleCheckboxChange} /></td>
+                    <tr key={item.id}>
+                      <td><Form.Check aria-label="" id={item.id} onChange={this.handleCheckboxChange} /></td>
                       <td>{item.accountNumber}</td>
                       <td><Link to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}
-                      /${item.invoiceEntryId}`}>{item.name}</Link></td>
+                      /${item.id}`}>{item.name}</Link></td>
                       <td>{item.description}</td>
-                      <td>{this.getPriceData(item.invoiceEntryId, 'timeSum')}</td>
-                      <td>{this.getPriceData(item.invoiceEntryId, 'unitPrice')}</td>
-                      <td>{this.getPriceData(item.invoiceEntryId, 'totalPrice')}</td>
+                      <td>{this.getPriceData(item.id, 'timeSum')}</td>
+                      <td>{this.getPriceData(item.id, 'unitPrice')}</td>
+                      <td>{this.getPriceData(item.id, 'totalPrice')}</td>
+                    </tr>
+                  )}
+                  {this.state.newInvoiceEntries && this.state.newInvoiceEntries.length > 0 && this.state.newInvoiceEntries.map((item) =>
+                    <tr key={item.id}>
+                      <td><Form.Check aria-label="" id={item.id} onChange={this.handleCheckboxChange} /></td>
+                      <td>{item.accountNumber}</td>
+                      <td><Link to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}
+                      /${item.id}`}>{item.name}</Link></td>
+                      <td>{item.description}</td>
+                      <td>{this.getPriceData(item.id, 'timeSum')}</td>
+                      <td>{this.getPriceData(item.id, 'unitPrice')}</td>
+                      <td>{this.getPriceData(item.id, 'totalPrice')}</td>
                     </tr>
                   )}
                 </tbody>
@@ -403,9 +493,11 @@ Invoice.propTypes = {
   invoice: PropTypes.object,
   createdAt: PropTypes.string,
   invoiceEntries: PropTypes.object,
+  newInvoiceEntries: PropTypes.object,
   jiraIssues: PropTypes.object,
   project: PropTypes.object,
-  dispatch: PropTypes.func.isRequired
+  dispatch: PropTypes.func.isRequired,
+  userActions: PropTypes.object
 };
 
 const mapStateToProps = state => {
@@ -419,9 +511,11 @@ const mapStateToProps = state => {
     invoice: state.invoice,
     createdAt: createdAt,
     invoiceEntries: state.invoiceEntries,
+    newInvoiceEntries: state.newInvoiceEntries,
     jiraIssues: state.jiraIssues,
     project: state.project,
-    priceData: priceData
+    priceData: priceData,
+    userActions: state.userActions
   };
 };
 

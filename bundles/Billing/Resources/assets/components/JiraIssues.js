@@ -45,9 +45,12 @@ const searchKeyValue = (data, key, value) => {
 class JiraIssues extends Component {
   constructor(props) {
     super(props);
-    this.state = { selected: [], selectAll: 0, selectedIssues: {} };
+    this.state = { selected: [], selectAll: 0, selectedIssues: {}, userActions: [] };
     if (this.props.selectedIssues.selectedIssues && this.props.selectedIssues.selectedIssues.length > 0) {
           this.state.selected = this.props.selectedIssues.selectedIssues;
+    }
+    if (this.props.userActions) {
+      this.state.userActions = this.props.userActions;
     }
     this.toggleRow = this.toggleRow.bind(this);
   }
@@ -258,7 +261,8 @@ class JiraIssues extends Component {
 
 JiraIssues.propTypes = {
   jiraIssues: PropTypes.object,
-  issueData: PropTypes.array
+  issueData: PropTypes.array,
+  userActions: PropTypes.object
 };
 
 const mapStateToProps = state => {
@@ -267,7 +271,8 @@ const mapStateToProps = state => {
   return {
     jiraIssues: state.jiraIssues,
     issueData: issueData,
-    selectedIssues: state.selectedIssues
+    selectedIssues: state.selectedIssues,
+    userActions: state.userActions
   };
 };
 

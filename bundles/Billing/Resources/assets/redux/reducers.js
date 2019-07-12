@@ -29,19 +29,19 @@ function newInvoiceEntries (state = {
   }
 }
 
-function newUserActions (state = {
-  newUserActions: []
+function userActions (state = {
+  userActions: []
 }, action) {
   switch (action.type) {
     case ADD_USER_ACTIONS:
       return {
-        newUserActions: state.newUserActions.concat(action.newUserActions)
+        userActions: state.userActions.concat(action.userActions)
       }
       default:
         return state;
   }
 }
 
-const rootReducer = combineReducers({ newUserActions, newInvoiceEntries, selectedIssues, ...rest.reducers });
+const rootReducer = combineReducers({ userActions, newInvoiceEntries, selectedIssues, ...rest.reducers });
 
 export default rootReducer;
