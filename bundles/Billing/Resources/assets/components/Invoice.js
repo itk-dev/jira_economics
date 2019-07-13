@@ -58,7 +58,7 @@ function makePriceData(invoiceEntries, jiraIssues) {
 class Invoice extends Component {
   constructor(props) {
     super(props);
-    this.handleRecordSubmit = this.handleRecordSubmit.bind(this);
+    this.recordInvoice = this.recordInvoice.bind(this);
     this.saveInvoice = this.saveInvoice.bind(this);
     this.handleModalShow = this.handleModalShow.bind(this);
     this.handleModalClose = this.handleModalClose.bind(this);
@@ -152,7 +152,7 @@ class Invoice extends Component {
     }
   };
 
-  handleRecordSubmit = (event) => {
+  recordInvoice = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
     const id = this.props.match.params.invoiceId;
@@ -170,7 +170,7 @@ class Invoice extends Component {
     }));
   };
 
-  handleDeleteSubmit = (event) => {
+  deleteInvoice = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
     dispatch(rest.actions.deleteInvoice({ id: `${this.props.match.params.invoiceId}` }));
@@ -341,12 +341,12 @@ class Invoice extends Component {
             Save invoice
           </Button>
           {this.props.match.params.invoiceId != 'new' &&
-            <Button variant="primary" type="submit" id="record-invoice" className="mr-3" onClick={this.handleRecordSubmit}>
+            <Button variant="primary" type="submit" id="record-invoice" className="mr-3" onClick={this.recordInvoice}>
               Record invoice
             </Button>
           }
           {this.props.match.params.invoiceId != 'new' &&
-            <Button variant="danger" type="submit" id="delete" className="mr-3" onClick={this.handleDeleteSubmit}>
+            <Button variant="danger" type="submit" id="delete" className="mr-3" onClick={this.deleteInvoice}>
               Delete invoice
             </Button>
           }
