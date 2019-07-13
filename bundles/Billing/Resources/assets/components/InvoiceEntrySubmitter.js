@@ -91,6 +91,11 @@ export class InvoiceEntrySubmitter extends Component {
     if (existingInvoiceEntryId) {
       invoiceEntryData.id = existingInvoiceEntryId;
       dispatch(addUserActions({ "UPDATE": invoiceEntryData }));
+      let stateCopy = Object.assign({}, this.state);
+      let entryIndex = stateCopy.newInvoiceEntries.findIndex((entry => entry.id == invoiceEntryData.id));
+      stateCopy.newInvoiceEntries[entryIndex] = invoiceEntryData;
+      this.setState(stateCopy);
+      dispatch(setInvoiceEntries(stateCopy.newInvoiceEntries));
       // dispatch(rest.actions.updateInvoiceEntry({id: invoiceEntryId}, {
       //   body: JSON.stringify(invoiceEntryData)
       // }));
@@ -99,13 +104,12 @@ export class InvoiceEntrySubmitter extends Component {
       let newInvoiceEntryId = this.state.newInvoiceEntries.length + 1;
       invoiceEntryData.id = "new-" + newInvoiceEntryId;
       dispatch(addUserActions({ "CREATE": invoiceEntryData }));
+      dispatch(setInvoiceEntries(this.state.newInvoiceEntries.concat([invoiceEntryData])));
       // dispatch(rest.actions.createInvoiceEntry({}, {
       //   body: JSON.stringify(invoiceEntryData)
       // }));
     }
     // @TODO: check that a new invoiceEntry was successfully created before navigating to invoice page
-    // @TODO: consider showing a modal dialog to confirm invoiceEntry creation
-    dispatch(setInvoiceEntries(this.state.newInvoiceEntries.concat([invoiceEntryData])));
     dispatch(setSelectedIssues({}));
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
   }
