@@ -121,16 +121,10 @@ class BillingService
             throw new HttpException(404, 'Invoice with id '.$invoiceId.' not found');
         }
 
-        if ('1' === $invoice->getRecorded()) {
-            $recorded = true;
-        } else {
-            $recorded = false;
-        }
-
         return [
             'name' => $invoice->getName(),
             'jiraId' => $invoice->getProject()->getJiraId(),
-            'recorded' => $recorded,
+            'recorded' => $invoice->getRecorded(),
             'created' => $invoice->getCreated(),
         ];
     }

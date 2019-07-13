@@ -324,8 +324,7 @@ class Invoice extends Component {
         <p>
           Invoice number: <strong className="pr-3">{this.props.match.params.invoiceId}</strong>
           Invoice recorded: <strong>
-            {String(this.props.invoice.data.recorded) && this.props.invoice.data.recorded}
-            {String(!this.props.invoice.data.recorded) && 'false'}
+            {String(this.props.invoice.data.recorded)}
           </strong>
         </p>
         <p>Invoice description TODO: save with invoice data</p>
