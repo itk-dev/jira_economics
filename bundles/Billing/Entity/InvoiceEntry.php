@@ -59,6 +59,11 @@ class InvoiceEntry
      */
     private $product;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $price;
+
     public function __construct()
     {
         $this->jiraIssues = new ArrayCollection();
@@ -156,6 +161,18 @@ class InvoiceEntry
     public function setProduct(?string $product): self
     {
         $this->product = $product;
+
+        return $this;
+    }
+
+    public function getPrice(): ?int
+    {
+        return $this->price;
+    }
+
+    public function setPrice(int $price): self
+    {
+        $this->price = $price;
 
         return $this;
     }
