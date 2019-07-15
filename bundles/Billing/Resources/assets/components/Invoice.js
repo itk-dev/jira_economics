@@ -94,6 +94,7 @@ class Invoice extends Component {
     }));
   };
 
+  // @TODO: show modal to confirm Invoice deletion
   deleteInvoice = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
@@ -115,6 +116,7 @@ class Invoice extends Component {
     });
   };
 
+  // @TODO: show Modal to confirm InvoiceEntry deletion
   handleEntryDelete = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
