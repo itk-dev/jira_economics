@@ -205,7 +205,7 @@ class JiraIssues extends Component {
     }
   }
 
-  handleCancelSubmit = (event) => {
+  handleCancel = (event) => {
     event.preventDefault();
     const { dispatch } = this.props;
     dispatch(setSelectedIssues({}));
@@ -242,7 +242,7 @@ class JiraIssues extends Component {
           <form id="submitForm" onSubmit={this.handleSubmitIssues}>
             <button type="submit" className="btn btn-primary" id="submit">Fortsæt med valgte issues</button>
           </form>
-          <form id="cancelForm" onSubmit={this.handleCancelSubmit}>
+          <form id="cancelForm" onSubmit={this.handleCancel}>
             <button type="submit" className="btn btn-danger" id="cancel">Annuller</button>
           </form>
         </ContentWrapper>

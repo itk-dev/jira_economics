@@ -93,7 +93,7 @@ export class InvoiceEntrySubmitter extends Component {
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
   }
 
-  handleCancelSubmit = (event) => {
+  handleCancel = (event) => {
     event.preventDefault();
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
   }
@@ -179,7 +179,7 @@ export class InvoiceEntrySubmitter extends Component {
                   id="create-invoice-entry">Overfør til faktura
               </button>
               </form>
-              <form onSubmit={this.handleCancelSubmit}>
+              <form onSubmit={this.handleCancel}>
                 <button
                   type="submit"
                   className="btn btn-danger"
@@ -264,7 +264,7 @@ export class InvoiceEntrySubmitter extends Component {
                   id="create-invoice-entry">Overfør til faktura
                 </button>
               </form>
-              <form onSubmit={this.handleCancelSubmit}>
+              <form onSubmit={this.handleCancel}>
                 <button
                   type="submit"
                   className="btn btn-danger"
@@ -364,7 +364,7 @@ export class InvoiceEntrySubmitter extends Component {
                   id="create-invoice-entry">Overfør til faktura
             </button>
               </form>
-              <form onSubmit={this.handleCancelSubmit}>
+              <form onSubmit={this.handleCancel}>
                 <button
                   type="submit"
                   className="btn btn-danger"
@@ -459,7 +459,7 @@ export class InvoiceEntrySubmitter extends Component {
                   id="create-invoice-entry">Overfør til faktura
               </button>
               </form>
-              <form onSubmit={this.handleCancelSubmit}>
+              <form onSubmit={this.handleCancel}>
                 <button
                   type="submit"
                   className="btn btn-danger"
