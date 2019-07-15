@@ -19,8 +19,6 @@ use Billing\Entity\Project;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 
-// @TODO: consistent snake_case or camelCase
-
 class BillingService
 {
     private $entityManager;
@@ -40,7 +38,7 @@ class BillingService
     /**
      * Get invoices for specific Jira project.
      *
-     * @param jira_id
+     * @param jiraId
      *
      * @return array
      */
@@ -123,16 +121,10 @@ class BillingService
             throw new HttpException(404, 'Invoice with id '.$invoiceId.' not found');
         }
 
-        if ('1' === $invoice->getRecorded()) {
-            $recorded = true;
-        } else {
-            $recorded = false;
-        }
-
         return [
             'name' => $invoice->getName(),
             'jiraId' => $invoice->getProject()->getJiraId(),
-            'recorded' => $recorded,
+            'recorded' => $invoice->getRecorded(),
             'created' => $invoice->getCreated(),
         ];
     }
@@ -246,7 +238,7 @@ class BillingService
     /**
      * Get invoiceEntries for specific invoice.
      *
-     * @param invoice_id
+     * @param invoiceId
      *
      * @return array
      */
@@ -272,7 +264,7 @@ class BillingService
             }
 
             $invoiceEntry = [
-                'invoiceEntryId' => $invoiceEntry->getId(),
+                'id' => $invoiceEntry->getId(),
                 'name' => $invoiceEntry->getName(),
                 'invoiceId' => $invoiceEntry->getInvoice()->getId(),
                 'description' => $invoiceEntry->getDescription(),
@@ -293,7 +285,7 @@ class BillingService
     /**
      * Get specific invoiceEntry by id.
      *
-     * @param invoice_entry_id
+     * @param invoiceEntryId
      *
      * @return array
      */
@@ -370,7 +362,7 @@ class BillingService
         }
 
         $response = [
-            'invoiceEntryId' => $invoiceEntry->getId(),
+            'id' => $invoiceEntry->getId(),
             'name' => $invoiceEntry->getName(),
             'jiraProjectId' => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
             'invoiceId' => $invoiceEntry->getInvoice()->getId(),
@@ -493,7 +485,7 @@ class BillingService
     /**
      * Get specific project by Jira project ID.
      *
-     * @param $jira_id
+     * @param $jiraId
      *
      * @return array
      */
@@ -537,7 +529,7 @@ class BillingService
     /**
      * Get jiraIssues for project.
      *
-     * @param $jira_id
+     * @param $jiraId
      *
      * @return array
      */
@@ -589,13 +581,12 @@ class BillingService
                 }
 
                 $issue = [
-                    'issue_id' => $jiraIssue->getIssueId(),
+                    'issueId' => $jiraIssue->getIssueId(),
                     'summary' => $jiraIssue->getSummary(),
                     'created' => $jiraIssue->getCreated(),
                     'finished' => $jiraIssue->getFinished(),
-                    'jira_users' => $jiraIssue->getJiraUsers(),
-                    'time_spent' => $jiraIssue->getTimeSpent(),
-                    'project_id' => $jiraIssue->getProject()->getId(),
+                    'jiraUsers' => $jiraIssue->getJiraUsers(),
+                    'timeSpent' => $jiraIssue->getTimeSpent(),
                 ];
 
                 if (null !== $jiraIssue->getInvoiceEntryId()) {

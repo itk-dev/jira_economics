@@ -16,14 +16,14 @@ function makeIssueData(jiraIssues) {
   }
   return jiraIssues.data.data.map((item, i) => ({
     key: `row-${i}`,
-    id: item.issue_id,
+    id: item.issueId,
     invoiceEntryId: item.invoiceEntryId ? item.invoiceEntryId : null,
     summary: item.summary,
     created: item.created.date,
     finished: item.finished.date,
     invoiceStatus: "?",
-    jiraUsers: item.jira_users,
-    timeSpent: item.time_spent ? (item.time_spent / 3600) : "N/A"
+    jiraUsers: item.jiraUsers,
+    timeSpent: item.timeSpent ? (item.timeSpent / 3600) : "N/A"
   }));
 }
 
@@ -45,9 +45,21 @@ const searchKeyValue = (data, key, value) => {
 class JiraIssues extends Component {
   constructor(props) {
     super(props);
-    this.state = { selected: [], selectAll: 0, selectedIssues: {} };
+    this.state = {
+       selected: [],
+       selectAll: 0,
+       selectedIssues: {},
+       userActions: [],
+       newInvoiceEntries: {}
+    };
     if (this.props.selectedIssues.selectedIssues && this.props.selectedIssues.selectedIssues.length > 0) {
           this.state.selected = this.props.selectedIssues.selectedIssues;
+    }
+    if (this.props.newInvoiceEntries && this.props.newInvoiceEntries.newInvoiceEntries) {
+      this.state.newInvoiceEntries = this.props.newInvoiceEntries.newInvoiceEntries;
+    }
+    if (this.props.userActions) {
+      this.state.userActions = this.props.userActions;
     }
     this.toggleRow = this.toggleRow.bind(this);
   }
@@ -56,11 +68,25 @@ class JiraIssues extends Component {
     const { dispatch } = this.props;
     dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
     if (this.props.location.state && this.props.location.state.existingInvoiceEntryId) {
+      // Toggle rows for persisted entries
       this.props.issueData.forEach(issue => {
         if (issue.invoiceEntryId == this.props.location.state.existingInvoiceEntryId) {
           this.toggleRow(issue);
         }
       });
+      // Toggle rows for non persisted entries
+      if (this.props.newInvoiceEntries && this.props.newInvoiceEntries.newInvoiceEntries) {
+        this.props.newInvoiceEntries.newInvoiceEntries.forEach(newInvoiceEntry => {
+          if (newInvoiceEntry.id == this.props.location.state.existingInvoiceEntryId) {
+            newInvoiceEntry.jiraIssueIds.forEach(issueId => {
+              let issue = this.props.issueData.find(function(element) {
+                return element.id == issueId;
+              });
+              this.toggleRow(issue);
+            });
+          }
+        });
+      }
     }
   }
 
@@ -258,7 +284,9 @@ class JiraIssues extends Component {
 
 JiraIssues.propTypes = {
   jiraIssues: PropTypes.object,
-  issueData: PropTypes.array
+  issueData: PropTypes.array,
+  userActions: PropTypes.object,
+  newInvoiceEntries: PropTypes.object
 };
 
 const mapStateToProps = state => {
@@ -267,7 +295,9 @@ const mapStateToProps = state => {
   return {
     jiraIssues: state.jiraIssues,
     issueData: issueData,
-    selectedIssues: state.selectedIssues
+    selectedIssues: state.selectedIssues,
+    userActions: state.userActions,
+    newInvoiceEntries: state.newInvoiceEntries,
   };
 };
 

@@ -10,6 +10,6 @@ export function setInvoiceEntries(newInvoiceEntries) {
   return { type: SET_INVOICE_ENTRIES, newInvoiceEntries: newInvoiceEntries }
 }
 
-export function addUserActions(newUserActions) {
-  return { type: ADD_USER_ACTIONS, newUserActions: newUserActions }
+export function addUserActions(userActions) {
+  return { type: ADD_USER_ACTIONS, userActions: userActions }
 }
