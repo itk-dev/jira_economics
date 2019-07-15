@@ -14,11 +14,6 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Table from 'react-bootstrap/Table';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Modal from 'react-bootstrap/Modal';
-import { addUserActions } from '../redux/actions';
-
-// @TODO: When the user clicks "Save invoice", persist both the Invoice and any InvoiceEntries that have not yet been persisted.
-// @TODO: Consider building a map with all create, update, and delete operations that the user has done locally.
-// Parse this map when "Save invoice" is clicked.
 
 function makePriceData(invoiceEntries, jiraIssues) {
   if (invoiceEntries.data.data === undefined) {
@@ -59,97 +54,26 @@ class Invoice extends Component {
   constructor(props) {
     super(props);
     this.recordInvoice = this.recordInvoice.bind(this);
-    this.saveInvoice = this.saveInvoice.bind(this);
     this.handleModalShow = this.handleModalShow.bind(this);
     this.handleModalClose = this.handleModalClose.bind(this);
     this.state = {
        checkedEntries: {},
        showModal: false,
        checkedCount: 0,
-       invoiceEntries: {},
-       newInvoiceEntries: {},
-       userActions: []
+       invoiceEntries: {}
     };
-
-    if (this.props.newInvoiceEntries && this.props.newInvoiceEntries.newInvoiceEntries) {
-      this.state.newInvoiceEntries = this.props.newInvoiceEntries.newInvoiceEntries;
-    }
-
-    if (this.props.userActions) {
-      this.state.userActions = this.props.userActions;
-    }
   };
 
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch(rest.actions.getProject({ id: `${this.props.match.params.projectId}` }));
-
-    if (this.props.match.params.invoiceId != 'new') {
-      dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
-      dispatch(rest.actions.getInvoice({ id: `${this.props.match.params.invoiceId}` }));
-      dispatch(rest.actions.getInvoiceEntries({ id: `${this.props.match.params.invoiceId}` }))
-      .then((response) => {
-        this.setState({ invoiceEntries: response });
-      })
-      .catch((reason) => console.log('isCanceled', reason.isCanceled));
-    }
-  };
-
-  saveInvoice = (event) => {
-    event.preventDefault();
-    const { dispatch } = this.props;
-    // @TODO: replace with real invoice name
-    const name = "New Invoice";
-    const projectId = this.props.match.params.projectId;
-    const created = this.props.createdAt;
-    const invoiceData = {
-      name,
-      projectId,
-      created
-    };
-    const invoiceId = this.props.match.params.invoiceId;
-    // New invoice?
-    if (invoiceId == "new") {
-      dispatch(rest.actions.createInvoice({}, { body: JSON.stringify(invoiceData) }))
-      .then(() => {
-        this.persistInvoiceEntries();
-        // @TODO: Persist InvoiceEntries after Invoice has been saved successfully
-      })
-      .then(() => {
-        this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.invoice.data.invoiceId}`);
-      })
-      //.catch((reason) => console.log('isCanceled', reason.isCanceled));
-    }
-    // Existing invoice
-    else {
-      invoiceData.id = invoiceId
-      dispatch(rest.actions.updateInvoice({ id: invoiceId }, {
-        body: JSON.stringify(invoiceData)
-      }));
-    }
-  };
-
-  persistInvoiceEntries = (event) => {
-    const { dispatch } = this.props;
-
-    if (this.state.userActions && this.state.userActions.userActions && this.state.userActions.userActions.length > 0) {
-      this.state.userActions.userActions.forEach(userAction => {
-        switch(Object.keys(userAction).pop()) {
-          case 'CREATE':
-            console.log("Create event");
-            break;
-          case 'UPDATE':
-            console.log("Update event");
-            break;
-          case 'DELETE':
-            console.log("Delete event");
-            break;
-          default:
-            console.log("Unknown event");
-            break;
-        }
-      });
-    }
+    dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
+    dispatch(rest.actions.getInvoice({ id: `${this.props.match.params.invoiceId}` }));
+    dispatch(rest.actions.getInvoiceEntries({ id: `${this.props.match.params.invoiceId}` }))
+    .then((response) => {
+      this.setState({ invoiceEntries: response });
+    })
+    .catch((reason) => console.log('isCanceled', reason.isCanceled));
   };
 
   recordInvoice = (event) => {
@@ -195,17 +119,15 @@ class Invoice extends Component {
     event.preventDefault();
     const { dispatch } = this.props;
     let checkedInvoiceEntryIds = [];
-    let userActions = [];
 
     for (let [invoiceEntryId, checked] of Object.entries(this.state.checkedEntries)) {
       if (checked) {
         checkedInvoiceEntryIds.push(parseInt(invoiceEntryId));
-        userActions.push({ 'DELETE': invoiceEntryId});
       }
     }
 
+    this.deleteInvoiceEntries(checkedInvoiceEntryIds);
     this.removeInvoiceEntriesFromState(checkedInvoiceEntryIds);
-    dispatch(addUserActions(userActions));
   };
 
   async deleteInvoiceEntries(invoiceEntryIds) {
@@ -222,14 +144,6 @@ class Invoice extends Component {
       });
       let updatedInvoiceEntries = { "data": filteredInvoiceEntries };
       this.setState({ invoiceEntries: updatedInvoiceEntries });
-    }
-
-    if (this.state.newInvoiceEntries && this.state.newInvoiceEntries.length > 0) {
-      let newFilteredInvoiceEntries = this.state.newInvoiceEntries.filter((invoiceEntry) => {
-        return !checkedInvoiceEntryIds.includes(invoiceEntry.id)
-      });
-      let newUpdatedInvoiceEntries = { "newInvoiceEntries": newFilteredInvoiceEntries };
-      this.setState({ newInvoiceEntries: newUpdatedInvoiceEntries });
     }
 
     this.setState({ checkedEntries: {} });
@@ -258,13 +172,6 @@ class Invoice extends Component {
     // Persisted InvoiceEntry?
     if (this.props.invoiceEntries.data && this.props.invoiceEntries.data.data) {
       invoiceEntry = this.props.invoiceEntries.data.data.filter(obj => {
-        return obj.id == selectedInvoiceEntryId;
-      }).pop();
-    }
-
-    // Unsaved InvoiceEntry?
-    if (this.props.newInvoiceEntries && this.props.newInvoiceEntries.newInvoiceEntries) {
-      invoiceEntry = this.props.newInvoiceEntries.newInvoiceEntries.filter(obj => {
         return obj.id == selectedInvoiceEntryId;
       }).pop();
     }
@@ -313,7 +220,6 @@ class Invoice extends Component {
     return (
       <PageTitle breadcrumb={"Invoice for project [" + this.props.project.data.name + "] (" + this.props.match.params.projectId + ")"}>
         {this.props.invoice.data.name && this.props.invoice.data.name}
-        {!this.props.invoice.data.name && 'New Invoice'}
       </PageTitle>
     )
   };
@@ -336,9 +242,6 @@ class Invoice extends Component {
     return (
       <div className="col-md-8 text-right">
         <ButtonGroup aria-label="Invoice actions">
-          <Button variant="success" type="submit" id="record-invoice" className="mr-3" onClick={this.saveInvoice}>
-            Save invoice
-          </Button>
           {this.props.match.params.invoiceId != 'new' &&
             <Button variant="primary" type="submit" id="record-invoice" className="mr-3" onClick={this.recordInvoice}>
               Record invoice
@@ -354,16 +257,7 @@ class Invoice extends Component {
     );
   };
 
-  renderFooter() {
-    if (this.props.createdAt) {
-      return (
-        <ContentFooter>
-          Invoice created <strong><Moment format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></strong>
-        </ContentFooter>
-      )
-    }
-  };
-
+  // @TODO: show spinner while invoiceEntries are being loaded
   render() {
     if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId) {
       return (
@@ -378,7 +272,6 @@ class Invoice extends Component {
       );
     }
     else if (this.props.project.data.name) {
-      // @TODO: show spinner unless both saved and unsaved invoice entries have been fully rendered
       return (
         <ContentWrapper>
           {this.renderPageTitle()}
@@ -430,18 +323,6 @@ class Invoice extends Component {
                       <td>{this.getPriceData(item.id, 'totalPrice')}</td>
                     </tr>
                   )}
-                  {this.state.newInvoiceEntries && this.state.newInvoiceEntries.length > 0 && this.state.newInvoiceEntries.map((item) =>
-                    <tr key={item.id}>
-                      <td><Form.Check aria-label="" id={item.id} onChange={this.handleCheckboxChange} /></td>
-                      <td>{item.accountNumber}</td>
-                      <td><Link to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}
-                      /${item.id}`}>{item.name}</Link></td>
-                      <td>{item.description}</td>
-                      <td>{this.getPriceData(item.id, 'timeSum')}</td>
-                      <td>{this.getPriceData(item.id, 'unitPrice')}</td>
-                      <td>{this.getPriceData(item.id, 'totalPrice')}</td>
-                    </tr>
-                  )}
                 </tbody>
               </Table>
             </div>
@@ -455,7 +336,9 @@ class Invoice extends Component {
               </ListGroup>
             </div>
           </div>
-          {this.renderFooter()}
+          <ContentFooter>
+            Invoice created <strong><Moment format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></strong>
+          </ContentFooter>
           <Modal show={this.state.showModal} onHide={this.handleModalClose}>
             <Modal.Header closeButton>
               <Modal.Title>Error</Modal.Title>
@@ -492,11 +375,9 @@ Invoice.propTypes = {
   invoice: PropTypes.object,
   createdAt: PropTypes.string,
   invoiceEntries: PropTypes.object,
-  newInvoiceEntries: PropTypes.object,
   jiraIssues: PropTypes.object,
   project: PropTypes.object,
-  dispatch: PropTypes.func.isRequired,
-  userActions: PropTypes.object
+  dispatch: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => {
@@ -510,11 +391,9 @@ const mapStateToProps = state => {
     invoice: state.invoice,
     createdAt: createdAt,
     invoiceEntries: state.invoiceEntries,
-    newInvoiceEntries: state.newInvoiceEntries,
     jiraIssues: state.jiraIssues,
     project: state.project,
-    priceData: priceData,
-    userActions: state.userActions
+    priceData: priceData
   };
 };
 
