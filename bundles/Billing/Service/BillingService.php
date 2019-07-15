@@ -272,7 +272,7 @@ class BillingService
                 'product' => $invoiceEntry->getProduct(),
             ];
 
-            if (count($jiraIssueIds) > 0) {
+            if (\count($jiraIssueIds) > 0) {
                 $invoiceEntry['jiraIssueIds'] = $jiraIssueIds;
             }
 
@@ -317,7 +317,7 @@ class BillingService
             'product' => $invoiceEntry->getProduct(),
         ];
 
-        if (count($jiraIssueIds) > 0) {
+        if (\count($jiraIssueIds) > 0) {
             $invoiceEntry['jiraIssueIds'] = $jiraIssueIds;
         }
 
