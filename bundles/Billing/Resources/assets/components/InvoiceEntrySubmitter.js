@@ -98,6 +98,7 @@ export class InvoiceEntrySubmitter extends Component {
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
   }
 
+  // @TODO: When editing an existing InvoiceEntry, fill form with existing values
   // @TODO: cleanup redundant HTML
   render() {
     // InvoiceEntry without JiraIssues?

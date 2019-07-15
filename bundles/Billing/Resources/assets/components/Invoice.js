@@ -216,47 +216,6 @@ class Invoice extends Component {
     this.setState({ showModal: true, checkedCount: checkedCount });
   };
 
-  renderPageTitle() {
-    return (
-      <PageTitle breadcrumb={"Invoice for project [" + this.props.project.data.name + "] (" + this.props.match.params.projectId + ")"}>
-        {this.props.invoice.data.name && this.props.invoice.data.name}
-      </PageTitle>
-    )
-  };
-
-  renderInvoiceData() {
-    return (
-      <div className="col-md-4">
-        <p>
-          Invoice number: <strong className="pr-3">{this.props.match.params.invoiceId}</strong>
-          Invoice recorded: <strong>
-            {String(this.props.invoice.data.recorded)}
-          </strong>
-        </p>
-        <p>Invoice description TODO: save with invoice data</p>
-      </div>
-    )
-  };
-
-  renderInvoiceButtons() {
-    return (
-      <div className="col-md-8 text-right">
-        <ButtonGroup aria-label="Invoice actions">
-          {this.props.match.params.invoiceId != 'new' &&
-            <Button variant="primary" type="submit" id="record-invoice" className="mr-3" onClick={this.recordInvoice}>
-              Record invoice
-            </Button>
-          }
-          {this.props.match.params.invoiceId != 'new' &&
-            <Button variant="danger" type="submit" id="delete" className="mr-3" onClick={this.deleteInvoice}>
-              Delete invoice
-            </Button>
-          }
-        </ButtonGroup>
-      </div>
-    );
-  };
-
   // @TODO: show spinner while invoiceEntries are being loaded
   render() {
     if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId) {
@@ -274,10 +233,27 @@ class Invoice extends Component {
     else if (this.props.project.data.name) {
       return (
         <ContentWrapper>
-          {this.renderPageTitle()}
+          <PageTitle breadcrumb={"Invoice for project [" + this.props.project.data.name + "] (" + this.props.match.params.projectId + ")"}>
+            {this.props.invoice.data.name && this.props.invoice.data.name}
+          </PageTitle>
           <div className="row">
-            {this.renderInvoiceData()}
-            {this.renderInvoiceButtons()}
+            <div className="col-md-4">
+              <p>
+                Invoice number: <strong className="pr-3">{this.props.match.params.invoiceId}</strong>
+                Invoice recorded: <strong>{String(this.props.invoice.data.recorded)}</strong>
+              </p>
+              <p>Invoice description TODO: save with invoice data</p>
+            </div>
+            <div className="col-md-8 text-right">
+              <ButtonGroup aria-label="Invoice actions">
+                <Button variant="primary" type="submit" id="record-invoice" className="mr-3" onClick={this.recordInvoice}>
+                  Record invoice
+                </Button>
+                <Button variant="danger" type="submit" id="delete" className="mr-3" onClick={this.deleteInvoice}>
+                  Delete invoice
+                </Button>
+              </ButtonGroup>
+            </div>
           </div>
           <div className="row">
             <div className="col-md-8">
