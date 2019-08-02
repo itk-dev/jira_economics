@@ -12,16 +12,17 @@ namespace App\Service;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
+use HWI\Bundle\OAuthBundle\Security\Core\Authentication\Token\OAuthToken;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
 class JiraService extends AbstractJiraService
 {
     protected $tokenStorage;
     protected $customerKey;
     protected $pemPath;
-    private $entity_manager;
 
     /**
      * Constructor.
@@ -42,7 +43,7 @@ class JiraService extends AbstractJiraService
     /**
      * {@inheritdoc}
      */
-    protected function getClient()
+    protected function getClient(string $path = '')
     {
         $stack = HandlerStack::create();
         $token = $this->tokenStorage->getToken();
@@ -51,47 +52,34 @@ class JiraService extends AbstractJiraService
             throw new HttpException(401, 'unauthorized');
         }
 
-        $middleware = $this->setOauth($token);
+        $headers = [];
 
-        $stack->push($middleware);
+        if ($token instanceof OAuthToken) {
+            $oauth1 = new Oauth1(
+                [
+                    'consumer_key' => $this->customerKey,
+                    'private_key_file' => $this->pemPath,
+                    'private_key_passphrase' => '',
+                    'signature_method' => Oauth1::SIGNATURE_METHOD_RSA,
+                    'token' => $token->getAccessToken(),
+                    'token_secret' => $token->getAccessToken(),
+                ]
+            );
 
-        return new Client(
-            [
-            'base_uri' => $this->jiraUrl,
-            'handler' => $stack,
-                'auth' => 'oauth',
-            ]
-        );
-    }
+            $request = new Request('GET', $this->jiraUrl.$path);
+            $handler = $oauth1->__invoke(function (Request $req, array $options) use (&$request) {
+                $request = $req;
+            });
+            $handler($request, ['auth' => 'oauth']);
 
-    /**
-     * Set OAuth token.
-     *
-     * @param $token
-     *
-     * @return \GuzzleHttp\Subscriber\Oauth\Oauth1
-     */
-    private function setOauth($token)
-    {
-        $accessToken = null;
-        $accessTokenSecret = null;
-
-        if (!$token instanceof AnonymousToken) {
-            $accessToken = $token->getAccessToken();
-            $accessTokenSecret = $token->getTokenSecret();
+            if ($request->hasHeader('authorization')) {
+                $headers['authorization'] = $request->getHeader('authorization');
+            }
         }
 
-        $middleware = new Oauth1(
-            [
-            'consumer_key' => $this->customerKey,
-            'private_key_file' => $this->pemPath,
-            'private_key_passphrase' => '',
-            'signature_method' => Oauth1::SIGNATURE_METHOD_RSA,
-            'token' => $accessToken,
-            'token_secret' => $accessTokenSecret,
-            ]
-        );
-
-        return $middleware;
+        return new Client([
+            'base_uri' => $this->jiraUrl,
+            'headers' => $headers,
+        ]);
     }
 }

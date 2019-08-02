@@ -176,6 +176,9 @@
     "jms/metadata": {
         "version": "2.0.0"
     },
+    "lesstif/php-jira-rest-client": {
+        "version": "1.41.0"
+    },
     "microsoft/tolerant-php-parser": {
         "version": "v0.0.17"
     },
@@ -265,6 +268,9 @@
     },
     "phpmd/phpmd": {
         "version": "2.6.0"
+    },
+    "phpoption/phpoption": {
+        "version": "1.5.0"
     },
     "pimple/pimple": {
         "version": "v3.2.3"
@@ -703,6 +709,9 @@
         "files": [
             "config/packages/vich_uploader.yaml"
         ]
+    },
+    "vlucas/phpdotenv": {
+        "version": "v3.4.0"
     },
     "webmozart/assert": {
         "version": "1.4.0"

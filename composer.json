@@ -10,6 +10,7 @@
         "guzzlehttp/oauth-subscriber": "^0.3.0",
         "guzzlehttp/psr7": "^1.5",
         "hwi/oauth-bundle": "^0.6.3",
+        "lesstif/php-jira-rest-client": "^1.41",
         "php-http/guzzle6-adapter": " ^1.0",
         "php-http/httplug": "^1.0",
         "php-http/httplug-bundle": "^1.15",

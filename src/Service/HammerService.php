@@ -34,7 +34,7 @@ class HammerService extends AbstractJiraService
     /**
      * {@inheritdoc}
      */
-    protected function getClient()
+    protected function getClient(string $path = '')
     {
         return new Client(
             [

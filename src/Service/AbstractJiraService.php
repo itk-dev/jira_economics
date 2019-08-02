@@ -24,7 +24,7 @@ abstract class AbstractJiraService
     /**
      * @return \GuzzleHttp\Client
      */
-    abstract protected function getClient();
+    abstract protected function getClient(string $path);
 
     /**
      * Get from Jira.
@@ -35,7 +35,7 @@ abstract class AbstractJiraService
      */
     public function get($path)
     {
-        $client = $this->getClient();
+        $client = $this->getClient($path);
 
         try {
             $response = $client->get($path);
@@ -57,7 +57,7 @@ abstract class AbstractJiraService
      */
     public function post($path, $data)
     {
-        $client = $this->getClient();
+        $client = $this->getClient($path);
 
         // Set the "auth" request option to "oauth" to sign using oauth
         try {
@@ -85,7 +85,7 @@ abstract class AbstractJiraService
      */
     public function put($path, $data)
     {
-        $client = $this->getClient();
+        $client = $this->getClient($path);
 
         // Set the "auth" request option to "oauth" to sign using oauth
         try {
