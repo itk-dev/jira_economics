@@ -33,7 +33,7 @@ abstract class AbstractJiraService
      *
      * @return mixed
      */
-    protected function get($path)
+    public function get($path)
     {
         $client = $this->getClient();
 
@@ -55,7 +55,7 @@ abstract class AbstractJiraService
      *
      * @return mixed
      */
-    protected function post($path, $data)
+    public function post($path, $data)
     {
         $client = $this->getClient();
 
@@ -83,7 +83,7 @@ abstract class AbstractJiraService
      *
      * @return mixed
      */
-    protected function put($path, $data)
+    public function put($path, $data)
     {
         $client = $this->getClient();
 
