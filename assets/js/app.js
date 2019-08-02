@@ -28,4 +28,4 @@ require('select2');
 // Add filer
 require('./jqueryFiler/js/jquery.filer.min.js');
 require('./jqueryFiler/css/jquery.filer.css');
-require('./jqueryFiler/css/themes/jquery.filer-dragdropbox-theme.css');;
+require('./jqueryFiler/css/themes/jquery.filer-dragdropbox-theme.css');

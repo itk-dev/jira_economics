@@ -32,7 +32,7 @@ function makePriceData(invoiceEntries, jiraIssues) {
     let timeSum = 0;
 
     jiraIssues.data.data.forEach(jiraIssue => {
-      if (jiraIssue.invoiceEntryId != invoiceEntry.invoiceEntryId) {
+      if (jiraIssue.invoiceEntryId !== invoiceEntry.invoiceEntryId) {
         return;
       }
       if (parseFloat(jiraIssue.time_spent)) {

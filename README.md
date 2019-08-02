@@ -79,10 +79,10 @@ JIRA_URL='https://[SITE].atlassian.net'
 JIRA_DEFAULT_BOARD=[TEAM BOARD ID]
 ```
 
-#Setup Database
+# Setup Database
 DATABASE_URL=""
 
-#Setup bundles/CreateProject
+# Setup bundles/CreateProject
 Set values in .env.local:
 
 ```
@@ -95,7 +95,7 @@ Define the config
 - Define each team config.
 
 
-#Setup bundles/GraphicServiceOrder
+# Setup bundles/GraphicServiceOrder
 Set values in .env.local:
 
 ```
