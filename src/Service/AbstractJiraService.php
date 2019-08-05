@@ -10,6 +10,7 @@
 
 namespace App\Service;
 
+use Expense\Entity\Category as ExpenseCategory;
 use GuzzleHttp\Exception\RequestException;
 
 abstract class AbstractJiraService
@@ -95,6 +96,29 @@ abstract class AbstractJiraService
                 'json' => $data,
                 ]
             );
+
+            if ($body = $response->getBody()) {
+                return json_decode($body);
+            }
+        } catch (RequestException $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Delete in Jira.
+     *
+     * @param $path
+     *
+     * @return mixed
+     */
+    protected function delete($path)
+    {
+        $client = $this->getClient();
+
+        // Set the "auth" request option to "oauth" to sign using oauth
+        try {
+            $response = $client->delete($path);
 
             if ($body = $response->getBody()) {
                 return json_decode($body);
@@ -196,6 +220,67 @@ abstract class AbstractJiraService
     public function getCurrentUser()
     {
         $result = $this->get('/rest/api/2/myself');
+
+        return $result;
+    }
+
+    /**
+     * @see http://developer.tempo.io/doc/core/api/rest/latest/#1349331745
+     */
+    public function getExpenseCategories()
+    {
+        $result = $this->get('/rest/tempo-core/1/expense/category/');
+
+        return $result;
+    }
+
+    public function getExpenseCategory(int $id)
+    {
+        $categories = $this->getExpenseCategories();
+
+        foreach ($categories as $category) {
+            if ($id === $category->id) {
+                return $category;
+            }
+        }
+
+        return null;
+    }
+
+    public function getExpenseCategoryByName(string $name)
+    {
+        $categories = $this->getExpenseCategories();
+
+        foreach ($categories as $category) {
+            if ($name === $category->name) {
+                return $category;
+            }
+        }
+
+        return null;
+    }
+
+    public function createExpenseCategory(ExpenseCategory $category)
+    {
+        $result = $this->post('/rest/tempo-core/1/expense/category/', [
+            'name' => $category->getName(),
+        ]);
+
+        return $result;
+    }
+
+    public function updateExpenseCategory(ExpenseCategory $category)
+    {
+        $result = $this->put('/rest/tempo-core/1/expense/category/'.$category->getId().'/', [
+            'name' => $category->getName(),
+        ]);
+
+        return $result;
+    }
+
+    public function deleteExpenseCategory(ExpenseCategory $category)
+    {
+        $result = $this->delete('/rest/tempo-core/1/expense/category/'.$category->getId().'/');
 
         return $result;
     }
