@@ -6,8 +6,6 @@ import { setSelectedIssues } from '../redux/actions';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
 
-// @TODO: each invoiceEntry should be persisted with the total cost
-
 export class InvoiceEntrySubmitter extends Component {
   constructor(props) {
     super(props);
@@ -62,6 +60,9 @@ export class InvoiceEntrySubmitter extends Component {
     const description = $('#invoice-entry-description').val();
     const account = $('#invoice-entry-account').val();
     const product = $('#invoice-entry-product').val();
+    const hoursSpent = $('#invoice-entry-hours-spent').val();
+    const unitPrice = $('#invoice-entry-unit-price').val();
+    const price = hoursSpent * unitPrice;
     let jiraIssueIds = [];
     if (this.props.selectedIssues && this.props.selectedIssues.selectedIssues && this.props.selectedIssues.selectedIssues.length > 0) {
       this.props.selectedIssues.selectedIssues.forEach(selectedIssue => {
@@ -74,7 +75,8 @@ export class InvoiceEntrySubmitter extends Component {
       description,
       account,
       product,
-      jiraIssueIds
+      jiraIssueIds,
+      price
     };
     const existingInvoiceEntryId = this.props.location.state.existingInvoiceEntryId;
     if (existingInvoiceEntryId) {
@@ -260,7 +262,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-hours-spent"
                 aria-describedby="enterHoursSpent"
-                placeholder={this.getTimeSpent()}
+                value={this.getTimeSpent()}
                 readOnly>
               </input>
               <label htmlFor="beskrivelse">
@@ -272,7 +274,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-unit-price"
                 aria-describedby="enterUnitPrice"
-                placeholder={this.getUnitPrice()}
+                value={this.getUnitPrice()}
                 readOnly>
               </input>
             </div>

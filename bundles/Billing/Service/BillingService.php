@@ -335,6 +335,10 @@ class BillingService
             throw new HttpException(400, "Expected integer value for 'invoiceId' in request");
         }
 
+        if (empty($invoiceEntryData['price']) || !(int) ($invoiceEntryData['price'])) {
+            throw new HttpException(400, "Expected integer value for 'price' in request");
+        }
+
         $invoiceRepository = $this->entityManager->getRepository(Invoice::class);
         $invoice = $invoiceRepository->findOneBy(['id' => $invoiceEntryData['invoiceId']]);
 
@@ -344,6 +348,7 @@ class BillingService
 
         $invoiceEntry = new InvoiceEntry();
         $invoiceEntry->setInvoice($invoice);
+        $invoiceEntry->setPrice($invoiceEntryData['price']);
 
         if (!empty($invoiceEntryData['name'])) {
             $invoiceEntry->setName($invoiceEntryData['name']);
@@ -369,6 +374,7 @@ class BillingService
             'description' => $invoiceEntry->getDescription(),
             'account' => $invoiceEntry->getAccount(),
             'product' => $invoiceEntry->getProduct(),
+            'price' => $invoiceEntry->getPrice(),
         ];
 
         if (!empty($invoiceEntryData['jiraIssueIds'])) {
@@ -406,12 +412,18 @@ class BillingService
             throw new HttpException(400, "Expected integer value for 'id' in request");
         }
 
+        if (empty($invoiceEntryData['price']) || !(int) ($invoiceEntryData['price'])) {
+            throw new HttpException(400, "Expected integer value for 'price' in request");
+        }
+
         $repository = $this->entityManager->getRepository(InvoiceEntry::class);
         $invoiceEntry = $repository->findOneBy(['id' => $invoiceEntryData['id']]);
 
         if (!$invoiceEntry) {
             throw new HttpException(404, 'Unable to update invoiceEntry with id '.$invoiceEntryData['id'].' as it does not already exist');
         }
+
+        $invoiceEntry->setPrice($invoiceEntryData['price']);
 
         if (!empty($invoiceEntryData['name'])) {
             $invoiceEntry->setName($invoiceEntryData['name']);
@@ -436,6 +448,7 @@ class BillingService
             'description' => $invoiceEntry->getDescription(),
             'account' => $invoiceEntry->getAccount(),
             'product' => $invoiceEntry->getProduct(),
+            'price' => $invoiceEntry->getPrice(),
         ];
 
         if (!empty($invoiceEntryData['jiraIssueIds'])) {

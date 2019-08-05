@@ -171,7 +171,7 @@ class Invoice extends Component {
 
     let invoiceEntry = {};
 
-    // Persisted InvoiceEntry?
+    // Get the selected InvoiceEntry
     if (this.props.invoiceEntries.data && this.props.invoiceEntries.data.data) {
       invoiceEntry = this.props.invoiceEntries.data.data.filter(obj => {
         return obj.id == selectedInvoiceEntryId;
