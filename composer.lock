@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6e0eca47449f46c19becc3503206bb91",
+    "content-hash": "e92c9d4a00790584f1f56f12f844fe02",
     "packages": [
         {
             "name": "api-platform/api-pack",
@@ -2181,16 +2181,16 @@
         },
         {
             "name": "lesstif/php-jira-rest-client",
-            "version": "1.41.0",
+            "version": "dev-authorization-header",
             "source": {
                 "type": "git",
-                "url": "https://github.com/lesstif/php-jira-rest-client.git",
-                "reference": "12e0e7c4723eb2d5952e8360c35c955fa64d1cf5"
+                "url": "https://github.com/itk-dev/php-jira-rest-client.git",
+                "reference": "5b66f36d6e3d6ed565be8c52d39b4c1df3460225"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lesstif/php-jira-rest-client/zipball/12e0e7c4723eb2d5952e8360c35c955fa64d1cf5",
-                "reference": "12e0e7c4723eb2d5952e8360c35c955fa64d1cf5",
+                "url": "https://api.github.com/repos/itk-dev/php-jira-rest-client/zipball/5b66f36d6e3d6ed565be8c52d39b4c1df3460225",
+                "reference": "5b66f36d6e3d6ed565be8c52d39b4c1df3460225",
                 "shasum": ""
             },
             "require": {
@@ -2219,7 +2219,6 @@
                     "JiraRestApi\\": "src"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "Apache-2.0"
             ],
@@ -2237,7 +2236,10 @@
                 "jira-rest",
                 "rest"
             ],
-            "time": "2019-07-30T12:31:28+00:00"
+            "support": {
+                "source": "https://github.com/itk-dev/php-jira-rest-client/tree/feature/2-legged-oauth"
+            },
+            "time": "2019-08-04T11:38:47+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -9172,9 +9174,11 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": [],
-    "prefer-stable": false,
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "lesstif/php-jira-rest-client": 20
+    },
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^7.1.3",

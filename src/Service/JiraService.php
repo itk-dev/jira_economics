@@ -11,9 +11,6 @@
 namespace App\Service;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Subscriber\Oauth\Oauth1;
 use HWI\Bundle\OAuthBundle\Security\Core\Authentication\Token\OAuthToken;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
@@ -43,43 +40,36 @@ class JiraService extends AbstractJiraService
     /**
      * {@inheritdoc}
      */
-    protected function getClient(string $path = '')
+    protected function getClient()
     {
-        $stack = HandlerStack::create();
         $token = $this->tokenStorage->getToken();
 
         if ($token instanceof AnonymousToken) {
             throw new HttpException(401, 'unauthorized');
         }
 
-        $headers = [];
-
-        if ($token instanceof OAuthToken) {
-            $oauth1 = new Oauth1(
-                [
-                    'consumer_key' => $this->customerKey,
-                    'private_key_file' => $this->pemPath,
-                    'private_key_passphrase' => '',
-                    'signature_method' => Oauth1::SIGNATURE_METHOD_RSA,
-                    'token' => $token->getAccessToken(),
-                    'token_secret' => $token->getAccessToken(),
-                ]
-            );
-
-            $request = new Request('GET', $this->jiraUrl.$path);
-            $handler = $oauth1->__invoke(function (Request $req, array $options) use (&$request) {
-                $request = $req;
-            });
-            $handler($request, ['auth' => 'oauth']);
-
-            if ($request->hasHeader('authorization')) {
-                $headers['authorization'] = $request->getHeader('authorization');
-            }
-        }
-
         return new Client([
             'base_uri' => $this->jiraUrl,
-            'headers' => $headers,
         ]);
+    }
+
+    protected function getConfiguration()
+    {
+        $configuration = [
+            'jiraLogEnabled' => false,
+            'jiraHost' => $this->jiraUrl,
+        ];
+
+        $token = $this->tokenStorage->getToken();
+        if ($token instanceof OAuthToken) {
+            $configuration['token'] = $token;
+            $configuration['authorizationConfiguration'] = [
+                'customerKey' => $this->customerKey,
+                'pemPath' => $this->pemPath,
+                'jiraUrl' => $this->jiraUrl.'/rest/api/2',
+            ];
+        }
+
+        return new JiraConfiguration($configuration);
     }
 }

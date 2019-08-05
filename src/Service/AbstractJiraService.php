@@ -11,6 +11,7 @@
 namespace App\Service;
 
 use GuzzleHttp\Exception\RequestException;
+use JiraRestApi\Project\ProjectService;
 
 abstract class AbstractJiraService
 {
@@ -24,7 +25,9 @@ abstract class AbstractJiraService
     /**
      * @return \GuzzleHttp\Client
      */
-    abstract protected function getClient(string $path);
+    abstract protected function getClient();
+
+    abstract protected function getConfiguration();
 
     /**
      * Get from Jira.
@@ -126,14 +129,13 @@ abstract class AbstractJiraService
      */
     public function getProjects()
     {
-        $projects = [];
+        $allProjects = $this->getAllProjects();
 
-        $results = $this->get('/rest/api/2/project');
-
-        foreach ($results as $result) {
-            if (!isset($result->projectCategory) || 'Lukket' !== $result->projectCategory->name) {
-                $result->url = parse_url($result->self, PHP_URL_SCHEME).'://'.parse_url($result->self, PHP_URL_HOST).'/browse/'.$result->key;
-                $projects[] = $result;
+        $projects = new \ArrayObject();
+        foreach ($allProjects as &$project) {
+            if (!isset($project->projectCategory) || 'Lukket' !== $project->projectCategory['name']) {
+                $project->url = parse_url($project->self, PHP_URL_SCHEME).'://'.parse_url($project->self, PHP_URL_HOST).'/browse/'.$project->key;
+                $projects[] = $project;
             }
         }
 
@@ -143,13 +145,16 @@ abstract class AbstractJiraService
     /**
      * Get all projects, including archived.
      *
-     * @return array
+     * @return \ArrayObject
      */
     public function getAllProjects()
     {
-        $projects = $this->get('/rest/api/2/project');
+        return $this->projects()->getAllProjects();
+    }
 
-        return $projects;
+    private function projects()
+    {
+        return new ProjectService($this->getConfiguration());
     }
 
     /**

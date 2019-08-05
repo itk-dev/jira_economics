@@ -11,6 +11,7 @@
 namespace App\Service;
 
 use GuzzleHttp\Client;
+use JiraRestApi\Configuration\DotEnvConfiguration;
 
 class HammerService extends AbstractJiraService
 {
@@ -34,7 +35,7 @@ class HammerService extends AbstractJiraService
     /**
      * {@inheritdoc}
      */
-    protected function getClient(string $path = '')
+    protected function getClient()
     {
         return new Client(
             [
@@ -45,5 +46,10 @@ class HammerService extends AbstractJiraService
                 ],
             ]
         );
+    }
+
+    protected function getConfiguration()
+    {
+        return new DotEnvConfiguration();
     }
 }
