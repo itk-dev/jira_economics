@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Boards{% endblock %}
+
+{% block content %}
+    Søg i alle boards i venstre side, eller åben udvalgte boards herunder...
+{% endblock %}
+
+{% block sidebar %}
+    {% include '@PlanningBundle/_planning-sidebar.html.twig' %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('planning_sidebar') }}
+{% endblock %}

@@ -1,8 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
+{% block content %}
     <div id="app" class="app">
         <h1>{{ 'planning.headline.headline' | trans }}</h1>
+
+        <h2>{{ board.name }}</h2>
 
         <div class="planning-section">
             <h2>{{ 'planning.headline.users' | trans }}</h2>
@@ -160,6 +162,10 @@
     </div>
 {% endblock %}
 
+{% block sidebar %}
+    {% include '@PlanningBundle/_planning-sidebar.html.twig' %}
+{% endblock %}
+
 {% block stylesheets %}
     {{ parent() }}
 
@@ -170,4 +176,5 @@
     {{ parent() }}
 
     {{ encore_entry_script_tags('planning') }}
+    {{ encore_entry_script_tags('planning_sidebar') }}
 {% endblock %}

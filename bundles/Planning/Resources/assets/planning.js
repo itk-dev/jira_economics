@@ -4,6 +4,8 @@ import axios from 'axios';
 require('./planning.css');
 
 (function () {
+    const currentUrl = window.location.href;
+
     const app = new Vue({
         el: '#app',
         data: {
@@ -68,7 +70,7 @@ require('./planning.css');
                 this.hideUsers = JSON.parse(hideUsers);
             }
 
-            axios.get('future_sprints')
+            axios.get(currentUrl + '/future_sprints')
                 .then(function (response) {
                     this.sprints = response.data.sprints;
 
@@ -277,7 +279,7 @@ require('./planning.css');
                 }
             },
             getSprint: function (id, index) {
-                axios.get('issues/' + id)
+                axios.get(currentUrl + '/issues/' + id)
                     .then(function (response) {
                         var sprint = this.sprints[index];
                         sprint.issues = response.data.issues;

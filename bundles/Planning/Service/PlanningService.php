@@ -18,13 +18,42 @@ class PlanningService extends JiraService
         parent::__construct($jiraUrl, $tokenStorage, $customerKey, $pemPath);
     }
 
+    public function getBoard($boardId)
+    {
+        return $this->get('/rest/agile/1.0/board/'.$boardId);
+    }
+
     /**
-     * Get all future sprints.
+     * Get all boards.
      *
      * @return array
      */
-    public function getFutureSprints() {
-        $boardId = getenv('JIRA_DEFAULT_BOARD');
+    public function getAllBoards()
+    {
+        $boards = [];
+
+        $start = 0;
+        while (true) {
+            $result = $this->get('/rest/agile/1.0/board?maxResults=50&startAt=' . $start);
+            $boards = array_merge($boards, $result->values);
+
+            if ($result->isLast) {
+                break;
+            }
+
+            $start = $start + 50;
+        }
+
+        return $boards;
+    }
+
+    /**
+     * Get all future sprints.
+     *
+     * @param $boardId
+     * @return array
+     */
+    public function getFutureSprints($boardId) {
         $sprints = [];
 
         $start = 0;
@@ -45,11 +74,11 @@ class PlanningService extends JiraService
     /**
      * Get all issues for sprint.
      *
+     * @param $boardId
      * @param $sprintId
      * @return array
      */
-    public function getIssuesInSprint($sprintId) {
-        $boardId = getenv('JIRA_DEFAULT_BOARD');
+    public function getIssuesInSprint($boardId, $sprintId) {
         $issues = [];
         $fields = implode(
             ',',

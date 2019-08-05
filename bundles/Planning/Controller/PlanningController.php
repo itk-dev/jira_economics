@@ -17,31 +17,64 @@ class PlanningController extends AbstractController
     /**
      * @Route("/")
      */
-    public function planningOverviewAction() {
-        $jiraUrl = getenv('JIRA_URL');
+    public function boardAction(PlanningService $planningService)
+    {
+        $boards = $planningService->getAllBoards();
 
         return $this->render(
-            '@PlanningBundle/planning.html.twig',
+            '@PlanningBundle/board.html.twig',
             [
-                'jiraUrl' => $jiraUrl,
+                'boards' => $boards,
             ]
         );
     }
 
     /**
-     * @Route("/future_sprints")
+     * @Route("/board")
      */
-    public function futureSprints(PlanningService $planningService) {
-        $sprints = $planningService->getFutureSprints();
+    public function allBoards(PlanningService $planningService) {
+        $boards = $planningService->getAllBoards();
+
+        return new JsonResponse(['boards' => $boards]);
+    }
+
+    /**
+     * @Route("/board/{boardId}")
+     * @param null $boardId
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function planningOverviewAction(PlanningService $planningService, $boardId = null) {
+        $jiraUrl = getenv('JIRA_URL');
+
+        if ($boardId == null) {
+            $boardId = getenv('JIRA_DEFAULT_BOARD');
+        }
+
+        $board = $planningService->getBoard($boardId);
+
+        return $this->render(
+            '@PlanningBundle/planning.html.twig',
+            [
+                'jiraUrl' => $jiraUrl,
+                'board' => $board,
+            ]
+        );
+    }
+
+    /**
+     * @Route("/board/{boardId}/future_sprints")
+     */
+    public function futureSprints(PlanningService $planningService, $boardId) {
+        $sprints = $planningService->getFutureSprints($boardId);
 
         return new JsonResponse(['sprints' => $sprints]);
     }
 
     /**
-     * @Route("/issues/{sprintId}")
+     * @Route("/board/{boardId}/issues/{sprintId}")
      */
-    public function issuesInSprint(PlanningService $planningService, $sprintId) {
-        $issues = $planningService->getIssuesInSprint($sprintId);
+    public function issuesInSprint(PlanningService $planningService, $boardId, $sprintId) {
+        $issues = $planningService->getIssuesInSprint($boardId, $sprintId);
 
         return new JsonResponse(['issues' => $issues]);
     }
