@@ -5,27 +5,31 @@ namespace Planning\Controller;
 use Planning\Service\PlanningService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Class PlanningController.
  *
- * @Route("/planning")
+ * @Route("/")
  */
 class PlanningController extends AbstractController
 {
     /**
      * @Route("/")
-     * @Method("GET")
      */
     public function planningOverviewAction() {
+        $jiraUrl = getenv('JIRA_URL');
+
         return $this->render(
-            '@PlanningBundle/planning.html.twig'
+            '@PlanningBundle/planning.html.twig',
+            [
+                'jiraUrl' => $jiraUrl,
+            ]
         );
     }
 
     /**
      * @Route("/future_sprints")
-     * @Method("GET")
      */
     public function futureSprints(PlanningService $planningService) {
         $sprints = $planningService->getFutureSprints();
@@ -35,7 +39,6 @@ class PlanningController extends AbstractController
 
     /**
      * @Route("/issues/{sprintId}")
-     * @Method("GET")
      */
     public function issuesInSprint(PlanningService $planningService, $sprintId) {
         $issues = $planningService->getIssuesInSprint($sprintId);

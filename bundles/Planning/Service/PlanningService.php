@@ -7,6 +7,18 @@ use App\Service\JiraService;
 class PlanningService extends JiraService
 {
     /**
+     * Constructor.
+     */
+    public function __construct(
+        $jiraUrl,
+        $tokenStorage,
+        $customerKey,
+        $pemPath
+    ) {
+        parent::__construct($jiraUrl, $tokenStorage, $customerKey, $pemPath);
+    }
+
+    /**
      * Get all future sprints.
      *
      * @return array

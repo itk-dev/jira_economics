@@ -1,0 +1,19 @@
+services:
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    Planning\:
+        resource: '../../*'
+        exclude: '../../{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    Planning\Controller\:
+        resource: '../../Controller'
+        tags: ['controller.service_arguments']
+
+    Planning\Service\PlanningService:
+        arguments:
+            $jiraUrl: '%env(JIRA_URL)%'
+            $tokenStorage: '@security.token_storage'
+            $customerKey: '%env(JIRA_OAUTH_CUSTOMER_KEY)%'
+            $pemPath: '%env(JIRA_OAUTH_PEM_PATH)%'
