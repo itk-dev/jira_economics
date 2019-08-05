@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import axios from 'axios';
 
+require('./planning.css');
+
 (function () {
     const app = new Vue({
         el: '#app',
