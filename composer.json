@@ -59,7 +59,8 @@
             "App\\": "src/",
             "Billing\\":"bundles/Billing",
             "CreateProject\\":"bundles/CreateProject",
-            "GraphicServiceOrder\\":"bundles/GraphicServiceOrder"
+            "GraphicServiceOrder\\":"bundles/GraphicServiceOrder",
+            "Planning":"bundles/Planning"
         }
     },
     "autoload-dev": {

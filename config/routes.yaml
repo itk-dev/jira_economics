@@ -21,3 +21,6 @@ create-project:
 
 create-graphic-service-order:
     resource: "@GraphicServiceOrderBundle/Resources/config/routing.yaml"
+
+planning:
+    resource: "@PlanningBundle/Resources/config/routing.yaml"
