@@ -270,6 +270,8 @@ class BillingService
                 'description' => $invoiceEntry->getDescription(),
                 'account' => $invoiceEntry->getAccount(),
                 'product' => $invoiceEntry->getProduct(),
+                'amount' => $invoiceEntry->getAmount(),
+                'price' => $invoiceEntry->getPrice(),
             ];
 
             if (\count($jiraIssueIds) > 0) {
@@ -315,6 +317,8 @@ class BillingService
             'description' => $invoiceEntry->getDescription(),
             'account' => $invoiceEntry->getAccount(),
             'product' => $invoiceEntry->getProduct(),
+            'amount' => $invoiceEntry->getAmount(),
+            'price' => $invoiceEntry->getPrice(),
         ];
 
         if (\count($jiraIssueIds) > 0) {
@@ -335,6 +339,10 @@ class BillingService
             throw new HttpException(400, "Expected integer value for 'invoiceId' in request");
         }
 
+        if (empty($invoiceEntryData['amount']) || !(float) ($invoiceEntryData['amount'])) {
+            throw new HttpException(400, "Expected integer value for 'amount' in request");
+        }
+
         if (empty($invoiceEntryData['price']) || !(int) ($invoiceEntryData['price'])) {
             throw new HttpException(400, "Expected integer value for 'price' in request");
         }
@@ -348,6 +356,7 @@ class BillingService
 
         $invoiceEntry = new InvoiceEntry();
         $invoiceEntry->setInvoice($invoice);
+        $invoiceEntry->setAmount($invoiceEntryData['amount']);
         $invoiceEntry->setPrice($invoiceEntryData['price']);
 
         if (!empty($invoiceEntryData['name'])) {
@@ -374,6 +383,7 @@ class BillingService
             'description' => $invoiceEntry->getDescription(),
             'account' => $invoiceEntry->getAccount(),
             'product' => $invoiceEntry->getProduct(),
+            'amount' => $invoiceEntry->getAmount(),
             'price' => $invoiceEntry->getPrice(),
         ];
 
@@ -412,6 +422,10 @@ class BillingService
             throw new HttpException(400, "Expected integer value for 'id' in request");
         }
 
+        if (empty($invoiceEntryData['amount']) || !(float) ($invoiceEntryData['amount'])) {
+            throw new HttpException(400, "Expected integer value for 'amount' in request");
+        }
+
         if (empty($invoiceEntryData['price']) || !(int) ($invoiceEntryData['price'])) {
             throw new HttpException(400, "Expected integer value for 'price' in request");
         }
@@ -423,6 +437,7 @@ class BillingService
             throw new HttpException(404, 'Unable to update invoiceEntry with id '.$invoiceEntryData['id'].' as it does not already exist');
         }
 
+        $invoiceEntry->setAmount($invoiceEntryData['amount']);
         $invoiceEntry->setPrice($invoiceEntryData['price']);
 
         if (!empty($invoiceEntryData['name'])) {
@@ -448,6 +463,7 @@ class BillingService
             'description' => $invoiceEntry->getDescription(),
             'account' => $invoiceEntry->getAccount(),
             'product' => $invoiceEntry->getProduct(),
+            'amount' => $invoiceEntry->getAmount(),
             'price' => $invoiceEntry->getPrice(),
         ];
 

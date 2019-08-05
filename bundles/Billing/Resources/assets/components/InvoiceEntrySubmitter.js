@@ -63,6 +63,7 @@ export class InvoiceEntrySubmitter extends Component {
     const hoursSpent = $('#invoice-entry-hours-spent').val();
     const unitPrice = $('#invoice-entry-unit-price').val();
     const price = hoursSpent * unitPrice;
+    const amount = Math.round(parseFloat(hoursSpent) * 1e2) / 1e2;
     let jiraIssueIds = [];
     if (this.props.selectedIssues && this.props.selectedIssues.selectedIssues && this.props.selectedIssues.selectedIssues.length > 0) {
       this.props.selectedIssues.selectedIssues.forEach(selectedIssue => {
@@ -76,7 +77,8 @@ export class InvoiceEntrySubmitter extends Component {
       account,
       product,
       jiraIssueIds,
-      price
+      price,
+      amount
     };
     const existingInvoiceEntryId = this.props.location.state.existingInvoiceEntryId;
     if (existingInvoiceEntryId) {

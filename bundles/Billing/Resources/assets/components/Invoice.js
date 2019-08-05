@@ -23,28 +23,12 @@ function makePriceData(invoiceEntries, jiraIssues) {
     return [];
   }
   let priceData = [];
-  // @TODO: replace with real customer data
-  const unitPrices = [560, 760, 820];
-
   invoiceEntries.data.data.forEach(invoiceEntry => {
     let key = `row-${invoiceEntry.id}`;
-    let timeSum = 0;
-
-    jiraIssues.data.data.forEach(jiraIssue => {
-      if (jiraIssue.invoiceEntryId != invoiceEntry.id) {
-        return;
-      }
-      if (parseFloat(jiraIssue.timeSpent)) {
-        timeSum += jiraIssue.timeSpent;
-      }
-    });
-    if (timeSum > 0) {
-      timeSum /= 3600;
-    }
-
-    const unitPrice = unitPrices[Math.floor(Math.random() * unitPrices.length)];
-    const totalPrice = timeSum * unitPrice;
-    priceData[key] = { unitPrice: unitPrice, timeSum: timeSum, totalPrice: totalPrice };
+    const amount = invoiceEntry.amount;
+    const unitPrice = invoiceEntry.price / amount;
+    const totalPrice = invoiceEntry.price;
+    priceData[key] = { unitPrice: unitPrice, amount: amount, totalPrice: totalPrice };
   });
 
   return priceData;
@@ -296,7 +280,7 @@ class Invoice extends Component {
                       <td><Link to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}
                       /${item.id}`}>{item.name}</Link></td>
                       <td>{item.description}</td>
-                      <td>{this.getPriceData(item.id, 'timeSum')}</td>
+                      <td>{this.getPriceData(item.id, 'amount')}</td>
                       <td>{this.getPriceData(item.id, 'unitPrice')}</td>
                       <td>{this.getPriceData(item.id, 'totalPrice')}</td>
                     </tr>
