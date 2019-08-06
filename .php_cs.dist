@@ -22,5 +22,7 @@ return PhpCsFixer\Config::create()
     'list_syntax' => ['syntax' => 'short'],
     'method_argument_space' => ['on_multiline' => 'ensure_fully_multiline'],
     'strict_comparison' => true,
+    'method_chaining_indentation' => true,
+    'array_indentation' => true,
   ])
   ->setFinder($finder);
