@@ -6,7 +6,8 @@ import axios from 'axios';
         el: '#planningBoardApp',
         data: {
             boards: [],
-            filter: ''
+            filter: '',
+            loading: false
         },
         computed: {
             sortedBoards: function () {
@@ -27,13 +28,17 @@ import axios from 'axios';
             }
         },
         created: function () {
+            this.loading = true;
+
             axios.get('/planning/board')
                 .then(function (response) {
                     this.boards = response.data.boards;
+                    this.loading = false;
                 }.bind(this))
                 .catch(function (error) {
                     console.log(error);
-                });
+                    this.loading = false;
+                }.bind(this));
         },
         methods: {}
     });

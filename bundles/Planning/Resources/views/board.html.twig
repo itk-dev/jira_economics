@@ -3,9 +3,14 @@
 {% block title %}Boards - Planning - ITK Jira{% endblock %}
 
 {% block main %}
-    <div class="row-1 p-2">
+    <div class="row-1 p-2" id="planningBoardApp">
         <h1>{{ 'planning.board.headline' | trans }}</h1>
-        <div id="planningBoardApp" class="col">
+
+        <div class="spinner-border" role="status" v-show="loading">
+            <span class="sr-only">Loading...</span>
+        </div>
+
+        <div class="col" v-if="!loading && boards.length > 0">
             <div class="input-group mb-3">
                 <input type="text" class="form-control" placeholder="filter" aria-label="filter" aria-describedby="basic-addon1" v-model="filter">
             </div>
