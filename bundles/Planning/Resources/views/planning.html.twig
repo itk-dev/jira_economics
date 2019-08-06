@@ -6,10 +6,10 @@
     <div id="app" class="app">
         <a href="/planning"><- Vælg andet board</a>
 
-        <h1>{{ 'planning.headline.headline' | trans }} - {{ board.name }}</h1>
+        <h1>{{ 'planning.headline.headline'|trans }} - {{ board.name }}</h1>
 
         <div class="planning-section">
-            <h5>{{ 'planning.headline.users' | trans }}</h5>
+            <h5>{{ 'planning.headline.users'|trans }}</h5>
 
             <div class="input-group mb-3" style="max-width: 400px">
                 <div class="input-group-prepend">
@@ -93,7 +93,7 @@
                 </table>
             </div>
             <div>
-                <div><i class="fas fa-eye-slash"></i> <strong>{{ 'planning.ignored_users' | trans }}</strong></div>
+                <div><i class="fas fa-eye-slash"></i> <strong>{{ 'planning.ignored_users'|trans }}</strong></div>
                 <div v-for="user in sortedUsers" v-if="hideUsers.hasOwnProperty(user.key) && hideUsers[user.key] === true">
                     <a v-on:click="toggleUser(user.key)">
                         <span v-html="user.displayName"></span> <i class="fas fa-eye"></i>
@@ -103,7 +103,7 @@
         </div>
 
         <div class="planning-section">
-            <h5>{{ 'planning.headline.projects' | trans }}</h5>
+            <h5>{{ 'planning.headline.projects'|trans }}</h5>
 
             <div class="input-group mb-3" style="max-width: 400px">
                 <div class="input-group-prepend">

@@ -22,49 +22,49 @@ class DefaultController extends Controller
     public function index(MenuService $menuService)
     {
         $apps = [
-            'invoice' => (object)[
+            'invoice' => (object) [
                 'title' => 'Faktura',
                 'desc' => 'Opret og rediger fakturaer baseret på tasks i Jira',
                 'icon' => 'fa-file-invoice',
                 'routeName' => 'billing_index',
                 'btnTxt' => 'Lav en Faktura',
             ],
-            'taskWizard' => (object)[
+            'taskWizard' => (object) [
                 'title' => 'Task wizard',
                 'desc' => 'Opret mange tasks på en gang.',
                 'icon' => 'fa-tasks',
                 'routeName' => 'index',
                 'btnTxt' => 'Bliv Task wizard',
             ],
-            'order' => (object)[
+            'order' => (object) [
                 'title' => 'Ordre',
                 'desc' => 'Opret ordrepakker ud fra tasks i Jira',
                 'icon' => 'fa-box-open',
                 'routeName' => 'index',
                 'btnTxt' => 'Pak en Ordre',
             ],
-            'planning' => (object)[
+            'planning' => (object) [
                 'title' => 'Planlægning',
                 'desc' => 'Planlægningsoversigt baseret på tasks i Jira',
                 'icon' => 'fa-braille',
                 'routeName' => 'planning_index',
                 'btnTxt' => 'Se planlægning',
             ],
-            'newProject' => (object)[
+            'newProject' => (object) [
                 'title' => 'Nyt projekt',
                 'desc' => 'Opret et nyt Jira-projekt ud fra en skabelon',
                 'icon' => 'fa-project-diagram',
                 'routeName' => 'create_project_form',
                 'btnTxt' => 'Opret Nyt projekt',
             ],
-            'expenses' => (object)[
+            'expenses' => (object) [
                 'title' => 'Udgift',
                 'desc' => 'Opret udgifter i forbindelse med projekter og tasks',
                 'icon' => 'fa-credit-card',
                 'routeName' => 'index',
                 'btnTxt' => 'Tilføj en Udgift',
             ],
-            'sprintplan' => (object)[
+            'sprintplan' => (object) [
                 'title' => 'Sprintrapport',
                 'desc' => 'Generér sprintrapport',
                 'icon' => 'fa-braille',

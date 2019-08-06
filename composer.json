@@ -102,7 +102,8 @@
             "twigcs lint templates",
             "twigcs lint bundles/Billing/Resources/views",
             "twigcs lint bundles/CreateProject/Resources/views",
-            "twigcs lint bundles/GraphicServiceOrder/Resources/views"
+            "twigcs lint bundles/GraphicServiceOrder/Resources/views",
+            "twigcs lint bundles/Planning/Resources/views"
         ],
         "check-coding-standards": [
             "@check-coding-standards/php-cs-fixer",

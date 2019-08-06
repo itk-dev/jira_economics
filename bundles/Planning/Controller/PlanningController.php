@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of aakb/jira_economics.
+ *
+ * (c) 2019 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace Planning\Controller;
 
 use App\Service\MenuService;
@@ -34,7 +42,8 @@ class PlanningController extends AbstractController
     /**
      * @Route("/board", name="boards")
      */
-    public function allBoards(PlanningService $planningService) {
+    public function allBoards(PlanningService $planningService)
+    {
         $boards = $planningService->getAllBoards();
 
         return new JsonResponse(['boards' => $boards]);
@@ -42,13 +51,16 @@ class PlanningController extends AbstractController
 
     /**
      * @Route("/board/{boardId}", name="board")
+     *
      * @param null $boardId
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function planningOverviewAction(PlanningService $planningService, MenuService $menuService, $boardId = null) {
+    public function planningOverviewAction(PlanningService $planningService, MenuService $menuService, $boardId = null)
+    {
         $jiraUrl = getenv('JIRA_URL');
 
-        if ($boardId == null) {
+        if (null === $boardId) {
             $boardId = getenv('JIRA_DEFAULT_BOARD');
         }
 
@@ -67,7 +79,8 @@ class PlanningController extends AbstractController
     /**
      * @Route("/board/{boardId}/future_sprints", name="future_sprints")
      */
-    public function futureSprints(PlanningService $planningService, $boardId) {
+    public function futureSprints(PlanningService $planningService, $boardId)
+    {
         $sprints = $planningService->getFutureSprints($boardId);
 
         return new JsonResponse(['sprints' => $sprints]);
@@ -76,7 +89,8 @@ class PlanningController extends AbstractController
     /**
      * @Route("/board/{boardId}/issues/{sprintId}", name="issues")
      */
-    public function issuesInSprint(PlanningService $planningService, $boardId, $sprintId) {
+    public function issuesInSprint(PlanningService $planningService, $boardId, $sprintId)
+    {
         $issues = $planningService->getIssuesInSprint($boardId, $sprintId);
 
         return new JsonResponse(['issues' => $issues]);
