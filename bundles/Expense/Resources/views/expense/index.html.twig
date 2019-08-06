@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    {% if expenses|length > 0 %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>{{ 'Date'|trans }}</th>
+                    <th>{{ 'Category'|trans }}</th>
+                    <th>{{ 'Description'|trans }}</th>
+                    <th class="amount">{{ 'Amount'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.date|date }}</td>
+                        <td>{{ expense.expenseCategory.name }}</td>
+                        <td>{{ expense.description|raw }}</td>
+                        <td class="amount">{{ expense.amount|number_format(2) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <div class="action-buttons">
+        <a class="btn btn-success" href="{{ path('expense_new') }}">{{ 'Add expense'|trans }}</a>
+    </div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    {{ form(form) }}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('expense') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        var Expense = {{
+                          {
+                              project_issues_url: project_issues_url,
+                              messages: {
+                                  select_project: 'expense.new.project.placeholder'|trans,
+                                  search_for_issue_in_project: 'Search for issue in project {project}'|trans,
+                              }
+                          }
+                          |json_encode|raw
+                      }};
+    </script>
+    {{ encore_entry_script_tags('expense') }}
+{% endblock %}

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="da" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="5aldMnF" resname="Expense categories successfully refreshed">
+        <source>Expense categories successfully refreshed</source>
+        <target state="translated">Udgiftskategorier er blevet opdateret</target>
+      </trans-unit>
+      <trans-unit id="6G3Qkon" resname="Expense category “%name%” already used">
+        <source>Expense category “%name%” already used</source>
+        <target state="translated">Udgiftskategori “%name%” findes allerede</target>
+      </trans-unit>
+      <trans-unit id="NPFOl4g" resname="expense.new.category.label_format">
+        <source>expense.new.category.label_format</source>
+        <target state="translated">%name% (enhedspris: %unit_price% kr.)</target>
+      </trans-unit>
+      <trans-unit id="expense.new.project" resname="expense.new.project">
+        <source>expense.new.project</source>
+        <target state="translated">Projekt</target>
+      </trans-unit>
+      <trans-unit id="expense.new.project.placeholder" resname="expense.new.project.placeholder">
+        <source>expense.new.project.placeholder</source>
+        <target state="translated">Vælg projekt</target>
+      </trans-unit>
+      <trans-unit id="expense.new.issue" resname="expense.new.issue">
+        <source>expense.new.issue</source>
+        <target state="translated">Sag</target>
+      </trans-unit>
+      <trans-unit id="expense.new.issue.placeholder" resname="expense.new.issue.placeholder">
+        <source>expense.new.placeholder</source>
+        <target state="translated">Vælg sag</target>
+      </trans-unit>
+      <trans-unit id="expense.new.issue.help" resname="expense.new.issue.help">
+        <source>expense.new.help</source>
+        <target state="translated">Vælg et projekt for at kunne vælge sag</target>
+      </trans-unit>
+      <trans-unit id="expense.new.category" resname="expense.new.category">
+        <source>expense.new.category</source>
+        <target state="translated">Kategori</target>
+      </trans-unit>
+      <trans-unit id="expense.new.category.placeholder" resname="expense.new.category.placeholder">
+        <source>expense.new.category.placeholder</source>
+        <target state="translated">Vælg kategori</target>
+      </trans-unit>
+      <trans-unit id="expense.new.quantity" resname="expense.new.quantity">
+        <source>expense.new.quantity</source>
+        <target state="translated">Antal</target>
+      </trans-unit>
+      <trans-unit id="expense.new.quantity.placeholder" resname="expense.new.quantity.placeholder">
+        <source>expense.new.quantity.placeholder</source>
+        <target state="translated">Skriv antal</target>
+      </trans-unit>
+      <trans-unit id="expense.new.description" resname="expense.new.description">
+        <source>expense.new.description</source>
+        <target state="translated">Beskrivelse</target>
+      </trans-unit>
+      <trans-unit id="expense.new.description.placeholder" resname="expense.new.description.placeholder">
+        <source>expense.new.description.placeholder</source>
+        <target state="translated">Beskrivelse af udgiften</target>
+      </trans-unit>
+      <trans-unit id="expense.new.submit" resname="expense.new.submit">
+        <source>expense.new.submit</source>
+        <target state="translated">Opret udgift</target>
+      </trans-unit>
+      <trans-unit id="Search for issue in project {project}" resname="Search for issue in project {project}">
+        <source>Search for issue in project {project}</source>
+        <target state="translated">Søg efter sag i projektet {project}</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

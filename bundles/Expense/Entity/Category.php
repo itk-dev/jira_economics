@@ -61,18 +61,6 @@ class Category
         return $this;
     }
 
-    public function getJiraId(): ?int
-    {
-        return $this->jiraId;
-    }
-
-    public function setJiraId(int $jiraId): self
-    {
-        $this->jiraId = $jiraId;
-
-        return $this;
-    }
-
     public function getUnitPrice()
     {
         return $this->unitPrice;
@@ -83,5 +71,10 @@ class Category
         $this->unitPrice = $unitPrice;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getName() ?? static::class;
     }
 }
