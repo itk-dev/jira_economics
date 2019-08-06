@@ -34,7 +34,8 @@
         "symfony/web-link": "4.3.*",
         "symfony/webpack-encore-bundle": "^1.6",
         "symfony/yaml": "4.3.*",
-        "vich/uploader-bundle": "^1.9"
+        "vich/uploader-bundle": "^1.9",
+        "ext-json": "*"
     },
     "require-dev": {
         "escapestudios/symfony2-coding-standard": "^3.8",

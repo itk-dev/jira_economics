@@ -26,7 +26,7 @@ class PlanningController extends AbstractController
     /**
      * @Route("/", name="index")
      */
-    public function boardAction(PlanningService $planningService, MenuService $menuService)
+    public function index(PlanningService $planningService, MenuService $menuService)
     {
         $boards = $planningService->getAllBoards();
 
@@ -56,7 +56,7 @@ class PlanningController extends AbstractController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function planningOverviewAction(PlanningService $planningService, MenuService $menuService, $boardId = null)
+    public function planningOverview(PlanningService $planningService, MenuService $menuService, $boardId = null)
     {
         $jiraUrl = getenv('JIRA_URL');
 

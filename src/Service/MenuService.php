@@ -44,27 +44,6 @@ class MenuService
                 'routeName' => 'index',
                 'active' => '/' === $pathInfo,
             ],
-            'invoice' => (object) [
-                'title' => 'Faktura',
-                'desc' => 'Opret og rediger fakturaer baseret på tasks i Jira',
-                'icon' => 'fa-file-invoice',
-                'routeName' => 'billing_index',
-                'active' => $this->routeStartsWith('billing_index', $pathInfo),
-            ],
-            'taskWizard' => (object) [
-                'title' => 'Task wizard',
-                'desc' => 'Opret mange tasks på en gang.',
-                'icon' => 'fa-tasks',
-                'routeName' => 'index',
-                'active' => false,
-            ],
-            'order' => (object) [
-                'title' => 'Ordre',
-                'desc' => 'Opret ordrepakker ud fra tasks i Jira',
-                'icon' => 'fa-box-open',
-                'routeName' => 'index',
-                'active' => false,
-            ],
             'planning' => (object) [
                 'title' => 'Planlægning',
                 'desc' => 'Planlægningsoversigt baseret på tasks i Jira',
@@ -78,6 +57,31 @@ class MenuService
                 'icon' => 'fa-project-diagram',
                 'routeName' => 'create_project_form',
                 'active' => $this->routeStartsWith('create_project_form', $pathInfo),
+            ],
+            'invoice' => (object) [
+                'title' => 'Faktura',
+                'desc' => 'Opret og rediger fakturaer baseret på tasks i Jira',
+                'icon' => 'fa-file-invoice',
+                'routeName' => 'billing_index',
+                'active' => $this->routeStartsWith('billing_index', $pathInfo),
+            ],
+
+
+            // @TODO: Add when ready.
+            /*
+            'taskWizard' => (object) [
+                'title' => 'Task wizard',
+                'desc' => 'Opret mange tasks på en gang.',
+                'icon' => 'fa-tasks',
+                'routeName' => 'index',
+                'active' => false,
+            ],
+            'order' => (object) [
+                'title' => 'Ordre',
+                'desc' => 'Opret ordrepakker ud fra tasks i Jira',
+                'icon' => 'fa-box-open',
+                'routeName' => 'index',
+                'active' => false,
             ],
             'expenses' => (object) [
                 'title' => 'Udgift',
@@ -93,6 +97,7 @@ class MenuService
                 'routeName' => 'index',
                 'active' => false,
             ],
+            */
         ];
 
         return $globalMenu;

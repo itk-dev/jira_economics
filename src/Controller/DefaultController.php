@@ -22,27 +22,6 @@ class DefaultController extends Controller
     public function index(MenuService $menuService)
     {
         $apps = [
-            'invoice' => (object) [
-                'title' => 'Faktura',
-                'desc' => 'Opret og rediger fakturaer baseret på tasks i Jira',
-                'icon' => 'fa-file-invoice',
-                'routeName' => 'billing_index',
-                'btnTxt' => 'Lav en Faktura',
-            ],
-            'taskWizard' => (object) [
-                'title' => 'Task wizard',
-                'desc' => 'Opret mange tasks på en gang.',
-                'icon' => 'fa-tasks',
-                'routeName' => 'index',
-                'btnTxt' => 'Bliv Task wizard',
-            ],
-            'order' => (object) [
-                'title' => 'Ordre',
-                'desc' => 'Opret ordrepakker ud fra tasks i Jira',
-                'icon' => 'fa-box-open',
-                'routeName' => 'index',
-                'btnTxt' => 'Pak en Ordre',
-            ],
             'planning' => (object) [
                 'title' => 'Planlægning',
                 'desc' => 'Planlægningsoversigt baseret på tasks i Jira',
@@ -56,6 +35,30 @@ class DefaultController extends Controller
                 'icon' => 'fa-project-diagram',
                 'routeName' => 'create_project_form',
                 'btnTxt' => 'Opret Nyt projekt',
+            ],
+            'invoice' => (object) [
+                'title' => 'Faktura',
+                'desc' => 'Opret og rediger fakturaer baseret på tasks i Jira',
+                'icon' => 'fa-file-invoice',
+                'routeName' => 'billing_index',
+                'btnTxt' => 'Lav en Faktura',
+            ],
+
+            // @TODO: Add when ready.
+            /*
+            'taskWizard' => (object) [
+                'title' => 'Task wizard',
+                'desc' => 'Opret mange tasks på en gang.',
+                'icon' => 'fa-tasks',
+                'routeName' => 'index',
+                'btnTxt' => 'Bliv Task wizard',
+            ],
+            'order' => (object) [
+                'title' => 'Ordre',
+                'desc' => 'Opret ordrepakker ud fra tasks i Jira',
+                'icon' => 'fa-box-open',
+                'routeName' => 'index',
+                'btnTxt' => 'Pak en Ordre',
             ],
             'expenses' => (object) [
                 'title' => 'Udgift',
@@ -71,9 +74,10 @@ class DefaultController extends Controller
                 'routeName' => 'index',
                 'btnTxt' => 'Se sprintrapporter',
             ],
+            */
         ];
 
-        return $this->render('base.html.twig', [
+        return $this->render('main/dashboard.html.twig', [
             'apps' => $apps,
             'global_menu_items' => $menuService->getGlobalMenuItems(),
         ]);

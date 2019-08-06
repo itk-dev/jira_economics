@@ -1,18 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Boards - Planning - ITK Jira{% endblock %}
+{% block title %}{{ 'planning.board.title'|trans }}{% endblock %}
 
 {% block main %}
     <div class="row-1 p-2" id="planningBoardApp">
         <h1>{{ 'planning.board.headline'|trans }}</h1>
 
         <div class="spinner-border" role="status" v-show="loading">
-            <span class="sr-only">Loading...</span>
+            <span class="sr-only">{{ 'planning.board.loading'|trans }}</span>
         </div>
 
         <div class="col" v-if="!loading && boards.length > 0">
             <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="filter" aria-label="filter" aria-describedby="basic-addon1" v-model="filter">
+                <input type="text" class="form-control" placeholder="{{ 'planning.board.filter_placeholder'|trans }}" aria-label="filter" aria-describedby="basic-addon1" v-model="filter">
             </div>
             <a v-for="board in sortedBoards" class="m-1 btn btn-light" v-bind:href="'/planning/board/'+board.id" v-html="board.name"> </a>
             <div v-html="'Viser ' + Math.min(sortedBoards.length, boards.length) + ' af ' + boards.length + ' boards.'" class="mb-3"></div>

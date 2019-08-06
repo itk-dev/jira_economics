@@ -29,8 +29,17 @@ class GraphicServiceOrderController extends AbstractController
     private $ownCloudService;
     private $formData;
 
-    public function __construct(JiraService $jiraService, OwnCloudService $ownCloudService)
-    {
+    /**
+     * GraphicServiceOrderController constructor.
+     * @param \App\Service\JiraService $jiraService
+     * @param \App\Service\OwnCloudService $ownCloudService
+     *
+     * @TODO: Create service that extends AbstractJiraService instead of using JiraService.
+     */
+    public function __construct(
+        JiraService $jiraService,
+        OwnCloudService $ownCloudService
+    ) {
         $this->jiraService = $jiraService;
         $this->ownCloudService = $ownCloudService;
     }
@@ -40,25 +49,29 @@ class GraphicServiceOrderController extends AbstractController
      *
      * @Route("/new", name="graphic_service_order_form")
      */
-    public function createOrder(EntityManagerInterface $entitityManagerInterface, Request $request)
-    {
+    public function createOrder(
+        EntityManagerInterface $entitityManagerInterface,
+        Request $request
+    ) {
         $gsOrder = new GsOrder();
         $form = $this->createForm(GraphicServiceOrderForm::class, $gsOrder);
 
         $this->formData = [
-      'form' => $form->getData(),
-      'accounts' => $this->jiraService->getAllAccounts(),
-      'user' => $this->jiraService->getCurrentUser(),
-    ];
+            'form' => $form->getData(),
+            'accounts' => $this->jiraService->getAllAccounts(),
+            'user' => $this->jiraService->getCurrentUser(),
+        ];
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Do stuff on submission.
-            $gsOrder = $this->storeFile($entitityManagerInterface, $form, $gsOrder);
+            $gsOrder = $this->storeFile($entitityManagerInterface, $form,
+                $gsOrder);
 
             $entitityManagerInterface->persist($gsOrder);
             $entitityManagerInterface->flush();
+
             // Save a file to Own Cloud.
             //$ownCloudPath = $this->storeFile();
 
@@ -76,9 +89,11 @@ class GraphicServiceOrderController extends AbstractController
         }
 
         // The initial form build.
-        return $this->render('@GraphicServiceOrderBundle/createOrderForm.html.twig', [
-      'form' => $form->createView(),
-    ]);
+        return $this->render('@GraphicServiceOrderBundle/createOrderForm.html.twig',
+            [
+                'form' => $form->createView(),
+            ]
+        );
     }
 
     /**
@@ -86,13 +101,23 @@ class GraphicServiceOrderController extends AbstractController
      *
      * @Route("/submitted", name="graphic_service_order_submitted")
      */
-    public function createOrderSubmitted(JiraService $jiraService, Request $request)
-    {
-        return $this->render('@GraphicServiceOrderBundle/createOrderSubmitted.html.twig', [
-      'form_data' => '',
-    ]);
+    public function createOrderSubmitted(
+        JiraService $jiraService,
+        Request $request
+    ) {
+        return $this->render('@GraphicServiceOrderBundle/createOrderSubmitted.html.twig',
+            [
+                'form_data' => '',
+            ]);
     }
 
+    /**
+     * @TODO: Missing description.
+     *
+     * @return string
+     *
+     * @TODO: Move to service.
+     */
     private function shareFile()
     {
         $capabilities = $this->ownCloudService->get('owncloud/ocs/v1.php/cloud/capabilities?format=json');
@@ -107,23 +132,25 @@ class GraphicServiceOrderController extends AbstractController
      * Create a Jira task from a form submission.
      *
      * @param $owncloudPath
+     *
+     * @TODO: Move to service.
      */
     private function createOrderTask($owncloudPath)
     {
         $formSubmissions = $this->formData['form'];
         $description = $this->getDescription();
         $data = [
-      'fields' => [
-        'project' => [
-          'id' => 10010,
-        ],
-        'summary' => $formSubmissions['job_title'],
-        'description' => $description,
-        'issuetype' => [
-          'id' => 10002,
-        ],
-      ],
-    ];
+            'fields' => [
+                'project' => [
+                    'id' => 10010,
+                ],
+                'summary' => $formSubmissions['job_title'],
+                'description' => $description,
+                'issuetype' => [
+                    'id' => 10002,
+                ],
+            ],
+        ];
         $this->jiraService->post('/rest/api/2/issue', $data);
     }
 
@@ -150,6 +177,8 @@ class GraphicServiceOrderController extends AbstractController
      * Create description for task.
      *
      * @return string
+     *
+     * @TODO: Move to service.
      */
     private function getDescription()
     {
@@ -187,6 +216,8 @@ class GraphicServiceOrderController extends AbstractController
 
     /**
      * Store files locally.
+     *
+     * @TODO: Move to service.
      */
     private function storeFile($entitityManagerInterface, $form, $gsOrder)
     {
@@ -194,12 +225,13 @@ class GraphicServiceOrderController extends AbstractController
         $newFilenames = [];
         foreach ($uploadedFiles as $file) {
             $destination = $this->getParameter('kernel.project_dir').'/private/files/gs';
-            $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $originalFilename = pathinfo($file->getClientOriginalName(),
+                PATHINFO_FILENAME);
             $newFilename = Urlizer::urlize($originalFilename).'-'.uniqid().'.'.$file->guessExtension();
             $file->move(
                 $destination,
                 $newFilename
-      );
+            );
             $newFilenames[] = $newFilename;
         }
 
