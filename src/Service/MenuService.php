@@ -66,7 +66,6 @@ class MenuService
                 'active' => $this->routeStartsWith('billing_index', $pathInfo),
             ],
 
-
             // @TODO: Add when ready.
             /*
             'taskWizard' => (object) [

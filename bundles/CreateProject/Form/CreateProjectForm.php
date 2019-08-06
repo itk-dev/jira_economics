@@ -46,7 +46,7 @@ class CreateProjectForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-      ->add('project_name', TextType::class, [
+        ->add('project_name', TextType::class, [
         'label' => 'create_project_form.project_name.label',
         'constraints' => [
           new NotNull(['groups' => 'base']),
@@ -55,9 +55,9 @@ class CreateProjectForm extends AbstractType
         'help_attr' => ['class' => 'form-text text-muted'],
         'help' => 'create_project_form.project_name.help',
         'required' => false,
-      ])
+        ])
 
-      ->add('project_key', TextType::class, [
+        ->add('project_key', TextType::class, [
         'label' => 'create_project_form.project_key.label',
         'constraints' => [
           new NotNull(['groups' => 'base']),
@@ -76,9 +76,9 @@ class CreateProjectForm extends AbstractType
         'help_attr' => ['class' => 'form-text text-muted'],
         'help' => 'create_project_form.project_key.help',
         'required' => false,
-      ])
+        ])
 
-      ->add('description', TextareaType::class, [
+        ->add('description', TextareaType::class, [
         'label' => 'create_project_form.description.label',
         'constraints' => [
           new NotNull(['groups' => 'base']),
@@ -87,9 +87,9 @@ class CreateProjectForm extends AbstractType
         'help_attr' => ['class' => 'form-text text-muted'],
         'help' => 'create_project_form.description.help',
         'required' => false,
-      ])
+        ])
 
-      ->add('team', ChoiceType::class, [
+        ->add('team', ChoiceType::class, [
         'label' => 'create_project_form.team.label',
         'choices' => $this->getTeamChoices(),
         'choice_translation_domain' => false,
@@ -102,9 +102,9 @@ class CreateProjectForm extends AbstractType
         'attr' => ['class' => 'form-control'],
         'help_attr' => ['class' => 'form-text text-muted'],
         'help' => 'create_project_form.team.help',
-      ])
+        ])
 
-      ->add('account', ChoiceType::class, [
+        ->add('account', ChoiceType::class, [
         'label' => 'create_project_form.account.label',
         'choices' => $this->getAccountChoices(),
         'choice_translation_domain' => false,
@@ -117,9 +117,9 @@ class CreateProjectForm extends AbstractType
             'message' => 'create_project_form.account.constraint.not_null',
           ]),
         ],
-      ])
+        ])
 
-      ->add('new_account', CheckboxType::class, [
+        ->add('new_account', CheckboxType::class, [
         'label' => 'create_project_form.create_new_account.label',
         'label_attr' => ['class' => 'form-check-label'],
         'attr' => [
@@ -131,9 +131,9 @@ class CreateProjectForm extends AbstractType
         'help' => 'create_project_form.create_new_account.help',
         'required' => false,
         'validation_groups' => ['account'],
-      ])
+        ])
 
-      ->add('new_account_name', TextType::class, [
+        ->add('new_account_name', TextType::class, [
         'label' => 'create_project_form.new_account_name.label',
         'attr' => ['class' => 'form-control'],
         'required' => false,
@@ -142,9 +142,9 @@ class CreateProjectForm extends AbstractType
         'constraints' => [
           new NotNull(['groups' => 'account']),
         ],
-      ])
+        ])
 
-      ->add('new_account_key', TextType::class, [
+        ->add('new_account_key', TextType::class, [
         'label' => 'create_project_form.new_account_key.label',
         'attr' => ['class' => 'form-control'],
         'required' => false,
@@ -153,9 +153,9 @@ class CreateProjectForm extends AbstractType
         'constraints' => [
           new NotNull(['groups' => 'account']),
         ],
-      ])
+        ])
 
-      ->add('new_account_contact', TextType::class, [
+        ->add('new_account_contact', TextType::class, [
         'label' => 'create_project_form.new_account_contact.label',
         'attr' => ['class' => 'form-control'],
         'required' => false,
@@ -164,9 +164,9 @@ class CreateProjectForm extends AbstractType
         'constraints' => [
           new NotNull(['groups' => 'account']),
         ],
-      ])
+        ])
 
-      ->add('new_account_customer', ChoiceType::class, [
+        ->add('new_account_customer', ChoiceType::class, [
         'label' => 'create_project_form.new_account_customer.label',
         'choices' => $this->getCustomerChoices(),
         'choice_translation_domain' => false,
@@ -180,9 +180,9 @@ class CreateProjectForm extends AbstractType
             'message' => 'create_project_form.new_account_customer.constraint.not_null',
           ]),
         ],
-      ])
+        ])
 
-      ->add('new_customer', CheckboxType::class, [
+        ->add('new_customer', CheckboxType::class, [
         'label' => 'create_project_form.new_customer.label',
         'label_attr' => ['class' => 'form-check-label'],
         'attr' => [
@@ -194,9 +194,9 @@ class CreateProjectForm extends AbstractType
         'help_attr' => ['class' => 'form-text text-muted'],
         'help' => 'create_project_form.new_customer.help',
         'validation_groups' => ['customer'],
-      ])
+        ])
 
-      ->add('new_customer_name', TextType::class, [
+        ->add('new_customer_name', TextType::class, [
         'label' => 'create_project_form.new_customer_name.label',
         'attr' => ['class' => 'form-control'],
         'required' => false,
@@ -205,9 +205,9 @@ class CreateProjectForm extends AbstractType
         'constraints' => [
           new NotNull(['groups' => 'customer']),
         ],
-      ])
+        ])
 
-      ->add('new_customer_key', TextType::class, [
+        ->add('new_customer_key', TextType::class, [
         'label' => 'create_project_form.new_customer_key.label',
         'attr' => ['class' => 'form-control'],
         'required' => false,
@@ -221,12 +221,12 @@ class CreateProjectForm extends AbstractType
             'groups' => 'customer',
           ]),
         ],
-      ])
+        ])
 
-      ->add('save', SubmitType::class, [
+        ->add('save', SubmitType::class, [
         'label' => 'create_project_form.save.label',
         'attr' => ['class' => 'btn btn-primary'],
-      ]);
+        ]);
     }
 
     /**
@@ -275,7 +275,7 @@ class CreateProjectForm extends AbstractType
     {
         $customers = $this->jiraService->getAllCustomers();
         $optionalCustomerChoices = [];
-        foreach ($customers  as $customer) {
+        foreach ($customers as $customer) {
             $optionalCustomerChoices[$customer->name.' ('.$customer->key.')'] = $customer->key;
         }
         $optionalCustomerChoices = ['-- Select --' => null] + $optionalCustomerChoices;
@@ -292,18 +292,18 @@ class CreateProjectForm extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-      'validation_groups' => function (FormInterface $form) {
-          $data = $form->getData();
-          if (true === $data['new_account']) {
-              if (true === $data['new_customer']) {
-                  return ['Default', 'base', 'account', 'customer'];
-              }
+        'validation_groups' => function (FormInterface $form) {
+            $data = $form->getData();
+            if (true === $data['new_account']) {
+                if (true === $data['new_customer']) {
+                    return ['Default', 'base', 'account', 'customer'];
+                }
 
-              return ['Default', 'base', 'account', 'select_customer'];
-          }
+                return ['Default', 'base', 'account', 'select_customer'];
+            }
 
-          return ['Default', 'base', 'select_account'];
-      },
-    ]);
+            return ['Default', 'base', 'select_account'];
+        },
+        ]);
     }
 }

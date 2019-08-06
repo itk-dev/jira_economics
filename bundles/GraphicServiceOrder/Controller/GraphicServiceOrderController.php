@@ -31,7 +31,8 @@ class GraphicServiceOrderController extends AbstractController
 
     /**
      * GraphicServiceOrderController constructor.
-     * @param \App\Service\JiraService $jiraService
+     *
+     * @param \App\Service\JiraService     $jiraService
      * @param \App\Service\OwnCloudService $ownCloudService
      *
      * @TODO: Create service that extends AbstractJiraService instead of using JiraService.
@@ -66,8 +67,11 @@ class GraphicServiceOrderController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Do stuff on submission.
-            $gsOrder = $this->storeFile($entitityManagerInterface, $form,
-                $gsOrder);
+            $gsOrder = $this->storeFile(
+                $entitityManagerInterface,
+                $form,
+                $gsOrder
+            );
 
             $entitityManagerInterface->persist($gsOrder);
             $entitityManagerInterface->flush();
@@ -89,7 +93,8 @@ class GraphicServiceOrderController extends AbstractController
         }
 
         // The initial form build.
-        return $this->render('@GraphicServiceOrderBundle/createOrderForm.html.twig',
+        return $this->render(
+            '@GraphicServiceOrderBundle/createOrderForm.html.twig',
             [
                 'form' => $form->createView(),
             ]
@@ -105,10 +110,12 @@ class GraphicServiceOrderController extends AbstractController
         JiraService $jiraService,
         Request $request
     ) {
-        return $this->render('@GraphicServiceOrderBundle/createOrderSubmitted.html.twig',
+        return $this->render(
+            '@GraphicServiceOrderBundle/createOrderSubmitted.html.twig',
             [
                 'form_data' => '',
-            ]);
+            ]
+        );
     }
 
     /**
@@ -225,8 +232,10 @@ class GraphicServiceOrderController extends AbstractController
         $newFilenames = [];
         foreach ($uploadedFiles as $file) {
             $destination = $this->getParameter('kernel.project_dir').'/private/files/gs';
-            $originalFilename = pathinfo($file->getClientOriginalName(),
-                PATHINFO_FILENAME);
+            $originalFilename = pathinfo(
+                $file->getClientOriginalName(),
+                PATHINFO_FILENAME
+            );
             $newFilename = Urlizer::urlize($originalFilename).'-'.uniqid().'.'.$file->guessExtension();
             $file->move(
                 $destination,

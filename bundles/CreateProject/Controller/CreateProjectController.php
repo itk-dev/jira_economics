@@ -72,9 +72,11 @@ class CreateProjectController extends Controller
             if ($this->formData['form']['new_account']) {
                 // Add project ID if account key is municipality name.
                 if (!is_numeric($this->formData['form']['new_account_key'])) {
-                    $this->formData['form']['new_account_key'] = str_replace(' ',
-                            '_',
-                            $this->formData['form']['new_account_key']).'-'.$newProjectKey;
+                    $this->formData['form']['new_account_key'] = str_replace(
+                        ' ',
+                        '_',
+                        $this->formData['form']['new_account_key']
+                    ).'-'.$newProjectKey;
                 }
 
                 // Check for new customer.
@@ -115,7 +117,8 @@ class CreateProjectController extends Controller
         }
 
         // The initial form build.
-        return $this->render('@CreateProjectBundle/createProjectForm.html.twig',
+        return $this->render(
+            '@CreateProjectBundle/createProjectForm.html.twig',
             [
                 'form' => $form->createView(),
                 'formConfig' => json_encode(
@@ -124,7 +127,8 @@ class CreateProjectController extends Controller
                     ]
                 ),
                 'global_menu_items' => $menuService->getGlobalMenuItems(),
-            ]);
+            ]
+        );
     }
 
     /**
@@ -137,11 +141,13 @@ class CreateProjectController extends Controller
         JiraService $jiraService,
         Request $request
     ) {
-        return $this->render('@CreateProjectBundle/createProjectSubmitted.html.twig',
+        return $this->render(
+            '@CreateProjectBundle/createProjectSubmitted.html.twig',
             [
                 'form_data' => $_SESSION['form_data'],
                 'global_menu_items' => $menuService->getGlobalMenuItems(),
-            ]);
+            ]
+        );
     }
 
     /**
@@ -159,8 +165,10 @@ class CreateProjectController extends Controller
             'name' => $this->formData['form']['new_customer_name'],
             'key' => $this->formData['form']['new_customer_key'],
         ];
-        $response = $this->jiraService->post('rest/tempo-accounts/1/customer/',
-            $customer);
+        $response = $this->jiraService->post(
+            'rest/tempo-accounts/1/customer/',
+            $customer
+        );
 
         return $response;
     }
@@ -194,8 +202,10 @@ class CreateProjectController extends Controller
                 'username' => $_ENV['CPB_ACCOUNT_MANAGER'],
             ],
         ];
-        $response = $this->jiraService->post('rest/tempo-accounts/1/account/',
-            $account);
+        $response = $this->jiraService->post(
+            'rest/tempo-accounts/1/account/',
+            $account
+        );
 
         return $response;
     }
@@ -229,8 +239,10 @@ class CreateProjectController extends Controller
             'permissionScheme' => $this->formData['selectedTeamConfig']['permission_scheme'],
         ];
 
-        $response = $this->jiraService->post('rest/extender/1.0/project/createProject',
-            $project);
+        $response = $this->jiraService->post(
+            'rest/extender/1.0/project/createProject',
+            $project
+        );
 
         return ('project was created' === $response->message) ? $projectKey : null;
     }
@@ -255,8 +267,10 @@ class CreateProjectController extends Controller
             'accountId' => $account->id,
             'scope' => $project->id,
         ];
-        $response = $this->jiraService->post('rest/tempo-accounts/1/link/',
-            $link);
+        $response = $this->jiraService->post(
+            'rest/tempo-accounts/1/link/',
+            $link
+        );
     }
 
     /**
@@ -283,8 +297,10 @@ class CreateProjectController extends Controller
             'editable' => false,
         ];
 
-        $filterResponse = $this->jiraService->post('/rest/api/2/filter',
-            $filter);
+        $filterResponse = $this->jiraService->post(
+            '/rest/api/2/filter',
+            $filter
+        );
 
         // Share project filter with project members.
         $projectShare = [
@@ -294,8 +310,10 @@ class CreateProjectController extends Controller
             'edit' => false,
         ];
 
-        $projectShareResponse = $this->jiraService->post('/rest/api/2/filter/'.$filterResponse->id.'/permission',
-            $projectShare);
+        $projectShareResponse = $this->jiraService->post(
+            '/rest/api/2/filter/'.$filterResponse->id.'/permission',
+            $projectShare
+        );
 
         // Create board with project filter.
         $board = [
@@ -304,8 +322,10 @@ class CreateProjectController extends Controller
             'filterId' => $filterResponse->id,
         ];
 
-        $boardResponse = $this->jiraService->post('/rest/agile/1.0/board',
-            $board);
+        $boardResponse = $this->jiraService->post(
+            '/rest/agile/1.0/board',
+            $board
+        );
     }
 
     /**
