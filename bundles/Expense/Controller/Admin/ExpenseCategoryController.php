@@ -95,7 +95,7 @@ class ExpenseCategoryController extends AbstractController
                 ]);
             }
 
-            $jiraCategory = $this->jiraService->createExpenseCategory($category->getName());
+            $jiraCategory = $this->jiraService->createExpenseCategory($category);
             $category->setId($jiraCategory->id);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($category);
