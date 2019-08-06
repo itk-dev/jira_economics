@@ -2,6 +2,7 @@
 
 namespace Planning\Controller;
 
+use App\Service\MenuService;
 use Planning\Service\PlanningService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -10,14 +11,14 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Class PlanningController.
  *
- * @Route("/")
+ * @Route("/", name="planning_")
  */
 class PlanningController extends AbstractController
 {
     /**
-     * @Route("/")
+     * @Route("/", name="index")
      */
-    public function boardAction(PlanningService $planningService)
+    public function boardAction(PlanningService $planningService, MenuService $menuService)
     {
         $boards = $planningService->getAllBoards();
 
@@ -25,12 +26,13 @@ class PlanningController extends AbstractController
             '@PlanningBundle/board.html.twig',
             [
                 'boards' => $boards,
+                'global_menu_items' => $menuService->getGlobalMenuItems(),
             ]
         );
     }
 
     /**
-     * @Route("/board")
+     * @Route("/board", name="boards")
      */
     public function allBoards(PlanningService $planningService) {
         $boards = $planningService->getAllBoards();
@@ -39,11 +41,11 @@ class PlanningController extends AbstractController
     }
 
     /**
-     * @Route("/board/{boardId}")
+     * @Route("/board/{boardId}", name="board")
      * @param null $boardId
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function planningOverviewAction(PlanningService $planningService, $boardId = null) {
+    public function planningOverviewAction(PlanningService $planningService, MenuService $menuService, $boardId = null) {
         $jiraUrl = getenv('JIRA_URL');
 
         if ($boardId == null) {
@@ -57,12 +59,13 @@ class PlanningController extends AbstractController
             [
                 'jiraUrl' => $jiraUrl,
                 'board' => $board,
+                'global_menu_items' => $menuService->getGlobalMenuItems(),
             ]
         );
     }
 
     /**
-     * @Route("/board/{boardId}/future_sprints")
+     * @Route("/board/{boardId}/future_sprints", name="future_sprints")
      */
     public function futureSprints(PlanningService $planningService, $boardId) {
         $sprints = $planningService->getFutureSprints($boardId);
@@ -71,7 +74,7 @@ class PlanningController extends AbstractController
     }
 
     /**
-     * @Route("/board/{boardId}/issues/{sprintId}")
+     * @Route("/board/{boardId}/issues/{sprintId}", name="issues")
      */
     public function issuesInSprint(PlanningService $planningService, $boardId, $sprintId) {
         $issues = $planningService->getIssuesInSprint($boardId, $sprintId);

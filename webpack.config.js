@@ -8,7 +8,7 @@ Encore
     .addEntry('create_project', './bundles/CreateProject/Resources/assets/index.js')
     .addEntry('graphic_service_order', './bundles/GraphicServiceOrder/Resources/assets/index.js')
     .addEntry('planning', './bundles/Planning/Resources/assets/planning.js')
-    .addEntry('planning_sidebar', './bundles/Planning/Resources/assets/planningSidebar.js')
+    .addEntry('planning_board', './bundles/Planning/Resources/assets/planningBoard.js')
     .enableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()
     .enableBuildNotifications()

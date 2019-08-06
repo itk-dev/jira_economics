@@ -1,9 +1,13 @@
 planning:
+    board:
+        headline: Boards
     headline:
-        headline: Planlægningsoversigt
-        projects: Projektoversigt
-        users: Brugeroversigt
+        headline: Planlægning
+        projects: Projeker
+        users: Brugere
     ignored_users: Skjulte brugere
     ignore_user: Skjul
     sidebar:
         title: Boards
+    title:
+        suffix: ' - Planning - ITK Jira'

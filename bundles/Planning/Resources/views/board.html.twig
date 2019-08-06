@@ -1,15 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Boards{% endblock %}
+{% block title %}Boards - Planning - ITK Jira{% endblock %}
 
-{% block content %}
-    Søg i alle boards i venstre side, eller åben udvalgte boards herunder...
-{% endblock %}
-
-{% block sidebar %}
-    {% include '@PlanningBundle/_planning-sidebar.html.twig' %}
+{% block main %}
+    <div class="row-1 p-2">
+        <h1>{{ 'planning.board.headline' | trans }}</h1>
+        <div id="planningBoardApp" class="col">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="filter" aria-label="filter" aria-describedby="basic-addon1" v-model="filter">
+            </div>
+            <a v-for="board in sortedBoards" class="m-1 btn btn-light" v-bind:href="'/planning/board/'+board.id" v-html="board.name"> </a>
+            <div v-html="'Viser ' + Math.min(sortedBoards.length, boards.length) + ' af ' + boards.length + ' boards.'" class="mb-3"></div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block javascripts %}
-    {{ encore_entry_script_tags('planning_sidebar') }}
+    {{ encore_entry_script_tags('planning_board') }}
 {% endblock %}

@@ -1,17 +1,19 @@
 {% extends 'base.html.twig' %}
 
-{% block content %}
-    <div id="app" class="app">
-        <h1>{{ 'planning.headline.headline' | trans }}</h1>
+{% block title %}{{ board.name }}{{ 'planning.title.suffix'|trans }}{% endblock %}
 
-        <h2>{{ board.name }}</h2>
+{% block main %}
+    <div id="app" class="app">
+        <a href="/planning"><- Vælg andet board</a>
+
+        <h1>{{ 'planning.headline.headline' | trans }} - {{ board.name }}</h1>
 
         <div class="planning-section">
-            <h2>{{ 'planning.headline.users' | trans }}</h2>
+            <h5>{{ 'planning.headline.users' | trans }}</h5>
 
-            <div class="input-group mb-3">
+            <div class="input-group mb-3" style="max-width: 400px">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">Filter</span>
+                    <span class="input-group-text" id="basic-addon1">Filtrér brugere</span>
                 </div>
                 <input type="text" class="form-control" placeholder="" aria-label="filter" aria-describedby="basic-addon1" v-model="userFilter">
             </div>
@@ -101,10 +103,11 @@
         </div>
 
         <div class="planning-section">
-            <h2>{{ 'planning.headline.projects' | trans }}</h2>
-            <div class="input-group mb-3">
+            <h5>{{ 'planning.headline.projects' | trans }}</h5>
+
+            <div class="input-group mb-3" style="max-width: 400px">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">Filter</span>
+                    <span class="input-group-text" id="basic-addon1">Filtrér projekter</span>
                 </div>
                 <input type="text" class="form-control" placeholder="" aria-label="filter" aria-describedby="basic-addon1" v-model="projectFilter">
             </div>
@@ -176,5 +179,4 @@
     {{ parent() }}
 
     {{ encore_entry_script_tags('planning') }}
-    {{ encore_entry_script_tags('planning_sidebar') }}
 {% endblock %}
