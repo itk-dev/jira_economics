@@ -23,6 +23,10 @@ easy_admin:
                 fields:
                     - property: email
                     - property: roles
+                      type: App\Form\UserRolesType
+                      type_options:
+                          multiple: true
+                          expanded: true
                     - property: portalApps
                       type: App\Form\PortalAppsType
                       type_options:

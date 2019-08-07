@@ -10,6 +10,7 @@
 
 namespace App\Service;
 
+use App\Entity\User;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -64,14 +65,16 @@ class AppService
             if (null !== $token) {
                 /** @var \App\Entity\User $user */
                 $user = $token->getUser();
-                $enabledApps = $user->getPortalApps();
-                $items = array_filter(
-                    $items,
-                    function ($app) use ($enabledApps) {
-                        return \in_array($app, $enabledApps);
-                    },
-                    ARRAY_FILTER_USE_KEY
-                );
+                if ($user instanceof User) {
+                    $enabledApps = $user->getPortalApps();
+                    $items = array_filter(
+                        $items,
+                        function ($app) use ($enabledApps) {
+                            return \in_array($app, $enabledApps);
+                        },
+                        ARRAY_FILTER_USE_KEY
+                    );
+                }
             }
         }
 
