@@ -197,7 +197,7 @@ class HomePage extends Component {
           </Tab>
         </Tabs>
         <Modal show={this.state.showModal} onHide={this.handleModalClose}>
-          <Modal.Header closeButton>
+          <Modal.Header>
             <Modal.Title>Confirm deletion</Modal.Title>
           </Modal.Header>
           <Modal.Body>Are you sure you want to delete this invoice?</Modal.Body>

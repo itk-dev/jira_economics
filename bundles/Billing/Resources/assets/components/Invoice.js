@@ -332,7 +332,7 @@ class Invoice extends Component {
             Invoice created <strong><Moment format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></strong>
           </ContentFooter>
           <Modal show={this.state.showModal} onHide={this.handleModalClose}>
-            <Modal.Header closeButton>
+            <Modal.Header>
               <Modal.Title>Error</Modal.Title>
             </Modal.Header>
             {this.state.checkedCount > 1 &&
@@ -348,7 +348,7 @@ class Invoice extends Component {
             </Modal.Footer>
           </Modal>
           <Modal show={this.state.showDeleteModal} onHide={this.handleInvoiceDeleteModalClose}>
-          <Modal.Header closeButton>
+          <Modal.Header>
             <Modal.Title>Confirm deletion</Modal.Title>
           </Modal.Header>
           <Modal.Body>Are you sure you want to delete this invoice?</Modal.Body>
@@ -362,7 +362,7 @@ class Invoice extends Component {
           </Modal.Footer>
         </Modal>
         <Modal show={this.state.showRecordModal} onHide={this.handleInvoiceRecordModalClose}>
-          <Modal.Header closeButton>
+          <Modal.Header>
             <Modal.Title>Confirm recording</Modal.Title>
           </Modal.Header>
           <Modal.Body>Are you sure you want to record this invoice?</Modal.Body>

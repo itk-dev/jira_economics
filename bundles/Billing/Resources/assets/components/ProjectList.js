@@ -129,7 +129,7 @@ class ProjectList extends Component {
 
         {fetching}
         <Modal show={this.state.showModal} onHide={this.handleModalCancel}>
-          <Modal.Header closeButton>
+          <Modal.Header>
             <Modal.Title>Create Invoice</Modal.Title>
           </Modal.Header>
           <Form>
