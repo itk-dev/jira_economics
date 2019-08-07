@@ -1,0 +1,37 @@
+.app {
+  margin: 1em;
+}
+
+.toggle {
+  float: right;
+  margin: 0.5em;
+}
+
+.planning-section {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.remaining-critical {
+  color: white;
+  background-color: #880066;
+  font-weight: bold;
+}
+
+.remaining-warning {
+  color: white;
+  background-color: #ffc107;
+  font-weight: bold;
+}
+
+.remaining-danger {
+  color: white;
+  background-color: #dc3545;
+  font-weight: bold;
+}
+
+.remaining-success {
+  color: white;
+  background-color: #28a745;
+  font-weight: bold;
+}

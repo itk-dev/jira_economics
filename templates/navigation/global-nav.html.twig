@@ -1,13 +1,3 @@
-{% set global_menu_items = {
-    dash: { title: "Dash", desc: "App oversigt", icon: "fa-th-large", path: "/", active: true },
-    faktura: { title: "Faktura", desc: "Opret og rediger fakturaer baseret på tasks i Jira", icon: "fa-file-invoice", path: "/", active: false },
-    taskWizard: { title: "Task wizard", desc: "Opret mange tasks på en gang.", icon: "fa-tasks", path: "/", active: false },
-    ordre: { title: "Ordre", desc: "Opret ordrepakker ud fra tasks i Jira", icon: "fa-box-open", path: "/", active: false },
-    sprintplan: { title: "Sprintplan", desc: "Planlægningsoversigt og sprintrapporter baseret på tasks i Jira", icon: "fa-braille", path: "/", active: false },
-    nytProjekt: { title: "Nyt projekt", desc: "Opret et nyt Jira-projekt ud fra en skabelon", icon: "fa-project-diagram", path: "/create-project/new", active: false },
-    udgift: { title: "Udgift", desc: "Opret udgifter i forbindelse med projekter og tasks", icon: "fa-credit-card", path: "/", active: false },
-} %}
-
 <div class="global-nav flex-grow-1">
   <nav class="navbar navbar-expand-md navbar-dark bg-primary flex-md-column p-md-1">
     <a class="navbar-brand mr-md-0 ml-md-0 mb-md-3" href="/">
@@ -22,7 +12,7 @@
         {% if global_menu_items is defined %}
           {% for globalMenuItem in global_menu_items %}
             <li class="nav-item">
-              <a class="nav-link{{ globalMenuItem.active ? ' active' : '' }} pl-0 pr-0" href="{{ globalMenuItem.path }}" data-toggle="tooltip" data-placement="right" title="{{ globalMenuItem.desc }}">
+              <a class="nav-link{{ globalMenuItem.active ? ' active' : '' }} pl-0 pr-0" href="{{ path(globalMenuItem.routeName) }}" data-toggle="tooltip" data-placement="right" title="{{ globalMenuItem.desc }}">
                 <i class="fas {{ globalMenuItem.icon }} fa-fw" ></i><span class="d-md-block ml-3 ml-md-0">{{ globalMenuItem.title }}</span>
               </a>
             </li>

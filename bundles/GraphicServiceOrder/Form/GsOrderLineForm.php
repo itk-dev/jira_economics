@@ -19,19 +19,19 @@ class GsOrderLineForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-      ->add('amount', TextType::class, [
+        ->add('amount', TextType::class, [
         'label' => 'service_order_form.order_line.amount.label',
         'attr' => ['class' => 'form-control'],
         'help_attr' => ['class' => 'form-text text-muted'],
         'help' => 'service_order_form.order_line.amount.help',
         'required' => false,
-      ])
-      ->add('type', TextType::class, [
+        ])
+        ->add('type', TextType::class, [
         'label' => 'service_order_form.order_line.type.label',
         'attr' => ['class' => 'form-control'],
         'help_attr' => ['class' => 'form-text text-muted'],
         'help' => 'service_order_form.order_line.type.help',
         'required' => false,
-      ]);
+        ]);
     }
 }

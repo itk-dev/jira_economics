@@ -20,6 +20,7 @@ return [
     ApiPlatform\Core\Bridge\Symfony\Bundle\ApiPlatformBundle::class => ['all' => true],
     Symfony\WebpackEncoreBundle\WebpackEncoreBundle::class => ['all' => true],
     Billing\BillingBundle::class => ['all' => true],
+    Planning\PlanningBundle::class => ['all' => true],
     CreateProject\CreateProjectBundle::class => ['all' => true],
     GraphicServiceOrder\GraphicServiceOrderBundle::class => ['all' => true],
     Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],

@@ -34,7 +34,8 @@
         "symfony/web-link": "4.3.*",
         "symfony/webpack-encore-bundle": "^1.6",
         "symfony/yaml": "4.3.*",
-        "vich/uploader-bundle": "^1.9"
+        "vich/uploader-bundle": "^1.9",
+        "ext-json": "*"
     },
     "require-dev": {
         "escapestudios/symfony2-coding-standard": "^3.8",
@@ -57,9 +58,10 @@
     "autoload": {
         "psr-4": {
             "App\\": "src/",
-            "Billing\\":"bundles/Billing",
-            "CreateProject\\":"bundles/CreateProject",
-            "GraphicServiceOrder\\":"bundles/GraphicServiceOrder"
+            "Billing\\": "bundles/Billing/",
+            "CreateProject\\": "bundles/CreateProject/",
+            "GraphicServiceOrder\\": "bundles/GraphicServiceOrder/",
+            "Planning\\": "bundles/Planning/"
         }
     },
     "autoload-dev": {
@@ -101,7 +103,8 @@
             "twigcs lint templates",
             "twigcs lint bundles/Billing/Resources/views",
             "twigcs lint bundles/CreateProject/Resources/views",
-            "twigcs lint bundles/GraphicServiceOrder/Resources/views"
+            "twigcs lint bundles/GraphicServiceOrder/Resources/views",
+            "twigcs lint bundles/Planning/Resources/views"
         ],
         "check-coding-standards": [
             "@check-coding-standards/php-cs-fixer",
