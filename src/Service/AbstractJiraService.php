@@ -10,6 +10,8 @@
 
 namespace App\Service;
 
+use Expense\Entity\Category as ExpenseCategory;
+use Expense\Entity\Category;
 use GuzzleHttp\Exception\RequestException;
 
 abstract class AbstractJiraService
@@ -33,12 +35,12 @@ abstract class AbstractJiraService
      *
      * @return mixed
      */
-    public function get($path)
+    public function get($path, array $query = [])
     {
         $client = $this->getClient();
 
         try {
-            $response = $client->get($path);
+            $response = $client->get($path, ['query' => $query]);
 
             if ($body = $response->getBody()) {
                 return json_decode($body);
@@ -59,7 +61,6 @@ abstract class AbstractJiraService
     {
         $client = $this->getClient();
 
-        // Set the "auth" request option to "oauth" to sign using oauth
         try {
             $response = $client->post(
                 $path,
@@ -87,7 +88,6 @@ abstract class AbstractJiraService
     {
         $client = $this->getClient();
 
-        // Set the "auth" request option to "oauth" to sign using oauth
         try {
             $response = $client->put(
                 $path,
@@ -95,6 +95,28 @@ abstract class AbstractJiraService
                 'json' => $data,
                 ]
             );
+
+            if ($body = $response->getBody()) {
+                return json_decode($body);
+            }
+        } catch (RequestException $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Delete in Jira.
+     *
+     * @param $path
+     *
+     * @return mixed
+     */
+    protected function delete($path)
+    {
+        $client = $this->getClient();
+
+        try {
+            $response = $client->delete($path);
 
             if ($body = $response->getBody()) {
                 return json_decode($body);
@@ -196,6 +218,132 @@ abstract class AbstractJiraService
     public function getCurrentUser()
     {
         $result = $this->get('/rest/api/2/myself');
+
+        return $result;
+    }
+
+    public function search(array $query)
+    {
+        $result = $this->get('/rest/api/2/search', $query);
+
+        return $result;
+    }
+
+    /**
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/8.3.1/?_ga=2.202569298.2139473575.1564917078-393255252.1550779361#api/2/issue-getIssuePickerResource
+     *
+     * @param string $project
+     * @param string $query
+     *
+     * @return mixed
+     */
+    public function issuePicker(string $project, string $query)
+    {
+        $result = $this->get('/rest/api/2/issue/picker', [
+            'currentJQL' => 'project="'.$project.'"',
+            'query' => $query,
+        ]);
+
+        return $result;
+    }
+
+    public function getIssue($issueIdOrKey)
+    {
+        $result = $this->get('/rest/api/2/issue/'.$issueIdOrKey);
+
+        return $result;
+    }
+
+    /**
+     * @see http://developer.tempo.io/doc/core/api/rest/latest/#1349331745
+     */
+    public function getExpenseCategories()
+    {
+        $result = $this->get('/rest/tempo-core/1/expense/category/');
+
+        return $result;
+    }
+
+    public function getExpenseCategory(int $id)
+    {
+        $categories = $this->getExpenseCategories();
+
+        foreach ($categories as $category) {
+            if ($id === $category->id) {
+                return $category;
+            }
+        }
+
+        return null;
+    }
+
+    public function getExpenseCategoryByName(string $name)
+    {
+        $categories = $this->getExpenseCategories();
+
+        foreach ($categories as $category) {
+            if ($name === $category->name) {
+                return $category;
+            }
+        }
+
+        return null;
+    }
+
+    public function createExpenseCategory(ExpenseCategory $category)
+    {
+        $result = $this->post('/rest/tempo-core/1/expense/category/', [
+            'name' => $category->getName(),
+        ]);
+
+        return $result;
+    }
+
+    public function updateExpenseCategory(ExpenseCategory $category)
+    {
+        $result = $this->put('/rest/tempo-core/1/expense/category/'.$category->getId().'/', [
+            'name' => $category->getName(),
+        ]);
+
+        return $result;
+    }
+
+    public function deleteExpenseCategory(ExpenseCategory $category)
+    {
+        $result = $this->delete('/rest/tempo-core/1/expense/category/'.$category->getId().'/');
+
+        return $result;
+    }
+
+    /**
+     * @see http://developer.tempo.io/doc/core/api/rest/latest/#1349331745
+     */
+    public function getExpenses(array $query = [])
+    {
+        $result = $this->get('/rest/tempo-core/1/expense/', $query);
+
+        return $result;
+    }
+
+    public function createExpense(array $data)
+    {
+        $category = $data['category'] ?? null;
+        if (!$category instanceof Category) {
+            throw new \RuntimeException('Invalid or missing category');
+        }
+        $data = [
+            'expenseCategory' => [
+                'id' => $category->getId(),
+            ],
+            'scope' => [
+                'scopeType' => $data['scope_type'],
+                'scopeId' => $data['scope_id'],
+            ],
+            'amount' => (int) ($data['quantity'] * $category->getUnitPrice()),
+            'description' => $data['description'],
+            'date' => (new \DateTime())->format(\DateTime::ATOM),
+        ];
+        $result = $this->post('/rest/tempo-core/1/expense/', $data);
 
         return $result;
     }

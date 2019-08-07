@@ -24,3 +24,6 @@ create-graphic-service-order:
 
 planning:
     resource: "@PlanningBundle/Resources/config/routing.yaml"
+
+expense:
+    resource: "@ExpenseBundle/Resources/config/routing.yaml"

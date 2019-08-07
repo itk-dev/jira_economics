@@ -24,4 +24,5 @@ return [
     CreateProject\CreateProjectBundle::class => ['all' => true],
     GraphicServiceOrder\GraphicServiceOrderBundle::class => ['all' => true],
     Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],
+    Expense\ExpenseBundle::class => ['all' => true],
 ];

@@ -5,6 +5,7 @@ Encore
     .setPublicPath('/build')
     .addEntry('app', './assets/js/app.js')
     .addEntry('billing', './bundles/Billing/Resources/assets/index.js')
+    .addEntry('expense', './bundles/Expense/Resources/assets/index.js')
     .addEntry('create_project', './bundles/CreateProject/Resources/assets/index.js')
     .addEntry('graphic_service_order', './bundles/GraphicServiceOrder/Resources/assets/index.js')
     .addEntry('planning', './bundles/Planning/Resources/assets/planning.js')
