@@ -43,13 +43,16 @@ class Invoice extends Component {
     this.handleModalClose = this.handleModalClose.bind(this);
     this.handleInvoiceDeleteModalShow = this.handleInvoiceDeleteModalShow.bind(this);
     this.handleInvoiceDeleteModalClose = this.handleInvoiceDeleteModalClose.bind(this);
+    this.handleInvoiceRecordModalShow = this.handleInvoiceRecordModalShow.bind(this);
+    this.handleInvoiceRecordModalClose = this.handleInvoiceRecordModalClose.bind(this);
 
     this.state = {
        checkedEntries: {},
        showModal: false,
+       showDeleteModal: false,
+       showRecordModal: false,
        checkedCount: 0,
        invoiceEntries: {},
-       showDeleteModal: false
     };
   };
 
@@ -67,20 +70,7 @@ class Invoice extends Component {
 
   recordInvoice = (event) => {
     event.preventDefault();
-    const { dispatch } = this.props;
-    const id = this.props.match.params.invoiceId;
-    const name = this.props.invoice.data.name;
-    const recorded = true;
-    const created = this.props.createdAt;
-    const invoiceData = {
-      id,
-      name,
-      recorded,
-      created
-    };
-    dispatch(rest.actions.updateInvoice({ id: `${this.props.match.params.invoiceId}` }, {
-      body: JSON.stringify(invoiceData)
-    }));
+    this.handleInvoiceRecordModalShow();
   };
 
   deleteInvoice = (event) => {
@@ -217,6 +207,31 @@ class Invoice extends Component {
     this.setState({ showDeleteModal: false });
   };
 
+  handleInvoiceRecordModalShow() {
+    this.setState({ showRecordModal: true });
+  };
+
+  handleInvoiceRecordModalClose = (event) => {
+    event.preventDefault();
+    if (event.target.id = "record-invoice-btn") {
+      const { dispatch } = this.props;
+      const id = this.props.match.params.invoiceId;
+      const name = this.props.invoice.data.name;
+      const recorded = true;
+      const created = this.props.createdAt;
+      const invoiceData = {
+        id,
+        name,
+        recorded,
+        created
+      };
+      dispatch(rest.actions.updateInvoice({ id: `${this.props.match.params.invoiceId}` }, {
+        body: JSON.stringify(invoiceData)
+      }));
+    }
+    this.setState({ showRecordModal: false });
+  };
+
   // @TODO: show spinner while invoiceEntries are being loaded
   render() {
     if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId) {
@@ -343,6 +358,20 @@ class Invoice extends Component {
             </Button>
             <Button id="delete-invoice-btn" variant="danger" onClick={this.handleInvoiceDeleteModalClose}>
               Delete
+            </Button>
+          </Modal.Footer>
+        </Modal>
+        <Modal show={this.state.showRecordModal} onHide={this.handleInvoiceRecordModalClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm recording</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>Are you sure you want to record this invoice?</Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={this.handleInvoiceRecordModalClose}>
+              Cancel
+            </Button>
+            <Button id="record-invoice-btn" variant="primary" onClick={this.handleInvoiceRecordModalClose}>
+              Record
             </Button>
           </Modal.Footer>
         </Modal>
