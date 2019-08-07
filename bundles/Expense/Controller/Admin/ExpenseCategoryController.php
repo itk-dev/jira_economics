@@ -11,6 +11,7 @@
 namespace Expense\Controller\Admin;
 
 use App\Service\JiraService;
+use App\Service\MenuService;
 use Doctrine\ORM\EntityManagerInterface;
 use Expense\Entity\Category;
 use Expense\Form\CategoryType;
@@ -33,10 +34,14 @@ class ExpenseCategoryController extends AbstractController
     /** @var \Symfony\Contracts\Translation\TranslatorInterface */
     private $translator;
 
-    public function __construct(JiraService $jiraService, TranslatorInterface $translator)
+    /** @var \App\Service\MenuService */
+    private $menuService;
+
+    public function __construct(JiraService $jiraService, TranslatorInterface $translator, MenuService $menuService)
     {
         $this->jiraService = $jiraService;
         $this->translator = $translator;
+        $this->menuService = $menuService;
     }
 
     /**
@@ -45,6 +50,7 @@ class ExpenseCategoryController extends AbstractController
     public function index(ExpenseCategoryRepository $categoryRepository): Response
     {
         return $this->render('@ExpenseBundle/admin/expense/category/index.html.twig', [
+            'global_menu_items' => $this->menuService->getGlobalMenuItems(),
             'categories' => $categoryRepository->findAll(),
         ]);
     }
@@ -103,6 +109,7 @@ class ExpenseCategoryController extends AbstractController
         }
 
         return $this->render('@ExpenseBundle/admin/expense/category/new.html.twig', [
+            'global_menu_items' => $this->menuService->getGlobalMenuItems(),
             'category' => $category,
             'form' => $form->createView(),
         ]);
@@ -114,6 +121,7 @@ class ExpenseCategoryController extends AbstractController
     public function show(Category $category): Response
     {
         return $this->render('@ExpenseBundle/admin/expense/category/show.html.twig', [
+            'global_menu_items' => $this->menuService->getGlobalMenuItems(),
             'category' => $category,
         ]);
     }
@@ -145,6 +153,7 @@ class ExpenseCategoryController extends AbstractController
         }
 
         return $this->render('@ExpenseBundle/admin/expense/category/edit.html.twig', [
+            'global_menu_items' => $this->menuService->getGlobalMenuItems(),
             'category' => $category,
             'form' => $form->createView(),
         ]);

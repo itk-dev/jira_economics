@@ -15,11 +15,15 @@ $(() => {
 
     const buildIssuePicker = () => {
         const project = $projectCtrl.val()
+        $issuePicker
+            .select2('destroy')
+            .select2({
+                placeholder: Expense.messages['expense.new.project.placeholder']
+            })
         if (project) {
             $issuePicker
-                .select2('destroy')
                 .select2({
-                    placeholder: Expense.messages.search_for_issue_in_project.replace('{project}', project),
+                    placeholder: Expense.messages['expense.new.search_for_issue_in_project'].replace('{project}', project),
                     ajax: {
                         url: Expense.project_issues_url.replace('{project}', project),
                         dataType: 'json',

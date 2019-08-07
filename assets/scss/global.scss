@@ -72,3 +72,9 @@ html, body, .wrapper, .main{
   -moz-osx-font-smoothing: grayscale;
   transform: translate(0, 0);
 }
+
+th, td {
+    &.amount {
+        text-align: right;
+    }
+}

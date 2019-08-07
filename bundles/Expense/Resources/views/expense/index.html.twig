@@ -1,8 +1,12 @@
 {% extends 'base.html.twig' %}
 
+{% block sidebar '' %}
+
 {% block content %}
+    <h1>{{ 'expense.list.title'|trans }}</h1>
+
     {% if expenses|length > 0 %}
-        <table class="table">
+        <table class="table table-responsive">
             <thead>
                 <tr>
                     <th>{{ 'expense.date'|trans }}</th>
@@ -14,10 +18,12 @@
             <tbody>
                 {% for expense in expenses %}
                     <tr>
-                        <td>{{ expense.date|date }}</td>
+                        {# @TODO: Localize #}
+                        <td>{{ expense.date|date('d/m/Y') }}</td>
                         <td>{{ expense.expenseCategory.name }}</td>
                         <td>{{ expense.description|raw }}</td>
-                        <td class="amount">{{ expense.amount|number_format(2) }}</td>
+                        {# @TODO: Localize #}
+                        <td class="amount">{{ expense.amount|number_format(2, ',') }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

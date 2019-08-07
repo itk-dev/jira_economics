@@ -65,6 +65,13 @@ class MenuService
                 'routeName' => 'billing_index',
                 'active' => $this->routeStartsWith('billing_index', $pathInfo),
             ],
+            'expense' => (object) [
+                'title' => 'Udgift',
+                'desc' => 'Opret udgifter i forbindelse med projekter og tasks',
+                'icon' => 'fa-credit-card',
+                'routeName' => 'expense_new',
+                'active' => $this->routeStartsWith('expense_new', $pathInfo),
+            ],
 
             // @TODO: Add when ready.
             /*
@@ -79,13 +86,6 @@ class MenuService
                 'title' => 'Ordre',
                 'desc' => 'Opret ordrepakker ud fra tasks i Jira',
                 'icon' => 'fa-box-open',
-                'routeName' => 'index',
-                'active' => false,
-            ],
-            'expenses' => (object) [
-                'title' => 'Udgift',
-                'desc' => 'Opret udgifter i forbindelse med projekter og tasks',
-                'icon' => 'fa-credit-card',
                 'routeName' => 'index',
                 'active' => false,
             ],

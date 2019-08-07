@@ -43,6 +43,13 @@ class DefaultController extends Controller
                 'routeName' => 'billing_index',
                 'btnTxt' => 'Lav en Faktura',
             ],
+            'expense' => (object) [
+                'title' => 'Udgift',
+                'desc' => 'Opret udgifter i forbindelse med projekter og tasks',
+                'icon' => 'fa-credit-card',
+                'routeName' => 'expense_new',
+                'btnTxt' => 'Opret en udgift',
+            ],
 
             // @TODO: Add when ready.
             /*
@@ -59,13 +66,6 @@ class DefaultController extends Controller
                 'icon' => 'fa-box-open',
                 'routeName' => 'index',
                 'btnTxt' => 'Pak en Ordre',
-            ],
-            'expenses' => (object) [
-                'title' => 'Udgift',
-                'desc' => 'Opret udgifter i forbindelse med projekter og tasks',
-                'icon' => 'fa-credit-card',
-                'routeName' => 'index',
-                'btnTxt' => 'Tilføj en Udgift',
             ],
             'sprintplan' => (object) [
                 'title' => 'Sprintrapport',

@@ -10,6 +10,7 @@
 
 namespace Expense\Controller\Admin;
 
+use App\Service\MenuService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -23,8 +24,10 @@ class DefaultController extends AbstractController
      *
      * @Route("/", name="index")
      */
-    public function index()
+    public function index(MenuService $menuService)
     {
-        return $this->render('@ExpenseBundle/admin/index.html.twig');
+        return $this->render('@ExpenseBundle/admin/index.html.twig', [
+            'global_menu_items' => $menuService->getGlobalMenuItems(),
+        ]);
     }
 }

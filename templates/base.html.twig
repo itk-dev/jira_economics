@@ -43,11 +43,14 @@
             <div class="d-flex flex-row flex-grow-1">
               <div class="container-fluid">
                 <div class="main row">
-                  <div class="main-sidebar col-12 col-md-2 pt-md-3 order-1 order-md-0">
-                    {% block sidebar %}
-                      {% include "main/sidebar.html.twig" %}
-                    {% endblock %}
-                  </div>
+                    {% block sidebar '' %}
+                    {# Only render sidebar (and wrapper) is not empty #}
+                    {% set _sidebar = block('sidebar') %}
+                    {% if _sidebar is not empty %}
+                        <div class="main-sidebar col-12 col-md-2 pt-md-3 order-1 order-md-0">
+                            {{ _sidebar|raw }}
+                        </div>
+                    {% endif %}
                   <div class="main-content col-12 col-md-10 py-md-3 px-md-5 order-0 order-md-1">
                       {% block flash_messages %}
                           {% for label, messages in app.flashes %}

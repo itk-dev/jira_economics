@@ -11,6 +11,7 @@
 namespace Expense\Controller;
 
 use App\Service\JiraService;
+use App\Service\MenuService;
 use Doctrine\ORM\EntityRepository;
 use Expense\Entity\Category;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -32,6 +33,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ExpenseController extends AbstractController
 {
+    /** @var \App\Service\MenuService */
+    private $menuService;
+
+    public function __construct(MenuService $menuService)
+    {
+        $this->menuService = $menuService;
+    }
+
     /**
      * @Route("", name="index")
      */
@@ -40,6 +49,7 @@ class ExpenseController extends AbstractController
         $expenses = $jiraService->getExpenses();
 
         return $this->render('@ExpenseBundle/expense/index.html.twig', [
+            'global_menu_items' => $this->menuService->getGlobalMenuItems(),
             'expenses' => $expenses,
         ]);
     }
@@ -63,7 +73,6 @@ class ExpenseController extends AbstractController
             ])
             ->add('issue_key', TextType::class, [
                 'label' => 'expense.new.issue',
-                'help' => 'expense.new.issue.help',
             ])
             ->add('category', EntityType::class, [
                 'label' => 'expense.new.category',
@@ -128,6 +137,7 @@ class ExpenseController extends AbstractController
         );
 
         return $this->render('@ExpenseBundle/expense/new.html.twig', [
+            'global_menu_items' => $this->menuService->getGlobalMenuItems(),
             'form' => $form->createView(),
             'project_issues_url' => $project_issues_url,
         ]);

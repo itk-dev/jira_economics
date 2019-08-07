@@ -19,7 +19,6 @@
                 <td>{{ category.name }}</td>
                 <td>{{ category.unitPrice }}</td>
                 <td>
-                    <a href="{{ path('expense_admin_category_show', {'id': category.id}) }}">{{ 'expense.category.action.show'|trans }}</a>
                     <a href="{{ path('expense_admin_category_edit', {'id': category.id}) }}">{{ 'expense.category.action.edit'|trans }}</a>
                 </td>
             </tr>
