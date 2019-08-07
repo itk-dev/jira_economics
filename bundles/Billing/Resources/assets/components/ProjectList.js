@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import connect from 'react-redux/es/connect/connect';
 import rest from '../redux/utils/rest';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Form from 'react-bootstrap/Form';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
 
 const createRows = (projects) => {
   if (projects.data.data === undefined) {
@@ -15,8 +18,7 @@ const createRows = (projects) => {
     name: project.name,
     key: project.key,
     id: project.id,
-    avatar: <img src={project.avatarUrls['16x16']} style={imageStyle}/>,
-    linkUrl: `/billing/project/${project.id}/new`
+    avatar: <img src={project.avatarUrls['16x16']} style={imageStyle}/>
   }));
 };
 
@@ -28,10 +30,17 @@ class ProjectList extends Component {
   constructor(){
     super();
     this.state = {
-      inputFilter: ''
+      inputFilter: '',
+      showModal: false,
+      selectedProject: 0
     };
 
-    this.onFilterChange = this.onFilterChange.bind(this)
+    this.onFilterChange = this.onFilterChange.bind(this);
+    this.handleModalShow = this.handleModalShow.bind(this);
+    this.handleModalCancel = this.handleModalCancel.bind(this);
+    this.handleModalCreate = this.handleModalCreate.bind(this);
+
+    this.textInput = React.createRef();
   }
 
   componentDidMount() {
@@ -51,6 +60,37 @@ class ProjectList extends Component {
     ) !== -1)
   }
 
+  handleModalCancel() {
+    this.setState({ showModal: false });
+  }
+
+  handleModalShow(projectId) {
+    this.setState({ showModal: true, selectedProject: projectId });
+  }
+
+  handleModalCreate() {
+    event.preventDefault();
+    const { dispatch } = this.props;
+    const name = this.textInput.current.value;
+    const projectId = this.state.selectedProject;
+    const invoiceData = {
+      name,
+      projectId
+    };
+    dispatch(rest.actions.createInvoice({}, {
+      body: JSON.stringify(invoiceData)
+    }))
+    .then((response) => {
+      this.setState({ showModal: false });
+      this.props.history.push(`/project/${projectId}/${response.invoiceId}`);
+    })
+    .catch((reason) => {
+      this.setState({ showModal: false });
+      console.log('isCanceled', reason.isCanceled);
+    });
+    // @TODO: verify that invoice creation was successful
+  }
+
   render () {
     const items = [];
 
@@ -58,7 +98,7 @@ class ProjectList extends Component {
 
     for (const [index, project] of Object.entries(projects)) {
       items.push(
-        <ListGroup.Item key={project.rowKey} id={project.id} action href={project.linkUrl}>
+        <ListGroup.Item key={project.rowKey} id={project.id} action onClick={() => this.handleModalShow(project.id)}>
           <span className="mr-2">{project.avatar}</span>
           <span className="mr-2 lead d-inline">{project.name}</span>
           <span className="text-muted">{project.key}</span>
@@ -88,6 +128,25 @@ class ProjectList extends Component {
         </ListGroup>
 
         {fetching}
+        <Modal show={this.state.showModal} onHide={this.handleModalCancel}>
+          <Modal.Header closeButton>
+            <Modal.Title>Create Invoice</Modal.Title>
+          </Modal.Header>
+          <Form>
+            <Form.Group controlId="newInvoiceForm">
+              <Form.Label>Invoice name</Form.Label>
+              <Form.Control ref={this.textInput} type="text" placeholder="Enter new invoice name"></Form.Control>
+            </Form.Group>
+          </Form>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={this.handleModalCancel}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={this.handleModalCreate}>
+              Create
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     );
   }
@@ -109,6 +168,6 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(
+export default withRouter(connect(
   mapStateToProps
-)(ProjectList);
+)(ProjectList));
