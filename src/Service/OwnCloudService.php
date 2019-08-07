@@ -149,7 +149,7 @@ class OwnCloudService
         $serializer = new Serializer($normalizers, $encoders);
         $client = new Client(
             [
-              'base_uri' => $this->host,
+                'base_uri' => $this->host,
             ]
         );
 
@@ -159,7 +159,7 @@ class OwnCloudService
                 'PROPFIND',
                 $path,
                 [
-                'auth' => [$this->username, $this->password],
+                    'auth' => [$this->username, $this->password],
                 ]
             );
 

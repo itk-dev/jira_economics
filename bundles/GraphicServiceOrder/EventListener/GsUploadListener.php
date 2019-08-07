@@ -41,8 +41,8 @@ class GsUploadListener
         $destination = $this->projectDir.'/private/files/gs';
         $filename = Urlizer::urlize($_FILES['graphic_service_order_form']['name']['files'][0]).'-'.uniqid().'.'.$file->guessExtension();
         $file->move(
-        $destination,
-        $filename
+            $destination,
+            $filename
     );
         $response = $event->getResponse();
         $response['success'] = true;
