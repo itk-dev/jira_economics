@@ -20,12 +20,12 @@ require('./planning.css');
         },
         computed: {
             // Sorted by displayName.
-            sortedUsers: function () {
+            filteredUsers: function () {
                 if (this.users === {}) {
                     return [];
                 }
 
-                var arr = Object.keys(this.users).map(function (i) {
+                let arr = Object.keys(this.users).map(function (i) {
                     return this.users[i];
                 }.bind(this));
 
@@ -44,12 +44,12 @@ require('./planning.css');
                 return arr;
             },
             // Sorted by name.
-            sortedProjects: function () {
+            filteredProjects: function () {
                 if (this.projects === {}) {
                     return [];
                 }
 
-                var arr = Object.keys(this.projects).map(function (i) {
+                let arr = Object.keys(this.projects).map(function (i) {
                     return this.projects[i];
                 }.bind(this));
 
@@ -67,7 +67,7 @@ require('./planning.css');
         },
         created: function () {
             // Get hidden users from local storage.
-            var hideUsers = localStorage.getItem('hideUsers');
+            let hideUsers = localStorage.getItem('hideUsers');
 
             if (hideUsers !== null) {
                 this.hideUsers = JSON.parse(hideUsers);
@@ -77,7 +77,7 @@ require('./planning.css');
                 .then(function (response) {
                     this.sprints = response.data.sprints;
 
-                    for (var i = 0; i < this.sprints.length; i++) {
+                    for (let i = 0; i < this.sprints.length; i++) {
                         this.getSprint(this.sprints[i].id, i);
                     }
                 }.bind(this))
@@ -87,19 +87,14 @@ require('./planning.css');
         },
         methods: {
             toggleUser: function (key) {
-                var newValue = !this.hideUsers[key];
+                let newValue = !this.hideUsers[key];
                 Vue.set(this.hideUsers, key, newValue);
                 localStorage.setItem('hideUsers', JSON.stringify(this.hideUsers));
             },
             getToggle: function (key) {
-                var toggled = this.toggle.hasOwnProperty(key) && this.toggle[key];
+                let toggled = this.toggle.hasOwnProperty(key) && this.toggle[key];
 
-                if (toggled) {
-                    return '<i class="fas fa-angle-up"></i>';
-                }
-                else {
-                    return '<i class="fas fa-angle-down"></i>';
-                }
+                return toggled ? '<i class="fas fa-angle-up"></i>' : '<i class="fas fa-angle-down"></i>';
             },
             keyToggled: function (key) {
                 return this.toggle.hasOwnProperty(key) && this.toggle[key];
@@ -108,10 +103,10 @@ require('./planning.css');
                 Vue.set(this.toggle, key, !this.toggle[key]);
             },
             getSprintRemainingTotal: function (sprint) {
-                var total = 0;
+                let total = 0;
 
-                for (var i in sprint.issues) {
-                    var issue = sprint.issues[i];
+                for (let i in sprint.issues) {
+                    let issue = sprint.issues[i];
 
                     if (issue.timeRemaining &&
                         issue.fields.assignee &&
@@ -128,7 +123,7 @@ require('./planning.css');
             },
             getRemainingEstimatIssue: function (sprint, issue) {
                 if (sprint.hasOwnProperty('issuesById') && sprint.issuesById.hasOwnProperty(issue.id)) {
-                    var sprintIssue = sprint.issuesById[issue.id];
+                    let sprintIssue = sprint.issuesById[issue.id];
 
                     if (sprintIssue.done) {
                         return 'Done';
@@ -144,12 +139,31 @@ require('./planning.css');
                     return '';
                 }
             },
+            getStatusLevelClass: function (user, sprint) {
+                let remainingEstimateUser = this.getRemainingEstimatUser(user, sprint);
+
+                if (remainingEstimateUser > 35) {
+                    return 'remaining-critical';
+                }
+                else if (remainingEstimateUser> 28 && remainingEstimateUser <= 30) {
+                    return 'remaining-warning';
+                }
+                else if (remainingEstimateUser > 30 && remainingEstimateUser <= 35) {
+                    return 'remaining-danger';
+                }
+                else if (remainingEstimateUser >= 24 && remainingEstimateUser <= 28) {
+                    return 'remaining-success';
+                }
+                else {
+                    return '';
+                }
+            },
             getRemainingEstimatUserProjectSprint: function (user, project, sprint) {
-                var sum = 0;
+                let sum = 0;
 
                 if (user.projects.hasOwnProperty(project.id)) {
-                    var issues = user.projects[project.id].issues;
-                    for (var issue in issues) {
+                    let issues = user.projects[project.id].issues;
+                    for (let issue in issues) {
                         issue = user.projects[project.id].issues[issue];
 
                         if (issue.sprintId === sprint.id &&
@@ -188,14 +202,14 @@ require('./planning.css');
                 }
             },
             updateGlobalTable: function (sprint) {
-                for (var issue in sprint.issues) {
+                for (let issue in sprint.issues) {
                     issue = sprint.issues[issue];
 
-                    var assigned = issue.fields.assignee;
-                    var project = issue.fields.project;
-                    var timeRemaining = issue.fields.timetracking.remainingEstimateSeconds;
-                    var issueDone = issue.fields.hasOwnProperty('status') && issue.fields.status.name === 'Done';
-                    var saveProject = null;
+                    let assigned = issue.fields.assignee;
+                    let project = issue.fields.project;
+                    let timeRemaining = issue.fields.timetracking.remainingEstimateSeconds;
+                    let issueDone = issue.fields.hasOwnProperty('status') && issue.fields.status.name === 'Done';
+                    let saveProject = null;
 
                     issue.done = issueDone;
                     issue.sprintId = sprint.id;
@@ -253,7 +267,7 @@ require('./planning.css');
 
                     // Users
 
-                    var saveUser = null;
+                    let saveUser = null;
 
                     if (this.users.hasOwnProperty(assigned.key)) {
                         saveUser = this.users[assigned.key];
@@ -284,11 +298,11 @@ require('./planning.css');
             getSprint: function (id, index) {
                 axios.get(currentUrl + '/issues/' + id)
                     .then(function (response) {
-                        var sprint = this.sprints[index];
+                        let sprint = this.sprints[index];
                         sprint.issues = response.data.issues;
                         sprint.issuesById = {};
 
-                        for (var issue in sprint.issues) {
+                        for (let issue in sprint.issues) {
                             issue = sprint.issues[issue];
 
                             sprint.issuesById[issue.id] = issue;

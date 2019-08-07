@@ -14,8 +14,7 @@
             <div class="input-group mb-3">
                 <input type="text" class="form-control" placeholder="{{ 'planning.board.filter_placeholder'|trans }}" aria-label="filter" aria-describedby="basic-addon1" v-model="filter">
             </div>
-            <a v-for="board in sortedBoards" class="m-1 btn btn-light" v-bind:href="'/planning/board/'+board.id" v-html="board.name"> </a>
-            <div v-html="'Viser ' + Math.min(sortedBoards.length, boards.length) + ' af ' + boards.length + ' boards.'" class="mb-3"></div>
+            <a v-for="board in filteredBoards" class="m-1 btn btn-light" v-bind:href="'/planning/board/'+board.id" v-html="board.name"> </a>
         </div>
     </div>
 {% endblock %}

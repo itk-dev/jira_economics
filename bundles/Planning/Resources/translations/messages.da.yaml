@@ -4,7 +4,7 @@ planning:
         filter_placeholder: Filtrér
         loading: Indlæser...
         title: 'Boards - Planning - ITK Jira'
-    choose_another_board: '<- Vælg andet board'
+    choose_another_board: '← Vælg andet board'
     filter_projects: Filtrér projekter
     filter_users: Filtrér brugere
     headline:

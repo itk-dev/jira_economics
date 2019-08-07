@@ -10,7 +10,8 @@ import axios from 'axios';
             loading: false
         },
         computed: {
-            sortedBoards: function () {
+            // Sorted by name.
+            filteredBoards: function () {
                 if (this.boards === undefined) {
                     return [];
                 }
