@@ -19,6 +19,7 @@ require('./planning.css');
             userFilter: ''
         },
         computed: {
+            // Sorted by displayName.
             sortedUsers: function () {
                 if (this.users === {}) {
                     return [];
@@ -42,6 +43,7 @@ require('./planning.css');
 
                 return arr;
             },
+            // Sorted by name.
             sortedProjects: function () {
                 if (this.projects === {}) {
                     return [];
@@ -64,6 +66,7 @@ require('./planning.css');
             }
         },
         created: function () {
+            // Get hidden users from local storage.
             var hideUsers = localStorage.getItem('hideUsers');
 
             if (hideUsers !== null) {

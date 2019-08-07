@@ -56,12 +56,10 @@ class PlanningController extends AbstractController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function planningOverview(PlanningService $planningService, MenuService $menuService, $boardId = null)
+    public function planningOverview(PlanningService $planningService, MenuService $menuService, string $jiraUrl, string $jiraDefaultBoard, $boardId = null)
     {
-        $jiraUrl = getenv('JIRA_URL');
-
         if (null === $boardId) {
-            $boardId = getenv('JIRA_DEFAULT_BOARD');
+            $boardId = $jiraDefaultBoard;
         }
 
         $board = $planningService->getBoard($boardId);

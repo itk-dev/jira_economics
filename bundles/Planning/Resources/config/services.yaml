@@ -2,6 +2,9 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $jiraUrl: '%env(JIRA_URL)%'
+            $jiraDefaultBoard: '%env(JIRA_DEFAULT_BOARD)%'
 
     Planning\:
         resource: '../../*'
