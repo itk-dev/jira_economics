@@ -18,7 +18,7 @@ import axios from 'axios';
 
                 let arr = this.boards.filter(function (item) {
                     return item.name.toLowerCase()
-                        .indexOf(this.filter) !== -1;
+                        .indexOf(this.filter.toLowerCase()) !== -1;
                 }.bind(this));
 
                 arr = arr.sort(function (a, b) {
