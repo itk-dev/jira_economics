@@ -40,28 +40,10 @@ class AppService
     {
         switch ($this->contextService->getContext()) {
             case ContextService::JIRA:
-                return $this->getJiraApps();
+                return $this->getAppsInContext('jira');
         }
 
-        return $this->getPortalApps();
-    }
-
-    private function getJiraApps()
-    {
-        $apps = $this->getAppsInContext('jira');
-
-        // @TODO: Check access to apps.
-
-        return $apps;
-    }
-
-    private function getPortalApps()
-    {
-        $apps = $this->getAppsInContext('portal');
-
-        // @TODO: Check access to apps.
-
-        return $apps;
+        return $this->getAppsInContext('portal');
     }
 
     private function getAppsInContext($context)
@@ -70,6 +52,29 @@ class AppService
             return [];
         }
 
-        return $this->parameters->get($context)['apps'] ?? [];
+        $items = $this->parameters->get($context)['apps'] ?? [];
+        $items = array_filter($items, [$this->contextService, 'isAccessible']);
+        foreach ($items as &$item) {
+            $item['active'] = $this->contextService->isActiveRoute($item['routeName']);
+        }
+
+        // Keep only enabled apps.
+        if (!$this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+            $token = $this->tokenStorage->getToken();
+            if (null !== $token) {
+                /** @var \App\Entity\User $user */
+                $user = $token->getUser();
+                $enabledApps = $user->getPortalApps();
+                $items = array_filter(
+                    $items,
+                    function ($app) use ($enabledApps) {
+                        return \in_array($app, $enabledApps);
+                    },
+                    ARRAY_FILTER_USE_KEY
+                );
+            }
+        }
+
+        return $items;
     }
 }

@@ -60,8 +60,6 @@ class ContextService
             }
         }
 
-        // @TODO Check user access to portal app. Use voter?
-
         return true;
     }
 }

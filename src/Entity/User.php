@@ -29,7 +29,7 @@ class User extends BaseUser
     /**
      * @ORM\Column(type="json")
      */
-    private $portals = [];
+    private $portalApps = [];
 
     public function setEmail($email)
     {
@@ -38,14 +38,14 @@ class User extends BaseUser
         return parent::setEmail($email);
     }
 
-    public function getPortals(): ?array
+    public function getPortalApps(): ?array
     {
-        return $this->portals;
+        return $this->portalApps;
     }
 
-    public function setPortals(array $portals): self
+    public function setPortalApps(array $portalApps): self
     {
-        $this->portals = $portals;
+        $this->portalApps = $portalApps;
 
         return $this;
     }

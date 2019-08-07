@@ -31,8 +31,12 @@ class MenuService
     /**
      * MenuService constructor.
      */
-    public function __construct(RequestStack $requestStack, RouterInterface $router, ContextService $contextService, ParameterBagInterface $parameters)
-    {
+    public function __construct(
+        RequestStack $requestStack,
+        RouterInterface $router,
+        ContextService $contextService,
+        ParameterBagInterface $parameters
+    ) {
         $this->requestStack = $requestStack;
         $this->router = $router;
         $this->contextService = $contextService;
@@ -43,28 +47,10 @@ class MenuService
     {
         switch ($this->contextService->getContext()) {
             case ContextService::JIRA:
-                return $this->getJiraMenuItems();
+                return $this->getMenuItemsInContext('jira');
         }
 
-        return $this->getPortalMenuItems();
-    }
-
-    private function getJiraMenuItems()
-    {
-        $items = $this->getMenuItemsInContext('jira');
-
-        // @TODO: Check access to menu items.
-
-        return $items;
-    }
-
-    private function getPortalMenuItems()
-    {
-        $items = $this->getMenuItemsInContext('portal');
-
-        // @TODO: Check access to menu items.
-
-        return $items;
+        return $this->getMenuItemsInContext('portal');
     }
 
     private function getMenuItemsInContext($context)
@@ -73,7 +59,13 @@ class MenuService
             return [];
         }
 
-        return $this->parameters->get($context)['menu'] ?? [];
+        $items = $this->parameters->get($context)['menu'] ?? [];
+        $items = array_filter($items, [$this->contextService, 'isAccessible']);
+        foreach ($items as &$item) {
+            $item['active'] = $this->contextService->isActiveRoute($item['routeName']);
+        }
+
+        return $items;
     }
 
     /**
@@ -85,28 +77,6 @@ class MenuService
     {
         $items = $this->getMenuItems();
 
-        $items = array_filter($items, [$this->contextService, 'isAccessible']);
-
-        foreach ($items as &$item) {
-            $item['active'] = $this->contextService->isActiveRoute($item['routeName']);
-        }
-
         return $items;
-    }
-
-    /**
-     * Test if route url starts with path.
-     *
-     * @param $routeName
-     * @param $path
-     *
-     * @return bool
-     */
-    private function routeStartsWith($routeName, $path)
-    {
-        $route = $this->router->generate($routeName);
-        $length = \strlen($route);
-
-        return substr($path, 0, $length) === $route;
     }
 }

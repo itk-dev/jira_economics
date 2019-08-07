@@ -16,17 +16,16 @@ easy_admin:
                     - property: email
                     - property: roles
                     - property: enabled
+                    - property: portalApps
                     - property: lastLogin
 
             form:
                 fields:
                     - property: email
                     - property: roles
-                    - property: portals
-                      # @TODO: Make this work!
-                      type: App\Form\PortalsType
+                    - property: portalApps
+                      type: App\Form\PortalAppsType
                       type_options:
                           multiple: true
                           expanded: true
-                          # portals: '%portals%'
                     - property: enabled
