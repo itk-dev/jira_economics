@@ -14,8 +14,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Class ExpenseController.
- *
  * @Route("/admin", name="expense_admin_")
  */
 class DefaultController extends AbstractController

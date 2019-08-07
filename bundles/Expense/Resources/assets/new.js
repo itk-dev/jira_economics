@@ -9,9 +9,7 @@ $(() => {
     const $issuePicker = $('<select class="form-control"></select>')
         .insertBefore($issueCtrl)
         .css({width: '100%'})
-        .select2({
-            // placeholder: Expense.messages.select_project
-        })
+        .select2()
 
     const $projectCtrl = $('#form_project');
 

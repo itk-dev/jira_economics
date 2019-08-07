@@ -23,8 +23,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class ExpenseController.
- *
  * @Route("/admin/expense/category", name="expense_admin_category_")
  */
 class ExpenseCategoryController extends AbstractController

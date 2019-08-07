@@ -152,7 +152,6 @@ class ExpenseController extends AbstractController
                     return new JsonResponse($section);
                 }
             }
-//            return new JsonResponse($result->sections[0]);
         }
 
         return new JsonResponse(['issues' => []]);

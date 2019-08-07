@@ -61,7 +61,6 @@ abstract class AbstractJiraService
     {
         $client = $this->getClient();
 
-        // Set the "auth" request option to "oauth" to sign using oauth
         try {
             $response = $client->post(
                 $path,
@@ -74,7 +73,6 @@ abstract class AbstractJiraService
                 return json_decode($body);
             }
         } catch (RequestException $e) {
-//            header('Content-type: text/plain'); echo var_export((string)$e->getResponse()->getBody(), true); die(__FILE__.':'.__LINE__.':'.__METHOD__);
             throw $e;
         }
     }
@@ -90,7 +88,6 @@ abstract class AbstractJiraService
     {
         $client = $this->getClient();
 
-        // Set the "auth" request option to "oauth" to sign using oauth
         try {
             $response = $client->put(
                 $path,
@@ -118,7 +115,6 @@ abstract class AbstractJiraService
     {
         $client = $this->getClient();
 
-        // Set the "auth" request option to "oauth" to sign using oauth
         try {
             $response = $client->delete($path);
 

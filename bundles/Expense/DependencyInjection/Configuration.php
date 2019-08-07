@@ -20,8 +20,7 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->getRootNode('expense');
+        $treeBuilder = new TreeBuilder('expense');
 
         return $treeBuilder;
     }
