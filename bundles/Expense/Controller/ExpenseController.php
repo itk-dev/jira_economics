@@ -75,7 +75,7 @@ class ExpenseController extends AbstractController
                         ->orderBy('c.name', 'ASC');
                 },
                 'choice_label' => function (Category $category) use ($translator) {
-                    return $translator->trans('expense.new.category.label_format', [
+                    return $translator->trans('expense.category.new.label_format', [
                         '%name%' => $category->getName(),
                         '%unit_price%' => money_format('%i', $category->getUnitPrice()),
                     ]);
@@ -112,7 +112,7 @@ class ExpenseController extends AbstractController
                 $expense = $jiraService->createExpense($data);
                 $this->addFlash(
                     'success',
-                    $translator->trans('Expense successfuly created')
+                    $translator->trans('expense.created.success')
                 );
 
                 return $this->redirectToRoute('expense_index');

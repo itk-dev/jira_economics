@@ -68,7 +68,7 @@ class ExpenseCategoryController extends AbstractController
             $entityManager->flush();
         }
 
-        $this->addFlash('success', $this->translator->trans('Expense categories successfully refreshed'));
+        $this->addFlash('success', $this->translator->trans('expense.category.successfully_refreshed'));
 
         return $this->redirectToRoute('expense_admin_category_index');
     }
@@ -85,7 +85,7 @@ class ExpenseCategoryController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $existingCategory = $this->jiraService->getExpenseCategoryByName($category->getName());
             if (null !== $existingCategory) {
-                $form->addError(new FormError($this->translator->trans('Expense category “%name%” already used', ['%name%' => $category->getName()])));
+                $form->addError(new FormError($this->translator->trans('expense.category.name_already_used', ['%name%' => $category->getName()])));
 
                 return $this->render('@ExpenseBundle/admin/expense/category/new.html.twig', [
                     'category' => $category,
@@ -129,7 +129,7 @@ class ExpenseCategoryController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $existingCategory = $this->jiraService->getExpenseCategoryByName($category->getName());
             if (null !== $existingCategory && $existingCategory->id !== $category->getId()) {
-                $form->addError(new FormError($this->translator->trans('Expense category “%name%” already used', ['%name%' => $category->getName()])));
+                $form->addError(new FormError($this->translator->trans('expense.category.name_already_used', ['%name%' => $category->getName()])));
 
                 return $this->render('@ExpenseBundle/admin/expense/category/edit.html.twig', [
                     'category' => $category,

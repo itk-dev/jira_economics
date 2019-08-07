@@ -20,8 +20,12 @@ class CategoryType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name')
-            ->add('unitPrice')
+            ->add('name', null, [
+                'label' => 'expense.category.name',
+            ])
+            ->add('unitPrice', null, [
+                'label' => 'expense.category.unitPrice',
+            ])
         ;
     }
 

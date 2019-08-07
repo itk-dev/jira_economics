@@ -5,10 +5,10 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>{{ 'Date'|trans }}</th>
-                    <th>{{ 'Category'|trans }}</th>
-                    <th>{{ 'Description'|trans }}</th>
-                    <th class="amount">{{ 'Amount'|trans }}</th>
+                    <th>{{ 'expense.date'|trans }}</th>
+                    <th>{{ 'expense.category'|trans }}</th>
+                    <th>{{ 'expense.description'|trans }}</th>
+                    <th class="amount">{{ 'expense.amount'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,6 +25,6 @@
     {% endif %}
 
     <div class="action-buttons">
-        <a class="btn btn-success" href="{{ path('expense_new') }}">{{ 'Add expense'|trans }}</a>
+        <a class="btn btn-success" href="{{ path('expense_new') }}">{{ 'expense.action.add'|trans }}</a>
     </div>
 {% endblock %}

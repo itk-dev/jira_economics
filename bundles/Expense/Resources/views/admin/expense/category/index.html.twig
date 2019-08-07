@@ -1,16 +1,16 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Category index{% endblock %}
+{% block title %}{{ 'expense.category.list.title'|trans }}{% endblock %}
 
 {% block content %}
-    <h1>Category index</h1>
+    <h1>{{ 'expense.category.list.title'|trans }}</h1>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Unit price</th>
-                <th>actions</th>
+                <th>{{ 'expense.category.name'|trans }}</th>
+                <th>{{ 'expense.category.unitPrice'|trans }}</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -19,21 +19,21 @@
                 <td>{{ category.name }}</td>
                 <td>{{ category.unitPrice }}</td>
                 <td>
-                    <a href="{{ path('expense_admin_category_show', {'id': category.id}) }}">show</a>
-                    <a href="{{ path('expense_admin_category_edit', {'id': category.id}) }}">edit</a>
+                    <a href="{{ path('expense_admin_category_show', {'id': category.id}) }}">{{ 'expense.category.action.show'|trans }}</a>
+                    <a href="{{ path('expense_admin_category_edit', {'id': category.id}) }}">{{ 'expense.category.action.edit'|trans }}</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="3">no records found</td>
+                <td colspan="3">{{ 'expense.category.empty_list'|trans }}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
     <form method="post" action="{{ path('expense_admin_category_refresh') }}">
-        <button class="btn btn-primary" type="submit">Refresh list from Jira</button>
+        <button class="btn btn-primary" type="submit">{{ 'expense.category.refresh_from_jira'|trans }}</button>
     </form>
 
-    <a class="btn btn-success" href="{{ path('expense_admin_category_new') }}">Create new</a>
+    <a class="btn btn-success" href="{{ path('expense_admin_category_new') }}">{{ 'expense.category.new'|trans }}</a>
 {% endblock %}
