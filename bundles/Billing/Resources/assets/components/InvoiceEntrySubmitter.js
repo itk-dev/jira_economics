@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from './ContentWrapper';
 import PageTitle from './PageTitle';
-import { setSelectedIssues } from '../redux/actions';
+import { setSelectedIssues, clearInvoiceEntry } from '../redux/actions';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
+
+// @TODO: an InvoiceEntry may still be set in props if we have previously edited an InvoiceEntry. Fix this.
 
 export class InvoiceEntrySubmitter extends Component {
   constructor(props) {
@@ -12,6 +14,18 @@ export class InvoiceEntrySubmitter extends Component {
     this.state = { account: 'Vælg PSP' };
     this.handleSelectJiraIssues = this.handleSelectJiraIssues.bind(this);
     this.onAccountChange = this.onAccountChange.bind(this);
+  }
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    let existingInvoiceEntryId = this.props.location.state.existingInvoiceEntryId;
+    if (existingInvoiceEntryId) {
+      dispatch(rest.actions.getInvoiceEntry({ id: existingInvoiceEntryId }))
+      .then((response) => {
+        this.setState({ account: response.account });
+      })
+      .catch((reason) => console.log('isCanceled', reason.isCanceled));
+    }
   }
 
   handleSelectJiraIssues = (event) => {
@@ -34,14 +48,10 @@ export class InvoiceEntrySubmitter extends Component {
     return timeSum;
   }
 
-  getUnitPrice() {
+  getUnitPrice(account) {
     // @TODO: replace with real data
     const unitPrices = { "PSP1": 560, "PSP2": 760, "PSP3": 820 };
-    let unitPrice = 0;
-    if ($('#invoice-entry-account').val()) {
-      unitPrice = unitPrices[$('#invoice-entry-account').val()];
-    }
-    return unitPrice;
+    return unitPrices[account] || 0;
   }
 
   onAccountChange(event) {
@@ -80,9 +90,8 @@ export class InvoiceEntrySubmitter extends Component {
       price,
       amount
     };
-    const existingInvoiceEntryId = this.props.location.state.existingInvoiceEntryId;
-    if (existingInvoiceEntryId) {
-      invoiceEntryData.id = existingInvoiceEntryId;
+    invoiceEntryData.id = this.props.location.state.existingInvoiceEntryId;
+    if (invoiceEntryData.id) {
       dispatch(rest.actions.updateInvoiceEntry({ id: invoiceEntryData.id }, {
         body: JSON.stringify(invoiceEntryData)
       }));
@@ -94,27 +103,31 @@ export class InvoiceEntrySubmitter extends Component {
     }
     // @TODO: check that a new invoiceEntry was successfully created before navigating to invoice page
     dispatch(setSelectedIssues({}));
+    dispatch(clearInvoiceEntry({}));
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
   }
 
   handleCancel = (event) => {
     event.preventDefault();
+    const { dispatch } = this.props;
+    dispatch(setSelectedIssues({}));
+    dispatch(clearInvoiceEntry({}));
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
   }
 
   renderManualInvoiceEntryForm() {
-    let pagetitle;
+    let pageTitle;
     // Editing an existing InvoiceEntry?
     if (this.props.location.state.existingInvoiceEntryId) {
-      pagetitle = <PageTitle>Rediger manuel fakturalinje</PageTitle>;
+      pageTitle = <PageTitle>Rediger manuel fakturalinje</PageTitle>;
     }
     // Creating a new InvoiceEntry?
     else {
-      pagetitle = <PageTitle>Opret fakturalinje manuelt</PageTitle>;
+      pageTitle = <PageTitle>Opret fakturalinje manuelt</PageTitle>;
     }
     return (
       <ContentWrapper>
-        {pagetitle}
+        {pageTitle}
         <div>
           <form id="manual-invoice-entry-form">
             <div>
@@ -127,6 +140,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-account"
                 aria-describedby="enterKontonr"
+                defaultValue={this.props.invoiceEntry.data.account || ''}
                 placeholder="Kontonummer">
               </input>
             </div>
@@ -140,6 +154,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-product"
                 aria-describedby="enterVarenr"
+                defaultValue={this.props.invoiceEntry.data.product || ''}
                 placeholder="Varenavn">
               </input>
               <label htmlFor="beskrivelse">
@@ -151,6 +166,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-description"
                 aria-describedby="enterBeskrivelse"
+                defaultValue={this.props.invoiceEntry.data.description || ''}
                 placeholder="Varebeskrivelse">
               </input>
               <label htmlFor="antal">
@@ -162,6 +178,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-hours-spent"
                 aria-describedby="enterHoursSpent"
+                defaultValue={this.props.invoiceEntry.data.amount || ''}
                 placeholder="Vareantal">
               </input>
               <label htmlFor="beskrivelse">
@@ -173,6 +190,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-unit-price"
                 aria-describedby="enterUnitPrice"
+                defaultValue={this.props.invoiceEntry.data.price / this.props.invoiceEntry.data.amount || ''}
                 placeholder="0">
               </input>
             </div>
@@ -223,9 +241,9 @@ export class InvoiceEntrySubmitter extends Component {
             </label>
             <div>
               <select className="browser-default custom-select"
-                defaultValue={this.state.account}
+                value={this.state.account}
                 id="invoice-entry-account"
-                onChange={this.onAccountChange}>
+                onChange={this.onAccountChange.bind(this)}>
                 <option value="Vælg PSP" hidden>Vælg PSP</option>
                 <option value="PSP1">PSP1</option>
                 <option value="PSP2">PSP2</option>
@@ -242,6 +260,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-product"
                 aria-describedby="enterVarenr"
+                defaultValue={this.props.invoiceEntry.data.product || ''}
                 placeholder="Varenavn">
               </input>
               <label htmlFor="beskrivelse">
@@ -253,6 +272,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-description"
                 aria-describedby="enterBeskrivelse"
+                defaultValue={this.props.invoiceEntry.data.description || ''}
                 placeholder="Varebeskrivelse">
               </input>
               <label htmlFor="antal">
@@ -276,7 +296,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-unit-price"
                 aria-describedby="enterUnitPrice"
-                value={this.getUnitPrice()}
+                value={this.getUnitPrice(this.state.account)}
                 readOnly>
               </input>
             </div>
@@ -300,7 +320,6 @@ export class InvoiceEntrySubmitter extends Component {
     );
   }
 
-  // @TODO: When editing an existing InvoiceEntry, fill form with existing values
   // @TODO: cleanup redundant HTML
   render() {
     // InvoiceEntry without JiraIssues?
@@ -331,14 +350,16 @@ InvoiceEntrySubmitter.propTypes = {
   invoiceEntrySubmitter: PropTypes.object,
   dispatch: PropTypes.func.isRequired,
   selectedIssues: PropTypes.object,
-  invoiceEntries: PropTypes.object
+  invoiceEntries: PropTypes.object,
+  invoiceEntry: PropTypes.object
 };
 
 const mapStateToProps = state => {
   return {
     invoiceEntrySubmitter: state.invoiceEntrySubmitter,
     selectedIssues: state.selectedIssues,
-    invoiceEntries: state.invoiceEntries
+    invoiceEntries: state.invoiceEntries,
+    invoiceEntry: state.invoiceEntry
   };
 };
 
