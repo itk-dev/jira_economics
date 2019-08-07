@@ -65,7 +65,7 @@ abstract class AbstractJiraService
             $response = $client->post(
                 $path,
                 [
-                'json' => $data,
+                    'json' => $data,
                 ]
             );
 
@@ -92,7 +92,7 @@ abstract class AbstractJiraService
             $response = $client->put(
                 $path,
                 [
-                'json' => $data,
+                    'json' => $data,
                 ]
             );
 

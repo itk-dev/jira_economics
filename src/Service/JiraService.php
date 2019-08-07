@@ -57,8 +57,8 @@ class JiraService extends AbstractJiraService
 
         return new Client(
             [
-            'base_uri' => $this->jiraUrl,
-            'handler' => $stack,
+                'base_uri' => $this->jiraUrl,
+                'handler' => $stack,
                 'auth' => 'oauth',
             ]
         );
@@ -83,12 +83,12 @@ class JiraService extends AbstractJiraService
 
         $middleware = new Oauth1(
             [
-            'consumer_key' => $this->customerKey,
-            'private_key_file' => $this->pemPath,
-            'private_key_passphrase' => '',
-            'signature_method' => Oauth1::SIGNATURE_METHOD_RSA,
-            'token' => $accessToken,
-            'token_secret' => $accessTokenSecret,
+                'consumer_key' => $this->customerKey,
+                'private_key_file' => $this->pemPath,
+                'private_key_passphrase' => '',
+                'signature_method' => Oauth1::SIGNATURE_METHOD_RSA,
+                'token' => $accessToken,
+                'token_secret' => $accessTokenSecret,
             ]
         );
 
