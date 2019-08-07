@@ -41,7 +41,7 @@ class OwnCloudService
     {
         $client = new Client(
             [
-            'base_uri' => $this->host,
+                'base_uri' => $this->host,
             ]
         );
         try {
