@@ -205,7 +205,7 @@ class HomePage extends Component {
             <Button variant="secondary" onClick={this.handleModalClose}>
               Cancel
             </Button>
-            <Button id="delete-btn" variant="secondary" onClick={this.handleModalClose}>
+            <Button id="delete-btn" variant="danger" onClick={this.handleModalClose}>
               Delete
             </Button>
           </Modal.Footer>

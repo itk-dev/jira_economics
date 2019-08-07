@@ -38,13 +38,18 @@ class Invoice extends Component {
   constructor(props) {
     super(props);
     this.recordInvoice = this.recordInvoice.bind(this);
+    this.deleteInvoice = this.deleteInvoice.bind(this);
     this.handleModalShow = this.handleModalShow.bind(this);
     this.handleModalClose = this.handleModalClose.bind(this);
+    this.handleInvoiceDeleteModalShow = this.handleInvoiceDeleteModalShow.bind(this);
+    this.handleInvoiceDeleteModalClose = this.handleInvoiceDeleteModalClose.bind(this);
+
     this.state = {
        checkedEntries: {},
        showModal: false,
        checkedCount: 0,
-       invoiceEntries: {}
+       invoiceEntries: {},
+       showDeleteModal: false
     };
   };
 
@@ -78,13 +83,9 @@ class Invoice extends Component {
     }));
   };
 
-  // @TODO: show modal to confirm Invoice deletion
   deleteInvoice = (event) => {
     event.preventDefault();
-    const { dispatch } = this.props;
-    dispatch(rest.actions.deleteInvoice({ id: `${this.props.match.params.invoiceId}` }));
-    // @TODO: Check that deletion is successful before navigating back to main billing page
-    this.props.history.push(`/`);
+    this.handleInvoiceDeleteModalShow();
   };
 
   handleAddFromJira = (event) => {
@@ -103,7 +104,6 @@ class Invoice extends Component {
   // @TODO: show Modal to confirm InvoiceEntry deletion
   handleEntryDelete = (event) => {
     event.preventDefault();
-    const { dispatch } = this.props;
     let checkedInvoiceEntryIds = [];
 
     for (let [invoiceEntryId, checked] of Object.entries(this.state.checkedEntries)) {
@@ -202,6 +202,21 @@ class Invoice extends Component {
     this.setState({ showModal: true, checkedCount: checkedCount });
   };
 
+  handleInvoiceDeleteModalShow() {
+    this.setState({ showDeleteModal: true });
+  };
+
+  handleInvoiceDeleteModalClose = (event) => {
+    event.preventDefault();
+    if (event.target.id == "delete-invoice-btn") {
+      const { dispatch } = this.props;
+      dispatch(rest.actions.deleteInvoice({ id: `${this.props.match.params.invoiceId}` }));
+      // @TODO: Check that deletion is successful before navigating back to main billing page
+      this.props.history.push(`/`);
+    }
+    this.setState({ showDeleteModal: false });
+  };
+
   // @TODO: show spinner while invoiceEntries are being loaded
   render() {
     if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId) {
@@ -276,9 +291,9 @@ class Invoice extends Component {
                   {this.state.invoiceEntries.data && this.state.invoiceEntries.data.map((item) =>
                     <tr key={item.id}>
                       <td><Form.Check aria-label="" id={item.id} onChange={this.handleCheckboxChange} /></td>
-                      <td>{item.accountNumber}</td>
+                      <td>{item.account}</td>
                       <td><Link to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}
-                      /${item.id}`}>{item.name}</Link></td>
+                      /${item.id}`}>{item.product}</Link></td>
                       <td>{item.description}</td>
                       <td>{this.getPriceData(item.id, 'amount')}</td>
                       <td>{this.getPriceData(item.id, 'unitPrice')}</td>
@@ -317,6 +332,20 @@ class Invoice extends Component {
             </Button>
             </Modal.Footer>
           </Modal>
+          <Modal show={this.state.showDeleteModal} onHide={this.handleInvoiceDeleteModalClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm deletion</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>Are you sure you want to delete this invoice?</Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={this.handleInvoiceDeleteModalClose}>
+              Cancel
+            </Button>
+            <Button id="delete-invoice-btn" variant="danger" onClick={this.handleInvoiceDeleteModalClose}>
+              Delete
+            </Button>
+          </Modal.Footer>
+        </Modal>
         </ContentWrapper>
       );
     }
