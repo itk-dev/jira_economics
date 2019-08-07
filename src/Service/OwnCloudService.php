@@ -73,7 +73,7 @@ class OwnCloudService
     {
         $client = new Client(
             [
-            'base_uri' => $this->host,
+                'base_uri' => $this->host,
             ]
         );
 
@@ -82,8 +82,8 @@ class OwnCloudService
             $response = $client->post(
                 $path,
                 [
-                'auth' => [$this->username, $this->password],
-                'json' => $data,
+                    'auth' => [$this->username, $this->password],
+                    'json' => $data,
                 ]
             );
 
@@ -109,7 +109,7 @@ class OwnCloudService
     {
         $client = new Client(
             [
-            'base_uri' => $this->host,
+                'base_uri' => $this->host,
             ]
         );
 
@@ -119,7 +119,7 @@ class OwnCloudService
                 'MKCOL',
                 $path,
                 [
-                'auth' => [$this->username, $this->password],
+                    'auth' => [$this->username, $this->password],
                 ]
             );
 
@@ -143,40 +143,40 @@ class OwnCloudService
      */
     public function propFind($path)
     {
+        $encoders = [new XmlEncoder()];
+        $normalizers = [];
 
-      $encoders = [new XmlEncoder()];
-      $normalizers = [];
-
-      $serializer = new Serializer($normalizers, $encoders);
-      $client = new Client(
-        [
-          'base_uri' => $this->host,
-        ]
-      );
-
-      // Set the "auth" request option to "oauth" to sign using oauth
-      try {
-        $response = $client->request(
-          'PROPFIND',
-          $path,
-          [
-            'auth' => [$this->username, $this->password],
-          ]
+        $serializer = new Serializer($normalizers, $encoders);
+        $client = new Client(
+            [
+              'base_uri' => $this->host,
+            ]
         );
 
-        if ($body = $response->getBody()->getContents()) {
-          $folders = [];
-          $content = $serializer->decode($body, 'xml');
-          foreach ($content['d:response'] as $folder) {
-            if (is_array($folder) && array_key_exists('d:href', $folder)) {
-              $folders[] = str_replace($path, '', $folder['d:href']);
+        // Set the "auth" request option to "oauth" to sign using oauth
+        try {
+            $response = $client->request(
+                'PROPFIND',
+                $path,
+                [
+                'auth' => [$this->username, $this->password],
+                ]
+            );
+
+            if ($body = $response->getBody()->getContents()) {
+                $folders = [];
+                $content = $serializer->decode($body, 'xml');
+                foreach ($content['d:response'] as $folder) {
+                    if (\is_array($folder) && \array_key_exists('d:href', $folder)) {
+                        $folders[] = str_replace($path, '', $folder['d:href']);
+                    }
+                }
+
+                return $folders;
             }
-          }
-          return $folders;
+        } catch (RequestException $e) {
+            throw $e;
         }
-      } catch (RequestException $e) {
-        throw $e;
-      }
     }
 
     /**
@@ -192,7 +192,7 @@ class OwnCloudService
     {
         $client = new Client(
             [
-            'base_uri' => $this->host,
+                'base_uri' => $this->host,
             ]
         );
 
@@ -201,13 +201,13 @@ class OwnCloudService
             $response = $client->put(
                 $path,
                 [
-                'auth' => [$this->username, $this->password],
-                'body' => $file,
+                    'auth' => [$this->username, $this->password],
+                    'body' => $file,
                 ]
             );
 
-            if ($body = $response->getBody()) {
-                return json_decode($body);
+            if ($status = $response->getStatusCode()) {
+                return $status;
             }
         } catch (RequestException $e) {
             throw $e;

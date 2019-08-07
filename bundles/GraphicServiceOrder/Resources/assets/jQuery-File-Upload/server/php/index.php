@@ -1,15 +1,13 @@
 <?php
+
 /*
- * jQuery File Upload Plugin PHP Example
- * https://github.com/blueimp/jQuery-File-Upload
+ * This file is part of aakb/jira_economics.
  *
- * Copyright 2010, Sebastian Tschan
- * https://blueimp.net
+ * (c) 2019 ITK Development
  *
- * Licensed under the MIT license:
- * https://opensource.org/licenses/MIT
+ * This source file is subject to the MIT license.
  */
 
 error_reporting(E_ALL | E_STRICT);
-require('UploadHandler.php');
+require 'UploadHandler.php';
 $upload_handler = new UploadHandler();

@@ -111,26 +111,26 @@ class GsOrder
 
     public function getIssueId(): ?int
     {
-      return $this->issueId;
+        return $this->issueId;
     }
 
     public function setIssueId(int $issueId): self
     {
-      $this->issueId = $issueId;
+        $this->issueId = $issueId;
 
-      return $this;
+        return $this;
     }
 
     public function getIssueKey(): ?string
     {
-      return $this->issueKey;
+        return $this->issueKey;
     }
 
     public function setIssueKey(string $issueKey): self
     {
-      $this->issueKey = $issueKey;
+        $this->issueKey = $issueKey;
 
-      return $this;
+        return $this;
     }
 
     public function getJobTitle(): ?string
