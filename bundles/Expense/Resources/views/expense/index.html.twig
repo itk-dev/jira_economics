@@ -18,12 +18,10 @@
             <tbody>
                 {% for expense in expenses %}
                     <tr>
-                        {# @TODO: Localize #}
-                        <td>{{ expense.date|date('d/m/Y') }}</td>
+                        <td>{{ expense.date|localizeddate('short', 'none') }}</td>
                         <td>{{ expense.expenseCategory.name }}</td>
                         <td>{{ expense.description|raw }}</td>
-                        {# @TODO: Localize #}
-                        <td class="amount">{{ expense.amount|number_format(2, ',') }}</td>
+                        <td class="amount">{{ expense.amount|number_format }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
