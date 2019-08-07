@@ -45,12 +45,15 @@ class Invoice extends Component {
     this.handleInvoiceDeleteModalClose = this.handleInvoiceDeleteModalClose.bind(this);
     this.handleInvoiceRecordModalShow = this.handleInvoiceRecordModalShow.bind(this);
     this.handleInvoiceRecordModalClose = this.handleInvoiceRecordModalClose.bind(this);
+    this.handleDeleteEntryModalShow = this.handleDeleteEntryModalShow.bind(this);
+    this.handleDeleteEntryModalClose = this.handleDeleteEntryModalClose.bind(this);
 
     this.state = {
        checkedEntries: {},
        showModal: false,
        showDeleteModal: false,
        showRecordModal: false,
+       showDeleteEntryModal: false,
        checkedCount: 0,
        invoiceEntries: {},
     };
@@ -91,19 +94,9 @@ class Invoice extends Component {
     });
   };
 
-  // @TODO: show Modal to confirm InvoiceEntry deletion
-  handleEntryDelete = (event) => {
+  handleDeleteEntry = (event) => {
     event.preventDefault();
-    let checkedInvoiceEntryIds = [];
-
-    for (let [invoiceEntryId, checked] of Object.entries(this.state.checkedEntries)) {
-      if (checked) {
-        checkedInvoiceEntryIds.push(parseInt(invoiceEntryId));
-      }
-    }
-
-    this.deleteInvoiceEntries(checkedInvoiceEntryIds);
-    this.removeInvoiceEntriesFromState(checkedInvoiceEntryIds);
+    this.handleDeleteEntryModalShow();
   };
 
   async deleteInvoiceEntries(invoiceEntryIds) {
@@ -166,6 +159,19 @@ class Invoice extends Component {
         state: { from: this.props.location.pathname, existingInvoiceEntryId: selectedInvoiceEntryId }
       });
     }
+  };
+
+  handleEntryDelete = (event) => {
+    event.preventDefault();
+    let checkedInvoiceEntryIds = [];
+
+    for (let [invoiceEntryId, checked] of Object.entries(this.state.checkedEntries)) {
+      if (checked) {
+        checkedInvoiceEntryIds.push(parseInt(invoiceEntryId));
+      }
+    }
+
+    this.handleDeleteEntryModalShow(checkedInvoiceEntryIds.length);
   };
 
   handleCheckboxChange = (event) => {
@@ -232,6 +238,27 @@ class Invoice extends Component {
     this.setState({ showRecordModal: false });
   };
 
+  handleDeleteEntryModalShow(checkedCount) {
+    this.setState({ showDeleteEntryModal: true, checkedCount: checkedCount });
+  };
+
+  handleDeleteEntryModalClose = (event) => {
+    event.preventDefault();
+    if (event.target.id == "delete-entry-btn") {
+      let checkedInvoiceEntryIds = [];
+
+      for (let [invoiceEntryId, checked] of Object.entries(this.state.checkedEntries)) {
+        if (checked) {
+          checkedInvoiceEntryIds.push(parseInt(invoiceEntryId));
+        }
+      }
+
+      this.deleteInvoiceEntries(checkedInvoiceEntryIds);
+      this.removeInvoiceEntriesFromState(checkedInvoiceEntryIds);
+    }
+    this.setState({ showDeleteEntryModal: false });
+  };
+
   // @TODO: show spinner while invoiceEntries are being loaded
   render() {
     if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId) {
@@ -284,7 +311,7 @@ class Invoice extends Component {
                     <Button variant="primary" type="submit" id="editEntry" onClick={this.handleEntryEdit}>
                       Edit entry
                     </Button>
-                    <Button variant="danger" type="submit" id="deleteEntry" onClick={this.handleEntryDelete}>
+                    <Button variant="danger" type="submit" id="delete-entry-btn" onClick={this.handleEntryDelete}>
                       Delete entry
                     </Button>
                   </ButtonGroup>
@@ -346,6 +373,34 @@ class Invoice extends Component {
                 Ok
             </Button>
             </Modal.Footer>
+          </Modal>
+          <Modal show={this.state.showDeleteEntryModal} onHide={this.handleDeleteEntryModalClose}>
+            <Modal.Header>
+              <Modal.Title>Error</Modal.Title>
+            </Modal.Header>
+            {this.state.checkedCount == 0 &&
+              <Modal.Body>Please select at least one InvoiceEntry for deletion</Modal.Body>
+            }
+            {this.state.checkedCount == 0 &&
+              <Modal.Footer>
+                <Button variant="secondary" onClick={this.handleDeleteEntryModalClose}>
+                  Ok
+                </Button>
+              </Modal.Footer>
+            }
+            {this.state.checkedCount > 0 &&
+              <Modal.Body>Are you sure you want to delete these entries?</Modal.Body>
+            }
+            {this.state.checkedCount > 0 &&
+              <Modal.Footer>
+                <Button variant="secondary" onClick={this.handleDeleteEntryModalClose}>
+                  Cancel
+                </Button>
+                <Button id="delete-entry-btn" variant="danger" onClick={this.handleDeleteEntryModalClose}>
+                  Delete
+                </Button>
+              </Modal.Footer>
+            }
           </Modal>
           <Modal show={this.state.showDeleteModal} onHide={this.handleInvoiceDeleteModalClose}>
           <Modal.Header>
