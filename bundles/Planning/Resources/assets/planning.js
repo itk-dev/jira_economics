@@ -31,7 +31,7 @@ require('./planning.css');
 
                 arr = arr.filter(function (item) {
                     return item.displayName.toLowerCase()
-                        .indexOf(this.userFilter) !== -1;
+                        .indexOf(this.userFilter.toLowerCase()) !== -1;
                 }.bind(this));
 
                 arr = arr.sort(function (a, b) {
@@ -55,7 +55,7 @@ require('./planning.css');
 
                 arr = arr.filter(function (item) {
                     return item.name.toLowerCase()
-                        .indexOf(this.projectFilter) !== -1;
+                        .indexOf(this.projectFilter.toLowerCase()) !== -1;
                 }.bind(this));
 
                 arr = arr.sort(function (a, b) {
