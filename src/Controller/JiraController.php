@@ -10,21 +10,24 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use App\Service\AppService;
+use App\Service\MenuService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/jira", name="jira_")
  */
-class JiraController extends Controller
+class JiraController extends AbstractController
 {
     /**
      * @Route("/", name="index")
      */
-    public function index()
+    public function index(AppService $appService, MenuService $menuService)
     {
-        return $this->render('jira/base.html.twig', [
-          'template_path' => 'jira/',
+        return $this->render('jira/main/index.html.twig', [
+            'apps' => $appService->getApps(),
+            'global_menu_items' => $menuService->getGlobalMenuItems(),
         ]);
     }
 }

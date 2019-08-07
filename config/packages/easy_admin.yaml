@@ -28,5 +28,5 @@ easy_admin:
                       type_options:
                           multiple: true
                           expanded: true
-                          portals: '%portals%'
+                          # portals: '%portals%'
                     - property: enabled

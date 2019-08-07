@@ -25,7 +25,7 @@ class PortalsType extends ChoiceType
     {
         parent::configureOptions($resolver);
         $resolver->setDefaults([
-        'portals' => [],
+            'portals' => [],
         ]);
     }
 }
