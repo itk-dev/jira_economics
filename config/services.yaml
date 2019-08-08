@@ -15,6 +15,10 @@ parameters:
     env(JIRA_USER): null
     env(JIRA_TOKEN): null
 
+    portals:
+        - name: GraphicServiceOrder
+          path: graphic_service_order_form
+
 services:
     # default configuration for services in *this* file
     _defaults:

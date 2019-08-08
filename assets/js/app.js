@@ -24,8 +24,3 @@ require('@fortawesome/fontawesome-free/js/all.js');
 
 // Add select2
 require('select2');
-
-// Add filer
-require('./jqueryFiler/js/jquery.filer.min.js');
-require('./jqueryFiler/css/jquery.filer.css');
-require('./jqueryFiler/css/themes/jquery.filer-dragdropbox-theme.css');

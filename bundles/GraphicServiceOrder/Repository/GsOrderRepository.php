@@ -8,27 +8,27 @@
  * This source file is subject to the MIT license.
  */
 
-namespace App\Repository;
+namespace GraphicServiceOrder\Repository;
 
-use App\Entity\GsFile;
+use GraphicServiceOrder\Entity\GsOrder;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method GsFile|null find($id, $lockMode = null, $lockVersion = null)
- * @method GsFile|null findOneBy(array $criteria, array $orderBy = null)
- * @method GsFile[]    findAll()
- * @method GsFile[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method GsOrder|null find($id, $lockMode = null, $lockVersion = null)
+ * @method GsOrder|null findOneBy(array $criteria, array $orderBy = null)
+ * @method GsOrder[]    findAll()
+ * @method GsOrder[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class GsFileRepository extends ServiceEntityRepository
+class GsOrderRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, GsFile::class);
+        parent::__construct($registry, GsOrder::class);
     }
 
     // /**
-    //  * @return GsFile[] Returns an array of GsFile objects
+    //  * @return GsOrder[] Returns an array of GsOrder objects
     //  */
     /*
     public function findByExampleField($value)
@@ -45,7 +45,7 @@ class GsFileRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?GsFile
+    public function findOneBySomeField($value): ?GsOrder
     {
         return $this->createQueryBuilder('g')
             ->andWhere('g.exampleField = :val')

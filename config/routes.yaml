@@ -27,3 +27,4 @@ planning:
 
 expense:
     resource: "@ExpenseBundle/Resources/config/routing.yaml"
+    prefix: /portal

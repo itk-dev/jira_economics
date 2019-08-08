@@ -38,10 +38,8 @@ class CreateProjectForm extends AbstractType
     /**
      * Build the form.
      *
-     * @param \Symfony\Component\Form\FormBuilderInterface $builder
-     *                                                              The form builder
-     * @param array                                        $options
-     *                                                              Options related to the form
+     * @param \Symfony\Component\Form\FormBuilderInterface $builder The form builder
+     * @param array                                        $options Options related to the form
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -219,8 +217,7 @@ class CreateProjectForm extends AbstractType
     /**
      * Generate an array of teams from project categories.
      *
-     * @return array
-     *               A list of teams and their id
+     * @return array A list of teams and their id
      */
     private function getTeamChoices()
     {
@@ -237,8 +234,7 @@ class CreateProjectForm extends AbstractType
     /**
      * Generate an array of accounts from tempo accounts.
      *
-     * @return array
-     *               A list of tempo accounts and their key
+     * @return array A list of tempo accounts and their key
      */
     private function getAccountChoices()
     {
@@ -255,8 +251,7 @@ class CreateProjectForm extends AbstractType
     /**
      * Generate an array of customers from tempo customers.
      *
-     * @return array
-     *               A list of tempo customers and their key
+     * @return array A list of tempo customers and their key
      */
     private function getCustomerChoices()
     {
@@ -273,8 +268,7 @@ class CreateProjectForm extends AbstractType
     /**
      * Perform validation in groups based on choices during submit.
      *
-     * @param \Symfony\Component\OptionsResolver\OptionsResolver $resolver
-     *                                                                     Options related to form
+     * @param \Symfony\Component\OptionsResolver\OptionsResolver $resolver Options related to form
      */
     public function configureOptions(OptionsResolver $resolver)
     {

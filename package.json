@@ -9,6 +9,7 @@
         "axios": "^0.19.0",
         "babel-polyfill": "^6.26.0",
         "babel-preset-react": "^6.24.1",
+        "blueimp-file-upload": "^10.1.0",
         "bootstrap": "^4.3.1",
         "core-js": "^3.0.0",
         "cross-fetch": "^3.0.2",
@@ -54,7 +55,11 @@
         "watch": "encore dev --watch",
         "build": "encore production --progress"
     },
-    "dependencies": {},
+    "dependencies": {
+        "bootstrap-datepicker": "^1.9.0",
+        "jquery-knob": "^1.2.11",
+        "jquery-ui": "^1.12.1"
+    },
     "browserslist": [
         "> 0.5%",
         "last 2 versions",
