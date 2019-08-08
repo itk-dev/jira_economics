@@ -10,7 +10,7 @@
 
 namespace GraphicServiceOrder\Message;
 
-class OwnCloudShare
+class OwnCloudShareMessage
 {
     private $orderId;
 
