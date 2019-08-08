@@ -229,6 +229,13 @@ abstract class AbstractJiraService
         return $result;
     }
 
+    public function getIssueUrl($issue)
+    {
+        $key = $issue->key ?? $issue;
+
+        return $this->jiraUrl.'/browse/'.$key;
+    }
+
     /**
      * @see https://docs.atlassian.com/software/jira/docs/api/REST/8.3.1/?_ga=2.202569298.2139473575.1564917078-393255252.1550779361#api/2/issue-getIssuePickerResource
      *

@@ -22,7 +22,13 @@ expense.category.show.title: Kategori
 expense.category.successfully_refreshed: 'Udgiftskategorier er blevet opdateret'
 expense.category.unitPrice: Enhedspris
 expense.category: Kategori
-expense.created.success: 'Udgift oprettet'
+
+# Placeholders:
+#   %project_key%
+#   %project_name%
+#   %issue_key%
+#   %issue_url%
+expense.created.success: 'Udgift oprettet. <a href="%issue_url%">Se sag (%issue_key%) i Jira</a>'
 expense.date: Dato
 expense.description: Beskrivelse
 expense.list.title: Udgifter
@@ -33,7 +39,7 @@ expense.new.description: Beskrivelse
 expense.new.issue.help: 'Vælg projekt for at kunne vælge sag'
 expense.new.issue: Sag
 expense.new.project.placeholder: 'Vælg projekt'
-expense.new.project: 'Ny udgift'
+expense.new.project: 'Projekt'
 expense.new.quantity.placeholder: ''
 expense.new.quantity: Antal
 expense.new.search_for_issue_in_project: 'Søg efter sag i projektet {project}'

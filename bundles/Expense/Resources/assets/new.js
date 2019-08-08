@@ -13,7 +13,9 @@ $(() => {
 
     const $projectCtrl = $('#form_project');
 
-    const buildIssuePicker = () => {
+    const renderIssue = issue => issue.summary + ' (' + issue.key + ')'
+
+    const buildIssuePicker = (event) => {
         const project = $projectCtrl.val()
         $issuePicker
             .select2('destroy')
@@ -32,7 +34,7 @@ $(() => {
                                 results: data.issues.map(function (issue) {
                                     return {
                                         id: issue.key,
-                                        text: issue.summary + ' (' + issue.key + ')'
+                                        text: renderIssue(issue)
                                     }
                                 })
                             }
@@ -43,6 +45,17 @@ $(() => {
                     $issueCtrl.val(e.params.data.id)
                 })
                 .val('').trigger('change')
+
+            if (!event) {
+                const selectedIssue = $issueCtrl.data('issue')
+                if (selectedIssue) {
+                    // @see https://stackoverflow.com/a/39359653
+                    $issuePicker
+                        .append($('<option/>', { value: selectedIssue.key }).html(renderIssue(selectedIssue)))
+                        .val(selectedIssue.key)
+                        .trigger('change')
+                }
+            }
         }
     }
 
