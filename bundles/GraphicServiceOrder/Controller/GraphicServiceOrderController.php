@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Class GraphicServiceOrderController.
  *
- * @Route(name="graphic_service_order_")
+ * @Route("/", name="graphic_service_order_")
  */
 class GraphicServiceOrderController extends AbstractController
 {
@@ -57,7 +57,7 @@ class GraphicServiceOrderController extends AbstractController
     /**
      * Receipt page displayed when an order was created.
      *
-     * @Route("/submitted", name="_submitted")
+     * @Route("/submitted", name="submitted")
      */
     public function createOrderSubmitted()
     {

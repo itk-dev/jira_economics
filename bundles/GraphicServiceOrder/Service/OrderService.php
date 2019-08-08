@@ -23,6 +23,7 @@ class OrderService
 
     /**
      * OrderService constructor.
+     *
      * @param \Doctrine\ORM\EntityManagerInterface $entityManager
      * @param \App\Service\JiraService $jiraService
      * @param \App\Service\OwnCloudService $ownCloudService
@@ -50,6 +51,12 @@ class OrderService
         $this->ownCloudFilesFolder = $ownCloudFilesFolder;
     }
 
+    /**
+     * Create a GsOrder.
+     *
+     * @param \GraphicServiceOrder\Entity\GsOrder $gsOrder
+     * @param $uploadedFiles
+     */
     public function createOrder(GsOrder $gsOrder, $uploadedFiles)
     {
         // Create a task on a jira project.
@@ -72,6 +79,12 @@ class OrderService
         // @TODO: Send notification mail.
     }
 
+    /**
+     * Handle file transfer to OwnCloud.
+     *
+     * @param \GraphicServiceOrder\Entity\GsOrder $order
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function handleOrderMessage(GsOrder $order)
     {
         $files = $order->getFiles();
@@ -106,6 +119,7 @@ class OrderService
             $order->setOrderStatus('received');
             // Remove local files.
             foreach ($order->getOwnCloudSharedFiles() as $file) {
+                // @TODO: Fix path parameters.
                 $files_dir = $this->appKernel->getProjectDir().'/private/files/gs/';
                 unlink($files_dir.$file);
             }
@@ -150,6 +164,7 @@ class OrderService
      */
     private function createFolder($order_key)
     {
+        // @TODO: Fix path parameters.
         // Make sure folder does not already exist.
         $existing_folders = $this->ownCloudService->propFind('/owncloud/remote.php/dav/files/'.$_ENV['OWNCLOUD_USER_SHARED_DIR']);
         if (!\in_array($order_key.'/', $existing_folders)) {
@@ -170,6 +185,7 @@ class OrderService
      */
     private function shareFile($fileName, $order_id)
     {
+        // @TODO: Fix path parameters.
         $ownCloudPath = $_ENV['OWNCLOUD_USER_SHARED_DIR'].$order_id.'/_Materiale/';
         $ocFilename = $order_id.'-'.$fileName;
         $file = file_get_contents('/app/private/files/gs/'.$fileName);
@@ -212,15 +228,14 @@ class OrderService
         $description .= $orderData->getDepartment().' \\\\ ';
         $description .= $orderData->getAddress().'\\\\ ';
         $description .= $orderData->getPostalcode().' '.$orderData->getCity().'\\\\ ';
-        $description .= 'Dato: '.$orderData->getDate()
-                ->format('d-m-Y').'\\\\ ';
+        $description .= 'Dato: '.$orderData->getDate()->format('d-m-Y').'\\\\ ';
         $description .= $orderData->getDeliveryDescription();
 
         return $description;
     }
 
     /**
-     *  Store files locally.
+     * Store files locally.
      *
      * @param $gsOrder
      *
