@@ -25,4 +25,5 @@ return [
     GraphicServiceOrder\GraphicServiceOrderBundle::class => ['all' => true],
     Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],
     Expense\ExpenseBundle::class => ['all' => true],
+    Oneup\UploaderBundle\OneupUploaderBundle::class => ['all' => true],
 ];

@@ -16,5 +16,4 @@ framework:
 
         routing:
             # Route your messages to the transports
-            'GraphicServiceOrder\Message\OwnCloudShare': amqp
-
+            'GraphicServiceOrder\Message\OwnCloudShare': async

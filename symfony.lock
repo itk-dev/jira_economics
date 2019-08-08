@@ -206,6 +206,19 @@
     "ocramius/proxy-manager": {
         "version": "2.2.2"
     },
+    "oneup/uploader-bundle": {
+        "version": "2.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "2.0",
+            "ref": "b19678d1535b9fe7cdf4647fd3483455e4fca458"
+        },
+        "files": [
+            "config/packages/oneup_uploader.yaml",
+            "config/routes/oneup_uploader.yaml"
+        ]
+    },
     "pdepend/pdepend": {
         "version": "2.5.2"
     },
@@ -457,22 +470,20 @@
             "ref": "fadbfe33303a76e25cb63401050439aa9b1a9c7f"
         }
     },
-<<<<<<< HEAD
-    "symfony/mime": {
-        "version": "v4.3.1"
-=======
     "symfony/messenger": {
-        "version": "4.1",
+        "version": "4.3",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "master",
-            "version": "4.1",
-            "ref": "2c72a5331d001fce2e8e8e94371b97afd5c32f34"
+            "version": "4.3",
+            "ref": "29716c100e8aef803ad72670deb3dc09bb052a64"
         },
         "files": [
             "config/packages/messenger.yaml"
         ]
->>>>>>> JE-48: Added messenger
+    },
+    "symfony/mime": {
+        "version": "v4.3.1"
     },
     "symfony/monolog-bridge": {
         "version": "v4.2.4"
