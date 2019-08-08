@@ -2,8 +2,8 @@
 
 {% block title %}{{ 'planning.board.title'|trans }}{% endblock %}
 
-{% block main %}
-    <div class="row-1 p-2" id="planningBoardApp">
+{% block content %}
+    <div id="planningBoardApp">
         <h1>{{ 'planning.board.headline'|trans }}</h1>
 
         <div class="spinner-border" role="status" v-show="loading">
