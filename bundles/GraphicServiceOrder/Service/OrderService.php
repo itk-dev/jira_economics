@@ -50,16 +50,10 @@ class OrderService
         $this->ownCloudFilesFolder = $ownCloudFilesFolder;
     }
 
-    public function createOrder(GsOrder $gsOrder, $uploadedFiles, $orderData)
+    public function createOrder(GsOrder $gsOrder, $uploadedFiles)
     {
-        $orderData = [
-            'form' => $orderData,
-            'accounts' => $this->jiraService->getAllAccounts(),
-            'user' => $this->jiraService->getCurrentUser(),
-        ];
-
         // Create a task on a jira project.
-        $taskCreated = $this->createOrderTask($orderData);
+        $taskCreated = $this->createOrderTask($gsOrder);
 
         // Add task values to order entity.
         $gsOrder->setIssueId($taskCreated->id);
@@ -124,18 +118,18 @@ class OrderService
     /**
      * Create a Jira task from a form submission.
      *
-     * @param $orderData
+     * @param \GraphicServiceOrder\Entity\GsOrder $gsOrder
      * @return mixed
      */
-    private function createOrderTask($orderData)
+    private function createOrderTask(GsOrder $gsOrder)
     {
-        $description = $this->getDescription($orderData['form']);
+        $description = $this->getDescription($gsOrder);
         $data = [
             'fields' => [
                 'project' => [
                     'id' => $_ENV['GS_ORDER_PROJECT_ID'],
                 ],
-                'summary' => $orderData['form']->getJobTitle(),
+                'summary' => $gsOrder->getJobTitle(),
                 'description' => $description,
                 'issuetype' => [
                     'id' => $_ENV['GS_ORDER_ISSUETYPE_ID'],
@@ -192,7 +186,7 @@ class OrderService
      * @param $orderData
      * @return string
      */
-    private function getDescription($orderData)
+    private function getDescription(GsOrder $orderData)
     {
         // Create task description.
         $description = '*Opgavebeskrivelse* \\\\ ';
@@ -233,7 +227,7 @@ class OrderService
      * @param $uploadedFiles
      * @return mixed
      */
-    private function storeFile($gsOrder, $uploadedFiles)
+    private function storeFile(GsOrder $gsOrder, $uploadedFiles)
     {
         $uploadedFiles = explode(';', $uploadedFiles);
         foreach ($uploadedFiles as $key => $file) {
