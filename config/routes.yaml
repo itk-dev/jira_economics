@@ -31,4 +31,3 @@ planning:
 expense:
     prefix: /jira
     resource: "@ExpenseBundle/Resources/config/routing.yaml"
-    prefix: /portal

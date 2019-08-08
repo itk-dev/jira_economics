@@ -10,19 +10,24 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use App\Service\AppService;
+use App\Service\MenuService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/portal", name="portal_")
+ * @Route(name="portal_")
  */
-class PortalController extends Controller
+class PortalController extends AbstractController
 {
     /**
      * @Route("/", name="index")
      */
-    public function index()
+    public function index(AppService $appService, MenuService $menuService)
     {
-        return $this->render('portal/base.html.twig');
+        return $this->render('portal/main/index.html.twig', [
+            'apps' => $appService->getApps(),
+            'global_menu_items' => $menuService->getGlobalMenuItems(),
+        ]);
     }
 }

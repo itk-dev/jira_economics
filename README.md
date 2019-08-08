@@ -2,6 +2,19 @@
 
 Apps to make life with Jira easier.
 
+## Overview
+
+The site is split into three parts:
+
+1. “portal” (path: `/`) – the public area (after login, though)
+2. “jira“ (path: `/jira`) – protected by OAuth login via Jira
+3. “admin” (path: `/admin`) – admin area
+
+* Regular user login (via [FOSUserBundle](https://github.com/FriendsOfSymfony/FOSUserBundle) required to access site
+* Users with the role `ROLE_JIRA` can access `/jira` where OAuth login via Jira is required
+* `MenuService`/`AppService` reads menu/app items from configuration (actually, parameters defined in [`config/jira_economics.yaml`](config/jira_economics.yaml)) and checks access based on user roles
+* The admin area is based on [EasyAdmin](https://symfony.com/doc/master/bundles/EasyAdminBundle/index.html)
+
 ## Getting started
 
 ### Using the docker setup (recommended)

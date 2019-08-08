@@ -7,5 +7,5 @@ hwi_oauth:
         jira:
             type:                jira
             client_id:           '%env(JIRA_OAUTH_CUSTOMER_KEY)%'
-            client_secret:       '%env(JIRA_OAUTH_PEM_PATH)%'
+            client_secret:       '%env(resolve:JIRA_OAUTH_PEM_PATH)%'
             base_url:            '%env(JIRA_URL)%'

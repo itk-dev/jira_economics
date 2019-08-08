@@ -9,6 +9,3 @@ twig:
         decimals: 2
         decimal_point: ','
         thousands_separator: '.'
-
-    globals:
-        jira_path_prefix: /jira
