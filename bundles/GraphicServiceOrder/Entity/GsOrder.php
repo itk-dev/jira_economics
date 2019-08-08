@@ -13,7 +13,7 @@ namespace GraphicServiceOrder\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="GrapphicServiceOrder\Repository\GsOrderRepository")
+ * @ORM\Entity(repositoryClass="GraphicServiceOrder\Repository\GsOrderRepository")
  */
 class GsOrder
 {
