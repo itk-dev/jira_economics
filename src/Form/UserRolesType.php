@@ -32,6 +32,7 @@ class UserRolesType extends ChoiceType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $options['choice_loader'] = new CallbackChoiceLoader(function () {
+            // Note: We assume that all roles are reachable from ROLE_ADMIN.
             $roles = $this->roleHierarchy->getReachableRoleNames(['ROLE_ADMIN']);
 
             return array_combine($roles, $roles);
