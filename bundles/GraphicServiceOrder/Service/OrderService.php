@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of aakb/jira_economics.
+ *
+ * (c) 2019 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace GraphicServiceOrder\Service;
 
 use App\Service\JiraService;
@@ -24,13 +32,13 @@ class OrderService
     /**
      * OrderService constructor.
      *
-     * @param \Doctrine\ORM\EntityManagerInterface $entityManager
-     * @param \App\Service\JiraService $jiraService
-     * @param \App\Service\OwnCloudService $ownCloudService
+     * @param \Doctrine\ORM\EntityManagerInterface              $entityManager
+     * @param \App\Service\JiraService                          $jiraService
+     * @param \App\Service\OwnCloudService                      $ownCloudService
      * @param \GraphicServiceOrder\Repository\GsOrderRepository $gsOrderRepository
-     * @param \Symfony\Component\HttpKernel\KernelInterface $appKernel
-     * @param \Symfony\Component\Messenger\MessageBusInterface $messageBus
-     * @param string $ownCloudFilesFolder
+     * @param \Symfony\Component\HttpKernel\KernelInterface     $appKernel
+     * @param \Symfony\Component\Messenger\MessageBusInterface  $messageBus
+     * @param string                                            $ownCloudFilesFolder
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -83,6 +91,7 @@ class OrderService
      * Handle file transfer to OwnCloud.
      *
      * @param \GraphicServiceOrder\Entity\GsOrder $order
+     *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function handleOrderMessage(GsOrder $order)
@@ -133,6 +142,7 @@ class OrderService
      * Create a Jira task from a form submission.
      *
      * @param \GraphicServiceOrder\Entity\GsOrder $gsOrder
+     *
      * @return mixed
      */
     private function createOrderTask(GsOrder $gsOrder)
@@ -181,6 +191,7 @@ class OrderService
      * @param $order_id
      *
      * @return mixed
+     *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     private function shareFile($fileName, $order_id)
@@ -189,17 +200,19 @@ class OrderService
         $ownCloudPath = $_ENV['OWNCLOUD_USER_SHARED_DIR'].$order_id.'/_Materiale/';
         $ocFilename = $order_id.'-'.$fileName;
         $file = file_get_contents('/app/private/files/gs/'.$fileName);
-        $response = $this->ownCloudService->sendFile('owncloud/remote.php/dav/files/'.$ownCloudPath.$ocFilename,
-            $file);
+        $response = $this->ownCloudService->sendFile(
+            'owncloud/remote.php/dav/files/'.$ownCloudPath.$ocFilename,
+            $file
+        );
 
         return $response;
     }
-
 
     /**
      * Create description for task.
      *
      * @param $orderData
+     *
      * @return string
      */
     private function getDescription(GsOrder $orderData)
@@ -238,8 +251,8 @@ class OrderService
      * Store files locally.
      *
      * @param $gsOrder
-     *
      * @param $uploadedFiles
+     *
      * @return mixed
      */
     private function storeFile(GsOrder $gsOrder, $uploadedFiles)

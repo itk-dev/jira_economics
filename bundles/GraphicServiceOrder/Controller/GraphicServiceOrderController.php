@@ -31,6 +31,7 @@ class GraphicServiceOrderController extends AbstractController
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param \GraphicServiceOrder\Service\OrderService $orderService
+     *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function createOrder(Request $request, OrderService $orderService)
