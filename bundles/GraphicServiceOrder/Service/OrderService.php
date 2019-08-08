@@ -15,11 +15,11 @@ class OrderService
 {
     private $jiraService;
     private $ownCloudService;
-    private $formData;
     private $gsOrderRepository;
     private $appKernel;
     private $entityManager;
     private $messageBus;
+    private $ownCloudFilesFolder;
 
     /**
      * OrderService constructor.
@@ -28,6 +28,8 @@ class OrderService
      * @param \App\Service\OwnCloudService $ownCloudService
      * @param \GraphicServiceOrder\Repository\GsOrderRepository $gsOrderRepository
      * @param \Symfony\Component\HttpKernel\KernelInterface $appKernel
+     * @param \Symfony\Component\Messenger\MessageBusInterface $messageBus
+     * @param string $ownCloudFilesFolder
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -35,7 +37,8 @@ class OrderService
         OwnCloudService $ownCloudService,
         GsOrderRepository $gsOrderRepository,
         KernelInterface $appKernel,
-        MessageBusInterface $messageBus
+        MessageBusInterface $messageBus,
+        string $ownCloudFilesFolder
     ) {
         $this->entityManager = $entityManager;
         $this->gsOrderRepository = $gsOrderRepository;
@@ -44,12 +47,19 @@ class OrderService
         $this->gsOrderRepository = $gsOrderRepository;
         $this->appKernel = $appKernel;
         $this->messageBus = $messageBus;
+        $this->ownCloudFilesFolder = $ownCloudFilesFolder;
     }
 
-    public function createOrder(GsOrder $gsOrder, $uploadedFiles)
+    public function createOrder(GsOrder $gsOrder, $uploadedFiles, $orderData)
     {
+        $orderData = [
+            'form' => $orderData,
+            'accounts' => $this->jiraService->getAllAccounts(),
+            'user' => $this->jiraService->getCurrentUser(),
+        ];
+
         // Create a task on a jira project.
-        $taskCreated = $this->createOrderTask();
+        $taskCreated = $this->createOrderTask($orderData);
 
         // Add task values to order entity.
         $gsOrder->setIssueId($taskCreated->id);
@@ -65,26 +75,67 @@ class OrderService
         // Notify messenger of new job.
         $this->messageBus->dispatch(new OwnCloudShareMessage($gsOrder->getId()));
 
-        // Send notification mails
-        // @todo
+        // @TODO: Send notification mail.
     }
 
+    public function handleOrderMessage(GsOrder $order)
+    {
+        $files = $order->getFiles();
+
+        // If no files on order, consider all files received.
+        if (empty($files)) {
+            $order->setOrderStatus('received');
+        } else {
+            // Create a folder with issue key as name.
+            $this->createFolder($order->getIssueKey());
+
+            // Get all files on the order that have already been shared.
+            $sharedFiles = $order->getOwnCloudSharedFiles();
+            foreach ($files as $file) {
+                // if a file exists on the entity that has not yet been shared.
+                if (!\in_array($file, $sharedFiles)) {
+                    // Attempt to share the file in owncloud.
+                    $response = $this->shareFile($file, $order->getIssueKey());
+                    $success = [201, 204];  // Successful responses;
+                    // if file was shared successfully add to shared files array.
+                    if (\in_array($response, $success)) {
+                        $sharedFiles[] = $file;
+                        $order->setOwnCloudSharedFiles($sharedFiles);
+                    }
+                }
+            }
+        }
+
+        // If all files are considered shared change status to "received".
+        $diff = array_diff($files, $order->getOwnCloudSharedFiles());
+        if (empty($diff)) {
+            $order->setOrderStatus('received');
+            // Remove local files.
+            foreach ($order->getOwnCloudSharedFiles() as $file) {
+                $files_dir = $this->appKernel->getProjectDir().'/private/files/gs/';
+                unlink($files_dir.$file);
+            }
+        }
+
+        // Update entity.
+        $this->entityManager->flush();
+    }
 
     /**
      * Create a Jira task from a form submission.
      *
+     * @param $orderData
      * @return mixed
      */
-    private function createOrderTask()
+    private function createOrderTask($orderData)
     {
-        $formSubmissions = $this->formData['form'];
-        $description = $this->getDescription();
+        $description = $this->getDescription($orderData['form']);
         $data = [
             'fields' => [
                 'project' => [
                     'id' => $_ENV['GS_ORDER_PROJECT_ID'],
                 ],
-                'summary' => $formSubmissions->getJobTitle(),
+                'summary' => $orderData['form']->getJobTitle(),
                 'description' => $description,
                 'issuetype' => [
                     'id' => $_ENV['GS_ORDER_ISSUETYPE_ID'],
@@ -114,7 +165,6 @@ class OrderService
         }
     }
 
-
     /**
      * Share file in owncloud.
      *
@@ -139,39 +189,38 @@ class OrderService
     /**
      * Create description for task.
      *
+     * @param $orderData
      * @return string
      */
-    private function getDescription()
+    private function getDescription($orderData)
     {
-        $formSubmissions = $this->formData['form'];
-
         // Create task description.
         $description = '*Opgavebeskrivelse* \\\\ ';
-        foreach ($formSubmissions->getOrderLines() as $order) {
+        foreach ($orderData->getOrderLines() as $order) {
             $description .= '- '.$order['amount'].' '.$order['type'].'\\\\ ';
         }
-        $description .= $formSubmissions->getDescription().'\\\\ ';
+        $description .= $orderData->getDescription().'\\\\ ';
         $description .= ' \\\\ ';
-        $description .= '[Åbn filer i OwnCloud|https://itkboks.eteket.dk/owncloud/index.php/apps/files/?dir=/Nye%20Ordrer] \\\\ ';
+        $description .= '[Åbn filer i OwnCloud|'.$this->ownCloudFilesFolder.'] \\\\ ';
         $description .= ' \\\\ ';
 
         // Create payment description.
         $description .= '*Hvem skal betale?* \\\\ ';
-        if ($formSubmissions->getMarketingAccount()) {
+        if ($orderData->getMarketingAccount()) {
             $description .= 'Borgerservice og bibliotekers markedsføringskonto. \\\\ ';
         } else {
-            $description .= 'Debitor: '.$formSubmissions->getDebitor().'\\\\ ';
+            $description .= 'Debitor: '.$orderData->getDebitor().'\\\\ ';
         }
         $description .= ' \\\\ ';
 
         // Create delivery description.
         $description .= '*Hvor skal ordren leveres?* \\\\ ';
-        $description .= $formSubmissions->getDepartment().' \\\\ ';
-        $description .= $formSubmissions->getAddress().'\\\\ ';
-        $description .= $formSubmissions->getPostalcode().' '.$formSubmissions->getCity().'\\\\ ';
-        $description .= 'Dato: '.$formSubmissions->getDate()
+        $description .= $orderData->getDepartment().' \\\\ ';
+        $description .= $orderData->getAddress().'\\\\ ';
+        $description .= $orderData->getPostalcode().' '.$orderData->getCity().'\\\\ ';
+        $description .= 'Dato: '.$orderData->getDate()
                 ->format('d-m-Y').'\\\\ ';
-        $description .= $formSubmissions->getDeliveryDescription();
+        $description .= $orderData->getDeliveryDescription();
 
         return $description;
     }
