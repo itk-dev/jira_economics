@@ -77,8 +77,8 @@ class UploadHandler
                     .'://'
                     .parse_url($this->get_server_var('HTTP_REFERER'), PHP_URL_HOST)
                     .'/', // Trailing slash to not match subdomains by mistake
-                    '/' // preg_quote delimiter param
-                ).'/',
+                '/' // preg_quote delimiter param
+            ).'/',
             // Enable to provide file downloads via GET requests to the PHP script:
             //     1. Set to 1 to download files via readfile method through PHP
             //     2. Set to 2 to send a X-Sendfile header for lighttpd/Apache
@@ -480,8 +480,7 @@ class UploadHandler
             [$img_width, $img_height] = $this->get_image_size($uploaded_file);
             // If we are auto rotating the image by default, do the checks on
             // the correct orientation
-            if (
-                @$this->options['image_versions']['']['auto_orient'] &&
+            if (@$this->options['image_versions']['']['auto_orient'] &&
                 function_exists('exif_read_data') &&
                 ($exif = @exif_read_data($uploaded_file)) &&
                 (((int) @$exif['Orientation']) >= 5)
@@ -855,7 +854,7 @@ class UploadHandler
         if (!empty($options['auto_orient']) && $this->gd_orient_image(
             $file_path,
             $src_img
-            )) {
+        )) {
             $image_oriented = true;
             $src_img = $this->gd_get_image_object(
                 $file_path,
@@ -924,7 +923,7 @@ class UploadHandler
             $new_height,
             $img_width,
             $img_height
-            ) && $write_func($new_img, $new_file_path, $image_quality);
+        ) && $write_func($new_img, $new_file_path, $image_quality);
         $this->gd_set_image_object($file_path, $new_img);
 
         return $success;

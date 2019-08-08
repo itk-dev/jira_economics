@@ -43,7 +43,7 @@ class GsUploadListener
         $file->move(
             $destination,
             $filename
-    );
+        );
         $response = $event->getResponse();
         $response['success'] = true;
         $response['files'] = [
