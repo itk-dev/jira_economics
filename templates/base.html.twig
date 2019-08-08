@@ -43,7 +43,7 @@
             <div class="d-flex flex-row flex-grow-1">
               <div class="container-fluid">
                 <div class="main row">
-                    {# Only render sidebar (and wrapper) if it is not empty #}
+                    {# Only render sidebar (and wrapper) if it is defined #}
                     {% if block('sidebar') is defined %}
                         <div class="main-sidebar col-12 col-md-2 pt-md-3 order-1 order-md-0">
                             {{ block('sidebar') }}
