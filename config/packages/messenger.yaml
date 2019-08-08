@@ -16,4 +16,4 @@ framework:
 
         routing:
             # Route your messages to the transports
-            'GraphicServiceOrder\Message\OwnCloudShare': async
+            'GraphicServiceOrder\Message\OwnCloudShareMessage': async

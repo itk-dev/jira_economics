@@ -20,8 +20,7 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('graphic_service_order');
+        $treeBuilder = new TreeBuilder('graphic_service_order');
 
         return $treeBuilder;
     }

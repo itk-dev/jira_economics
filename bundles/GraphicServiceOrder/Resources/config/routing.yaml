@@ -2,6 +2,7 @@ controllers:
     resource: "@GraphicServiceOrderBundle/Controller"
     type: annotation
     prefix: /create-graphic-service-order
+
 #https://github.com/1up-lab/OneupUploaderBundle/blob/master/Resources/doc/index.md
 oneup_uploader:
     resource: .
