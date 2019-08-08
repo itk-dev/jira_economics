@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from './ContentWrapper';
 import PageTitle from './PageTitle';
-import { setSelectedIssues, clearInvoiceEntry } from '../redux/actions';
+import { setSelectedIssues } from '../redux/actions';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
 
@@ -11,7 +11,7 @@ import rest from '../redux/utils/rest';
 export class InvoiceEntrySubmitter extends Component {
   constructor(props) {
     super(props);
-    this.state = { account: 'Vælg PSP' };
+    this.state = { account: 'Vælg PSP', invoiceEntry: {} };
     this.handleSelectJiraIssues = this.handleSelectJiraIssues.bind(this);
     this.onAccountChange = this.onAccountChange.bind(this);
   }
@@ -23,6 +23,7 @@ export class InvoiceEntrySubmitter extends Component {
       dispatch(rest.actions.getInvoiceEntry({ id: existingInvoiceEntryId }))
       .then((response) => {
         this.setState({ account: response.account });
+        this.setState({ invoiceEntry: response });
       })
       .catch((reason) => console.log('isCanceled', reason.isCanceled));
     }
@@ -48,10 +49,17 @@ export class InvoiceEntrySubmitter extends Component {
     return timeSum;
   }
 
+  // @TODO: getUnitPrice functions are temporary and should be scrapped when customer data is available
   getUnitPrice(account) {
-    // @TODO: replace with real data
     const unitPrices = { "PSP1": 560, "PSP2": 760, "PSP3": 820 };
     return unitPrices[account] || 0;
+  }
+
+  getManualUnitPrice(invoiceEntry) {
+    if (invoiceEntry.price == undefined) {
+      return 0;
+    }
+    return Math.round(parseFloat(invoiceEntry.price / invoiceEntry.amount) * 1e2) / 1e2;
   }
 
   onAccountChange(event) {
@@ -103,7 +111,6 @@ export class InvoiceEntrySubmitter extends Component {
     }
     // @TODO: check that a new invoiceEntry was successfully created before navigating to invoice page
     dispatch(setSelectedIssues({}));
-    dispatch(clearInvoiceEntry({}));
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
   }
 
@@ -111,7 +118,6 @@ export class InvoiceEntrySubmitter extends Component {
     event.preventDefault();
     const { dispatch } = this.props;
     dispatch(setSelectedIssues({}));
-    dispatch(clearInvoiceEntry({}));
     this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
   }
 
@@ -140,7 +146,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-account"
                 aria-describedby="enterKontonr"
-                defaultValue={this.props.invoiceEntry.data.account || ''}
+                defaultValue={this.state.invoiceEntry ? this.state.invoiceEntry.account : ''}
                 placeholder="Kontonummer">
               </input>
             </div>
@@ -154,7 +160,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-product"
                 aria-describedby="enterVarenr"
-                defaultValue={this.props.invoiceEntry.data.product || ''}
+                defaultValue={this.state.invoiceEntry ? this.state.invoiceEntry.product : ''}
                 placeholder="Varenavn">
               </input>
               <label htmlFor="beskrivelse">
@@ -166,7 +172,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-description"
                 aria-describedby="enterBeskrivelse"
-                defaultValue={this.props.invoiceEntry.data.description || ''}
+                defaultValue={this.state.invoiceEntry ? this.state.invoiceEntry.description : ''}
                 placeholder="Varebeskrivelse">
               </input>
               <label htmlFor="antal">
@@ -178,7 +184,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-hours-spent"
                 aria-describedby="enterHoursSpent"
-                defaultValue={this.props.invoiceEntry.data.amount || ''}
+                defaultValue={this.state.invoiceEntry ? this.state.invoiceEntry.amount : 0}
                 placeholder="Vareantal">
               </input>
               <label htmlFor="beskrivelse">
@@ -189,9 +195,11 @@ export class InvoiceEntrySubmitter extends Component {
                 name="unitPrice"
                 className="form-control"
                 id="invoice-entry-unit-price"
+                // Hack to force re-render when invoiceEntry is loaded, otherwise defaultValue won't be updated
+                key={this.state.invoiceEntry.price ? 'notLoadedYet' : 'loaded'}
                 aria-describedby="enterUnitPrice"
-                defaultValue={this.props.invoiceEntry.data.price / this.props.invoiceEntry.data.amount || ''}
-                placeholder="0">
+                defaultValue={this.getManualUnitPrice(this.state.invoiceEntry)}
+              >
               </input>
             </div>
           </form>
@@ -260,7 +268,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-product"
                 aria-describedby="enterVarenr"
-                defaultValue={this.props.invoiceEntry.data.product || ''}
+                defaultValue={this.state.invoiceEntry ? this.state.invoiceEntry.product : ''}
                 placeholder="Varenavn">
               </input>
               <label htmlFor="beskrivelse">
@@ -272,7 +280,7 @@ export class InvoiceEntrySubmitter extends Component {
                 className="form-control"
                 id="invoice-entry-description"
                 aria-describedby="enterBeskrivelse"
-                defaultValue={this.props.invoiceEntry.data.description || ''}
+                defaultValue={this.state.invoiceEntry ? this.state.invoiceEntry.description : ''}
                 placeholder="Varebeskrivelse">
               </input>
               <label htmlFor="antal">

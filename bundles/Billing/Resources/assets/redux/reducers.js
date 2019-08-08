@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import rest from "./utils/rest";
 
-import { SET_ISSUES, CLEAR_INVOICE_ENTRY } from './actions';
+import { SET_ISSUES } from './actions';
 
 function selectedIssues (state = {
   selectedIssues: []
@@ -16,17 +16,6 @@ function selectedIssues (state = {
   }
 }
 
-function clearInvoiceEntry (state = {
-  invoiceEntry: ''
-}, action) {
-  switch (action.type) {
-    case CLEAR_INVOICE_ENTRY:
-      return null;
-    default:
-      return state;
-  }
-}
-
-const rootReducer = combineReducers({ clearInvoiceEntry, selectedIssues, ...rest.reducers });
+const rootReducer = combineReducers({ selectedIssues, ...rest.reducers });
 
 export default rootReducer;
