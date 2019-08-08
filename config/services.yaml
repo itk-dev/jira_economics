@@ -57,6 +57,3 @@ services:
             $host: '%env(OWNCLOUD_HOST)%'
             $username: '%env(OWNCLOUD_USERNAME)%'
             $password: '%env(OWNCLOUD_PASSWORD)%'
-
-maker:
-    root_namespace: '%env(resolve:MAKER_NAMESPACE)%'
