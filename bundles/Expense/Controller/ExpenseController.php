@@ -14,6 +14,7 @@ use App\Service\JiraService;
 use App\Service\MenuService;
 use Doctrine\ORM\EntityRepository;
 use Expense\Entity\Category;
+use GuzzleHttp\Exception\ClientException;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -61,6 +62,36 @@ class ExpenseController extends AbstractController
     {
         $projects = $jiraService->getProjects();
 
+        // Get project and issue from query string.
+        $selectedProject = null;
+        $selectedIssue = null;
+
+        if (null !== $projectId = $request->get('project')) {
+            // Find project by id or key.
+            $selected = array_filter(
+                $projects,
+                function ($project) use ($projectId) {
+                    return $projectId === $project->id || $projectId === $project->key;
+                }
+            );
+            $selectedProject = reset($selected);
+
+            if (null !== $selectedProject) {
+                if (null !== $issueId = $request->get('issue')) {
+                    try {
+                        $selectedIssue = $jiraService->getIssue($issueId);
+                        // Check that the selected issue belongs to the selected project.
+                        if (!isset($selectedIssue->fields->project->id, $selectedProject->id)
+                            || $selectedIssue->fields->project->id !== $selectedProject->id) {
+                            $selectedIssue = null;
+                        }
+                    } catch (ClientException $exception) {
+                        // Invalid issue id. Move along!
+                    }
+                }
+            }
+        }
+
         $form = $this->createFormBuilder([])
             ->add('project', ChoiceType::class, [
                 'label' => 'expense.new.project',
@@ -70,9 +101,18 @@ class ExpenseController extends AbstractController
                 'choice_label' => function ($project) use ($translator) {
                     return sprintf('%s (%s)', $project->name, $project->key);
                 },
+                'data' => $selectedProject,
             ])
             ->add('issue_key', TextType::class, [
                 'label' => 'expense.new.issue',
+                'data' => $selectedIssue ? $selectedIssue->key : null,
+                'attr' => [
+                    'data-issue' => $selectedIssue ? json_encode([
+                        'id' => $selectedIssue->id,
+                        'key' => $selectedIssue->key,
+                        'summary' => $selectedIssue->fields->summary,
+                    ]) : null,
+                ],
             ])
             ->add('category', EntityType::class, [
                 'label' => 'expense.new.category',
@@ -112,6 +152,7 @@ class ExpenseController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $data = $form->getData();
+                $project = $data['project'];
                 $issue = $jiraService->getIssue($data['issue_key']);
                 $data += [
                     'scope_type' => 'ISSUE',
@@ -119,12 +160,21 @@ class ExpenseController extends AbstractController
                 ];
 
                 $expense = $jiraService->createExpense($data);
+
                 $this->addFlash(
-                    'success',
-                    $translator->trans('expense.created.success')
+                    'raw-success',
+                    $translator->trans('expense.created.success', [
+                        '%project_key%' => $project->key,
+                        '%project_name%' => $project->name,
+                        '%issue_key%' => $issue->key,
+                        '%issue_url%' => $jiraService->getIssueUrl($issue),
+                    ])
                 );
 
-                return $this->redirectToRoute('expense_index');
+                return $this->redirectToRoute('expense_new', [
+                    'project' => $data['project']->key,
+                    'issue' => $data['issue_key'],
+                ]);
             } catch (\Exception $exception) {
                 $this->addFlash('danger', $exception->getMessage());
             }
