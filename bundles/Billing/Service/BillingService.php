@@ -285,6 +285,38 @@ class BillingService
     }
 
     /**
+     * Get all invoiceEntries
+     *
+     * @return array
+     */
+    public function getAllInvoiceEntries()
+    {
+        $repository = $this->entityManager->getRepository(InvoiceEntry::class);
+        $invoiceEntries = $repository->findAll();
+
+        if (!$invoiceEntries) {
+            throw new HttpException(404, 'No invoiceEntries found');
+        }
+
+        $invoiceEntriesJson = [];
+
+        foreach ($invoiceEntries as $invoiceEntry) {
+            $invoiceEntriesJson[] = [
+                'id' => $invoiceEntry->getId(),
+                'invoiceId' => $invoiceEntry->getInvoice()->getId(),
+                'name' => $invoiceEntry->getName(),
+                'description' => $invoiceEntry->getDescription(),
+                'account' => $invoiceEntry->getAccount(),
+                'product' => $invoiceEntry->getProduct(),
+                'price' => $invoiceEntry->getPrice(),
+                'amount' => $invoiceEntry->getAmount(),
+            ];
+        }
+
+        return $invoiceEntriesJson;
+    }
+
+    /**
      * Get specific invoiceEntry by id.
      *
      * @param invoiceEntryId
@@ -340,11 +372,11 @@ class BillingService
         }
 
         if (empty($invoiceEntryData['amount']) || !(float) ($invoiceEntryData['amount'])) {
-            throw new HttpException(400, "Expected integer value for 'amount' in request");
+            throw new HttpException(400, "Expected numerical value for 'amount' in request");
         }
 
-        if (empty($invoiceEntryData['price']) || !(int) ($invoiceEntryData['price'])) {
-            throw new HttpException(400, "Expected integer value for 'price' in request");
+        if (empty($invoiceEntryData['price']) || !(float) ($invoiceEntryData['price'])) {
+            throw new HttpException(400, "Expected numerical value for 'price' in request");
         }
 
         $invoiceRepository = $this->entityManager->getRepository(Invoice::class);
@@ -423,11 +455,11 @@ class BillingService
         }
 
         if (empty($invoiceEntryData['amount']) || !(float) ($invoiceEntryData['amount'])) {
-            throw new HttpException(400, "Expected integer value for 'amount' in request");
+            throw new HttpException(400, "Expected numerical value for 'amount' in request");
         }
 
-        if (empty($invoiceEntryData['price']) || !(int) ($invoiceEntryData['price'])) {
-            throw new HttpException(400, "Expected integer value for 'price' in request");
+        if (empty($invoiceEntryData['price']) || !(float) ($invoiceEntryData['price'])) {
+            throw new HttpException(400, "Expected numerical value for 'price' in request");
         }
 
         $repository = $this->entityManager->getRepository(InvoiceEntry::class);

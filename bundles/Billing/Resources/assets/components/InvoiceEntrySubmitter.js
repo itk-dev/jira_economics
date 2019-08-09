@@ -326,6 +326,7 @@ export class InvoiceEntrySubmitter extends Component {
     );
   }
 
+  // @TODO: add type validation to input fields (decimals currently need to be specified with dot notation)
   // @TODO: cleanup redundant HTML
   render() {
     // InvoiceEntry without JiraIssues?
