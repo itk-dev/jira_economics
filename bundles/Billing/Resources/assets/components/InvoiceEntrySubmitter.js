@@ -6,8 +6,6 @@ import { setSelectedIssues } from '../redux/actions';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
 
-// @TODO: an InvoiceEntry may still be set in props if we have previously edited an InvoiceEntry. Fix this.
-
 export class InvoiceEntrySubmitter extends Component {
   constructor(props) {
     super(props);

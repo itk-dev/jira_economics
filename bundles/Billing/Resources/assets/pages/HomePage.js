@@ -40,10 +40,10 @@ class HomePage extends Component {
     if (event.target.id == "delete-btn") {
       const { dispatch } = this.props;
       dispatch(rest.actions.deleteInvoice({ id: invoiceId }))
-      .then(() => {
-        this.removeInvoiceFromState(invoiceId);
-      })
-      .catch((reason) => console.log('isCanceled', reason.isCanceled));
+        .then(() => {
+          this.removeInvoiceFromState(invoiceId);
+        })
+        .catch((reason) => console.log('isCanceled', reason.isCanceled));
       // @TODO: Check that deletion is successful
     }
     this.setState({ showModal: false, invoiceIdToDelete: -1 });
@@ -67,151 +67,165 @@ class HomePage extends Component {
     this.setState({ allInvoices: remainingInvoices });
   };
 
-  render() {
-    return (
-      <ContentWrapper>
-        <PageTitle breadcrumb="">Fakturaer</PageTitle>
-        <Tabs defaultActiveKey="drafts" id="uncontrolled-tab-example">
-          <Tab eventKey="drafts" title="Kladder">
-            <Form className="mt-3 mb-1 w-25">
-              <Form.Group controlId="exampleForm.ControlSelect1" className="mb-0">
-                <Form.Label className="sr-only">Sorter</Form.Label>
-                <Form.Control size="sm" as="select">
-                  <option>Nyeste først</option>
-                  <option>Ældste først</option>
-                </Form.Control>
-              </Form.Group>
-            </Form>
-            <Table responsive striped hover borderless>
-              <thead>
-                <tr>
-                  <th>Fakturanavn</th>
-                  <th>Projekt</th>
-                  <th>Fakturadato</th>
-                  <th>Beløb (DKK)</th>
-                  <th className="text-right">Funktion</th>
-                </tr>
-              </thead>
-              <tbody>
-                {this.state.allInvoices.data && this.state.allInvoices.data
-                  .filter((item) => {
-                    return item.recorded === false;
-                  })
-                  .map((item) =>
-                    <tr key={item.invoiceId}>
-                      <td><a href={"/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}><strong>{item.invoiceName}</strong></a></td>
-                      <td>{item.jiraProjectName}</td>
-                      <td><Moment format="DD-MM-YYYY">{item.created.date}</Moment></td>
-                      <td><strong>65.146</strong></td>
-                      <td className="text-right">
-                        <ButtonGroup size="sm" className="float-right" aria-label="Invoice functions">
-                          <OverlayTrigger
-                            key="edit"
-                            placement="top"
-                            overlay={
-                              <Tooltip id="tooltip-edit">
-                                Edit this invoice
-                            </Tooltip>
-                            }
-                          >
-                            <Button className="btn-primary" href={"/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}>
-                              <i className="fas fa-edit mx-2"></i>
-                              <span className="sr-only">rediger</span>
-                            </Button>
-                          </OverlayTrigger>
-                          <OverlayTrigger
-                            key="delete"
-                            placement="top"
-                            overlay={
-                              <Tooltip id="tooltip-delete">
-                                Delete this invoice
-                            </Tooltip>
-                            }
-                          >
-                            <Button className="btn-danger" onClick={this.handleInvoiceDelete.bind(this, item.invoiceId)}>
-                              <i className="fas fa-trash-alt mx-2"></i>
-                              <span className="sr-only">slet</span>
-                            </Button>
-                          </OverlayTrigger>
+  // @TODO: implement sorting by date
+  // @TODO: get sum of price for all invoiceEntries for each invoice
 
-                        </ButtonGroup>
-                      </td>
-                    </tr>
-                  )}
-              </tbody>
-            </Table>
-          </Tab>
-          <Tab eventKey="posted" title="Bogførte">
-            <Form className="float-right">
-              <Form.Group controlId="exampleForm.ControlSelect1">
-                <Form.Label>Sorter</Form.Label>
-                <Form.Control as="select">
-                  <option>Nyeste først</option>
-                  <option>Ældste først</option>
-                </Form.Control>
-              </Form.Group>
-            </Form>
-            <Table responsive striped hover borderless>
-              <thead>
-                <tr>
-                  <th>Fakturanavn</th>
-                  <th>Projekt</th>
-                  <th>Fakturadato</th>
-                  <th>Beløb (DKK)</th>
-                  <th className="text-right">Funktion</th>
-                </tr>
-              </thead>
-              <tbody>
-                {this.state.allInvoices.data && this.state.allInvoices.data
-                  .filter((item) => {
-                    return item.recorded === true;
-                  })
-                  .map((item) =>
-                    <tr key={item.invoiceId}>
-                      <td><a href={"/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}><strong>{item.invoiceName}</strong></a></td>
-                      <td>{item.jiraProjectName}</td>
-                      <td><Moment format="DD-MM-YYYY">{item.created.date}</Moment></td>
-                      <td><strong>65.146</strong></td>
-                      <td className="text-right">
-                        <ButtonGroup className="btn-group-sm float-right" aria-label="Invoice functions">
-                          <OverlayTrigger
-                            key="download-csv"
-                            placement="top"
-                            overlay={
-                              <Tooltip id="tooltip-download-csv">
-                                Download csv file
+  render() {
+    if (this.state.allInvoices.data) {
+      return (
+        <ContentWrapper>
+          <PageTitle breadcrumb="">Fakturaer</PageTitle>
+          <Tabs defaultActiveKey="drafts" id="uncontrolled-tab-example">
+            <Tab eventKey="drafts" title="Kladder">
+              <Form className="mt-3 mb-1 w-25">
+                <Form.Group controlId="exampleForm.ControlSelect1" className="mb-0">
+                  <Form.Label className="sr-only">Sorter</Form.Label>
+                  <Form.Control size="sm" as="select">
+                    <option>Nyeste først</option>
+                    <option>Ældste først</option>
+                  </Form.Control>
+                </Form.Group>
+              </Form>
+              <Table responsive striped hover borderless>
+                <thead>
+                  <tr>
+                    <th>Fakturanavn</th>
+                    <th>Projekt</th>
+                    <th>Fakturadato</th>
+                    <th>Beløb (DKK)</th>
+                    <th className="text-right">Funktion</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {this.state.allInvoices.data && this.state.allInvoices.data
+                    .filter((item) => {
+                      return item.recorded === false;
+                    })
+                    .map((item) =>
+                      <tr key={item.invoiceId}>
+                        <td><a href={"/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}><strong>{item.invoiceName}</strong></a></td>
+                        <td>{item.jiraProjectName}</td>
+                        <td><Moment format="DD-MM-YYYY">{item.created.date}</Moment></td>
+                        <td><strong>65.146</strong></td>
+                        <td className="text-right">
+                          <ButtonGroup size="sm" className="float-right" aria-label="Invoice functions">
+                            <OverlayTrigger
+                              key="edit"
+                              placement="top"
+                              overlay={
+                                <Tooltip id="tooltip-edit">
+                                  Edit this invoice
                             </Tooltip>
-                            }
-                          >
-                            <Button>
-                              <i className="fas fa-file-csv mx-2"></i>
-                              <span className="sr-only">hent csv</span>
-                            </Button>
-                          </OverlayTrigger>
-                        </ButtonGroup>
-                      </td>
-                    </tr>
-                  )}
-              </tbody>
-            </Table>
-          </Tab>
-        </Tabs>
-        <Modal show={this.state.showModal} onHide={this.handleModalClose}>
-          <Modal.Header>
-            <Modal.Title>Confirm deletion</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>Are you sure you want to delete this invoice?</Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={this.handleModalClose}>
-              Cancel
+                              }
+                            >
+                              <Button className="btn-primary" href={"/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}>
+                                <i className="fas fa-edit mx-2"></i>
+                                <span className="sr-only">rediger</span>
+                              </Button>
+                            </OverlayTrigger>
+                            <OverlayTrigger
+                              key="delete"
+                              placement="top"
+                              overlay={
+                                <Tooltip id="tooltip-delete">
+                                  Delete this invoice
+                            </Tooltip>
+                              }
+                            >
+                              <Button className="btn-danger" onClick={this.handleInvoiceDelete.bind(this, item.invoiceId)}>
+                                <i className="fas fa-trash-alt mx-2"></i>
+                                <span className="sr-only">slet</span>
+                              </Button>
+                            </OverlayTrigger>
+
+                          </ButtonGroup>
+                        </td>
+                      </tr>
+                    )}
+                </tbody>
+              </Table>
+            </Tab>
+            <Tab eventKey="posted" title="Bogførte">
+              <Form className="float-right">
+                <Form.Group controlId="exampleForm.ControlSelect1">
+                  <Form.Label>Sorter</Form.Label>
+                  <Form.Control as="select">
+                    <option>Nyeste først</option>
+                    <option>Ældste først</option>
+                  </Form.Control>
+                </Form.Group>
+              </Form>
+              <Table responsive striped hover borderless>
+                <thead>
+                  <tr>
+                    <th>Fakturanavn</th>
+                    <th>Projekt</th>
+                    <th>Fakturadato</th>
+                    <th>Beløb (DKK)</th>
+                    <th className="text-right">Funktion</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {this.state.allInvoices.data && this.state.allInvoices.data
+                    .filter((item) => {
+                      return item.recorded === true;
+                    })
+                    .map((item) =>
+                      <tr key={item.invoiceId}>
+                        <td><a href={"/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}><strong>{item.invoiceName}</strong></a></td>
+                        <td>{item.jiraProjectName}</td>
+                        <td><Moment format="DD-MM-YYYY">{item.created.date}</Moment></td>
+                        <td><strong>65.146</strong></td>
+                        <td className="text-right">
+                          <ButtonGroup className="btn-group-sm float-right" aria-label="Invoice functions">
+                            <OverlayTrigger
+                              key="download-csv"
+                              placement="top"
+                              overlay={
+                                <Tooltip id="tooltip-download-csv">
+                                  Download csv file
+                            </Tooltip>
+                              }
+                            >
+                              <Button>
+                                <i className="fas fa-file-csv mx-2"></i>
+                                <span className="sr-only">hent csv</span>
+                              </Button>
+                            </OverlayTrigger>
+                          </ButtonGroup>
+                        </td>
+                      </tr>
+                    )}
+                </tbody>
+              </Table>
+            </Tab>
+          </Tabs>
+          <Modal show={this.state.showModal} onHide={this.handleModalClose}>
+            <Modal.Header>
+              <Modal.Title>Confirm deletion</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>Are you sure you want to delete this invoice?</Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={this.handleModalClose}>
+                Cancel
             </Button>
-            <Button id="delete-btn" variant="danger" onClick={this.handleModalClose}>
-              Delete
+              <Button id="delete-btn" variant="danger" onClick={this.handleModalClose}>
+                Delete
             </Button>
-          </Modal.Footer>
-        </Modal>
-      </ContentWrapper>
-    )
+            </Modal.Footer>
+          </Modal>
+        </ContentWrapper>
+      )
+    }
+    else {
+      return (
+        <ContentWrapper>
+          <div className="spinner-border" style={{ width: '3rem', height: '3rem', role: 'status' }}>
+            <span className="sr-only">Loading invoices...</span>
+          </div>
+        </ContentWrapper>
+      );
+    }
   }
 }
 
