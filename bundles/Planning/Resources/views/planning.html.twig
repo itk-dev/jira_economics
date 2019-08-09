@@ -169,5 +169,9 @@
 {% block javascripts %}
     {{ parent() }}
 
+    <script type="text/javascript">
+      var PLANNING_API_URL = '{{ planning_api_url }}';
+    </script>
+
     {{ encore_entry_script_tags('planning') }}
 {% endblock %}

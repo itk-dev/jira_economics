@@ -7,6 +7,7 @@ import axios from 'axios';
         data: {
             boards: [],
             filter: '',
+            baseUrl: '',
             loading: false
         },
         computed: {
@@ -29,9 +30,14 @@ import axios from 'axios';
             }
         },
         created: function () {
+            // eslint-disable-next-line no-undef
+            this.apiUrl = PLANNING_API_URL;
+            // eslint-disable-next-line no-undef
+            this.baseUrl = PLANNING_URL;
+
             this.loading = true;
 
-            axios.get('/planning/board')
+            axios.get(this.apiUrl + '/board')
                 .then(function (response) {
                     this.boards = response.data.boards;
                     this.loading = false;
