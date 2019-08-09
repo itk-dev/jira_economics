@@ -57,7 +57,6 @@ pipeline {
                 branch 'release'
             }
             steps {
-                steps {
                 // Update git repos.
                 sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; git clean -d --force'"
                 sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; git checkout ${BRANCH_NAME}'"
@@ -72,7 +71,6 @@ pipeline {
 
                 // Copy encore assets.
                 sh "ansible srvitkphp72stg -m synchronize -a 'src=${WORKSPACE}/public/build/ dest=/data/www/economics_srvitkphp72stg_itkdev_dk/htdocs/public/build'"
-            }
             }
         }
         stage('Deployment production') {
