@@ -11,7 +11,7 @@ $(() => {
         .css({width: '100%'})
         .select2()
 
-    const $projectCtrl = $('#form_project');
+    const $projectCtrl = $('#form_project')
 
     const renderIssue = issue => issue.summary + ' (' + issue.key + ')'
 
@@ -46,6 +46,7 @@ $(() => {
                 })
                 .val('').trigger('change')
 
+            // Initialize from control data on first run (i.e. not triggered by change of project).
             if (!event) {
                 const selectedIssue = $issueCtrl.data('issue')
                 if (selectedIssue) {

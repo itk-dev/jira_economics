@@ -86,6 +86,7 @@ class ExpenseController extends AbstractController
                             $selectedIssue = null;
                         }
                     } catch (ClientException $exception) {
+                        // Invalid issue id. Move along!
                     }
                 }
             }
