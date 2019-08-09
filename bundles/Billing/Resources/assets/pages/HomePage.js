@@ -22,7 +22,7 @@ class HomePage extends Component {
     super(props);
     this.handleModalShow = this.handleModalShow.bind(this);
     this.handleModalClose = this.handleModalClose.bind(this);
-    this.state = { allInvoices: {}, showModal: false, invoiceIdToDelete: -1 };
+    this.state = { allInvoices: {}, allInvoiceEntries: {}, showModal: false, invoiceIdToDelete: -1 };
   };
 
   componentDidMount() {
@@ -30,6 +30,11 @@ class HomePage extends Component {
     dispatch(rest.actions.getAllInvoices())
       .then((response) => {
         this.setState({ allInvoices: response });
+      })
+      .catch((reason) => console.log('isCanceled', reason.isCanceled));
+    dispatch(rest.actions.getAllInvoiceEntries())
+      .then((response) => {
+        this.setState({ allInvoiceEntries: response });
       })
       .catch((reason) => console.log('isCanceled', reason.isCanceled));
   };
@@ -67,11 +72,27 @@ class HomePage extends Component {
     this.setState({ allInvoices: remainingInvoices });
   };
 
+  getPriceForInvoice(invoiceId) {
+    if (!this.state.allInvoiceEntries.data) {
+      return 0;
+    }
+    let invoiceEntries = this.state.allInvoiceEntries.data.filter((invoiceEntry) => {
+      return invoiceEntry.invoiceId == invoiceId;
+    });
+    if (invoiceEntries == undefined) {
+      return "N/A";
+    }
+    let totalPrice = 0;
+    invoiceEntries.forEach(invoiceEntry => {
+      totalPrice += invoiceEntry.price;
+    });
+    return totalPrice.toFixed(2);
+  };
+
   // @TODO: implement sorting by date
-  // @TODO: get sum of price for all invoiceEntries for each invoice
 
   render() {
-    if (this.state.allInvoices.data) {
+    if (this.state.allInvoices.data && this.state.allInvoiceEntries.data) {
       return (
         <ContentWrapper>
           <PageTitle breadcrumb="">Fakturaer</PageTitle>
@@ -106,7 +127,7 @@ class HomePage extends Component {
                         <td><a href={"/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}><strong>{item.invoiceName}</strong></a></td>
                         <td>{item.jiraProjectName}</td>
                         <td><Moment format="DD-MM-YYYY">{item.created.date}</Moment></td>
-                        <td><strong>65.146</strong></td>
+                        <td><strong>{this.getPriceForInvoice(item.invoiceId)}</strong></td>
                         <td className="text-right">
                           <ButtonGroup size="sm" className="float-right" aria-label="Invoice functions">
                             <OverlayTrigger
@@ -175,7 +196,7 @@ class HomePage extends Component {
                         <td><a href={"/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}><strong>{item.invoiceName}</strong></a></td>
                         <td>{item.jiraProjectName}</td>
                         <td><Moment format="DD-MM-YYYY">{item.created.date}</Moment></td>
-                        <td><strong>65.146</strong></td>
+                        <td><strong>{this.getPriceForInvoice(item.invoiceId)}</strong></td>
                         <td className="text-right">
                           <ButtonGroup className="btn-group-sm float-right" aria-label="Invoice functions">
                             <OverlayTrigger
