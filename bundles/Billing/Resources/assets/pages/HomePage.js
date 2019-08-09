@@ -89,7 +89,22 @@ class HomePage extends Component {
     return totalPrice.toFixed(2);
   };
 
-  // @TODO: implement sorting by date
+  onSort(event) {
+    let sortOrder = "desc";
+    if (event.target.value == "Ældste først") {
+      sortOrder = "asc";
+    }
+    let sortedInvoices = this.state.allInvoices.data.sort(function (i1, i2) {
+      if (sortOrder == 'asc') {
+        return i1.created.date > i2.created.date;
+      }
+      else {
+        return i1.created.date < i2.created.date;
+      }
+    });
+    sortedInvoices = { "data": sortedInvoices };
+    this.setState({ allInvoices: sortedInvoices });
+  };
 
   render() {
     if (this.state.allInvoices.data && this.state.allInvoiceEntries.data) {
@@ -101,7 +116,7 @@ class HomePage extends Component {
               <Form className="mt-3 mb-1 w-25">
                 <Form.Group controlId="exampleForm.ControlSelect1" className="mb-0">
                   <Form.Label className="sr-only">Sorter</Form.Label>
-                  <Form.Control size="sm" as="select">
+                  <Form.Control size="sm" as="select" onChange={this.onSort.bind(this)}>
                     <option>Nyeste først</option>
                     <option>Ældste først</option>
                   </Form.Control>
@@ -170,7 +185,7 @@ class HomePage extends Component {
               <Form className="float-right">
                 <Form.Group controlId="exampleForm.ControlSelect1">
                   <Form.Label>Sorter</Form.Label>
-                  <Form.Control as="select">
+                  <Form.Control as="select" onChange={this.onSort.bind(this)}>
                     <option>Nyeste først</option>
                     <option>Ældste først</option>
                   </Form.Control>
@@ -251,12 +266,14 @@ class HomePage extends Component {
 }
 
 HomePage.propTypes = {
-  allInvoices: PropTypes.object
+  allInvoices: PropTypes.object,
+  allInvoiceEntries: PropTypes.object
 };
 
 const mapStateToProps = state => {
   return {
-    allInvoices: state.allInvoices
+    allInvoices: state.allInvoices,
+    allInvoiceEntries: state.allInvoiceEntries
   };
 };
 
