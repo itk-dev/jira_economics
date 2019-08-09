@@ -285,7 +285,7 @@ class BillingService
     }
 
     /**
-     * Get all invoiceEntries
+     * Get all invoiceEntries.
      *
      * @return array
      */
