@@ -67,6 +67,9 @@ pipeline {
                 // Run composer.
                 sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; composer install --no-dev -o'"
 
+                // Run migrations.
+                sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; bin/console doctrine:migrations:migrate --no-interaction'"
+
                 // Copy encore assets.
                 sh "ansible srvitkphp72stg -m synchronize -a 'src=${WORKSPACE}/public/build/ dest=/data/www/economics_srvitkphp72stg_itkdev_dk/htdocs/public/build'"
             }
