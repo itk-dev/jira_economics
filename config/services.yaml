@@ -3,6 +3,8 @@
 
 imports:
     - { resource: create_project_config.local.yml, ignore_errors: true }
+    - { resource: jira_economics.yaml, ignore_errors: true }
+    - { resource: jira_economics.local.yaml, ignore_errors: true }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
@@ -14,10 +16,6 @@ parameters:
     env(JIRA_DEFAULT_BOARD): null
     env(JIRA_USER): null
     env(JIRA_TOKEN): null
-
-    portals:
-        - name: GraphicServiceOrder
-          path: graphic_service_order_form
 
 services:
     # default configuration for services in *this* file
@@ -44,7 +42,7 @@ services:
             $jiraUrl: '%env(JIRA_URL)%'
             $tokenStorage: '@security.token_storage'
             $customerKey: '%env(JIRA_OAUTH_CUSTOMER_KEY)%'
-            $pemPath: '%env(JIRA_OAUTH_PEM_PATH)%'
+            $pemPath: '%env(resolve:JIRA_OAUTH_PEM_PATH)%'
 
     App\Service\HammerService:
         arguments:
@@ -57,3 +55,11 @@ services:
             $host: '%env(OWNCLOUD_HOST)%'
             $username: '%env(OWNCLOUD_USERNAME)%'
             $password: '%env(OWNCLOUD_PASSWORD)%'
+
+    App\Form\RegistrationFormType:
+        arguments:
+            $class: App\Entity\User
+
+    App\Form\ProfileFormType:
+        arguments:
+            $class: App\Entity\User

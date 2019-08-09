@@ -1,8 +1,10 @@
-{% block title %}
-    <h1>{{ 'main.title'|trans }}</h1>
-{% endblock %}
-<hr>
+{% extends 'base.html.twig' %}
+
+{% block title 'main.title'|trans %}
+
 {% block content %}
+    <h1>{{ block('title') }}</h1>
+
     <div class="row">
         {% for app in apps %}
             <div class="col-md-4 mb-3">

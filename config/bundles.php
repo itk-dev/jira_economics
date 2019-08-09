@@ -26,4 +26,6 @@ return [
     Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],
     Expense\ExpenseBundle::class => ['all' => true],
     Oneup\UploaderBundle\OneupUploaderBundle::class => ['all' => true],
+    FOS\UserBundle\FOSUserBundle::class => ['all' => true],
+    EasyCorp\Bundle\EasyAdminBundle\EasyAdminBundle::class => ['all' => true],
 ];

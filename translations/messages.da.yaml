@@ -13,3 +13,15 @@ main:
 dashboard:
     title: Dashboard
     headline: Vælg app
+
+# Admin user management
+portal.user: Bruger
+portal.user.email: E-mailadresse
+portal.user.enabled: Aktiv
+portal.user.lastLogin: Seneste login
+portal.user.portalApps: Apps
+portal.user.roles: Roler
+
+ROLE_ADMIN: Administrator
+ROLE_JIRA: Jira
+ROLE_USER: Bruger
