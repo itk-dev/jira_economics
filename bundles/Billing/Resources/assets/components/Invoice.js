@@ -259,7 +259,6 @@ class Invoice extends Component {
     this.setState({ showDeleteEntryModal: false });
   };
 
-  // @TODO: show spinner while invoiceEntries are being loaded
   render() {
     if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId) {
       return (
@@ -273,7 +272,7 @@ class Invoice extends Component {
         </ContentWrapper>
       );
     }
-    else if (this.props.project.data.name) {
+    else if (this.props.project.data.name && this.state.invoiceEntries.data) {
       return (
         <ContentWrapper>
           <PageTitle breadcrumb={"Invoice for project [" + this.props.project.data.name + "] (" + this.props.match.params.projectId + ")"}>

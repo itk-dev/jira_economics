@@ -7,6 +7,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import ContentWrapper from '../components/ContentWrapper';
 
 const createRows = (projects) => {
   if (projects.data.data === undefined) {
@@ -18,7 +19,7 @@ const createRows = (projects) => {
     name: project.name,
     key: project.key,
     id: project.id,
-    avatar: <img src={project.avatarUrls['16x16']} style={imageStyle}/>
+    avatar: <img src={project.avatarUrls['16x16']} style={imageStyle} />
   }));
 };
 
@@ -27,7 +28,7 @@ const imageStyle = {
 };
 
 class ProjectList extends Component {
-  constructor(){
+  constructor() {
     super();
     this.state = {
       inputFilter: '',
@@ -44,7 +45,7 @@ class ProjectList extends Component {
   }
 
   componentDidMount() {
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     dispatch(rest.actions.getProjects());
   }
 
@@ -80,18 +81,38 @@ class ProjectList extends Component {
     dispatch(rest.actions.createInvoice({}, {
       body: JSON.stringify(invoiceData)
     }))
-    .then((response) => {
-      this.setState({ showModal: false });
-      this.props.history.push(`/project/${projectId}/${response.invoiceId}`);
-    })
-    .catch((reason) => {
-      this.setState({ showModal: false });
-      console.log('isCanceled', reason.isCanceled);
-    });
+      .then((response) => {
+        this.setState({ showModal: false });
+        this.props.history.push(`/project/${projectId}/${response.invoiceId}`);
+      })
+      .catch((reason) => {
+        this.setState({ showModal: false });
+        console.log('isCanceled', reason.isCanceled);
+      });
     // @TODO: verify that invoice creation was successful
   }
 
-  render () {
+  displayProjects(items) {
+    if (this.props.projects.loading) {
+      return (
+        <ContentWrapper>
+          <div className="spinner-border"
+            style={{ width: '3rem', height: '3rem', role: 'status' }}>
+            <span className="sr-only">Loading...</span>
+          </div>
+        </ContentWrapper>
+      );
+    }
+    else {
+      return (
+        <ListGroup>
+          {items}
+        </ListGroup>
+      );
+    }
+  }
+
+  render() {
     const items = [];
 
     const projects = this.filterProjectRows();
@@ -105,9 +126,6 @@ class ProjectList extends Component {
         </ListGroup.Item>
       );
     }
-
-    // TODO: Add spinner
-    const fetching = this.props.isFetching ? 'Loading ...' : '';
 
     return (
       <div>
@@ -123,11 +141,8 @@ class ProjectList extends Component {
           </Form.Group>
         </Form>
 
-        <ListGroup>
-        {items}
-        </ListGroup>
+        {this.displayProjects(items)}
 
-        {fetching}
         <Modal show={this.state.showModal} onHide={this.handleModalCancel}>
           <Modal.Header>
             <Modal.Title>Create Invoice</Modal.Title>
@@ -154,8 +169,7 @@ class ProjectList extends Component {
 
 ProjectList.propTypes = {
   projects: PropTypes.object,
-  projectRows: PropTypes.array,
-  isFetching: PropTypes.bool
+  projectRows: PropTypes.array
 };
 
 const mapStateToProps = state => {
@@ -163,8 +177,7 @@ const mapStateToProps = state => {
 
   return {
     projects: state.projects,
-    projectRows: projectRows,
-    isFetching: state.projects.isFetching
+    projectRows: projectRows
   };
 };
 
