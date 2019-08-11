@@ -134,8 +134,7 @@ require('./planning.css');
                     }
 
                     return sprintIssue.fields.timetracking.remainingEstimateSeconds / 3600;
-                }
-                else {
+                } else {
                     return '';
                 }
             },
@@ -144,17 +143,13 @@ require('./planning.css');
 
                 if (remainingEstimateUser > 35) {
                     return 'remaining-critical';
-                }
-                else if (remainingEstimateUser> 28 && remainingEstimateUser <= 30) {
+                } else if (remainingEstimateUser > 28 && remainingEstimateUser <= 30) {
                     return 'remaining-warning';
-                }
-                else if (remainingEstimateUser > 30 && remainingEstimateUser <= 35) {
+                } else if (remainingEstimateUser > 30 && remainingEstimateUser <= 35) {
                     return 'remaining-danger';
-                }
-                else if (remainingEstimateUser >= 24 && remainingEstimateUser <= 28) {
+                } else if (remainingEstimateUser >= 24 && remainingEstimateUser <= 28) {
                     return 'remaining-success';
-                }
-                else {
+                } else {
                     return '';
                 }
             },
@@ -188,16 +183,14 @@ require('./planning.css');
             getRemainingEstimatUser: function (user, sprint) {
                 if (user.hasOwnProperty('timeRemaining') && user.timeRemaining.hasOwnProperty(sprint.id)) {
                     return (user.timeRemaining[sprint.id] / 3600).toFixed(2);
-                }
-                else {
+                } else {
                     return '';
                 }
             },
             getRemainingEstimat: function (project, sprint) {
                 if (project.hasOwnProperty('timeRemaining') && project.timeRemaining.hasOwnProperty(sprint.id)) {
                     return (project.timeRemaining[sprint.id] / 3600).toFixed(2);
-                }
-                else {
+                } else {
                     return '';
                 }
             },
@@ -219,8 +212,7 @@ require('./planning.css');
 
                     if (this.projects.hasOwnProperty(project.id)) {
                         saveProject = this.projects[project.id];
-                    }
-                    else {
+                    } else {
                         saveProject = project;
                     }
 
@@ -250,8 +242,7 @@ require('./planning.css');
                             key: 'unassigned'
                         };
                         assigned = saveProject.users['unassigned'];
-                    }
-                    else {
+                    } else {
                         if (!saveProject.users.hasOwnProperty(assigned.key)) {
                             saveProject.users[assigned.key] = assigned;
                         }
@@ -271,8 +262,7 @@ require('./planning.css');
 
                     if (this.users.hasOwnProperty(assigned.key)) {
                         saveUser = this.users[assigned.key];
-                    }
-                    else {
+                    } else {
                         saveUser = assigned;
                     }
 
