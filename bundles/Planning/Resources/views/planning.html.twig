@@ -4,7 +4,7 @@
 
 {% block content %}
     <div id="app" class="app">
-        <a href="/planning">{{ 'planning.choose_another_board'|trans }}</a>
+        <a href="{{ board_url }}">{{ 'planning.choose_another_board'|trans }}</a>
 
         <h1>{{ 'planning.headline.headline'|trans }} - {{ board.name }}</h1>
 
@@ -168,6 +168,10 @@
 
 {% block javascripts %}
     {{ parent() }}
+
+    <script type="text/javascript">
+      var PLANNING_API_URL = '{{ planning_api_url }}';
+    </script>
 
     {{ encore_entry_script_tags('planning') }}
 {% endblock %}
