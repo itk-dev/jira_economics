@@ -67,7 +67,8 @@
             "CreateProject\\": "bundles/CreateProject/",
             "Expense\\":"bundles/Expense",
             "GraphicServiceOrder\\": "bundles/GraphicServiceOrder/",
-            "Planning\\": "bundles/Planning/"
+            "Planning\\": "bundles/Planning/",
+            "SprintReport\\": "bundles/SprintReport/"
         }
     },
     "autoload-dev": {

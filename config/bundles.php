@@ -21,6 +21,7 @@ return [
     Symfony\WebpackEncoreBundle\WebpackEncoreBundle::class => ['all' => true],
     Billing\BillingBundle::class => ['all' => true],
     Planning\PlanningBundle::class => ['all' => true],
+    SprintReport\SprintReportBundle::class => ['all' => true],
     CreateProject\CreateProjectBundle::class => ['all' => true],
     GraphicServiceOrder\GraphicServiceOrderBundle::class => ['all' => true],
     Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],
