@@ -31,8 +31,8 @@ class PlanningController extends AbstractController
         return $this->render(
             '@PlanningBundle/board.html.twig',
             [
-                'planning_base_url' =>  $this->generateUrl('planning_index'),
-                'planning_api_url' =>  $this->generateUrl('planning_index').'api',
+                'planning_base_url' => $this->generateUrl('planning_index'),
+                'planning_api_url' => $this->generateUrl('planning_index').'api',
                 'global_menu_items' => $menuService->getGlobalMenuItems(),
             ]
         );
@@ -58,7 +58,7 @@ class PlanningController extends AbstractController
             [
                 'jiraUrl' => $jiraUrl,
                 'board' => $board,
-                'planning_api_url' =>  $this->generateUrl('planning_index').'/api/board/'.$boardId,
+                'planning_api_url' => $this->generateUrl('planning_index').'/api/board/'.$boardId,
                 'global_menu_items' => $menuService->getGlobalMenuItems(),
             ]
         );
