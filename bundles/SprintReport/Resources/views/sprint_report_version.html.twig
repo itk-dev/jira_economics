@@ -11,11 +11,11 @@
             <tbody>
             <tr>
               <td><strong>{{ 'sprint_report_version.sub.project' | trans }}: </strong></td>
-              <td>{{ project.name }}</td>
+              <td>{{ sprintReport.project.name }}</td>
             </tr>
             <tr>
               <td><strong>{{ 'sprint_report_version.sub.version' | trans }}: </strong></td>
-              <td>{{ version.name }}</td>
+              <td>{{ sprintReport.version.name }}</td>
             </tr>
             <tr>
               <td><strong>{{ 'sprint_report_version.sub.budget' | trans }}: </strong></td>
@@ -25,19 +25,19 @@
             <tr>
               <td><strong>{{ 'sprint_report_version.sub.spent_hours' | trans }}: </strong></td>
               <td>
-                <span id="spent_hours">{{ spentHours }}</span>
+                <span id="spent_hours">{{ sprintReport.spentHours }}</span>
               </td>
             </tr>
             <tr>
               <td><strong>{{ 'sprint_report_version.sub.remaining_hours' | trans }}: </strong></td>
               <td id="remaining_hours">
-                {{ remainingHours }}
+                {{ sprintReport.remainingHours }}
               </td>
             </tr>
             <tr>
               <td><strong>{{ 'sprint_report_version.sub.project_hours' | trans }}: </strong></td>
               <td id="project_hours">
-                {{ spentHours + remainingHours }}
+                {{ sprintReport.spentHours + sprintReport.remainingHours }}
               </td>
             </tr>
             <tr>
@@ -72,7 +72,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for epic in epics %}
+        {% for epic in sprintReport.epics %}
           <tr>
             <td>{{ epic.name }}</td>
             <td>{{ epic.originalEstimateSum / 60 / 60 }}</td>
@@ -93,7 +93,7 @@
           <th>{{ 'sprint_report_version.table.estimate' | trans }}</th>
           <th>{{ 'sprint_report_version.table.reg' | trans }}</th>
           <th>{{ 'sprint_report_version.table.no_sprint' | trans }}</th>
-          {% for sprint in sprints %}
+          {% for sprint in sprintReport.sprints %}
             {% if sprint.state != 'FUTURE' %}
               <th>{{ sprint.shortName }}</th>
             {% endif %}
@@ -101,7 +101,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for epic in epics %}
+        {% for epic in sprintReport.epics %}
           <tr>
             <td>{{ epic.name }}</td>
             <td>{{ epic.originalEstimateSum / 60 / 60 }}</td>
@@ -111,7 +111,7 @@
                   {{ epic.loggedWork['NoSprint'] / 60 / 60 }}
                 {% endif %}
               </td>
-            {% for sprint in sprints %}
+            {% for sprint in sprintReport.sprints %}
               {% if sprint.state != 'FUTURE' %}
                 <td>
                   {% if epic.loggedWork[sprint.id] is defined %}
@@ -135,7 +135,7 @@
           <th>{{ 'sprint_report_version.table.estimate' | trans }}</th>
           <th>{{ 'sprint_report_version.table.remaining_hours' | trans }}</th>
           <th>{{ 'sprint_report_version.table.planned_work_sum' | trans }}</th>
-          {% for sprint in sprints %}
+          {% for sprint in sprintReport.sprints %}
             {% if sprint.state == 'FUTURE' or sprint.state == 'ACTIVE' %}
               <th>{{ sprint.shortName }}</th>
             {% endif %}
@@ -143,13 +143,13 @@
         </tr>
         </thead>
         <tbody>
-        {% for epic in epics %}
+        {% for epic in sprintReport.epics %}
           <tr>
             <td>{{ epic.name }}</td>
             <td>{{ epic.originalEstimateSum / 60 / 60 }}</td>
             <td>{{ epic.remainingSum / 60 / 60 }}</td>
             <td>{{ epic.plannedWorkSum / 60 / 60 }}</td>
-            {% for sprint in sprints %}
+            {% for sprint in sprintReport.sprints %}
               {% if sprint.state == 'FUTURE' or sprint.state == 'ACTIVE' %}
                 <td>
                   {% if epic.remainingWork[sprint.id] is defined %}
