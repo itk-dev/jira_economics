@@ -19,34 +19,23 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Class PlanningController.
  *
- * @Route("/", name="planning_")
+ * @Route("", name="planning_")
  */
 class PlanningController extends AbstractController
 {
     /**
      * @Route("/", name="index")
      */
-    public function index(PlanningService $planningService, MenuService $menuService)
+    public function index(MenuService $menuService)
     {
-        $boards = $planningService->getAllBoards();
-
         return $this->render(
             '@PlanningBundle/board.html.twig',
             [
-                'boards' => $boards,
+                'planning_base_url' =>  $this->generateUrl('planning_index'),
+                'planning_api_url' =>  $this->generateUrl('planning_index').'api',
                 'global_menu_items' => $menuService->getGlobalMenuItems(),
             ]
         );
-    }
-
-    /**
-     * @Route("/board", name="boards")
-     */
-    public function allBoards(PlanningService $planningService)
-    {
-        $boards = $planningService->getAllBoards();
-
-        return new JsonResponse(['boards' => $boards]);
     }
 
     /**
@@ -69,13 +58,24 @@ class PlanningController extends AbstractController
             [
                 'jiraUrl' => $jiraUrl,
                 'board' => $board,
+                'planning_api_url' =>  $this->generateUrl('planning_index').'/api/board/'.$boardId,
                 'global_menu_items' => $menuService->getGlobalMenuItems(),
             ]
         );
     }
 
     /**
-     * @Route("/board/{boardId}/future_sprints", name="future_sprints")
+     * @Route("/api/board", name="boards")
+     */
+    public function allBoards(PlanningService $planningService)
+    {
+        $boards = $planningService->getAllBoards();
+
+        return new JsonResponse(['boards' => $boards]);
+    }
+
+    /**
+     * @Route("/api/board/{boardId}/future_sprints", name="future_sprints")
      */
     public function futureSprints(PlanningService $planningService, $boardId)
     {
@@ -85,7 +85,7 @@ class PlanningController extends AbstractController
     }
 
     /**
-     * @Route("/board/{boardId}/issues/{sprintId}", name="issues")
+     * @Route("/api/board/{boardId}/issues/{sprintId}", name="issues")
      */
     public function issuesInSprint(PlanningService $planningService, $boardId, $sprintId)
     {
