@@ -49,13 +49,13 @@ class Invoice extends Component {
     this.handleDeleteEntryModalClose = this.handleDeleteEntryModalClose.bind(this);
 
     this.state = {
-       checkedEntries: {},
-       showModal: false,
-       showDeleteModal: false,
-       showRecordModal: false,
-       showDeleteEntryModal: false,
-       checkedCount: 0,
-       invoiceEntries: {},
+      checkedEntries: {},
+      showModal: false,
+      showDeleteModal: false,
+      showRecordModal: false,
+      showDeleteEntryModal: false,
+      checkedCount: 0,
+      invoiceEntries: {},
     };
   };
 
@@ -65,10 +65,10 @@ class Invoice extends Component {
     dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
     dispatch(rest.actions.getInvoice({ id: `${this.props.match.params.invoiceId}` }));
     dispatch(rest.actions.getInvoiceEntries({ id: `${this.props.match.params.invoiceId}` }))
-    .then((response) => {
-      this.setState({ invoiceEntries: response });
-    })
-    .catch((reason) => console.log('isCanceled', reason.isCanceled));
+      .then((response) => {
+        this.setState({ invoiceEntries: response });
+      })
+      .catch((reason) => console.log('isCanceled', reason.isCanceled));
   };
 
   recordInvoice = (event) => {
@@ -402,33 +402,33 @@ class Invoice extends Component {
             }
           </Modal>
           <Modal show={this.state.showDeleteModal} onHide={this.handleInvoiceDeleteModalClose}>
-          <Modal.Header>
-            <Modal.Title>Confirm deletion</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>Are you sure you want to delete this invoice?</Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={this.handleInvoiceDeleteModalClose}>
-              Cancel
+            <Modal.Header>
+              <Modal.Title>Confirm deletion</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>Are you sure you want to delete this invoice?</Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={this.handleInvoiceDeleteModalClose}>
+                Cancel
             </Button>
-            <Button id="delete-invoice-btn" variant="danger" onClick={this.handleInvoiceDeleteModalClose}>
-              Delete
+              <Button id="delete-invoice-btn" variant="danger" onClick={this.handleInvoiceDeleteModalClose}>
+                Delete
             </Button>
-          </Modal.Footer>
-        </Modal>
-        <Modal show={this.state.showRecordModal} onHide={this.handleInvoiceRecordModalClose}>
-          <Modal.Header>
-            <Modal.Title>Confirm recording</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>Are you sure you want to record this invoice?</Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={this.handleInvoiceRecordModalClose}>
-              Cancel
+            </Modal.Footer>
+          </Modal>
+          <Modal show={this.state.showRecordModal} onHide={this.handleInvoiceRecordModalClose}>
+            <Modal.Header>
+              <Modal.Title>Confirm recording</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>Are you sure you want to record this invoice?</Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={this.handleInvoiceRecordModalClose}>
+                Cancel
             </Button>
-            <Button id="record-invoice-btn" variant="primary" onClick={this.handleInvoiceRecordModalClose}>
-              Record
+              <Button id="record-invoice-btn" variant="primary" onClick={this.handleInvoiceRecordModalClose}>
+                Record
             </Button>
-          </Modal.Footer>
-        </Modal>
+            </Modal.Footer>
+          </Modal>
         </ContentWrapper>
       );
     }

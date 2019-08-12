@@ -48,7 +48,7 @@ export default reduxApi({
         reducerName: "invoiceEntry",
         url: "/jira/billing/jira_api/invoice_entry",
         options: {
-            method : "post"
+            method: "post"
         }
     },
     deleteInvoiceEntry: {
@@ -100,7 +100,7 @@ export default reduxApi({
         reducerName: "customer",
         url: "/jira/billing/jira_api/customer",
         options: {
-            method : "post"
+            method: "post"
         }
     },
     updateCustomer: {

@@ -18,11 +18,11 @@ export class InvoiceEntrySubmitter extends Component {
     const { dispatch } = this.props;
     if (this.props.location.state && this.props.location.state.existingInvoiceEntryId) {
       dispatch(rest.actions.getInvoiceEntry({ id: this.props.location.state.existingInvoiceEntryId }))
-      .then((response) => {
-        this.setState({ account: response.account });
-        this.setState({ invoiceEntry: response });
-      })
-      .catch((reason) => console.log('isCanceled', reason.isCanceled));
+        .then((response) => {
+          this.setState({ account: response.account });
+          this.setState({ invoiceEntry: response });
+        })
+        .catch((reason) => console.log('isCanceled', reason.isCanceled));
     }
   }
 
@@ -330,6 +330,7 @@ export class InvoiceEntrySubmitter extends Component {
 
   // @TODO: add type validation to input fields (decimals currently need to be specified with dot notation)
   // @TODO: cleanup redundant HTML
+  // @TODO: replace HTML elements with react-bootstrap components
   render() {
     // InvoiceEntry without JiraIssues?
     if (this.props.location.state &&

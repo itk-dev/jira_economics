@@ -5,7 +5,7 @@ import PageTitle from '../components/PageTitle';
 import rest from '../redux/utils/rest';
 
 class Customer extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props);
   }
 
