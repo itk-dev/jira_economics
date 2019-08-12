@@ -16,6 +16,8 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import Modal from 'react-bootstrap/Modal';
 
+// @TODO: sort invoices by date on initial load
+
 class HomePage extends Component {
 
   constructor(props) {

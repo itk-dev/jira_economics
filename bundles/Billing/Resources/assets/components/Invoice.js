@@ -26,6 +26,7 @@ function makePriceData(invoiceEntries, jiraIssues) {
   invoiceEntries.data.data.forEach(invoiceEntry => {
     let key = `row-${invoiceEntry.id}`;
     const amount = invoiceEntry.amount;
+    // @TODO: unitPrice should be fetched from the customer instead
     const unitPrice = invoiceEntry.price / amount;
     const totalPrice = invoiceEntry.price;
     priceData[key] = { unitPrice: unitPrice, amount: amount, totalPrice: totalPrice };
@@ -284,7 +285,12 @@ class Invoice extends Component {
                 Invoice number: <strong className="pr-3">{this.props.match.params.invoiceId}</strong>
                 Invoice recorded: <strong>{String(this.props.invoice.data.recorded)}</strong>
               </p>
-              <p>Invoice description TODO: save with invoice data</p>
+              <Form>
+                <Form.Group controlId="formDescription">
+                  <Form.Control id="invoice-description" type="text" placeholder="Enter description for invoice here">
+                  </Form.Control>
+                </Form.Group>
+              </Form>
             </div>
             <div className="col-md-8 text-right">
               <ButtonGroup aria-label="Invoice actions">
