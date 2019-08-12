@@ -139,7 +139,7 @@ class HomePage extends Component {
                     })
                     .map((item) =>
                       <tr key={item.invoiceId}>
-                        <td><a href={"/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}><strong>{item.invoiceName}</strong></a></td>
+                        <td><a href={"/jira/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}><strong>{item.invoiceName}</strong></a></td>
                         <td>{item.jiraProjectName}</td>
                         <td><Moment format="DD-MM-YYYY">{item.created.date}</Moment></td>
                         <td><strong>{this.getPriceForInvoice(item.invoiceId)}</strong></td>
@@ -154,7 +154,7 @@ class HomePage extends Component {
                             </Tooltip>
                               }
                             >
-                              <Button className="btn-primary" href={"/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}>
+                              <Button className="btn-primary" href={"/jira/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}>
                                 <i className="fas fa-edit mx-2"></i>
                                 <span className="sr-only">rediger</span>
                               </Button>
@@ -208,7 +208,7 @@ class HomePage extends Component {
                     })
                     .map((item) =>
                       <tr key={item.invoiceId}>
-                        <td><a href={"/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}><strong>{item.invoiceName}</strong></a></td>
+                        <td><a href={"/jira/billing/project/" + item.jiraProjectId + "/" + item.invoiceId}><strong>{item.invoiceName}</strong></a></td>
                         <td>{item.jiraProjectName}</td>
                         <td><Moment format="DD-MM-YYYY">{item.created.date}</Moment></td>
                         <td><strong>{this.getPriceForInvoice(item.invoiceId)}</strong></td>

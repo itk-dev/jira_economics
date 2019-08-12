@@ -1,0 +1,19 @@
+planning:
+    board:
+        headline: Boards
+        filter_placeholder: Filtrér
+        loading: Indlæser...
+        title: 'Boards - Planning - ITK Jira'
+    choose_another_board: '← Vælg andet board'
+    filter_projects: Filtrér projekter
+    filter_users: Filtrér brugere
+    headline:
+        headline: Planlægning
+        projects: Projeker
+        users: Brugere
+    ignored_users: Skjulte brugere
+    ignore_user: Skjul
+    sidebar:
+        title: Boards
+    title:
+        suffix: ' - Planning - ITK Jira'

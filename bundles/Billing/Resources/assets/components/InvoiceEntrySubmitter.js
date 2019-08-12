@@ -17,7 +17,7 @@ export class InvoiceEntrySubmitter extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     if (this.props.location.state && this.props.location.state.existingInvoiceEntryId) {
-      dispatch(rest.actions.getInvoiceEntry({ id: existingInvoiceEntryId }))
+      dispatch(rest.actions.getInvoiceEntry({ id: this.props.location.state.existingInvoiceEntryId }))
       .then((response) => {
         this.setState({ account: response.account });
         this.setState({ invoiceEntry: response });

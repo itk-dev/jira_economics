@@ -1,0 +1,4 @@
+controllers:
+    resource: "@ExpenseBundle/Controller"
+    type: annotation
+    prefix: /expense

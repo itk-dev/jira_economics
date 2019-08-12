@@ -42,7 +42,7 @@ export default class MainRouter extends Component {
 
   render() {
     return (
-      <Router basename={"/billing"}>
+      <Router basename={"/jira/billing"}>
         <Route exact path="/" component={HomePage}/>
         <Route exact path="/new" component={NewInvoice}/>
         <Route exact path="/statistics" component={Statistics}/>

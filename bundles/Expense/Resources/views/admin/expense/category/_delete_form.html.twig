@@ -1,0 +1,7 @@
+<form method="post"
+      action="{{ path('expense_admin_category_delete', {'id': category.id}) }}"
+      onsubmit="return confirm({{ 'expense.category.action.confirm_delete'|trans({'%name%': category.name})|json_encode }});">
+    <input type="hidden" name="_method" value="DELETE">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ category.id) }}">
+    <button class="btn btn-danger">{{ 'expense.category.action.delete'|trans }}</button>
+</form>
