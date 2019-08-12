@@ -13,7 +13,7 @@
                     {% for globalMenuItem in global_menu_items %}
                         <li class="nav-item">
                             <a class="nav-link{{ globalMenuItem.active ? ' active' : '' }} pl-0 pr-0" href="{{ path(globalMenuItem.routeName) }}" data-toggle="tooltip" data-placement="right" title="{{ globalMenuItem.desc }}">
-                                <i class="fas {{ globalMenuItem.icon }} fa-fw" ></i><span class="d-md-block ml-3 ml-md-0">{{ globalMenuItem.title }}</span>
+                                <i class="fas {{ globalMenuItem.icon }} fa-fw" ></i><span class="d-md-block ml-3 ml-md-0">{{ globalMenuItem.title|nl2br }}</span>
                             </a>
                         </li>
                     {% endfor %}
