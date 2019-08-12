@@ -58,6 +58,7 @@ class PlanningController extends AbstractController
             [
                 'jiraUrl' => $jiraUrl,
                 'board' => $board,
+                'board_url' => $this->generateUrl('planning_index'),
                 'planning_api_url' => $this->generateUrl('planning_index').'/api/board/'.$boardId,
                 'global_menu_items' => $menuService->getGlobalMenuItems(),
             ]
