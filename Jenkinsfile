@@ -64,10 +64,10 @@ pipeline {
                 sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; git reset origin/${BRANCH_NAME} --hard'"
 
                 // Run composer.
-                sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; composer install --no-dev -o'"
+                sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; APP_ENV=prod composer install --no-dev -o'"
 
                 // Run migrations.
-                sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; bin/console doctrine:migrations:migrate --no-interaction'"
+                sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; APP_ENV=prod php bin/console doctrine:migrations:migrate --no-interaction'"
 
                 // Copy encore assets.
                 sh "ansible srvitkphp72stg -m synchronize -a 'src=${WORKSPACE}/public/build/ dest=/data/www/economics_srvitkphp72stg_itkdev_dk/htdocs/public/build'"
