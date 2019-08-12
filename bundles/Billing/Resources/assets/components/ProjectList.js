@@ -127,6 +127,8 @@ class ProjectList extends Component {
       );
     }
 
+    // @TODO: Center modal text
+
     return (
       <div>
         <Form>

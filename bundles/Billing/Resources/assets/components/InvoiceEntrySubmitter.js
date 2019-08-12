@@ -16,8 +16,7 @@ export class InvoiceEntrySubmitter extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    let existingInvoiceEntryId = this.props.location.state.existingInvoiceEntryId;
-    if (existingInvoiceEntryId) {
+    if (this.props.location.state && this.props.location.state.existingInvoiceEntryId) {
       dispatch(rest.actions.getInvoiceEntry({ id: existingInvoiceEntryId }))
       .then((response) => {
         this.setState({ account: response.account });
@@ -177,7 +176,8 @@ export class InvoiceEntrySubmitter extends Component {
                 Antal
               </label>
               <input
-                type="text"
+                type="number"
+                step="0.1"
                 name="hoursSpent"
                 className="form-control"
                 id="invoice-entry-hours-spent"
@@ -189,7 +189,9 @@ export class InvoiceEntrySubmitter extends Component {
                 Stk. pris
               </label>
               <input
-                type="text"
+                type="number"
+                step="0.01"
+                min="0"
                 name="unitPrice"
                 className="form-control"
                 id="invoice-entry-unit-price"
