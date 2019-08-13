@@ -39,9 +39,9 @@ class ApiController extends Controller
     /**
      * @Route("/projects", name="api_projects")
      */
-    public function projectsAction(JiraService $jiraService)
+    public function projectsAction(BillingService $billingService)
     {
-        return new JsonResponse($jiraService->getProjects());
+        return new JsonResponse($billingService->getProjects());
     }
 
     /**
