@@ -29,3 +29,10 @@ sprint_report_version:
         reg: Reg.
         no_sprint: Ingen sprint
         planned_work_sum: Sum af est. planlagt arb.
+sprint_report:
+    select_board: 'Vælg board'
+    select_project: Vælg projekt
+    select_version: Vælg version
+    selected: 'Valg'
+    selected_board: Board
+    selected_project: Projekt

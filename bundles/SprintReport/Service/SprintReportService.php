@@ -24,71 +24,17 @@ class SprintReportService extends JiraService
     }
 
     /**
-     * Get all future sprints.
-     *
-     * @return array
-     */
-    public function getFutureSprints() {
-        $boardId = getenv('JIRA_DEFAULT_BOARD');
-        $sprints = [];
-
-        $start = 0;
-        while (true) {
-            $result = $this->get('/rest/agile/1.0/board/' . $boardId . '/sprint?startAt='.$start.'&maxResults=50&state=future,active');
-            $sprints = array_merge($sprints, $result->values);
-
-            if ($result->isLast) {
-                break;
-            }
-
-            $start = $start + 50;
-        }
-
-        return $sprints;
-    }
-
-    /**
-     * Get all issues for sprint.
-     *
-     * @param $sprintId
-     * @return array
-     */
-    public function getIssuesInSprint($sprintId) {
-        $boardId = getenv('JIRA_DEFAULT_BOARD');
-        $issues = [];
-        $fields = implode(
-            ',',
-            [
-                'timetracking',
-                'summary',
-                'status',
-                'assignee',
-                'project',
-            ]
-        );
-
-        $start = 0;
-        while (true) {
-            $result = $this->get('/rest/agile/1.0/board/'.$boardId.'/sprint/'.$sprintId.'/issue?startAt=' . $start . '&fields='.$fields);
-            $issues = array_merge($issues, $result->issues);
-
-            $start = $start + 50;
-
-            if ($start > $result->total) {
-                break;
-            }
-        }
-
-        return $issues;
-    }
-
-    /**
      * Get the sprint report for a given version.
      *
-     * @param integer $vid version id.
+     * @param int $vid      Version id.
+     * @param int $boardId  Board id.
      * @return array
      */
-    public function getSprintReport($vid) {
+    public function getSprintReport(int $vid, int $boardId = null) {
+        if ($boardId == null) {
+            $boardId = getenv('JIRA_DEFAULT_BOARD');
+        }
+
         // Get version, project, customFields from Jira.
         $version = $this->get('/rest/api/2/version/'.$vid);
         $project = $this->getProject($version->projectId);
@@ -120,7 +66,6 @@ class SprintReportService extends JiraService
         $customFieldSprint = $customFields[$customFieldSprint];
 
         // Get active sprint.
-        $boardId = getenv('JIRA_DEFAULT_BOARD');
         $activeSprint = $this->get(
             '/rest/agile/1.0/board/'.$boardId.'/sprint', [
                 'state' => 'active',
@@ -186,8 +131,6 @@ class SprintReportService extends JiraService
         // Extract sprint and epics from agile custom field.
         foreach ($issues as $issue) {
             $issue->sprints = [];
-
-            $p = 1;
 
             // Get sprints for issue.
             foreach ($issue->fields->{$customFieldSprint->id} as $sprintString) {

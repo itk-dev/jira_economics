@@ -163,6 +163,41 @@ abstract class AbstractJiraService
     }
 
     /**
+     * Get all boards.
+     *
+     * @return array
+     */
+    public function getAllBoards()
+    {
+        $boards = [];
+
+        $start = 0;
+        while (true) {
+            $result = $this->get('/rest/agile/1.0/board?maxResults=50&startAt='.$start);
+            $boards = array_merge($boards, $result->values);
+
+            if ($result->isLast) {
+                break;
+            }
+
+            $start = $start + 50;
+        }
+
+        return $boards;
+    }
+
+    /**
+     * Get board by id.
+     *
+     * @param $boardId
+     * @return mixed
+     */
+    public function getBoard($boardId)
+    {
+        return $this->get('/rest/agile/1.0/board/'.$boardId);
+    }
+
+    /**
      * Get all projects, including archived.
      *
      * @return array
