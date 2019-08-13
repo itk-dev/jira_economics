@@ -190,6 +190,7 @@ abstract class AbstractJiraService
      * Get board by id.
      *
      * @param $boardId
+     *
      * @return mixed
      */
     public function getBoard($boardId)

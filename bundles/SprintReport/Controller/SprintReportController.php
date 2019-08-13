@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * This file is part of aakb/jira_economics.
+ *
+ * (c) 2019 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
 
 namespace SprintReport\Controller;
 
@@ -15,8 +22,10 @@ class SprintReportController extends AbstractController
 {
     /**
      * @Route("", methods={"GET"}, name="index")
+     *
      * @param \App\Service\MenuService $menuService
-     * @param SprintReportService $sprintReportService
+     * @param SprintReportService      $sprintReportService
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function selectBoard(MenuService $menuService, SprintReportService $sprintReportService)
@@ -34,9 +43,11 @@ class SprintReportController extends AbstractController
 
     /**
      * @Route("board/{boardId}", methods={"GET"}, name="select_project")
+     *
      * @param \App\Service\MenuService $menuService
-     * @param SprintReportService $sprintReportService
+     * @param SprintReportService      $sprintReportService
      * @param $boardId
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function selectProject(MenuService $menuService, SprintReportService $sprintReportService, $boardId)
@@ -57,10 +68,12 @@ class SprintReportController extends AbstractController
 
     /**
      * @Route("board/{boardId}/project/{pid}", methods={"GET"}, name="select_version")
+     *
      * @param \App\Service\MenuService $menuService
-     * @param SprintReportService $sprintReportService
+     * @param SprintReportService      $sprintReportService
      * @param $boardId
      * @param $pid
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function selectVersion(MenuService $menuService, SprintReportService $sprintReportService, $boardId, $pid)
@@ -81,10 +94,12 @@ class SprintReportController extends AbstractController
 
     /**
      * @Route("board/{boardId}/version/{vid}", methods={"GET"}, name="sprint_report")
+     *
      * @param \App\Service\MenuService $menuService
-     * @param SprintReportService $sprintReportService
+     * @param SprintReportService      $sprintReportService
      * @param $boardId
      * @param $vid
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function sprintReport(
@@ -92,8 +107,7 @@ class SprintReportController extends AbstractController
         SprintReportService $sprintReportService,
         $boardId,
         $vid
-    )
-    {
+    ) {
         $sprintReport = $sprintReportService->getSprintReport($vid, $boardId);
 
         return $this->render(

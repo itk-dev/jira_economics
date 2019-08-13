@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of aakb/jira_economics.
+ *
+ * (c) 2019 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace SprintReport\Service;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -9,6 +17,7 @@ class SprintReportService extends JiraService
 {
     /**
      * Constructor.
+     *
      * @param $tokenStorage
      * @param $customerKey
      * @param $pemPath
@@ -26,12 +35,14 @@ class SprintReportService extends JiraService
     /**
      * Get the sprint report for a given version.
      *
-     * @param int $vid      Version id.
-     * @param int $boardId  Board id.
+     * @param int $vid     version id
+     * @param int $boardId board id
+     *
      * @return array
      */
-    public function getSprintReport(int $vid, int $boardId = null) {
-        if ($boardId == null) {
+    public function getSprintReport(int $vid, int $boardId = null)
+    {
+        if (null === $boardId) {
             $boardId = getenv('JIRA_DEFAULT_BOARD');
         }
 
@@ -45,7 +56,7 @@ class SprintReportService extends JiraService
             'Epic Link',
             array_column($customFields, 'name')
         );
-        if ($customFieldEpicLink == false) {
+        if (false === $customFieldEpicLink) {
             throw new HttpException(
                 500,
                 'Epic Link custom field does not exist'
@@ -57,7 +68,7 @@ class SprintReportService extends JiraService
             'Sprint',
             array_column($customFields, 'name')
         );
-        if ($customFieldSprint == false) {
+        if (false === $customFieldSprint) {
             throw new HttpException(
                 500,
                 'Sprint custom field does not exist'
@@ -67,11 +78,12 @@ class SprintReportService extends JiraService
 
         // Get active sprint.
         $activeSprint = $this->get(
-            '/rest/agile/1.0/board/'.$boardId.'/sprint', [
+            '/rest/agile/1.0/board/'.$boardId.'/sprint',
+            [
                 'state' => 'active',
             ]
         );
-        $activeSprint = count(
+        $activeSprint = \count(
             $activeSprint->values
         ) > 0 ? $activeSprint->values[0] : null;
 
@@ -116,7 +128,7 @@ class SprintReportService extends JiraService
         }
 
         $epics = [];
-        $epics['NoEpic'] = (object)[
+        $epics['NoEpic'] = (object) [
             'id' => null,
             'name' => 'No epic',
             'spentSum' => 0,
@@ -157,7 +169,7 @@ class SprintReportService extends JiraService
                     $sprints[$sprint['id']] = (object) $sprint;
                 }
 
-                if ($sprint['state'] == 'ACTIVE' || $sprint['state'] == 'FUTURE') {
+                if ('ACTIVE' === $sprint['state'] || 'FUTURE' === $sprint['state']) {
                     $issue->assignedToSprint = (object) $sprint;
                 }
             }
@@ -175,8 +187,7 @@ class SprintReportService extends JiraService
                     $epic->plannedWorkSum = 0;
                 }
                 $issue->epic = $epics[$issue->fields->{$customFieldEpicLink->id}];
-            }
-            else {
+            } else {
                 $issue->epic = $epics['NoEpic'];
             }
 
@@ -189,7 +200,7 @@ class SprintReportService extends JiraService
             }
             foreach ($issue->fields->worklog->worklogs as $worklog) {
                 $workLogStarted = strtotime($worklog->started);
-                $sprint = array_filter($sprints, function($k) use ($workLogStarted) {
+                $sprint = array_filter($sprints, function ($k) use ($workLogStarted) {
                     return
                         strtotime($k->startDate) <= $workLogStarted &&
                         (isset($k->completeDate) ? strtotime($k->completeDate) : strtotime($k->endDate)) > $workLogStarted;
@@ -204,8 +215,7 @@ class SprintReportService extends JiraService
                     $issue->epic->worklogs[$sprint->id][] = $worklog;
 
                     $issue->epic->loggedWork[$sprint->id] = (isset($issue->epic->loggedWork[$sprint->id]) ? $issue->epic->loggedWork[$sprint->id] : 0) + $worklog->timeSpentSeconds;
-                }
-                else {
+                } else {
                     if (!isset($issue->epic->worklogs['NoSprint'])) {
                         $issue->epic->worklogs['NoSprint'] = [];
                     }
@@ -220,7 +230,7 @@ class SprintReportService extends JiraService
             $issue->epic->spentSum = $issue->epic->spentSum + $issue->fields->timespent;
 
             // Accumulate remainingSum.
-            if (!$issue->fields->status->name != 'Done' && isset($issue->fields->timetracking->remainingEstimateSeconds)) {
+            if ('Done' !== !$issue->fields->status->name && isset($issue->fields->timetracking->remainingEstimateSeconds)) {
                 $remainingSum = $remainingSum + $issue->fields->timetracking->remainingEstimateSeconds;
 
                 $issue->epic->remainingSum = $issue->epic->remainingSum + $issue->fields->timetracking->remainingEstimateSeconds;
