@@ -4,11 +4,10 @@ import axios from 'axios';
 require('./planning.css');
 
 (function () {
-    const currentUrl = window.location.href;
-
     const app = new Vue({
         el: '#app',
         data: {
+            apiUrl: '',
             hideUsers: {},
             toggle: {},
             sprints: [],
@@ -66,6 +65,9 @@ require('./planning.css');
             }
         },
         created: function () {
+            // eslint-disable-next-line no-undef
+            this.apiUrl = PLANNING_API_URL;
+
             // Get hidden users from local storage.
             let hideUsers = localStorage.getItem('hideUsers');
 
@@ -73,7 +75,7 @@ require('./planning.css');
                 this.hideUsers = JSON.parse(hideUsers);
             }
 
-            axios.get(currentUrl + '/future_sprints')
+            axios.get(this.apiUrl + '/future_sprints')
                 .then(function (response) {
                     this.sprints = response.data.sprints;
 
@@ -296,7 +298,7 @@ require('./planning.css');
                 }
             },
             getSprint: function (id, index) {
-                axios.get(currentUrl + '/issues/' + id)
+                axios.get(this.apiUrl + '/issues/' + id)
                     .then(function (response) {
                         let sprint = this.sprints[index];
                         sprint.issues = response.data.issues;

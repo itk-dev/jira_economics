@@ -2,7 +2,7 @@ parameters:
     portal:
         menu:
             grafisk_service:
-                title: 'Bestilling hos Grafisk service'
+                title: "Bestilling hos\nGrafisk service"
                 desc: 'Bestilling hos Grafisk service'
                 icon: 'fa-braille'
                 routeName: 'graphic_service_order_form'
