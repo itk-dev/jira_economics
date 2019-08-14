@@ -25,6 +25,7 @@ class BillingService extends JiraService
 
     /**
      * Constructor.
+     *
      * @param \Doctrine\ORM\EntityManagerInterface $entityManager
      * @param $jiraUrl
      * @param $tokenStorage
@@ -141,7 +142,9 @@ class BillingService extends JiraService
      * Post new invoice, creating a new entity referenced by the returned id.
      *
      * @param $invoiceData
+     *
      * @return array invoiceData
+     *
      * @throws \Exception
      */
     public function postInvoice($invoiceData)
@@ -375,6 +378,7 @@ class BillingService extends JiraService
      * Post new invoiceEntry, creating a new entity referenced by the returned id.
      *
      * @param $invoiceEntryData
+     *
      * @return array invoiceEntryData
      */
     public function postInvoiceEntry($invoiceEntryData)
@@ -559,6 +563,7 @@ class BillingService extends JiraService
      * Get specific project by Jira project ID.
      *
      * @param $jiraProjectId
+     *
      * @return \Billing\Entity\Project|object
      */
     public function getJiraProject($jiraProjectId)
@@ -596,7 +601,9 @@ class BillingService extends JiraService
      * Get jiraIssues for project.
      *
      * @param $jiraProjectId
+     *
      * @return array
+     *
      * @throws \Exception
      */
     public function getJiraIssues($jiraProjectId)
@@ -710,6 +717,7 @@ class BillingService extends JiraService
      * Post new customer, creating a new entity referenced by the returned id.
      *
      * @param $customerData
+     *
      * @return array customerData
      */
     public function postCustomer($customerData)
@@ -750,6 +758,7 @@ class BillingService extends JiraService
      * Put specific customer, replacing the customer referenced by the given id.
      *
      * @param $customerData
+     *
      * @return array customerData
      */
     public function putCustomer($customerData)
