@@ -2,7 +2,8 @@ import Vue from 'vue';
 import axios from 'axios';
 
 (function () {
-    new Vue({
+    // eslint-disable-next-line no-unused-vars
+    const vue = new Vue({
         el: '#planningBoardApp',
         data: {
             boards: [],

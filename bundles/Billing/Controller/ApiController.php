@@ -31,17 +31,23 @@ class ApiController extends Controller
     public function projectAction(BillingService $billingService, Request $request)
     {
         $jiraProjectId = $request->get('jiraProjectId');
-        $result = $billingService->getProject($jiraProjectId);
+        $project = $billingService->getJiraProject($jiraProjectId);
 
-        return new JsonResponse($result);
+        return new JsonResponse([
+            'jiraId' => $project->getJiraId(),
+            'jiraKey' => $project->getJiraKey(),
+            'name' => $project->getName(),
+            'url' => $project->getUrl(),
+            'avatarUrl' => $project->getAvatarUrl(),
+        ]);
     }
 
     /**
      * @Route("/projects", name="api_projects")
      */
-    public function projectsAction(JiraService $jiraService)
+    public function projectsAction(BillingService $billingService)
     {
-        return new JsonResponse($jiraService->getProjects());
+        return new JsonResponse($billingService->getProjects());
     }
 
     /**
@@ -168,6 +174,16 @@ class ApiController extends Controller
     {
         $invoiceId = $request->get('invoiceId');
         $result = $billingService->getInvoiceEntries($invoiceId);
+
+        return new JsonResponse($result);
+    }
+
+    /**
+     * @Route("/invoice_entries_all", name="api_invoice_entries_all")
+     */
+    public function allInvoiceEntriesAction(BillingService $billingService, Request $request)
+    {
+        $result = $billingService->getAllInvoiceEntries();
 
         return new JsonResponse($result);
     }
