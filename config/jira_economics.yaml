@@ -69,6 +69,12 @@ parameters:
                 routeName: 'expense_new'
                 # active: $this->routeStartsWith('expense_new' $pathInfo)
 
+            sprint_report:
+                title: 'Sprintrapport'
+                desc: 'Generér sprintrapport'
+                icon: 'fa-braille'
+                routeName: 'sprint_report_index'
+
             # @TODO: Add when ready.
 
             # taskWizard:
