@@ -293,7 +293,7 @@ class Invoice extends Component {
                                 Invoice recorded: <strong>{String(this.props.invoice.data.recorded)}</strong>
                             </p>
                             <Form>
-                                <Form.Group controlId="formDescription">
+                                <Form.Group>
                                     <Form.Control id="invoice-description"
                                         className={'invoice-description'}
                                         type="text"

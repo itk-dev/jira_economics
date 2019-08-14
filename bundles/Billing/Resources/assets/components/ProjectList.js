@@ -131,7 +131,7 @@ class ProjectList extends Component {
         return (
             <div>
                 <Form>
-                    <Form.Group controlId="formBasicEmail">
+                    <Form.Group>
                         <Form.Label
                             className="sr-only">Project filter</Form.Label>
                         <Form.Control
@@ -151,7 +151,7 @@ class ProjectList extends Component {
                         <Modal.Title>Create Invoice</Modal.Title>
                     </Modal.Header>
                     <Form>
-                        <Form.Group controlId="newInvoiceForm">
+                        <Form.Group>
                             <Form.Label>Invoice name</Form.Label>
                             <Form.Control ref={this.textInput} type="text"
                                 placeholder="Enter new invoice name"></Form.Control>

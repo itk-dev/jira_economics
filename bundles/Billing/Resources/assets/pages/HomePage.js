@@ -121,13 +121,9 @@ class HomePage extends Component {
                         id="uncontrolled-tab-example">
                         <Tab eventKey="drafts" title="Kladder">
                             <Form className="mt-3 mb-1 w-25">
-                                <Form.Group
-                                    controlId="exampleForm.ControlSelect1"
-                                    className="mb-0">
-                                    <Form.Label
-                                        className="sr-only">Sorter</Form.Label>
-                                    <Form.Control size="sm" as="select"
-                                        onChange={this.onSort.bind(this)}>
+                                <Form.Group className="mb-0">
+                                    <Form.Label className="sr-only">Sorter</Form.Label>
+                                    <Form.Control size="sm" as="select" onChange={this.onSort.bind(this)}>
                                         <option>Nyeste først</option>
                                         <option>Ældste først</option>
                                     </Form.Control>
@@ -210,11 +206,9 @@ class HomePage extends Component {
                         </Tab>
                         <Tab eventKey="posted" title="Bogførte">
                             <Form className="float-right">
-                                <Form.Group
-                                    controlId="exampleForm.ControlSelect1">
+                                <Form.Group>
                                     <Form.Label>Sorter</Form.Label>
-                                    <Form.Control as="select"
-                                        onChange={this.onSort.bind(this)}>
+                                    <Form.Control as="select" onChange={this.onSort.bind(this)}>
                                         <option>Nyeste først</option>
                                         <option>Ældste først</option>
                                     </Form.Control>
