@@ -62,7 +62,7 @@ class JiraIssues extends Component {
         dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
         if (this.props.location.state && this.props.location.state.existingInvoiceEntryId) {
             this.props.issueData.forEach(issue => {
-                if (issue.invoiceEntryId == this.props.location.state.existingInvoiceEntryId) {
+                if (issue.invoiceEntryId === this.props.location.state.existingInvoiceEntryId) {
                     this.toggleRow(issue);
                 }
             });
@@ -74,7 +74,7 @@ class JiraIssues extends Component {
         let newSelected = this.state.selected;
         let selectedIssueIndex = -1;
         for (var i = 0; i < newSelected.length; i++) {
-            if (newSelected[i] && newSelected[i]['id'] == issue.id) {
+            if (newSelected[i] && newSelected[i]['id'] === issue.id) {
                 selectedIssueIndex = i;
             }
         }
@@ -85,11 +85,11 @@ class JiraIssues extends Component {
             newSelected.push(issue);
         }
 
-        if (newSelected.length == this.props.issueData.length) {
+        if (newSelected.length === this.props.issueData.length) {
             this.setState({
                 selectAll: 1
             });
-        } else if (newSelected.length == 0) {
+        } else if (newSelected.length === 0) {
             this.setState({
                 selectAll: 0
             });
@@ -213,7 +213,7 @@ class JiraIssues extends Component {
     };
 
     getTimeSpent () {
-        if (this.state.selected == undefined) {
+        if (this.state.selected === undefined) {
             return 0;
         }
         let timeSum = 0;

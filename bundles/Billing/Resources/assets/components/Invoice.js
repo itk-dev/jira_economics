@@ -128,12 +128,12 @@ class Invoice extends Component {
         event.preventDefault();
 
         let checkedCount = 0;
-        let selectedInvoiceEntryId = false;
+        let selectedInvoiceEntryId = null;
 
         for (let [invoiceEntryId, checked] of Object.entries(this.state.checkedEntries)) {
             if (checked) {
                 checkedCount++;
-                selectedInvoiceEntryId = invoiceEntryId;
+                selectedInvoiceEntryId = parseInt(invoiceEntryId);
             }
         }
 
@@ -147,7 +147,7 @@ class Invoice extends Component {
         // Get the selected InvoiceEntry
         if (this.props.invoiceEntries.data && this.props.invoiceEntries.data.data) {
             invoiceEntry = this.props.invoiceEntries.data.data.filter(obj => {
-                return obj.id == selectedInvoiceEntryId;
+                return obj.id === selectedInvoiceEntryId;
             }).pop();
         }
 
@@ -211,7 +211,7 @@ class Invoice extends Component {
 
     handleInvoiceDeleteModalClose = (event) => {
         event.preventDefault();
-        if (event.target.id == 'delete-invoice-btn') {
+        if (event.target.id === 'delete-invoice-btn') {
             const { dispatch } = this.props;
             dispatch(rest.actions.deleteInvoice({ id: `${this.props.match.params.invoiceId}` }));
             // @TODO: Check that deletion is successful before navigating back to main billing page
@@ -251,7 +251,7 @@ class Invoice extends Component {
 
     handleDeleteEntryModalClose = (event) => {
         event.preventDefault();
-        if (event.target.id == 'delete-entry-btn') {
+        if (event.target.id === 'delete-entry-btn') {
             let checkedInvoiceEntryIds = [];
 
             for (let [invoiceEntryId, checked] of Object.entries(this.state.checkedEntries)) {

@@ -115,7 +115,7 @@ class ProjectList extends Component {
 
         const projects = this.filterProjectRows();
 
-        for (const [index, project] of Object.entries(projects)) {
+        for (const [, project] of Object.entries(projects)) {
             items.push(
                 <ListGroup.Item key={project.rowKey} id={project.id} action
                     onClick={() => this.handleModalShow(project.id)}>

@@ -54,7 +54,7 @@ export class InvoiceEntrySubmitter extends Component {
     }
 
     getManualUnitPrice (invoiceEntry) {
-        if (invoiceEntry.price == undefined) {
+        if (invoiceEntry.price === undefined) {
             return 0;
         }
         return Math.round(parseFloat(invoiceEntry.price / invoiceEntry.amount) * 1e2) / 1e2;
