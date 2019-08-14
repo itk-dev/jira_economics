@@ -9,18 +9,18 @@ import rest from '../redux/utils/rest';
 export class InvoiceEntrySubmitter extends Component {
     constructor (props) {
         super(props);
-        this.state = {account: 'Vælg PSP', invoiceEntry: {}};
+        this.state = { account: 'Vælg PSP', invoiceEntry: {} };
         this.handleSelectJiraIssues = this.handleSelectJiraIssues.bind(this);
         this.onAccountChange = this.onAccountChange.bind(this);
     }
 
     componentDidMount () {
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         if (this.props.location.state && this.props.location.state.existingInvoiceEntryId) {
-            dispatch(rest.actions.getInvoiceEntry({id: this.props.location.state.existingInvoiceEntryId}))
+            dispatch(rest.actions.getInvoiceEntry({ id: this.props.location.state.existingInvoiceEntryId }))
                 .then((response) => {
-                    this.setState({account: response.account});
-                    this.setState({invoiceEntry: response});
+                    this.setState({ account: response.account });
+                    this.setState({ invoiceEntry: response });
                 })
                 .catch((reason) => console.log('isCanceled', reason.isCanceled));
         }
@@ -28,7 +28,7 @@ export class InvoiceEntrySubmitter extends Component {
 
     handleSelectJiraIssues = (event) => {
         event.preventDefault();
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         dispatch(setSelectedIssues(this.props.selectedIssues.selectedIssues));
         this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
     };
@@ -48,7 +48,7 @@ export class InvoiceEntrySubmitter extends Component {
 
     // @TODO: getUnitPrice functions are temporary and should be scrapped when customer data is available
     getUnitPrice (account) {
-        const unitPrices = {'PSP1': 560, 'PSP2': 760, 'PSP3': 820};
+        const unitPrices = { 'PSP1': 560, 'PSP2': 760, 'PSP3': 820 };
         return unitPrices[account] || 0;
     }
 
@@ -67,7 +67,7 @@ export class InvoiceEntrySubmitter extends Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         const invoiceId = this.props.match.params.invoiceId;
         // @TODO: should an invoice entry even have a name?
         const name = 'dummy';
@@ -97,11 +97,10 @@ export class InvoiceEntrySubmitter extends Component {
         };
         invoiceEntryData.id = this.props.location.state.existingInvoiceEntryId;
         if (invoiceEntryData.id) {
-            dispatch(rest.actions.updateInvoiceEntry({id: invoiceEntryData.id}, {
+            dispatch(rest.actions.updateInvoiceEntry({ id: invoiceEntryData.id }, {
                 body: JSON.stringify(invoiceEntryData)
             }));
-        }
-        else {
+        } else {
             dispatch(rest.actions.createInvoiceEntry({}, {
                 body: JSON.stringify(invoiceEntryData)
             }));
@@ -113,7 +112,7 @@ export class InvoiceEntrySubmitter extends Component {
 
     handleCancel = (event) => {
         event.preventDefault();
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         dispatch(setSelectedIssues({}));
         this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
     };
@@ -241,9 +240,9 @@ export class InvoiceEntrySubmitter extends Component {
                 <div>{'Total timer valgt: ' + this.getTimeSpent()}</div>
                 <div>
                     <form id="submitForm"
-                          onSubmit={this.handleSelectJiraIssues}>
+                        onSubmit={this.handleSelectJiraIssues}>
                         <button type="submit" className="btn btn-primary"
-                                id="submit">Rediger valg
+                            id="submit">Rediger valg
                         </button>
                     </form>
                 </div>
@@ -254,9 +253,9 @@ export class InvoiceEntrySubmitter extends Component {
                         </label>
                         <div>
                             <select className="browser-default custom-select"
-                                    value={this.state.account}
-                                    id="invoice-entry-account"
-                                    onChange={this.onAccountChange.bind(this)}>
+                                value={this.state.account}
+                                id="invoice-entry-account"
+                                onChange={this.onAccountChange.bind(this)}>
                                 <option value="Vælg PSP" hidden>Vælg PSP
                                 </option>
                                 <option value="PSP1">PSP1</option>
@@ -349,8 +348,7 @@ export class InvoiceEntrySubmitter extends Component {
             this.props.location.state.from !==
             `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`) {
             return this.renderInvoiceEntryForm();
-        }
-        else {
+        } else {
             return (
                 <ContentWrapper>
                     <div className="spinner-border" style={{

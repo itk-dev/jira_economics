@@ -11,7 +11,7 @@ class Customer extends Component {
 
     handleSubmitCustomer = (event) => {
         event.preventDefault();
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         const name = $('#customer-name').val();
         const att = $('#customer-att').val();
         const cvr = $('#customer-cvr').val();
@@ -95,7 +95,7 @@ class Customer extends Component {
                     </form>
                     <form id="submitForm" onSubmit={this.handleSubmitCustomer}>
                         <button type="submit" className="btn btn-primary"
-                                id="submit">Opret kunde
+                            id="submit">Opret kunde
                         </button>
                     </form>
                 </div>

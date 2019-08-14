@@ -32,15 +32,15 @@ class HomePage extends Component {
     };
 
     componentDidMount () {
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         dispatch(rest.actions.getAllInvoices())
             .then((response) => {
-                this.setState({allInvoices: response});
+                this.setState({ allInvoices: response });
             })
             .catch((reason) => console.log('isCanceled', reason.isCanceled));
         dispatch(rest.actions.getAllInvoiceEntries())
             .then((response) => {
-                this.setState({allInvoiceEntries: response});
+                this.setState({ allInvoiceEntries: response });
             })
             .catch((reason) => console.log('isCanceled', reason.isCanceled));
     };
@@ -49,33 +49,33 @@ class HomePage extends Component {
         event.preventDefault();
         var invoiceId = this.state.invoiceIdToDelete;
         if (event.target.id == 'delete-btn') {
-            const {dispatch} = this.props;
-            dispatch(rest.actions.deleteInvoice({id: invoiceId}))
+            const { dispatch } = this.props;
+            dispatch(rest.actions.deleteInvoice({ id: invoiceId }))
                 .then(() => {
                     this.removeInvoiceFromState(invoiceId);
                 })
                 .catch((reason) => console.log('isCanceled', reason.isCanceled));
             // @TODO: Check that deletion is successful
         }
-        this.setState({showModal: false, invoiceIdToDelete: -1});
+        this.setState({ showModal: false, invoiceIdToDelete: -1 });
     };
 
     handleInvoiceDelete = (invoiceId) => {
         event.preventDefault();
-        this.setState({invoiceIdToDelete: invoiceId});
+        this.setState({ invoiceIdToDelete: invoiceId });
         this.handleModalShow();
     };
 
     handleModalShow () {
-        this.setState({showModal: true});
+        this.setState({ showModal: true });
     };
 
     removeInvoiceFromState (invoiceId) {
         let filteredInvoices = this.state.allInvoices.data.filter((invoice) => {
             return invoiceId != invoice.invoiceId;
         });
-        let remainingInvoices = {'data': filteredInvoices};
-        this.setState({allInvoices: remainingInvoices});
+        let remainingInvoices = { 'data': filteredInvoices };
+        this.setState({ allInvoices: remainingInvoices });
     };
 
     getPriceForInvoice (invoiceId) {
@@ -103,13 +103,12 @@ class HomePage extends Component {
         let sortedInvoices = this.state.allInvoices.data.sort(function (i1, i2) {
             if (sortOrder == 'asc') {
                 return i1.created.date > i2.created.date;
-            }
-            else {
+            } else {
                 return i1.created.date < i2.created.date;
             }
         });
-        sortedInvoices = {'data': sortedInvoices};
-        this.setState({allInvoices: sortedInvoices});
+        sortedInvoices = { 'data': sortedInvoices };
+        this.setState({ allInvoices: sortedInvoices });
     };
 
     render () {
@@ -118,7 +117,7 @@ class HomePage extends Component {
                 <ContentWrapper>
                     <PageTitle breadcrumb="">Fakturaer</PageTitle>
                     <Tabs defaultActiveKey="drafts"
-                          id="uncontrolled-tab-example">
+                        id="uncontrolled-tab-example">
                         <Tab eventKey="drafts" title="Kladder">
                             <Form className="mt-3 mb-1 w-25">
                                 <Form.Group
@@ -127,7 +126,7 @@ class HomePage extends Component {
                                     <Form.Label
                                         className="sr-only">Sorter</Form.Label>
                                     <Form.Control size="sm" as="select"
-                                                  onChange={this.onSort.bind(this)}>
+                                        onChange={this.onSort.bind(this)}>
                                         <option>Nyeste først</option>
                                         <option>Ældste først</option>
                                     </Form.Control>
@@ -135,76 +134,76 @@ class HomePage extends Component {
                             </Form>
                             <Table responsive striped hover borderless>
                                 <thead>
-                                <tr>
-                                    <th>Fakturanavn</th>
-                                    <th>Projekt</th>
-                                    <th>Fakturadato</th>
-                                    <th>Beløb (DKK)</th>
-                                    <th className="text-right">Funktion</th>
-                                </tr>
+                                    <tr>
+                                        <th>Fakturanavn</th>
+                                        <th>Projekt</th>
+                                        <th>Fakturadato</th>
+                                        <th>Beløb (DKK)</th>
+                                        <th className="text-right">Funktion</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                {this.state.allInvoices.data && this.state.allInvoices.data
-                                    .filter((item) => {
-                                        return item.recorded === false;
-                                    })
-                                    .map((item) =>
-                                        <tr key={item.invoiceId}>
-                                            <td><a
-                                                href={'/jira/billing/project/' + item.jiraProjectId + '/' + item.invoiceId}><strong>{item.invoiceName}</strong></a>
-                                            </td>
-                                            <td>{item.jiraProjectName}</td>
-                                            <td><Moment
-                                                format="DD-MM-YYYY">{item.created.date}</Moment>
-                                            </td>
-                                            <td>
-                                                <strong>{this.getPriceForInvoice(item.invoiceId)}</strong>
-                                            </td>
-                                            <td className="text-right">
-                                                <ButtonGroup size="sm"
-                                                             className="float-right"
-                                                             aria-label="Invoice functions">
-                                                    <OverlayTrigger
-                                                        key="edit"
-                                                        placement="top"
-                                                        overlay={
-                                                            <Tooltip
-                                                                id="tooltip-edit">
+                                    {this.state.allInvoices.data && this.state.allInvoices.data
+                                        .filter((item) => {
+                                            return item.recorded === false;
+                                        })
+                                        .map((item) =>
+                                            <tr key={item.invoiceId}>
+                                                <td><a
+                                                    href={'/jira/billing/project/' + item.jiraProjectId + '/' + item.invoiceId}><strong>{item.invoiceName}</strong></a>
+                                                </td>
+                                                <td>{item.jiraProjectName}</td>
+                                                <td><Moment
+                                                    format="DD-MM-YYYY">{item.created.date}</Moment>
+                                                </td>
+                                                <td>
+                                                    <strong>{this.getPriceForInvoice(item.invoiceId)}</strong>
+                                                </td>
+                                                <td className="text-right">
+                                                    <ButtonGroup size="sm"
+                                                        className="float-right"
+                                                        aria-label="Invoice functions">
+                                                        <OverlayTrigger
+                                                            key="edit"
+                                                            placement="top"
+                                                            overlay={
+                                                                <Tooltip
+                                                                    id="tooltip-edit">
                                                                 Edit this invoice
-                                                            </Tooltip>
-                                                        }
-                                                    >
-                                                        <Button
-                                                            className="btn-primary"
-                                                            href={'/jira/billing/project/' + item.jiraProjectId + '/' + item.invoiceId}>
-                                                            <i className="fas fa-edit mx-2"></i>
-                                                            <span
-                                                                className="sr-only">rediger</span>
-                                                        </Button>
-                                                    </OverlayTrigger>
-                                                    <OverlayTrigger
-                                                        key="delete"
-                                                        placement="top"
-                                                        overlay={
-                                                            <Tooltip
-                                                                id="tooltip-delete">
+                                                                </Tooltip>
+                                                            }
+                                                        >
+                                                            <Button
+                                                                className="btn-primary"
+                                                                href={'/jira/billing/project/' + item.jiraProjectId + '/' + item.invoiceId}>
+                                                                <i className="fas fa-edit mx-2"></i>
+                                                                <span
+                                                                    className="sr-only">rediger</span>
+                                                            </Button>
+                                                        </OverlayTrigger>
+                                                        <OverlayTrigger
+                                                            key="delete"
+                                                            placement="top"
+                                                            overlay={
+                                                                <Tooltip
+                                                                    id="tooltip-delete">
                                                                 Delete this invoice
-                                                            </Tooltip>
-                                                        }
-                                                    >
-                                                        <Button
-                                                            className="btn-danger"
-                                                            onClick={this.handleInvoiceDelete.bind(this, item.invoiceId)}>
-                                                            <i className="fas fa-trash-alt mx-2"></i>
-                                                            <span
-                                                                className="sr-only">slet</span>
-                                                        </Button>
-                                                    </OverlayTrigger>
+                                                                </Tooltip>
+                                                            }
+                                                        >
+                                                            <Button
+                                                                className="btn-danger"
+                                                                onClick={this.handleInvoiceDelete.bind(this, item.invoiceId)}>
+                                                                <i className="fas fa-trash-alt mx-2"></i>
+                                                                <span
+                                                                    className="sr-only">slet</span>
+                                                            </Button>
+                                                        </OverlayTrigger>
 
-                                                </ButtonGroup>
-                                            </td>
-                                        </tr>
-                                    )}
+                                                    </ButtonGroup>
+                                                </td>
+                                            </tr>
+                                        )}
                                 </tbody>
                             </Table>
                         </Tab>
@@ -214,7 +213,7 @@ class HomePage extends Component {
                                     controlId="exampleForm.ControlSelect1">
                                     <Form.Label>Sorter</Form.Label>
                                     <Form.Control as="select"
-                                                  onChange={this.onSort.bind(this)}>
+                                        onChange={this.onSort.bind(this)}>
                                         <option>Nyeste først</option>
                                         <option>Ældste først</option>
                                     </Form.Control>
@@ -222,80 +221,79 @@ class HomePage extends Component {
                             </Form>
                             <Table responsive striped hover borderless>
                                 <thead>
-                                <tr>
-                                    <th>Fakturanavn</th>
-                                    <th>Projekt</th>
-                                    <th>Fakturadato</th>
-                                    <th>Beløb (DKK)</th>
-                                    <th className="text-right">Funktion</th>
-                                </tr>
+                                    <tr>
+                                        <th>Fakturanavn</th>
+                                        <th>Projekt</th>
+                                        <th>Fakturadato</th>
+                                        <th>Beløb (DKK)</th>
+                                        <th className="text-right">Funktion</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                {this.state.allInvoices.data && this.state.allInvoices.data
-                                    .filter((item) => {
-                                        return item.recorded === true;
-                                    })
-                                    .map((item) =>
-                                        <tr key={item.invoiceId}>
-                                            <td><a
-                                                href={'/jira/billing/project/' + item.jiraProjectId + '/' + item.invoiceId}><strong>{item.invoiceName}</strong></a>
-                                            </td>
-                                            <td>{item.jiraProjectName}</td>
-                                            <td><Moment
-                                                format="DD-MM-YYYY">{item.created.date}</Moment>
-                                            </td>
-                                            <td>
-                                                <strong>{this.getPriceForInvoice(item.invoiceId)}</strong>
-                                            </td>
-                                            <td className="text-right">
-                                                <ButtonGroup
-                                                    className="btn-group-sm float-right"
-                                                    aria-label="Invoice functions">
-                                                    <OverlayTrigger
-                                                        key="download-csv"
-                                                        placement="top"
-                                                        overlay={
-                                                            <Tooltip
-                                                                id="tooltip-download-csv">
+                                    {this.state.allInvoices.data && this.state.allInvoices.data
+                                        .filter((item) => {
+                                            return item.recorded === true;
+                                        })
+                                        .map((item) =>
+                                            <tr key={item.invoiceId}>
+                                                <td><a
+                                                    href={'/jira/billing/project/' + item.jiraProjectId + '/' + item.invoiceId}><strong>{item.invoiceName}</strong></a>
+                                                </td>
+                                                <td>{item.jiraProjectName}</td>
+                                                <td><Moment
+                                                    format="DD-MM-YYYY">{item.created.date}</Moment>
+                                                </td>
+                                                <td>
+                                                    <strong>{this.getPriceForInvoice(item.invoiceId)}</strong>
+                                                </td>
+                                                <td className="text-right">
+                                                    <ButtonGroup
+                                                        className="btn-group-sm float-right"
+                                                        aria-label="Invoice functions">
+                                                        <OverlayTrigger
+                                                            key="download-csv"
+                                                            placement="top"
+                                                            overlay={
+                                                                <Tooltip
+                                                                    id="tooltip-download-csv">
                                                                 Download csv file
-                                                            </Tooltip>
-                                                        }
-                                                    >
-                                                        <Button>
-                                                            <i className="fas fa-file-csv mx-2"></i>
-                                                            <span
-                                                                className="sr-only">hent csv</span>
-                                                        </Button>
-                                                    </OverlayTrigger>
-                                                </ButtonGroup>
-                                            </td>
-                                        </tr>
-                                    )}
+                                                                </Tooltip>
+                                                            }
+                                                        >
+                                                            <Button>
+                                                                <i className="fas fa-file-csv mx-2"></i>
+                                                                <span
+                                                                    className="sr-only">hent csv</span>
+                                                            </Button>
+                                                        </OverlayTrigger>
+                                                    </ButtonGroup>
+                                                </td>
+                                            </tr>
+                                        )}
                                 </tbody>
                             </Table>
                         </Tab>
                     </Tabs>
                     <Modal show={this.state.showModal}
-                           onHide={this.handleModalClose}>
+                        onHide={this.handleModalClose}>
                         <Modal.Header>
                             <Modal.Title>Confirm deletion</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>Are you sure you want to delete this invoice?</Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary"
-                                    onClick={this.handleModalClose}>
+                                onClick={this.handleModalClose}>
                                 Cancel
                             </Button>
                             <Button id="delete-btn" variant="danger"
-                                    onClick={this.handleModalClose}>
+                                onClick={this.handleModalClose}>
                                 Delete
                             </Button>
                         </Modal.Footer>
                     </Modal>
                 </ContentWrapper>
             );
-        }
-        else {
+        } else {
             return (
                 <ContentWrapper>
                     <div className="spinner-border" style={{

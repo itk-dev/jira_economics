@@ -4,7 +4,7 @@ import adapterFetch from 'redux-api/lib/adapters/fetch';
 export default reduxApi({
     getProject: {
         reducerName: 'project',
-        url: '/jira/billing/jira_api/project/:id',
+        url: '/jira/billing/jira_api/project/:id'
     },
     getInvoice: {
         reducerName: 'invoice',
@@ -31,8 +31,8 @@ export default reduxApi({
             method: 'delete',
             headers: {
                 'Access-Control-Request-Method': 'DELETE'
-            },
-        },
+            }
+        }
     },
     getInvoiceEntry: {
         reducerName: 'invoiceEntry',
@@ -59,12 +59,12 @@ export default reduxApi({
             method: 'delete',
             headers: {
                 'Access-Control-Request-Method': 'DELETE'
-            },
-        },
+            }
+        }
     },
     getInvoices: {
         reducerName: 'invoices',
-        url: '/jira/billing/jira_api/invoices/:id',
+        url: '/jira/billing/jira_api/invoices/:id'
     },
     getAllInvoices: {
         reducerName: 'allInvoices',

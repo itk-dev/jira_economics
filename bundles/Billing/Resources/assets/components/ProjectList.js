@@ -45,7 +45,7 @@ class ProjectList extends Component {
     }
 
     componentDidMount () {
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         dispatch(rest.actions.getProjects());
     }
 
@@ -63,16 +63,16 @@ class ProjectList extends Component {
     }
 
     handleModalCancel () {
-        this.setState({showModal: false});
+        this.setState({ showModal: false });
     }
 
     handleModalShow (projectId) {
-        this.setState({showModal: true, selectedProject: projectId});
+        this.setState({ showModal: true, selectedProject: projectId });
     }
 
     handleModalCreate () {
         event.preventDefault();
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         const name = this.textInput.current.value;
         const projectId = this.state.selectedProject;
         const invoiceData = {
@@ -83,11 +83,11 @@ class ProjectList extends Component {
             body: JSON.stringify(invoiceData)
         }))
             .then((response) => {
-                this.setState({showModal: false});
+                this.setState({ showModal: false });
                 this.props.history.push(`/project/${projectId}/${response.invoiceId}`);
             })
             .catch((reason) => {
-                this.setState({showModal: false});
+                this.setState({ showModal: false });
                 console.log('isCanceled', reason.isCanceled);
             });
         // @TODO: verify that invoice creation was successful
@@ -98,17 +98,16 @@ class ProjectList extends Component {
             return (
                 <ContentWrapper>
                     <div className="spinner-border"
-                         style={{
-                             width: '3rem',
-                             height: '3rem',
-                             role: 'status'
-                         }}>
+                        style={{
+                            width: '3rem',
+                            height: '3rem',
+                            role: 'status'
+                        }}>
                         <span className="sr-only">Loading...</span>
                     </div>
                 </ContentWrapper>
             );
-        }
-        else {
+        } else {
             return (
                 <ListGroup>
                     {items}
@@ -125,7 +124,7 @@ class ProjectList extends Component {
         for (const [index, project] of Object.entries(projects)) {
             items.push(
                 <ListGroup.Item key={project.rowKey} id={project.id} action
-                                onClick={() => this.handleModalShow(project.id)}>
+                    onClick={() => this.handleModalShow(project.id)}>
                     <span className="mr-2">{project.avatar}</span>
                     <span className="mr-2 lead d-inline">{project.name}</span>
                     <span className="text-muted">{project.key}</span>
@@ -153,7 +152,7 @@ class ProjectList extends Component {
                 {this.displayProjects(items)}
 
                 <Modal show={this.state.showModal}
-                       onHide={this.handleModalCancel}>
+                    onHide={this.handleModalCancel}>
                     <Modal.Header>
                         <Modal.Title>Create Invoice</Modal.Title>
                     </Modal.Header>
@@ -161,16 +160,16 @@ class ProjectList extends Component {
                         <Form.Group controlId="newInvoiceForm">
                             <Form.Label>Invoice name</Form.Label>
                             <Form.Control ref={this.textInput} type="text"
-                                          placeholder="Enter new invoice name"></Form.Control>
+                                placeholder="Enter new invoice name"></Form.Control>
                         </Form.Group>
                     </Form>
                     <Modal.Footer>
                         <Button variant="secondary"
-                                onClick={this.handleModalCancel}>
+                            onClick={this.handleModalCancel}>
                             Cancel
                         </Button>
                         <Button variant="primary"
-                                onClick={this.handleModalCreate}>
+                            onClick={this.handleModalCreate}>
                             Create
                         </Button>
                     </Modal.Footer>

@@ -16,14 +16,14 @@ export default class MainRouter extends Component {
         this.state = {
             navOpenState: {
                 isOpen: true,
-                width: 304,
+                width: 304
             }
         };
     }
 
     getChildContext () {
         return {
-            navOpenState: this.state.navOpenState,
+            navOpenState: this.state.navOpenState
         };
     }
 
@@ -36,7 +36,7 @@ export default class MainRouter extends Component {
 
     onNavResize = (navOpenState) => {
         this.setState({
-            navOpenState,
+            navOpenState
         });
     };
 
@@ -47,13 +47,13 @@ export default class MainRouter extends Component {
                 <Route exact path="/new" component={NewInvoice}/>
                 <Route exact path="/statistics" component={Statistics}/>
                 <Route exact path="/project/:projectId/:invoiceId"
-                       component={Invoice}/>
+                    component={Invoice}/>
                 <Route exact
-                       path="/project/:projectId/:invoiceId/invoice_entry/jira_issues"
-                       component={JiraIssues}/>
+                    path="/project/:projectId/:invoiceId/invoice_entry/jira_issues"
+                    component={JiraIssues}/>
                 <Route exact
-                       path="/project/:projectId/:invoiceId/submit/invoice_entry"
-                       component={InvoiceEntrySubmitter}/>
+                    path="/project/:projectId/:invoiceId/submit/invoice_entry"
+                    component={InvoiceEntrySubmitter}/>
                 <Route exact path="/customer" component={Customer}/>
             </Router>
         );

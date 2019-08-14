@@ -28,17 +28,17 @@ function makeIssueData (jiraIssues) {
 }
 
 const searchKeyValue = (data, key, value) => {
-    //if falsy or not an object/array return false
+    // if falsy or not an object/array return false
     if (!data || typeof data !== 'object') {
         return false;
     }
 
-    //if the value of the key equals value return true
+    // if the value of the key equals value return true
     if (data[key] === value) {
         return true;
     }
 
-    //return the results of using searchKeyValue on all values of the object/array
+    // return the results of using searchKeyValue on all values of the object/array
     return Object.values(data).some((data) => searchKeyValue(data, key, value));
 };
 
@@ -57,8 +57,8 @@ class JiraIssues extends Component {
     }
 
     componentDidMount () {
-        const {dispatch} = this.props;
-        dispatch(rest.actions.getJiraIssues({id: `${this.props.match.params.projectId}`}));
+        const { dispatch } = this.props;
+        dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
         if (this.props.location.state && this.props.location.state.existingInvoiceEntryId) {
             this.props.issueData.forEach(issue => {
                 if (issue.invoiceEntryId == this.props.location.state.existingInvoiceEntryId) {
@@ -80,8 +80,7 @@ class JiraIssues extends Component {
 
         if (selectedIssueIndex > -1) {
             newSelected.splice(selectedIssueIndex, 1);
-        }
-        else {
+        } else {
             newSelected.push(issue);
         }
 
@@ -89,13 +88,11 @@ class JiraIssues extends Component {
             this.setState({
                 selectAll: 1
             });
-        }
-        else if (newSelected.length == 0) {
+        } else if (newSelected.length == 0) {
             this.setState({
                 selectAll: 0
             });
-        }
-        else {
+        } else {
             this.setState({
                 selectAll: 2
             });
@@ -124,7 +121,7 @@ class JiraIssues extends Component {
             {
                 id: 'checkbox',
                 accessor: '',
-                Cell: ({original}) => {
+                Cell: ({ original }) => {
                     return (
                         <input
                             type="checkbox"
@@ -188,7 +185,7 @@ class JiraIssues extends Component {
 
     handleSubmitIssues = (event) => {
         event.preventDefault();
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         dispatch(setSelectedIssues(this.state.selected));
         if (this.props.location.state &&
             this.props.location.state.existingInvoiceEntryId) {
@@ -199,18 +196,17 @@ class JiraIssues extends Component {
                     existingInvoiceEntryId: this.props.location.state.existingInvoiceEntryId
                 }
             });
-        }
-        else {
+        } else {
             this.props.history.push({
                 pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
-                state: {from: this.props.location.pathname}
+                state: { from: this.props.location.pathname }
             });
         }
     };
 
     handleCancel = (event) => {
         event.preventDefault();
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         dispatch(setSelectedIssues({}));
         this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
     };
@@ -238,24 +234,23 @@ class JiraIssues extends Component {
                         data={this.props.issueData}
                         columns={this.createColumns()}
                         defaultPageSize={10}
-                        defaultSorted={[{id: 'issueId', desc: false}]}
+                        defaultSorted={[{ id: 'issueId', desc: false }]}
                     />
                     <div>{Object.values(this.state.selected).length + ' issue(s) valgt'}</div>
                     <div>{'Total timer valgt: ' + this.getTimeSpent()}</div>
                     <form id="submitForm" onSubmit={this.handleSubmitIssues}>
                         <button type="submit" className="btn btn-primary"
-                                id="submit">Fortsæt med valgte issues
+                            id="submit">Fortsæt med valgte issues
                         </button>
                     </form>
                     <form id="cancelForm" onSubmit={this.handleCancel}>
                         <button type="submit" className="btn btn-danger"
-                                id="cancel">Annuller
+                            id="cancel">Annuller
                         </button>
                     </form>
                 </ContentWrapper>
             );
-        }
-        else {
+        } else {
             return (
                 <ContentWrapper>
                     <div className="spinner-border" style={{

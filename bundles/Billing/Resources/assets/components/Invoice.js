@@ -60,18 +60,18 @@ class Invoice extends Component {
             showRecordModal: false,
             showDeleteEntryModal: false,
             checkedCount: 0,
-            invoiceEntries: {},
+            invoiceEntries: {}
         };
     };
 
     componentDidMount () {
-        const {dispatch} = this.props;
-        dispatch(rest.actions.getProject({id: `${this.props.match.params.projectId}`}));
-        dispatch(rest.actions.getJiraIssues({id: `${this.props.match.params.projectId}`}));
-        dispatch(rest.actions.getInvoice({id: `${this.props.match.params.invoiceId}`}));
-        dispatch(rest.actions.getInvoiceEntries({id: `${this.props.match.params.invoiceId}`}))
+        const { dispatch } = this.props;
+        dispatch(rest.actions.getProject({ id: `${this.props.match.params.projectId}` }));
+        dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
+        dispatch(rest.actions.getInvoice({ id: `${this.props.match.params.invoiceId}` }));
+        dispatch(rest.actions.getInvoiceEntries({ id: `${this.props.match.params.invoiceId}` }))
             .then((response) => {
-                this.setState({invoiceEntries: response});
+                this.setState({ invoiceEntries: response });
             })
             .catch((reason) => console.log('isCanceled', reason.isCanceled));
     };
@@ -95,7 +95,7 @@ class Invoice extends Component {
         event.preventDefault();
         this.props.history.push({
             pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
-            state: {from: this.props.location.pathname}
+            state: { from: this.props.location.pathname }
         });
     };
 
@@ -105,9 +105,9 @@ class Invoice extends Component {
     };
 
     async deleteInvoiceEntries (invoiceEntryIds) {
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         for (let i = 0; i < invoiceEntryIds.length; i++) {
-            let result = await dispatch(rest.actions.deleteInvoiceEntry({id: `${invoiceEntryIds[i]}`}));
+            let result = await dispatch(rest.actions.deleteInvoiceEntry({ id: `${invoiceEntryIds[i]}` }));
         }
     }
 
@@ -116,11 +116,11 @@ class Invoice extends Component {
             let filteredInvoiceEntries = this.state.invoiceEntries.data.filter((invoiceEntry) => {
                 return !checkedInvoiceEntryIds.includes(invoiceEntry.id);
             });
-            let updatedInvoiceEntries = {'data': filteredInvoiceEntries};
-            this.setState({invoiceEntries: updatedInvoiceEntries});
+            let updatedInvoiceEntries = { 'data': filteredInvoiceEntries };
+            this.setState({ invoiceEntries: updatedInvoiceEntries });
         }
 
-        this.setState({checkedEntries: {}});
+        this.setState({ checkedEntries: {} });
     }
 
     handleEntryEdit = (event) => {
@@ -154,7 +154,7 @@ class Invoice extends Component {
         if (invoiceEntry.jiraIssueIds) {
             this.props.history.push({
                 pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`,
-                state: {existingInvoiceEntryId: selectedInvoiceEntryId}
+                state: { existingInvoiceEntryId: selectedInvoiceEntryId }
             });
         }
         // InvoiceEntry without Jira issues
@@ -192,43 +192,42 @@ class Invoice extends Component {
     getPriceData (invoiceEntryId, key) {
         if (this.props.priceData[`row-${invoiceEntryId}`] && this.props.priceData[`row-${invoiceEntryId}`][key]) {
             return this.props.priceData[`row-${invoiceEntryId}`][key];
-        }
-        else {
+        } else {
             return 0;
         }
     };
 
     handleModalClose () {
-        this.setState({showModal: false});
+        this.setState({ showModal: false });
     };
 
     handleModalShow (checkedCount) {
-        this.setState({showModal: true, checkedCount: checkedCount});
+        this.setState({ showModal: true, checkedCount: checkedCount });
     };
 
     handleInvoiceDeleteModalShow () {
-        this.setState({showDeleteModal: true});
+        this.setState({ showDeleteModal: true });
     };
 
     handleInvoiceDeleteModalClose = (event) => {
         event.preventDefault();
         if (event.target.id == 'delete-invoice-btn') {
-            const {dispatch} = this.props;
-            dispatch(rest.actions.deleteInvoice({id: `${this.props.match.params.invoiceId}`}));
+            const { dispatch } = this.props;
+            dispatch(rest.actions.deleteInvoice({ id: `${this.props.match.params.invoiceId}` }));
             // @TODO: Check that deletion is successful before navigating back to main billing page
             this.props.history.push(`/`);
         }
-        this.setState({showDeleteModal: false});
+        this.setState({ showDeleteModal: false });
     };
 
     handleInvoiceRecordModalShow () {
-        this.setState({showRecordModal: true});
+        this.setState({ showRecordModal: true });
     };
 
     handleInvoiceRecordModalClose = (event) => {
         event.preventDefault();
         if (event.target.id = 'record-invoice-btn') {
-            const {dispatch} = this.props;
+            const { dispatch } = this.props;
             const id = this.props.match.params.invoiceId;
             const name = this.props.invoice.data.name;
             const recorded = true;
@@ -239,15 +238,15 @@ class Invoice extends Component {
                 recorded,
                 created
             };
-            dispatch(rest.actions.updateInvoice({id: `${this.props.match.params.invoiceId}`}, {
+            dispatch(rest.actions.updateInvoice({ id: `${this.props.match.params.invoiceId}` }, {
                 body: JSON.stringify(invoiceData)
             }));
         }
-        this.setState({showRecordModal: false});
+        this.setState({ showRecordModal: false });
     };
 
     handleDeleteEntryModalShow (checkedCount) {
-        this.setState({showDeleteEntryModal: true, checkedCount: checkedCount});
+        this.setState({ showDeleteEntryModal: true, checkedCount: checkedCount });
     };
 
     handleDeleteEntryModalClose = (event) => {
@@ -264,7 +263,7 @@ class Invoice extends Component {
             this.deleteInvoiceEntries(checkedInvoiceEntryIds);
             this.removeInvoiceEntriesFromState(checkedInvoiceEntryIds);
         }
-        this.setState({showDeleteEntryModal: false});
+        this.setState({ showDeleteEntryModal: false });
     };
 
     render () {
@@ -279,8 +278,7 @@ class Invoice extends Component {
                     </div>
                 </ContentWrapper>
             );
-        }
-        else if (this.props.project.data.name && this.state.invoiceEntries.data) {
+        } else if (this.props.project.data.name && this.state.invoiceEntries.data) {
             return (
                 <ContentWrapper>
                     <PageTitle
@@ -291,15 +289,15 @@ class Invoice extends Component {
                         <div className="col-md-4">
                             <p>
                                 Invoice number: <strong
-                                className="pr-3">{this.props.match.params.invoiceId}</strong>
+                                    className="pr-3">{this.props.match.params.invoiceId}</strong>
                                 Invoice recorded: <strong>{String(this.props.invoice.data.recorded)}</strong>
                             </p>
                             <Form>
                                 <Form.Group controlId="formDescription">
                                     <Form.Control id="invoice-description"
-                                                  className={"invoice-description"}
-                                                  type="text"
-                                                  placeholder="Enter description for invoice here">
+                                        className={'invoice-description'}
+                                        type="text"
+                                        placeholder="Enter description for invoice here">
                                     </Form.Control>
                                 </Form.Group>
                             </Form>
@@ -307,13 +305,13 @@ class Invoice extends Component {
                         <div className="col-md-8 text-right">
                             <ButtonGroup aria-label="Invoice actions">
                                 <Button variant="primary" type="submit"
-                                        id="record-invoice" className="mr-3"
-                                        onClick={this.recordInvoice}>
+                                    id="record-invoice" className="mr-3"
+                                    onClick={this.recordInvoice}>
                                     Record invoice
                                 </Button>
                                 <Button variant="danger" type="submit"
-                                        id="delete" className="mr-3"
-                                        onClick={this.deleteInvoice}>
+                                    id="delete" className="mr-3"
+                                    onClick={this.deleteInvoice}>
                                     Delete invoice
                                 </Button>
                             </ButtonGroup>
@@ -325,57 +323,57 @@ class Invoice extends Component {
                             <div className="row mb-3">
                                 <div className="col-md-6">
                                     <Button variant="outline-success"
-                                            type="submit" className="mr-3"
-                                            onClick={this.handleAddFromJira}>Add entry from Jira</Button>
+                                        type="submit" className="mr-3"
+                                        onClick={this.handleAddFromJira}>Add entry from Jira</Button>
                                     <Button variant="outline-success"
-                                            type="submit"
-                                            onClick={this.handleAddManually}>Add manual entry</Button>
+                                        type="submit"
+                                        onClick={this.handleAddManually}>Add manual entry</Button>
                                 </div>
                                 <div className="col-md-6 text-right">
                                     <ButtonGroup aria-label="Entry actions">
                                         <Button variant="primary" type="submit"
-                                                id="editEntry"
-                                                onClick={this.handleEntryEdit}>
+                                            id="editEntry"
+                                            onClick={this.handleEntryEdit}>
                                             Edit entry
                                         </Button>
                                         <Button variant="danger" type="submit"
-                                                id="delete-entry-btn"
-                                                onClick={this.handleEntryDelete}>
+                                            id="delete-entry-btn"
+                                            onClick={this.handleEntryDelete}>
                                             Delete entry
                                         </Button>
                                     </ButtonGroup>
                                 </div>
                             </div>
                             <Table responsive hover
-                                   className="table-borderless bg-light">
+                                className="table-borderless bg-light">
                                 <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Account number</th>
-                                    <th>Item name</th>
-                                    <th>Description</th>
-                                    <th>Amount</th>
-                                    <th>Item price (DKK)</th>
-                                    <th>Total price (DKK)</th>
-                                </tr>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Account number</th>
+                                        <th>Item name</th>
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                        <th>Item price (DKK)</th>
+                                        <th>Total price (DKK)</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                {this.state.invoiceEntries.data && this.state.invoiceEntries.data.map((item) =>
-                                    <tr key={item.id}>
-                                        <td><Form.Check aria-label=""
-                                                        id={item.id}
-                                                        onChange={this.handleCheckboxChange}/>
-                                        </td>
-                                        <td>{item.account}</td>
-                                        <td><Link
-                                            to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}
+                                    {this.state.invoiceEntries.data && this.state.invoiceEntries.data.map((item) =>
+                                        <tr key={item.id}>
+                                            <td><Form.Check aria-label=""
+                                                id={item.id}
+                                                onChange={this.handleCheckboxChange}/>
+                                            </td>
+                                            <td>{item.account}</td>
+                                            <td><Link
+                                                to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}
                       /${item.id}`}>{item.product}</Link></td>
-                                        <td>{item.description}</td>
-                                        <td>{this.getPriceData(item.id, 'amount')}</td>
-                                        <td>{this.getPriceData(item.id, 'unitPrice')}</td>
-                                        <td>{this.getPriceData(item.id, 'totalPrice')}</td>
-                                    </tr>
-                                )}
+                                            <td>{item.description}</td>
+                                            <td>{this.getPriceData(item.id, 'amount')}</td>
+                                            <td>{this.getPriceData(item.id, 'unitPrice')}</td>
+                                            <td>{this.getPriceData(item.id, 'totalPrice')}</td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </Table>
                         </div>
@@ -395,10 +393,10 @@ class Invoice extends Component {
                     </div>
                     <ContentFooter>
                         Invoice created <strong><Moment
-                        format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></strong>
+                            format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></strong>
                     </ContentFooter>
                     <Modal show={this.state.showModal}
-                           onHide={this.handleModalClose}>
+                        onHide={this.handleModalClose}>
                         <Modal.Header>
                             <Modal.Title>Error</Modal.Title>
                         </Modal.Header>
@@ -410,13 +408,13 @@ class Invoice extends Component {
                         }
                         <Modal.Footer>
                             <Button variant="secondary"
-                                    onClick={this.handleModalClose}>
+                                onClick={this.handleModalClose}>
                                 Ok
                             </Button>
                         </Modal.Footer>
                     </Modal>
                     <Modal show={this.state.showDeleteEntryModal}
-                           onHide={this.handleDeleteEntryModalClose}>
+                        onHide={this.handleDeleteEntryModalClose}>
                         <Modal.Header>
                             <Modal.Title>Error</Modal.Title>
                         </Modal.Header>
@@ -426,7 +424,7 @@ class Invoice extends Component {
                         {this.state.checkedCount == 0 &&
                         <Modal.Footer>
                             <Button variant="secondary"
-                                    onClick={this.handleDeleteEntryModalClose}>
+                                onClick={this.handleDeleteEntryModalClose}>
                                 Ok
                             </Button>
                         </Modal.Footer>
@@ -437,62 +435,61 @@ class Invoice extends Component {
                         {this.state.checkedCount > 0 &&
                         <Modal.Footer>
                             <Button variant="secondary"
-                                    onClick={this.handleDeleteEntryModalClose}>
+                                onClick={this.handleDeleteEntryModalClose}>
                                 Cancel
                             </Button>
                             <Button id="delete-entry-btn" variant="danger"
-                                    onClick={this.handleDeleteEntryModalClose}>
+                                onClick={this.handleDeleteEntryModalClose}>
                                 Delete
                             </Button>
                         </Modal.Footer>
                         }
                     </Modal>
                     <Modal show={this.state.showDeleteModal}
-                           onHide={this.handleInvoiceDeleteModalClose}>
+                        onHide={this.handleInvoiceDeleteModalClose}>
                         <Modal.Header>
                             <Modal.Title>Confirm deletion</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>Are you sure you want to delete this invoice?</Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary"
-                                    onClick={this.handleInvoiceDeleteModalClose}>
+                                onClick={this.handleInvoiceDeleteModalClose}>
                                 Cancel
                             </Button>
                             <Button id="delete-invoice-btn" variant="danger"
-                                    onClick={this.handleInvoiceDeleteModalClose}>
+                                onClick={this.handleInvoiceDeleteModalClose}>
                                 Delete
                             </Button>
                         </Modal.Footer>
                     </Modal>
                     <Modal show={this.state.showRecordModal}
-                           onHide={this.handleInvoiceRecordModalClose}>
+                        onHide={this.handleInvoiceRecordModalClose}>
                         <Modal.Header>
                             <Modal.Title>Confirm recording</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>Are you sure you want to record this invoice?</Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary"
-                                    onClick={this.handleInvoiceRecordModalClose}>
+                                onClick={this.handleInvoiceRecordModalClose}>
                                 Cancel
                             </Button>
                             <Button id="record-invoice-btn" variant="primary"
-                                    onClick={this.handleInvoiceRecordModalClose}>
+                                onClick={this.handleInvoiceRecordModalClose}>
                                 Record
                             </Button>
                         </Modal.Footer>
                     </Modal>
                 </ContentWrapper>
             );
-        }
-        else {
+        } else {
             return (
                 <ContentWrapper>
                     <div className="spinner-border"
-                         style={{
-                             width: '3rem',
-                             height: '3rem',
-                             role: 'status'
-                         }}>
+                        style={{
+                            width: '3rem',
+                            height: '3rem',
+                            role: 'status'
+                        }}>
                         <span className="sr-only">Loading...</span>
                     </div>
                 </ContentWrapper>

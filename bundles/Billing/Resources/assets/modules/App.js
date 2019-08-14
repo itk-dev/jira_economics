@@ -5,17 +5,17 @@ require('./../billing.css');
 
 export default class App extends Component {
     state = {
-        isModalOpen: false,
+        isModalOpen: false
     };
 
     static contextTypes = {
         navOpenState: PropTypes.object,
-        router: PropTypes.object,
+        router: PropTypes.object
     };
 
     static propTypes = {
         navOpenState: PropTypes.object,
-        onNavResize: PropTypes.func,
+        onNavResize: PropTypes.func
     };
 
     render () {
