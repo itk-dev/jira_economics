@@ -82,7 +82,7 @@ class BillingService
         $invoices = $repository->findAll();
 
         if (!$invoices) {
-            throw new HttpException(404, 'No invoices found');
+            return [];
         }
 
         $invoicesJson = [];
@@ -295,7 +295,7 @@ class BillingService
         $invoiceEntries = $repository->findAll();
 
         if (!$invoiceEntries) {
-            throw new HttpException(404, 'No invoiceEntries found');
+            return [];
         }
 
         $invoiceEntriesJson = [];
