@@ -261,7 +261,7 @@ class Invoice extends Component {
   };
 
   render() {
-    if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId != this.props.match.params.projectId) {
+    if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId !== parseInt(this.props.match.params.projectId)) {
       return (
         <ContentWrapper>
           <PageTitle>Invoice</PageTitle>

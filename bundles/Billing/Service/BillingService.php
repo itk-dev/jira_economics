@@ -19,26 +19,34 @@ use Billing\Entity\Project;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 
-class BillingService
+class BillingService extends JiraService
 {
     private $entityManager;
-    private $jiraService;
 
     /**
      * Constructor.
+     * @param \Doctrine\ORM\EntityManagerInterface $entityManager
+     * @param $jiraUrl
+     * @param $tokenStorage
+     * @param $customerKey
+     * @param $pemPath
      */
     public function __construct(
-        JiraService $jiraService,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        $jiraUrl,
+        $tokenStorage,
+        $customerKey,
+        $pemPath
     ) {
+        parent::__construct($jiraUrl, $tokenStorage, $customerKey, $pemPath);
+
         $this->entityManager = $entityManager;
-        $this->jiraService = $jiraService;
     }
 
     /**
      * Get invoices for specific Jira project.
      *
-     * @param jiraId
+     * @param $jiraProjectId
      *
      * @return array
      */
@@ -104,7 +112,7 @@ class BillingService
     /**
      * Get specific invoice by id.
      *
-     * @param invoiceId
+     * @param $invoiceId
      *
      * @return array
      */
@@ -132,7 +140,9 @@ class BillingService
     /**
      * Post new invoice, creating a new entity referenced by the returned id.
      *
+     * @param $invoiceData
      * @return array invoiceData
+     * @throws \Exception
      */
     public function postInvoice($invoiceData)
     {
@@ -147,8 +157,9 @@ class BillingService
         $repository = $this->entityManager->getRepository(Project::class);
         $project = $repository->findOneBy(['jiraId' => $invoiceData['projectId']]);
 
+        // If project is not present in db, add it from Jira.
         if (!$project) {
-            throw new HttpException(404, 'Project with id '.$invoiceData['projectId'].' not found');
+            $project = $this->getJiraProject($invoiceData['projectId']);
         }
 
         $invoice = new Invoice();
@@ -172,7 +183,7 @@ class BillingService
     /**
      * Put specific invoice, replacing the invoice referenced by the given id.
      *
-     * @param invoiceData
+     * @param $invoiceData
      *
      * @return array
      */
@@ -216,7 +227,7 @@ class BillingService
     /**
      * Delete specific invoice referenced by the given id.
      *
-     * @param invoiceId
+     * @param $invoiceId
      */
     public function deleteInvoice($invoiceId)
     {
@@ -238,7 +249,7 @@ class BillingService
     /**
      * Get invoiceEntries for specific invoice.
      *
-     * @param invoiceId
+     * @param $invoiceId
      *
      * @return array
      */
@@ -363,6 +374,7 @@ class BillingService
     /**
      * Post new invoiceEntry, creating a new entity referenced by the returned id.
      *
+     * @param $invoiceEntryData
      * @return array invoiceEntryData
      */
     public function postInvoiceEntry($invoiceEntryData)
@@ -444,7 +456,7 @@ class BillingService
     /**
      * Put specific invoiceEntry, replacing the invoiceEntry referenced by the given id.
      *
-     * @param invoiceEntryData
+     * @param $invoiceEntryData
      *
      * @return array
      */
@@ -524,7 +536,7 @@ class BillingService
     /**
      * Delete specific invoice entry referenced by the given id.
      *
-     * @param invoiceEntryId
+     * @param $invoiceEntryId
      */
     public function deleteInvoiceEntry($invoiceEntryId)
     {
@@ -546,18 +558,17 @@ class BillingService
     /**
      * Get specific project by Jira project ID.
      *
-     * @param $jiraId
-     *
-     * @return array
+     * @param $jiraProjectId
+     * @return \Billing\Entity\Project|object
      */
-    public function getProject($jiraProjectId)
+    public function getJiraProject($jiraProjectId)
     {
         if (!(int) $jiraProjectId) {
             throw new HttpException(400, 'Expected integer in request');
         }
 
         try {
-            $result = $this->jiraService->get('/rest/api/2/project/'.$jiraProjectId);
+            $result = $this->getProject($jiraProjectId);
         } catch (HttpException $e) {
             throw $e;
         }
@@ -567,6 +578,7 @@ class BillingService
 
         if (!$project) {
             $project = new Project();
+            $this->entityManager->persist($project);
         }
 
         $project->setJiraId($result->id);
@@ -575,24 +587,17 @@ class BillingService
         $project->setUrl($result->self);
         $project->setAvatarUrl($result->avatarUrls->{'48x48'});
 
-        $this->entityManager->persist($project);
         $this->entityManager->flush();
 
-        return [
-            'jiraId' => $project->getJiraId(),
-            'jiraKey' => $project->getJiraKey(),
-            'name' => $project->getName(),
-            'url' => $project->getUrl(),
-            'avatarUrl' => $project->getAvatarUrl(),
-        ];
+        return $project;
     }
 
     /**
      * Get jiraIssues for project.
      *
-     * @param $jiraId
-     *
+     * @param $jiraProjectId
      * @return array
+     * @throws \Exception
      */
     public function getJiraIssues($jiraProjectId)
     {
@@ -613,7 +618,7 @@ class BillingService
 
         while (true) {
             try {
-                $results = $this->jiraService->get('rest/api/2/search?jql=project='.$jiraProjectId.'&startAt='.$start);
+                $results = $this->get('rest/api/2/search?jql=project='.$jiraProjectId.'&startAt='.$start);
             } catch (HttpException $e) {
                 throw $e;
             }
@@ -675,7 +680,7 @@ class BillingService
     /**
      * Get specific customer by id.
      *
-     * @param customerId
+     * @param $customerId
      *
      * @return array
      */
@@ -704,6 +709,7 @@ class BillingService
     /**
      * Post new customer, creating a new entity referenced by the returned id.
      *
+     * @param $customerData
      * @return array customerData
      */
     public function postCustomer($customerData)
@@ -743,6 +749,7 @@ class BillingService
     /**
      * Put specific customer, replacing the customer referenced by the given id.
      *
+     * @param $customerData
      * @return array customerData
      */
     public function putCustomer($customerData)
@@ -787,7 +794,7 @@ class BillingService
     /**
      * Delete specific customer referenced by the given id.
      *
-     * @param customerId
+     * @param $customerId
      */
     public function deleteCustomer($customerId)
     {

@@ -31,9 +31,15 @@ class ApiController extends Controller
     public function projectAction(BillingService $billingService, Request $request)
     {
         $jiraProjectId = $request->get('jiraProjectId');
-        $result = $billingService->getProject($jiraProjectId);
+        $project = $billingService->getJiraProject($jiraProjectId);
 
-        return new JsonResponse($result);
+        return new JsonResponse([
+            'jiraId' => $project->getJiraId(),
+            'jiraKey' => $project->getJiraKey(),
+            'name' => $project->getName(),
+            'url' => $project->getUrl(),
+            'avatarUrl' => $project->getAvatarUrl(),
+        ]);
     }
 
     /**
