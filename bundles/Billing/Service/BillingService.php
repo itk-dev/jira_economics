@@ -636,7 +636,7 @@ class BillingService extends JiraService
             }
             foreach ($results->issues as $jiraIssueResult) {
                 $issueStatus = $jiraIssueResult->fields->status->statusCategory->name;
-                if ($issueStatus !== "Done") {
+                if ('Done' !== $issueStatus) {
                     continue;
                 }
                 $repository = $this->entityManager->getRepository(JiraIssue::class);
