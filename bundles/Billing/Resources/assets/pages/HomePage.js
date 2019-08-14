@@ -36,7 +36,8 @@ class HomePage extends Component {
         const { dispatch } = this.props;
         dispatch(rest.actions.getAllInvoices())
             .then((response) => {
-                this.setState({ allInvoices: response });
+                let sortedInvoices = { data: this.sortInvoices(response.data, 'desc') };
+                this.setState({ allInvoices: sortedInvoices });
             })
             .catch((reason) => console.log('isCanceled', reason.isCanceled));
         dispatch(rest.actions.getAllInvoiceEntries())
@@ -101,16 +102,19 @@ class HomePage extends Component {
         if (event.target.value === 'Ældste først') {
             sortOrder = 'asc';
         }
-        let sortedInvoices = this.state.allInvoices.data.sort(function (i1, i2) {
+        let sortedInvoices = { data: this.sortInvoices(this.state.allInvoices.data, sortOrder) };
+        this.setState({ allInvoices: sortedInvoices });
+    };
+
+    sortInvoices (invoices, sortOrder) {
+        return invoices.sort(function (i1, i2) {
             if (sortOrder === 'asc') {
                 return i1.created.date > i2.created.date;
             } else {
                 return i1.created.date < i2.created.date;
             }
         });
-        sortedInvoices = { 'data': sortedInvoices };
-        this.setState({ allInvoices: sortedInvoices });
-    };
+    }
 
     render () {
         if (this.state.allInvoices.data && this.state.allInvoiceEntries.data) {
