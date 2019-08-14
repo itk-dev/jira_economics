@@ -17,8 +17,6 @@ import Tooltip from 'react-bootstrap/Tooltip';
 import Modal from 'react-bootstrap/Modal';
 import Spinner from '../components/Spinner';
 
-// @TODO: sort invoices by date on initial load
-
 class HomePage extends Component {
     constructor (props) {
         super(props);
