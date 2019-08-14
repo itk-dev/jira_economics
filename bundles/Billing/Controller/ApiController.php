@@ -252,4 +252,17 @@ class ApiController extends Controller
 
         return new JsonResponse($result);
     }
+
+    /**
+     * @Route("/fixed_version/{fixedVersion}/{jiraProjectId}", name="api_fixed_version")
+     * defaults={"fixedVersion="...." "jiraProjectId"="...."}
+     */
+    public function fixedVersionAction(BillingService $billingService, Request $request)
+    {
+        $fixedVersion = $request->get('fixedVersion');
+        $jiraProjectId = $request->get('jiraProjectId');
+        $result = $billingService->getFixedVersionForProject($fixedVersion, $jiraProjectId);
+
+        return new JsonResponse($result);
+    }
 }

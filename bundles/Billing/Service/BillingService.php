@@ -625,6 +625,7 @@ class BillingService extends JiraService
 
         while (true) {
             try {
+                // @TODO: this API call does not currently work as it returns all Jira issues, regardless of jiraProjectId
                 $results = $this->get('rest/api/2/search?jql=project='.$jiraProjectId.'&startAt='.$start);
             } catch (HttpException $e) {
                 throw $e;
@@ -820,5 +821,41 @@ class BillingService extends JiraService
 
         $this->entityManager->remove($customer);
         $this->entityManager->flush();
+    }
+
+    /**
+     * Get specific fixed version by the given fixed version and Jira Project ID.
+     *
+     * @param $fixedVersion
+     * @param $jiraId
+     *
+     * @return array
+     */
+    public function getFixedVersionForProject($fixedVersion, $jiraProjectId)
+    {
+        if (empty($fixedVersion) || !(int) $fixedVersion) {
+            throw new HttpException(400, "Expected integer value in request for 'fixedVersion'");
+        }
+
+        if (empty($jiraProjectId) || !(int) $jiraProjectId) {
+            throw new HttpException(400, "Expected integer value in request for 'jiraProjectId'");
+        }
+
+        try {
+            $results = $this->get(
+                '/rest/api/2/search'.
+                '?jql=fixVersion='.$fixedVersion.
+                '&project='.$jiraProjectId.
+                '&maxResults=50'.
+                '&startAt=0'
+            );
+        } catch (HttpException $e) {
+            throw $e;
+        }
+
+        // @TODO: return appropriate values, not just the entire result
+        //$result->id;
+
+        return $results;
     }
 }
