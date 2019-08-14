@@ -3,12 +3,9 @@ import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from '../components/ContentWrapper';
 import PageTitle from '../components/PageTitle';
 import rest from '../redux/utils/rest';
+import PropTypes from 'prop-types';
 
 class Customer extends Component {
-    constructor (props) {
-        super(props);
-    }
-
     handleSubmitCustomer = (event) => {
         event.preventDefault();
         const { dispatch } = this.props;
@@ -103,6 +100,10 @@ class Customer extends Component {
         );
     }
 }
+
+Customer.propTypes = {
+    dispatch: PropTypes.func.isRequired
+};
 
 const mapStateToProps = state => {
     return {};
