@@ -841,14 +841,15 @@ class BillingService extends JiraService
             throw new HttpException(400, "Expected integer value in request for 'jiraProjectId'");
         }
 
+        $params = [
+            'jql' => 'fixVersion='.$fixedVersion,
+            'project' => $jiraProjectId,
+            'maxResults' => 50,
+            'startAt' => 0
+        ];
+
         try {
-            $results = $this->get(
-                '/rest/api/2/search'.
-                '?jql=fixVersion='.$fixedVersion.
-                '&project='.$jiraProjectId.
-                '&maxResults=50'.
-                '&startAt=0'
-            );
+            $results = $this->get('/rest/api/2/search', $params);
         } catch (HttpException $e) {
             throw $e;
         }
