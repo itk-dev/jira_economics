@@ -1,0 +1,4 @@
+controllers:
+    resource: "@SprintReportBundle/Controller"
+    type: annotation
+    prefix: /sprint_report
