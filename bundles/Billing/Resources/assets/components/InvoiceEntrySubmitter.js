@@ -6,8 +6,6 @@ import { setSelectedIssues } from '../redux/actions';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
 
-// @TODO: an InvoiceEntry may still be set in props if we have previously edited an InvoiceEntry. Fix this.
-
 export class InvoiceEntrySubmitter extends Component {
   constructor(props) {
     super(props);
@@ -18,14 +16,13 @@ export class InvoiceEntrySubmitter extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-    let existingInvoiceEntryId = this.props.location.state.existingInvoiceEntryId;
-    if (existingInvoiceEntryId) {
-      dispatch(rest.actions.getInvoiceEntry({ id: existingInvoiceEntryId }))
-      .then((response) => {
-        this.setState({ account: response.account });
-        this.setState({ invoiceEntry: response });
-      })
-      .catch((reason) => console.log('isCanceled', reason.isCanceled));
+    if (this.props.location.state && this.props.location.state.existingInvoiceEntryId) {
+      dispatch(rest.actions.getInvoiceEntry({ id: this.props.location.state.existingInvoiceEntryId }))
+        .then((response) => {
+          this.setState({ account: response.account });
+          this.setState({ invoiceEntry: response });
+        })
+        .catch((reason) => console.log('isCanceled', reason.isCanceled));
     }
   }
 
@@ -179,7 +176,8 @@ export class InvoiceEntrySubmitter extends Component {
                 Antal
               </label>
               <input
-                type="text"
+                type="number"
+                step="0.1"
                 name="hoursSpent"
                 className="form-control"
                 id="invoice-entry-hours-spent"
@@ -191,7 +189,9 @@ export class InvoiceEntrySubmitter extends Component {
                 Stk. pris
               </label>
               <input
-                type="text"
+                type="number"
+                step="0.01"
+                min="0"
                 name="unitPrice"
                 className="form-control"
                 id="invoice-entry-unit-price"
@@ -328,7 +328,9 @@ export class InvoiceEntrySubmitter extends Component {
     );
   }
 
+  // @TODO: add type validation to input fields (decimals currently need to be specified with dot notation)
   // @TODO: cleanup redundant HTML
+  // @TODO: replace HTML elements with react-bootstrap components
   render() {
     // InvoiceEntry without JiraIssues?
     if (this.props.location.state &&

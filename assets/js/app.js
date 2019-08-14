@@ -6,7 +6,7 @@
  */
 
 // any CSS you require will output into a single css file (app.css in this case)
-//require('../css/app.css');
+// require('../css/app.css');
 require('../scss/global.scss');
 
 // Need jQuery? Install it with "yarn add jquery", then uncomment to require it.
@@ -24,8 +24,3 @@ require('@fortawesome/fontawesome-free/js/all.js');
 
 // Add select2
 require('select2');
-
-// Add filer
-require('./jqueryFiler/js/jquery.filer.min.js');
-require('./jqueryFiler/css/jquery.filer.css');
-require('./jqueryFiler/css/themes/jquery.filer-dragdropbox-theme.css');;

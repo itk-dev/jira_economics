@@ -1,0 +1,153 @@
+parameters:
+    portal:
+        menu:
+            grafisk_service:
+                title: "Bestilling hos\nGrafisk service"
+                desc: 'Bestilling hos Grafisk service'
+                icon: 'fa-braille'
+                routeName: 'graphic_service_order_form'
+                btnTxt: 'Opret bestilling'
+
+            jira:
+                roles: ROLE_JIRA
+                title: 'Jira'
+                desc: 'Jira'
+                icon: 'fa-th-large'
+                routeName: 'jira_index'
+                # active: false
+
+            admin:
+                roles: ROLE_ADMIN
+                title: 'Admin'
+                desc: 'Admin'
+                icon: 'fa-cog'
+                routeName: 'easyadmin'
+                # active: false
+
+        apps:
+            grafisk_service:
+                title: 'Bestilling hos Grafisk service'
+                desc: 'Bestilling hos Grafisk service'
+                icon: 'fa-braille'
+                routeName: 'graphic_service_order_form'
+                btnTxt: 'Opret bestilling'
+
+    jira:
+        menu:
+            dash:
+                title: 'Dash'
+                desc: 'App oversigt'
+                icon: 'fa-th-large'
+                routeName: 'portal_index'
+                # active: '/' === $pathInfo
+
+            planning:
+                title: 'Planlægning'
+                desc: 'Planlægningsoversigt baseret på tasks i Jira'
+                icon: 'fa-braille'
+                routeName: 'planning_index'
+                # active: $this->routeStartsWith('planning_index' $pathInfo)
+
+            newProject:
+                title: 'Nyt projekt'
+                desc: 'Opret et nyt Jira-projekt ud fra en skabelon'
+                icon: 'fa-project-diagram'
+                routeName: 'create_project_form'
+                # active: $this->routeStartsWith('create_project_form' $pathInfo)
+
+            invoice:
+                title: 'Faktura'
+                desc: 'Opret og rediger fakturaer baseret på tasks i Jira'
+                icon: 'fa-file-invoice'
+                routeName: 'billing_index'
+                # active: $this->routeStartsWith('billing_index' $pathInfo)
+
+            expense:
+                title: 'Udgift'
+                desc: 'Opret udgifter i forbindelse med projekter og tasks'
+                icon: 'fa-credit-card'
+                routeName: 'expense_new'
+                # active: $this->routeStartsWith('expense_new' $pathInfo)
+
+            # @TODO: Add when ready.
+
+            # taskWizard:
+            #     title: 'Task wizard'
+            #     desc: 'Opret mange tasks på en gang.'
+            #     icon: 'fa-tasks'
+            #     routeName: 'index'
+            #     # active: false
+
+            # order:
+            #     title: 'Ordre'
+            #     desc: 'Opret ordrepakker ud fra tasks i Jira'
+            #     icon: 'fa-box-open'
+            #     routeName: 'index'
+            #     # active: false
+
+            # sprintplan:
+            #     title: 'Sprintrapport'
+            #     desc: 'Generér sprintrapport'
+            #     icon: 'fa-braille'
+            #     routeName: 'index'
+            #     # active: false
+
+            portal:
+                title: 'Portal'
+                desc: 'Portal'
+                icon: 'fa-cog'
+                routeName: 'portal_index'
+                # active: false
+
+        apps:
+            planning:
+                title: 'Planlægning'
+                desc: 'Planlægningsoversigt baseret på tasks i Jira'
+                icon: 'fa-braille'
+                routeName: 'planning_index'
+                btnTxt: 'Se planlægning'
+
+            newProject:
+                title: 'Nyt projekt'
+                desc: 'Opret et nyt Jira-projekt ud fra en skabelon'
+                icon: 'fa-project-diagram'
+                routeName: 'create_project_form'
+                btnTxt: 'Opret Nyt projekt'
+
+            invoice:
+                title: 'Faktura'
+                desc: 'Opret og rediger fakturaer baseret på tasks i Jira'
+                icon: 'fa-file-invoice'
+                routeName: 'billing_index'
+                btnTxt: 'Lav en Faktura'
+
+            expense:
+                title: 'Udgift'
+                desc: 'Opret udgifter i forbindelse med projekter og tasks'
+                icon: 'fa-credit-card'
+                routeName: 'expense_new'
+                btnTxt: 'Opret en udgift'
+
+
+            # @TODO: Add when ready.
+
+            # taskWizard:
+            #     title: 'Task wizard'
+            #     desc: 'Opret mange tasks på en gang.'
+            #     icon: 'fa-tasks'
+            #     routeName: 'index'
+            #     btnTxt: 'Bliv Task wizard'
+
+            # order:
+            #     title: 'Ordre'
+            #     desc: 'Opret ordrepakker ud fra tasks i Jira'
+            #     icon: 'fa-box-open'
+            #     routeName: 'index'
+            #     btnTxt: 'Pak en Ordre'
+
+            # sprintplan:
+            #     title: 'Sprintrapport'
+            #     desc: 'Generér sprintrapport'
+            #     icon: 'fa-braille'
+            #     routeName: 'index'
+            #     btnTxt: 'Se sprintrapporter'

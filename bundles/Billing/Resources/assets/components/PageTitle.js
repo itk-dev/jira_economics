@@ -5,7 +5,7 @@ export default (props) => (
     <div className="col-12">
       <p className="text-muted">{props.breadcrumb}</p>
       <h1>{props.children}</h1>
-      <hr/>
+      <hr />
     </div>
   </div>
 )

@@ -1,0 +1,7 @@
+.select2-container--default {
+    .select2-selection,
+    .select2-selection--single .select2-selection__arrow {
+        // Make select2 control look like bootstrap form-control.
+        height: calc(1.5em + .75rem + 2px);
+    }
+}

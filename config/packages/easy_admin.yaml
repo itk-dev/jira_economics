@@ -1,0 +1,45 @@
+easy_admin:
+    design:
+        menu:
+            - entity: User
+            - label: Jira
+              route: jira_index
+            - label: Portal
+              route: portal_index
+
+    entities:
+        User:
+            class: App\Entity\User
+            label: portal.user
+
+            list:
+                fields:
+                    - property: email
+                      label: portal.user.email
+                    - property: roles
+                      label: portal.user.roles
+                    - property: enabled
+                      label: portal.user.enabled
+                    - property: portalApps
+                      label: portal.user.portalApps
+                    - property: lastLogin
+                      label: portal.user.lastLogin
+
+            form:
+                fields:
+                    - property: email
+                      label: portal.user.email
+                    - property: roles
+                      label: portal.user.roles
+                      type: App\Form\UserRolesType
+                      type_options:
+                          multiple: true
+                          expanded: true
+                    - property: portalApps
+                      label: portal.user.portalApps
+                      type: App\Form\PortalAppsType
+                      type_options:
+                          multiple: true
+                          expanded: true
+                    - property: enabled
+                      label: portal.user.enabled

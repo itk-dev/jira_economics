@@ -1,0 +1,46 @@
+expense.action.add: 'Tilføj udgift'
+expense.amount: Beløb
+expense.category.action.confirm_delete: 'Bekræft at du vil slette kategorien “%name%”'
+expense.category.action.delete: 'Slet kategori'
+expense.category.action.edit: Rediger
+expense.category.action.save: Gem
+expense.category.action.show: Vis
+expense.category.action.update: Opdater
+expense.category.back_to_list: 'Tilbage til listen'
+expense.category.edit.title: 'Rediger kategori'
+expense.category.empty_list: 'Ingen kategorier'
+expense.category.id: id
+expense.category.list.title: Kategorier
+expense.category.list: Kategorier
+expense.category.name: Navn
+expense.category.name_already_used: 'Udgiftskategori “%name%” findes allerede'
+expense.category.new.label_format: '%name% (enhedspris: %unit_price% kr.)'
+expense.category.new.title: 'Ny kategori'
+expense.category.new: 'Ny kategori'
+expense.category.refresh_from_jira: 'Opdater fra Jira'
+expense.category.show.title: Kategori
+expense.category.successfully_refreshed: 'Udgiftskategorier er blevet opdateret'
+expense.category.unitPrice: Enhedspris
+expense.category: Kategori
+
+# Placeholders:
+#   %project_key%
+#   %project_name%
+#   %issue_key%
+#   %issue_url%
+expense.created.success: 'Udgift oprettet. <a href="%issue_url%">Se sag (%issue_key%) i Jira</a>'
+expense.date: Dato
+expense.description: Beskrivelse
+expense.list.title: Udgifter
+expense.new.category.placeholder: 'Vælg kategori'
+expense.new.category: Kategori
+expense.new.description.placeholder: ''
+expense.new.description: Beskrivelse
+expense.new.issue.help: 'Vælg projekt for at kunne vælge sag'
+expense.new.issue: Sag
+expense.new.project.placeholder: 'Vælg projekt'
+expense.new.project: 'Projekt'
+expense.new.quantity.placeholder: ''
+expense.new.quantity: Antal
+expense.new.search_for_issue_in_project: 'Søg efter sag i projektet {project}'
+expense.new.submit: 'Opret'

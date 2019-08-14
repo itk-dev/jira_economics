@@ -173,6 +173,16 @@ class ApiController extends Controller
     }
 
     /**
+     * @Route("/invoice_entries_all", name="api_invoice_entries_all")
+     */
+    public function allInvoiceEntriesAction(BillingService $billingService, Request $request)
+    {
+        $result = $billingService->getAllInvoiceEntries();
+
+        return new JsonResponse($result);
+    }
+
+    /**
      * @Route("/customer/{customerId}", name="api_customer")
      * defaults={"customerId"="...."}
      */

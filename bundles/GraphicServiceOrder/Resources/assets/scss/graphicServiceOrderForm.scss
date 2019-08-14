@@ -1,75 +1,115 @@
+@import "~bootstrap-datepicker/dist/css/bootstrap-datepicker.standalone.css";
+
 // ----------------------------
 // Graphic service order form styling.
 // ----------------------------
 
+%remove-line {
+    position: relative;
+    flex: 0 0 20px;
+    align-items: center;
+    display: block;
+    top: 38px;
+    height: 24px;
+    margin-left: 20px;
+    cursor: pointer;
+}
+
 #graphic-service-order {
-  .order-lines {
-    ul {
-      list-style-type: none;
-      padding: 0;
+    .order-lines {
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            padding: 1em 0 0;
+            border-top: 1px solid $gray-300;
+            &:first-child,
+            &:last-child {
+                border: 0;
+                padding: 0;
+            }
+
+            > fieldset {
+                width: 100%;
+            }
+
+            > div,
+            > fieldset > div {
+                display: flex;
+                flex-wrap: nowrap;
+                justify-content: space-between;
+                flex: 1 0 75%;
+
+                .form-group:last-child {
+                    flex: 0 0 50%;
+                }
+
+                .form-group:first-child { /* stylelint-disable-line no-descending-specificity */
+                    flex: 0 0 40%;
+                }
+            }
+
+            .remove-line {
+                @extend %remove-line;
+            }
+        }
     }
 
-    li {
-      display: flex;
-      justify-content: space-between;
-      padding: 1em 0 0;
-      border-top: 1px solid $gray-300;
-      &:first-child,
-      &:last-child {
+    .icon-jfi-trash {
+        background: url("../images/trash-alt-solid.svg") no-repeat 0;
+        background-size: 16px;
         border: 0;
-        padding: 0;
-      }
-
-      > fieldset {
-        width: 100%;
-      }
-
-      > div,
-      > fieldset > div {
-        display: flex;
-        flex-wrap: nowrap;
-        justify-content: space-between;
-        flex: 1 0 75%;
-
-        .form-group:first-child {
-          flex: 0 0 40%;
+        &:before {
+            content: "";
         }
-        .form-group:last-child {
-          flex: 0 0 50%;
+    }
+
+    .marketing-account {
+        margin-top: 0;
+
+        @include media-breakpoint-up(md) {
+            margin-top: 37px;
         }
-      }
-      
-      .remove-line {
-        position: relative;
-        flex: 0 0 20px;
-        align-items: center;
-        display: block;
-        top: 38px;
-        height: 24px;
-        margin-left: 20px;
-        cursor: pointer;
-      }
     }
-  }
 
-  .icon-jfi-trash {
-    background: url("../images/trash-alt-solid.svg") no-repeat 0;
-    background-size: 16px;
-    border: 0;
-    &:before {
-      content: "";
+    .custom-file {
+        height: 100%;
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
     }
-  }
 
-  .marketing-account {
-    margin-top: 0;
+    #fileList {
+        list-style-type: none;
+        padding-left: 0;
 
-    @include media-breakpoint-up(md) {
-      margin-top: 37px;
+        li {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            padding: 0 0 .5em 0;
+            border-bottom: 1px solid #ced4da;
+            margin: 0 0 .5em 0;
+
+            > div, p {
+                flex: 0 1 auto;
+                margin: 0 1em 0 0;
+                line-height: 35px;
+            }
+
+            i {
+                padding-left: 1em;
+            }
+
+            .remove-line {
+                @extend %remove-line;
+                text-align: right;
+                flex: 1 1 auto;
+                top: 0;
+            }
+        }
     }
-  }
-
-  .custom-file {
-    height: 100%;
-  }
 }

@@ -13,7 +13,7 @@ namespace GraphicServiceOrder\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\GsOrderRepository")
+ * @ORM\Entity(repositoryClass="GraphicServiceOrder\Repository\GsOrderRepository")
  */
 class GsOrder
 {
@@ -23,6 +23,16 @@ class GsOrder
      * @ORM\Column(type="integer")
      */
     private $id;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $issueId;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $issueKey;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -84,9 +94,43 @@ class GsOrder
      */
     private $deliveryDescription;
 
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private $ownCloudSharedFiles = [];
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $orderStatus;
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getIssueId(): ?int
+    {
+        return $this->issueId;
+    }
+
+    public function setIssueId(int $issueId): self
+    {
+        $this->issueId = $issueId;
+
+        return $this;
+    }
+
+    public function getIssueKey(): ?string
+    {
+        return $this->issueKey;
+    }
+
+    public function setIssueKey(string $issueKey): self
+    {
+        $this->issueKey = $issueKey;
+
+        return $this;
     }
 
     public function getJobTitle(): ?string
@@ -229,6 +273,30 @@ class GsOrder
     public function setDeliveryDescription(?string $deliveryDescription): self
     {
         $this->deliveryDescription = $deliveryDescription;
+
+        return $this;
+    }
+
+    public function getOwnCloudSharedFiles(): ?array
+    {
+        return $this->ownCloudSharedFiles;
+    }
+
+    public function setOwnCloudSharedFiles(?array $ownCloudSharedFiles): self
+    {
+        $this->ownCloudSharedFiles = $ownCloudSharedFiles;
+
+        return $this;
+    }
+
+    public function getOrderStatus(): ?string
+    {
+        return $this->orderStatus;
+    }
+
+    public function setOrderStatus(?string $orderStatus): self
+    {
+        $this->orderStatus = $orderStatus;
 
         return $this;
     }

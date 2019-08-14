@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'dashboard.title'|trans }} - {{ 'common.title'|trans }}{% endblock %}
+{% block main %}
+    <div class="d-flex flex-row flex-grow-1">
+        <div class="container-fluid p-5">
+            <h1>{{ 'dashboard.headline'|trans }}</h1>
+
+            <div class="row">
+                {% for app in apps %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="row no-gutters flex-grow-1">
+                                <div class="col-3 col-md-12 col-lg-3 bg-light">
+                                    <div class="card-img-top text-secondary text-center p-3">
+                                        <i class="fas {{ app.icon }} fa-fw fa-2x"></i>
+                                    </div>
+                                </div>
+                                <div class="col-9 col-md-12 col-lg-9">
+                                    <div class="card-body h-100 flex-column">
+                                        <h5 class="card-title">{{ app.title }}</h5>
+                                        <p class="card-text">{{ app.desc }}</p>
+                                        <a href="{{ path(app.routeName) }}" class="btn btn-primary mt-auto">{{ app.btnTxt }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

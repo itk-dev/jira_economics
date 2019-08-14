@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block sidebar '' %}
+
+{% block content %}
+    <h1>{{ 'expense.list.title'|trans }}</h1>
+
+    {% if expenses|length > 0 %}
+        <table class="table table-responsive">
+            <thead>
+                <tr>
+                    <th>{{ 'expense.date'|trans }}</th>
+                    <th>{{ 'expense.category'|trans }}</th>
+                    <th>{{ 'expense.description'|trans }}</th>
+                    <th class="amount">{{ 'expense.amount'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.date|localizeddate('short', 'none') }}</td>
+                        <td>{{ expense.expenseCategory.name }}</td>
+                        <td>{{ expense.description|raw }}</td>
+                        <td class="amount">{{ expense.amount|number_format }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <div class="action-buttons">
+        <a class="btn btn-success" href="{{ path('expense_new') }}">{{ 'expense.action.add'|trans }}</a>
+    </div>
+{% endblock %}
