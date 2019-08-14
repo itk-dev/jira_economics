@@ -8,6 +8,7 @@ import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import ContentWrapper from '../components/ContentWrapper';
+import Spinner from './Spinner';
 
 const createRows = (projects) => {
     if (projects.data.data === undefined) {
@@ -97,14 +98,7 @@ class ProjectList extends Component {
         if (this.props.projects.loading) {
             return (
                 <ContentWrapper>
-                    <div className="spinner-border"
-                        style={{
-                            width: '3rem',
-                            height: '3rem',
-                            role: 'status'
-                        }}>
-                        <span className="sr-only">Loading...</span>
-                    </div>
+                    <Spinner/>
                 </ContentWrapper>
             );
         } else {

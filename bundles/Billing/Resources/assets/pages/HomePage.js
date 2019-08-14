@@ -15,6 +15,7 @@ import Button from 'react-bootstrap/Button';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import Modal from 'react-bootstrap/Modal';
+import Spinner from '../components/Spinner';
 
 // @TODO: sort invoices by date on initial load
 
@@ -296,13 +297,7 @@ class HomePage extends Component {
         } else {
             return (
                 <ContentWrapper>
-                    <div className="spinner-border" style={{
-                        width: '3rem',
-                        height: '3rem',
-                        role: 'status'
-                    }}>
-                        <span className="sr-only">Loading invoices...</span>
-                    </div>
+                    <Spinner/>
                 </ContentWrapper>
             );
         }

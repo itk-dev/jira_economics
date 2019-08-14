@@ -14,6 +14,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Table from 'react-bootstrap/Table';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Modal from 'react-bootstrap/Modal';
+import Spinner from './Spinner';
 
 function makePriceData (invoiceEntries, jiraIssues) {
     if (invoiceEntries.data.data === undefined) {
@@ -482,14 +483,7 @@ class Invoice extends Component {
         } else {
             return (
                 <ContentWrapper>
-                    <div className="spinner-border"
-                        style={{
-                            width: '3rem',
-                            height: '3rem',
-                            role: 'status'
-                        }}>
-                        <span className="sr-only">Loading...</span>
-                    </div>
+                    <Spinner/>
                 </ContentWrapper>
             );
         }

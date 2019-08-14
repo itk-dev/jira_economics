@@ -9,6 +9,7 @@ import rest from '../redux/utils/rest';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import moment from 'moment';
+import Spinner from './Spinner';
 
 function makeIssueData (jiraIssues) {
     if (jiraIssues.data.data === undefined) {
@@ -253,13 +254,7 @@ class JiraIssues extends Component {
         } else {
             return (
                 <ContentWrapper>
-                    <div className="spinner-border" style={{
-                        width: '3rem',
-                        height: '3rem',
-                        role: 'status'
-                    }}>
-                        <span className="sr-only">Loading...</span>
-                    </div>
+                    <Spinner/>
                 </ContentWrapper>
             );
         }

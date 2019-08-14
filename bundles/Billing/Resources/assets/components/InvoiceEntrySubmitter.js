@@ -5,6 +5,7 @@ import PageTitle from './PageTitle';
 import { setSelectedIssues } from '../redux/actions';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
+import Spinner from './Spinner';
 
 export class InvoiceEntrySubmitter extends Component {
     constructor (props) {
@@ -348,13 +349,7 @@ export class InvoiceEntrySubmitter extends Component {
         } else {
             return (
                 <ContentWrapper>
-                    <div className="spinner-border" style={{
-                        width: '3rem',
-                        height: '3rem',
-                        role: 'status'
-                    }}>
-                        <span className="sr-only">Loading...</span>
-                    </div>
+                    <Spinner/>
                 </ContentWrapper>
             );
         }
