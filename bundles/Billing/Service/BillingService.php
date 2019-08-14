@@ -622,14 +622,23 @@ class BillingService extends JiraService
         }
 
         $start = 0;
+        $params = [
+            'jql' => 'project='.$jiraProjectId,
+            'startAt' => $start,
+            'maxResults' => 100,
+        ];
 
         while (true) {
             try {
-                $results = $this->get('rest/api/2/search?jql=project='.$jiraProjectId.'&startAt='.$start);
+                $results = $this->get('rest/api/2/search', $params);
             } catch (HttpException $e) {
                 throw $e;
             }
             foreach ($results->issues as $jiraIssueResult) {
+                $issueStatus = $jiraIssueResult->fields->status->statusCategory->name;
+                if ($issueStatus !== "Done") {
+                    continue;
+                }
                 $repository = $this->entityManager->getRepository(JiraIssue::class);
                 $jiraIssue = $repository->findOneBy(['issueId' => $jiraIssueResult->id]);
 
@@ -673,7 +682,7 @@ class BillingService extends JiraService
                 $this->entityManager->persist($jiraIssue);
             }
 
-            $start += 50;
+            $start += 100;
 
             if ($start > $results->total) {
                 break;
