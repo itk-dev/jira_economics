@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 
 require('./../billing.css');
 
-export default class App extends Component {
+class App extends Component {
     state = {
         isModalOpen: false
     };
@@ -26,3 +26,12 @@ export default class App extends Component {
         );
     }
 }
+
+App.propTypes = {
+    children: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.node),
+        PropTypes.node
+    ])
+};
+
+export default App;

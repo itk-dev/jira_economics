@@ -1,6 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-export default (props) => (
+const ProjectTitle = (props) => (
     <div className="row">
         <div className="col-12">
             <p className="text-muted">{props.breadcrumb}</p>
@@ -9,3 +10,13 @@ export default (props) => (
         </div>
     </div>
 );
+
+ProjectTitle.propTypes = {
+    children: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.node),
+        PropTypes.node
+    ]),
+    breadcrumb: PropTypes.string
+};
+
+export default ProjectTitle;

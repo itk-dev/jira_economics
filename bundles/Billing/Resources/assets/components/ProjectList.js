@@ -70,7 +70,7 @@ class ProjectList extends Component {
         this.setState({ showModal: true, selectedProject: projectId });
     }
 
-    handleModalCreate () {
+    handleModalCreate (event) {
         event.preventDefault();
         const { dispatch } = this.props;
         const name = this.textInput.current.value;
@@ -181,7 +181,9 @@ class ProjectList extends Component {
 
 ProjectList.propTypes = {
     projects: PropTypes.object,
-    projectRows: PropTypes.array
+    projectRows: PropTypes.array,
+    dispatch: PropTypes.func.isRequired,
+    history: PropTypes.object
 };
 
 const mapStateToProps = state => {

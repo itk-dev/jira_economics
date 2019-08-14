@@ -1,5 +1,6 @@
 import reduxApi from 'redux-api';
 import adapterFetch from 'redux-api/lib/adapters/fetch';
+import fetch from 'cross-fetch';
 
 export default reduxApi({
     getProject: {

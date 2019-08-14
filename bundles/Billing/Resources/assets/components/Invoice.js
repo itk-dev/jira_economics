@@ -107,7 +107,7 @@ class Invoice extends Component {
     async deleteInvoiceEntries (invoiceEntryIds) {
         const { dispatch } = this.props;
         for (let i = 0; i < invoiceEntryIds.length; i++) {
-            let result = await dispatch(rest.actions.deleteInvoiceEntry({ id: `${invoiceEntryIds[i]}` }));
+            await dispatch(rest.actions.deleteInvoiceEntry({ id: `${invoiceEntryIds[i]}` }));
         }
     }
 
@@ -150,15 +150,14 @@ class Invoice extends Component {
             }).pop();
         }
 
-        // InvoiceEntry with Jira issues?
         if (invoiceEntry.jiraIssueIds) {
+            // InvoiceEntry with Jira issues?
             this.props.history.push({
                 pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`,
                 state: { existingInvoiceEntryId: selectedInvoiceEntryId }
             });
-        }
-        // InvoiceEntry without Jira issues
-        else {
+        } else {
+            // InvoiceEntry without Jira issues
             this.props.history.push({
                 pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
                 state: {
@@ -226,7 +225,7 @@ class Invoice extends Component {
 
     handleInvoiceRecordModalClose = (event) => {
         event.preventDefault();
-        if (event.target.id = 'record-invoice-btn') {
+        if (event.target.id === 'record-invoice-btn') {
             const { dispatch } = this.props;
             const id = this.props.match.params.invoiceId;
             const name = this.props.invoice.data.name;
@@ -272,9 +271,9 @@ class Invoice extends Component {
                 <ContentWrapper>
                     <PageTitle>Invoice</PageTitle>
                     <div>Error: the requested invoice does not match the project specified in the URL</div>
-                    <div>(URL contains projectId '{this.props.match.params.projectId}'
-                        but invoice with id '{this.props.match.params.invoiceId}'
-                        belongs to project with id '{this.props.invoice.data.jiraId}')
+                    <div>(URL contains projectId {this.props.match.params.projectId}
+                        but invoice with id {this.props.match.params.invoiceId}
+                        belongs to project with id {this.props.invoice.data.jiraId})
                     </div>
                 </ContentWrapper>
             );
@@ -366,8 +365,7 @@ class Invoice extends Component {
                                             </td>
                                             <td>{item.account}</td>
                                             <td><Link
-                                                to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}
-                      /${item.id}`}>{item.product}</Link></td>
+                                                to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.id}`}>{item.product}</Link></td>
                                             <td>{item.description}</td>
                                             <td>{this.getPriceData(item.id, 'amount')}</td>
                                             <td>{this.getPriceData(item.id, 'unitPrice')}</td>
@@ -403,7 +401,7 @@ class Invoice extends Component {
                         {this.state.checkedCount > 1 &&
                         <Modal.Body>Cannot edit more than one InvoiceEntry at a time!</Modal.Body>
                         }
-                        {this.state.checkedCount == 0 &&
+                        {this.state.checkedCount === 0 &&
                         <Modal.Body>Please select an InvoiceEntry for editing</Modal.Body>
                         }
                         <Modal.Footer>
@@ -418,10 +416,10 @@ class Invoice extends Component {
                         <Modal.Header>
                             <Modal.Title>Error</Modal.Title>
                         </Modal.Header>
-                        {this.state.checkedCount == 0 &&
+                        {this.state.checkedCount === 0 &&
                         <Modal.Body>Please select at least one InvoiceEntry for deletion</Modal.Body>
                         }
-                        {this.state.checkedCount == 0 &&
+                        {this.state.checkedCount === 0 &&
                         <Modal.Footer>
                             <Button variant="secondary"
                                 onClick={this.handleDeleteEntryModalClose}>
@@ -504,7 +502,19 @@ Invoice.propTypes = {
     invoiceEntries: PropTypes.object,
     jiraIssues: PropTypes.object,
     project: PropTypes.object,
-    dispatch: PropTypes.func.isRequired
+    priceData: PropTypes.array,
+    dispatch: PropTypes.func.isRequired,
+    match: PropTypes.shape({
+        params: PropTypes.shape({
+            id: PropTypes.node,
+            projectId: PropTypes.string,
+            invoiceId: PropTypes.string
+        }).isRequired
+    }).isRequired,
+    location: PropTypes.object.isRequired,
+    history: PropTypes.shape({
+        push: PropTypes.func.isRequired
+    }).isRequired
 };
 
 const mapStateToProps = state => {

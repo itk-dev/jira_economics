@@ -70,7 +70,7 @@ require('./planning.css');
             this.apiUrl = PLANNING_API_URL;
 
             // Get hidden users from local storage.
-            let hideUsers = localStorage.getItem('hideUsers');
+            let hideUsers = window.localStorage.getItem('hideUsers');
 
             if (hideUsers !== null) {
                 this.hideUsers = JSON.parse(hideUsers);
@@ -92,7 +92,7 @@ require('./planning.css');
             toggleUser: function (key) {
                 let newValue = !this.hideUsers[key];
                 Vue.set(this.hideUsers, key, newValue);
-                localStorage.setItem('hideUsers', JSON.stringify(this.hideUsers));
+                window.localStorage.setItem('hideUsers', JSON.stringify(this.hideUsers));
             },
             getToggle: function (key) {
                 let toggled = this.toggle.hasOwnProperty(key) && this.toggle[key];

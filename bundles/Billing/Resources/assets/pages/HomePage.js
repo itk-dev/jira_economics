@@ -48,7 +48,7 @@ class HomePage extends Component {
     handleModalClose = (event) => {
         event.preventDefault();
         var invoiceId = this.state.invoiceIdToDelete;
-        if (event.target.id == 'delete-btn') {
+        if (event.target.id === 'delete-btn') {
             const { dispatch } = this.props;
             dispatch(rest.actions.deleteInvoice({ id: invoiceId }))
                 .then(() => {
@@ -60,7 +60,7 @@ class HomePage extends Component {
         this.setState({ showModal: false, invoiceIdToDelete: -1 });
     };
 
-    handleInvoiceDelete = (invoiceId) => {
+    handleInvoiceDelete = (event, invoiceId) => {
         event.preventDefault();
         this.setState({ invoiceIdToDelete: invoiceId });
         this.handleModalShow();
@@ -72,7 +72,7 @@ class HomePage extends Component {
 
     removeInvoiceFromState (invoiceId) {
         let filteredInvoices = this.state.allInvoices.data.filter((invoice) => {
-            return invoiceId != invoice.invoiceId;
+            return invoiceId !== invoice.invoiceId;
         });
         let remainingInvoices = { 'data': filteredInvoices };
         this.setState({ allInvoices: remainingInvoices });
@@ -83,9 +83,9 @@ class HomePage extends Component {
             return 0;
         }
         let invoiceEntries = this.state.allInvoiceEntries.data.filter((invoiceEntry) => {
-            return invoiceEntry.invoiceId == invoiceId;
+            return invoiceEntry.invoiceId === invoiceId;
         });
-        if (invoiceEntries == undefined) {
+        if (invoiceEntries === undefined) {
             return 'N/A';
         }
         let totalPrice = 0;
@@ -97,11 +97,11 @@ class HomePage extends Component {
 
     onSort (event) {
         let sortOrder = 'desc';
-        if (event.target.value == 'Ældste først') {
+        if (event.target.value === 'Ældste først') {
             sortOrder = 'asc';
         }
         let sortedInvoices = this.state.allInvoices.data.sort(function (i1, i2) {
-            if (sortOrder == 'asc') {
+            if (sortOrder === 'asc') {
                 return i1.created.date > i2.created.date;
             } else {
                 return i1.created.date < i2.created.date;
@@ -311,7 +311,8 @@ class HomePage extends Component {
 
 HomePage.propTypes = {
     allInvoices: PropTypes.object,
-    allInvoiceEntries: PropTypes.object
+    allInvoiceEntries: PropTypes.object,
+    dispatch: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => {

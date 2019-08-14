@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import 'moment-timezone';
 import rest from '../redux/utils/rest';
 import ReactTable from 'react-table';
-import '!style-loader!css-loader!react-table/react-table.css';
+import 'react-table/react-table.css';
 import moment from 'moment';
 
 function makeIssueData (jiraIssues) {
@@ -268,7 +268,20 @@ class JiraIssues extends Component {
 
 JiraIssues.propTypes = {
     jiraIssues: PropTypes.object,
-    issueData: PropTypes.array
+    issueData: PropTypes.array,
+    selectedIssues: PropTypes.object,
+    dispatch: PropTypes.func.isRequired,
+    match: PropTypes.shape({
+        params: PropTypes.shape({
+            id: PropTypes.node,
+            projectId: PropTypes.string,
+            invoiceId: PropTypes.string
+        }).isRequired
+    }).isRequired,
+    location: PropTypes.object.isRequired,
+    history: PropTypes.shape({
+        push: PropTypes.func.isRequired
+    }).isRequired
 };
 
 const mapStateToProps = state => {
