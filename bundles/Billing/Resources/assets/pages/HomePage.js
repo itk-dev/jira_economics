@@ -16,8 +16,6 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import Modal from 'react-bootstrap/Modal';
 
-// @TODO: sort invoices by date on initial load
-
 class HomePage extends Component {
 
   constructor(props) {
@@ -31,7 +29,8 @@ class HomePage extends Component {
     const { dispatch } = this.props;
     dispatch(rest.actions.getAllInvoices())
       .then((response) => {
-        this.setState({ allInvoices: response });
+        let sortedInvoices = {data: this.sortInvoices(response.data, "desc")};
+        this.setState({ allInvoices: sortedInvoices });
       })
       .catch((reason) => console.log('isCanceled', reason.isCanceled));
     dispatch(rest.actions.getAllInvoiceEntries())
@@ -96,7 +95,12 @@ class HomePage extends Component {
     if (event.target.value == "Ældste først") {
       sortOrder = "asc";
     }
-    let sortedInvoices = this.state.allInvoices.data.sort(function (i1, i2) {
+    let sortedInvoices = {data: this.sortInvoices(this.state.allInvoices.data, sortOrder)};
+    this.setState({ allInvoices: sortedInvoices });
+  };
+
+  sortInvoices(invoices, sortOrder) {
+    let sortedInvoices = invoices.sort(function (i1, i2) {
       if (sortOrder == 'asc') {
         return i1.created.date > i2.created.date;
       }
@@ -104,9 +108,8 @@ class HomePage extends Component {
         return i1.created.date < i2.created.date;
       }
     });
-    sortedInvoices = { "data": sortedInvoices };
-    this.setState({ allInvoices: sortedInvoices });
-  };
+    return sortedInvoices;
+  }
 
   render() {
     if (this.state.allInvoices.data && this.state.allInvoiceEntries.data) {
