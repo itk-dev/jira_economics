@@ -31,3 +31,7 @@ planning:
 expense:
     prefix: /jira
     resource: "@ExpenseBundle/Resources/config/routing.yaml"
+
+sprint_report:
+    prefix: /jira
+    resource: "@SprintReportBundle/Resources/config/routing.yaml"
