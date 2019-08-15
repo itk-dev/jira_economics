@@ -128,7 +128,6 @@ class JiraIssues extends Component {
         distinctFixVersionNames.forEach(fixVersionName => {
             options.push(options.push(<option key={options.length + 1} value={fixVersionName}>{fixVersionName}</option>));
         });
-        <option value="Udvikling">Udvikling</option>
         options.push(<option key={"none"} value="none">Ingen version</option>);
         return options;
     }
