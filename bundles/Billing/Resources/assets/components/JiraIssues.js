@@ -8,6 +8,7 @@ import 'moment-timezone';
 import rest from '../redux/utils/rest';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
+import matchSorter from 'match-sorter'
 import moment from 'moment';
 import Spinner from './Spinner';
 
@@ -168,7 +169,10 @@ class JiraIssues extends Component {
             {
                 Header: 'Issue',
                 accessor: 'summary',
-                filterable: false,
+                filterable: true,
+                filterMethod: (filter, rows) =>
+                    matchSorter(rows, filter.value, { keys: ["summary"] }),
+                filterAll: true
             },
             {
                 Header: 'Oprettet',
@@ -194,10 +198,13 @@ class JiraIssues extends Component {
             {
                 Header: 'Jirabrugere',
                 id: 'jiraUsers',
-                filterable: false,
                 accessor: d => {
                     return d.jiraUsers;
-                }
+                },
+                filterable: true,
+                filterMethod: (filter, rows) =>
+                    matchSorter(rows, filter.value, { keys: ["jiraUsers"] }),
+                filterAll: true
             },
             {
                 Header: 'Registrerede timer',
