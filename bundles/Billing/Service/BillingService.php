@@ -636,7 +636,7 @@ class BillingService extends JiraService
             }
             foreach ($results->issues as $jiraIssueResult) {
                 $issueStatus = $jiraIssueResult->fields->status->statusCategory->name;
-                if ($issueStatus !== "Done") {
+                if ('Done' !== $issueStatus) {
                     continue;
                 }
                 $repository = $this->entityManager->getRepository(JiraIssue::class);
@@ -662,6 +662,13 @@ class BillingService extends JiraService
                     $jiraIssue->setJiraUsers([$jiraIssueResult->fields->assignee->key]);
                 }
 
+                if (!empty($jiraIssueResult->fields->fixVersions)) {
+                    $fixVersionId = (int) $jiraIssueResult->fields->fixVersions[0]->id;
+                    // @TODO: fixVersionId is fetched correctly from the object but never persisted properly by doctrine
+                    $jiraIssue->setFixVersionId($fixVersionId);
+                    $jiraIssue->setFixVersionName($jiraIssueResult->fields->fixVersions[0]->name);
+                }
+
                 $issue = [
                     'issueId' => $jiraIssue->getIssueId(),
                     'summary' => $jiraIssue->getSummary(),
@@ -669,6 +676,8 @@ class BillingService extends JiraService
                     'finished' => $jiraIssue->getFinished(),
                     'jiraUsers' => $jiraIssue->getJiraUsers(),
                     'timeSpent' => $jiraIssue->getTimeSpent(),
+                    'fixVersionId' => $jiraIssue->getFixVersionId(),
+                    'fixVersionName' => $jiraIssue->getFixVersionName(),
                 ];
 
                 if (null !== $jiraIssue->getInvoiceEntryId()) {
@@ -853,7 +862,7 @@ class BillingService extends JiraService
             'jql' => 'fixVersion='.$fixedVersion,
             'project' => $jiraProjectId,
             'maxResults' => 50,
-            'startAt' => 0
+            'startAt' => 0,
         ];
 
         try {

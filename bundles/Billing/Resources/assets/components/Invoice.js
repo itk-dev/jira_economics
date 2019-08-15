@@ -279,6 +279,7 @@ class Invoice extends Component {
                 </ContentWrapper>
             );
         } else if (this.props.project.data.name && this.state.invoiceEntries.data) {
+            // @TODO: persist invoice description
             return (
                 <ContentWrapper>
                     <PageTitle
