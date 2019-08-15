@@ -67,6 +67,16 @@ class JiraIssue
      */
     private $InvoiceEntryId;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $fixVersionId;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $fixVersionName;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -164,6 +174,30 @@ class JiraIssue
     public function setInvoiceEntryId(?InvoiceEntry $InvoiceEntryId): self
     {
         $this->InvoiceEntryId = $InvoiceEntryId;
+
+        return $this;
+    }
+
+    public function getFixVersionId(): ?int
+    {
+        return $this->fixVersionId;
+    }
+
+    public function setFixVersionId(int $fixVersionId): self
+    {
+        $this->$fixVersionId = $fixVersionId;
+
+        return $this;
+    }
+
+    public function getfixVersionName(): ?string
+    {
+        return $this->fixVersionName;
+    }
+
+    public function setfixVersionName(string $fixVersionName): self
+    {
+        $this->fixVersionName = $fixVersionName;
 
         return $this;
     }
