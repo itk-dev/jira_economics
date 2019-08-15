@@ -649,6 +649,7 @@ class BillingService extends JiraService
                 $jiraIssue->setIssueId($jiraIssueResult->id);
                 $jiraIssue->setProject($project);
 
+                // @TODO: persist billable time instead of logged time
                 if (!empty($jiraIssueResult->fields->timespent)) {
                     $jiraIssue->setTimeSpent($jiraIssueResult->fields->timespent);
                 }

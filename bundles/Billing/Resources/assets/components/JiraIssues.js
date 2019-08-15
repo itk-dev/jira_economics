@@ -24,7 +24,8 @@ function makeIssueData (jiraIssues) {
         finished: item.finished.date,
         invoiceStatus: '?',
         jiraUsers: item.jiraUsers,
-        timeSpent: item.timeSpent ? (item.timeSpent / 3600) : 'N/A'
+        timeSpent: item.timeSpent ? (item.timeSpent / 3600) : 'N/A',
+        fixVersionName: item.fixVersionName
     }));
 }
 
@@ -117,11 +118,28 @@ class JiraIssues extends Component {
         });
     }
 
+    getFixVersionOptions () {
+        let distinctFixVersionNames = [...new Set(this.props.issueData.map(issue => issue.fixVersionName))];
+        distinctFixVersionNames = distinctFixVersionNames.filter(function (element) {
+            return element !== "" && element !== null;
+        });
+        let options = [];
+        options.push(<option key={"all"} value="all">Alle fix versions</option>);
+        distinctFixVersionNames.forEach(fixVersionName => {
+            options.push(options.push(<option key={options.length + 1} value={fixVersionName}>{fixVersionName}</option>));
+        });
+        <option value="Udvikling">Udvikling</option>
+        options.push(<option key={"none"} value="none">Ingen version</option>);
+        return options;
+    }
+
+    // @TODO: properly implement filtering
     createColumns () {
         return [
             {
                 id: 'checkbox',
                 accessor: '',
+                filterable: false,
                 Cell: ({ original }) => {
                     return (
                         <input
@@ -150,11 +168,13 @@ class JiraIssues extends Component {
             },
             {
                 Header: 'Issue',
-                accessor: 'summary'
+                accessor: 'summary',
+                filterable: false,
             },
             {
                 Header: 'Oprettet',
                 id: 'created',
+                filterable: false,
                 accessor: d => {
                     return moment(d.created).format('YYYY-MM-DD HH:mm');
                 }
@@ -162,24 +182,53 @@ class JiraIssues extends Component {
             {
                 Header: 'Færdiggjort',
                 id: 'finished',
+                filterable: false,
                 accessor: d => {
                     return moment(d.finished).format('YYYY-MM-DD HH:mm');
                 }
             },
             {
                 Header: 'Fakturastatus',
-                accessor: 'invoiceStatus'
+                accessor: 'invoiceStatus',
+                filterable: false
             },
             {
                 Header: 'Jirabrugere',
                 id: 'jiraUsers',
+                filterable: false,
                 accessor: d => {
                     return d.jiraUsers;
                 }
             },
             {
                 Header: 'Registrerede timer',
-                accessor: 'timeSpent'
+                accessor: 'timeSpent',
+                filterable: false
+            },
+            {
+                Header: 'Fix version',
+                accessor: 'fixVersionName',
+                filterMethod: (filter, row) => {
+                    if (filter.value === "all") {
+                        return true;
+                    }
+                    else if (filter.value === "none" && row.fixVersionName === "") {
+                        return true;
+                    }
+                    else if (filter.value === row.fixVersionName) {
+                      return true;
+                    }
+                    else {
+                        return false;
+                    }
+                  },
+                  Filter: ({ filter, onChange }) =>
+                    <select
+                      onChange={event => onChange(event.target.value)}
+                      style={{ width: "100%" }}
+                      value={filter ? filter.value : "all"}>
+                        {this.getFixVersionOptions()}
+                    </select>
             }
         ];
     }
@@ -233,6 +282,9 @@ class JiraIssues extends Component {
                     <div>Vælg issues fra Jira</div>
                     <ReactTable
                         data={this.props.issueData}
+                        filterable
+                        defaultFilterMethod={(filter, row) => 
+                          String(row[filter.id]) === filter.value}
                         columns={this.createColumns()}
                         defaultPageSize={10}
                         defaultSorted={[{ id: 'issueId', desc: false }]}
