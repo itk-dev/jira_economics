@@ -11,6 +11,10 @@ export default reduxApi({
         reducerName: 'invoice',
         url: '/jira/billing/jira_api/invoice/:id'
     },
+    getProjectAccounts: {
+        reducerName: 'accounts',
+        url: '/jira/billing/jira_api/account/project/:id'
+    },
     updateInvoice: {
         reducerName: 'invoice',
         url: '/jira/billing/jira_api/invoice/:id',

@@ -154,7 +154,9 @@ abstract class AbstractJiraService
 
         foreach ($results as $result) {
             if (!isset($result->projectCategory) || 'Lukket' !== $result->projectCategory->name) {
-                $result->url = parse_url($result->self, PHP_URL_SCHEME).'://'.parse_url($result->self, PHP_URL_HOST).'/browse/'.$result->key;
+                $result->url = parse_url($result->self,
+                        PHP_URL_SCHEME).'://'.parse_url($result->self,
+                        PHP_URL_HOST).'/browse/'.$result->key;
                 $projects[] = $result;
             }
         }
@@ -244,6 +246,78 @@ abstract class AbstractJiraService
         $accounts = $this->get('/rest/tempo-accounts/1/customer/');
 
         return $accounts;
+    }
+
+    public function getAccount($accountId)
+    {
+        return $this->get('/rest/tempo-accounts/1/account/'.$accountId.'/');
+    }
+
+    public function getRateTableByAccount($accountId)
+    {
+        return $this->get('/rest/tempo-accounts/1/ratetable', [
+            'scopeId' => ''.$accountId,
+            'scopeType' => 'ACCOUNT',
+        ]);
+    }
+
+    public function getAccountDefaultPrice($accountId)
+    {
+        $rateTable = $this->getRateTableByAccount($accountId);
+
+        foreach ($rateTable->rates as $rate)
+        {
+            if ($rate->link->type == 'DEFAULT_RATE') {
+                return $rate->amount;
+            }
+        }
+
+        return null;
+    }
+
+    public function getAccountIdsByProject($projectId)
+    {
+        $projectLinks = $this->get('/rest/tempo-accounts/1/link/project/'.$projectId);
+
+        return array_reduce($projectLinks, function ($carry, $item) {
+            $carry[] = $item->accountId;
+            return $carry;
+        }, []);
+    }
+
+    /**
+     * Get tempo custom fields.
+     *
+     * @return mixed
+     */
+    public function getTempoCustomFields()
+    {
+        $customFields = $this->get('/rest/tempo-accounts/1/field/');
+
+        return $customFields;
+    }
+
+    /**
+     * Get all tempo categories.
+     *
+     * @return mixed
+     */
+    public function getTempoCategories()
+    {
+        $customFields = $this->get('/rest/tempo-accounts/1/category/');
+
+        return $customFields;
+    }
+
+    /**
+     * Get customer by id.
+     *
+     * @param $id
+     * @return mixed
+     */
+    public function getTempoCustomer($id)
+    {
+        return $this->get('/rest/tempo-accounts/1/customer/'.$id);
     }
 
     /**
@@ -344,9 +418,10 @@ abstract class AbstractJiraService
 
     public function updateExpenseCategory(ExpenseCategory $category)
     {
-        $result = $this->put('/rest/tempo-core/1/expense/category/'.$category->getId().'/', [
-            'name' => $category->getName(),
-        ]);
+        $result = $this->put('/rest/tempo-core/1/expense/category/'.$category->getId().'/',
+            [
+                'name' => $category->getName(),
+            ]);
 
         return $result;
     }
@@ -382,7 +457,7 @@ abstract class AbstractJiraService
                 'scopeType' => $data['scope_type'],
                 'scopeId' => $data['scope_id'],
             ],
-            'amount' => (int) ($data['quantity'] * $category->getUnitPrice()),
+            'amount' => (int)($data['quantity'] * $category->getUnitPrice()),
             'description' => $data['description'],
             'date' => (new \DateTime())->format(\DateTime::ATOM),
         ];

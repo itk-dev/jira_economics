@@ -55,6 +55,7 @@ class Invoice extends Component {
         this.handleDeleteEntryModalClose = this.handleDeleteEntryModalClose.bind(this);
 
         this.state = {
+            accounts: [],
             checkedEntries: {},
             showModal: false,
             showDeleteModal: false,
@@ -70,6 +71,7 @@ class Invoice extends Component {
         dispatch(rest.actions.getProject({ id: `${this.props.match.params.projectId}` }));
         dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
         dispatch(rest.actions.getInvoice({ id: `${this.props.match.params.invoiceId}` }));
+        dispatch(rest.actions.getProjectAccounts({ id: `${this.props.match.params.projectId}` }));
         dispatch(rest.actions.getInvoiceEntries({ id: `${this.props.match.params.invoiceId}` }))
             .then((response) => {
                 this.setState({ invoiceEntries: response });
@@ -491,6 +493,7 @@ class Invoice extends Component {
 }
 
 Invoice.propTypes = {
+    account: PropTypes.array,
     invoice: PropTypes.object,
     createdAt: PropTypes.string,
     invoiceEntries: PropTypes.object,
@@ -524,7 +527,8 @@ const mapStateToProps = state => {
         invoiceEntries: state.invoiceEntries,
         jiraIssues: state.jiraIssues,
         project: state.project,
-        priceData: priceData
+        priceData: priceData,
+        accounts: state.accounts
     };
 };
 
