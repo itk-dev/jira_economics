@@ -118,13 +118,14 @@ export class InvoiceEntrySubmitter extends Component {
         this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
     };
 
+    // @TODO: Styling.
     renderManualInvoiceEntryForm () {
         let pageTitle;
-        // @TODO: Editing an existing InvoiceEntry?
+        // Editing an existing InvoiceEntry.
         if (this.props.location.state.existingInvoiceEntryId) {
             pageTitle = <PageTitle>Rediger manuel fakturalinje</PageTitle>;
         } else {
-            // @TODO: Creating a new InvoiceEntry?
+            // Creating a new InvoiceEntry.
             pageTitle = <PageTitle>Opret fakturalinje manuelt</PageTitle>;
         }
         return (
@@ -221,14 +222,15 @@ export class InvoiceEntrySubmitter extends Component {
         );
     }
 
+    // @TODO: Styling.
     renderInvoiceEntryForm () {
         let pageTitle;
-        // @TODO: Editing an existing InvoiceEntry?
+        // Editing an existing InvoiceEntry.
         if (this.props.location.state.existingInvoiceEntryId) {
             pageTitle =
                 <PageTitle>Rediger eksisterende fakturalinje</PageTitle>;
         } else {
-            // @TODO: Creating a new InvoiceEntry with JiraIssues?
+            // Creating a new InvoiceEntry with JiraIssues.
             pageTitle =
                 <PageTitle>Opret fakturalinje med issues fra Jira</PageTitle>;
         }
@@ -334,17 +336,16 @@ export class InvoiceEntrySubmitter extends Component {
 
     // @TODO: add type validation to input fields (decimals currently need to be specified with dot notation)
     // @TODO: cleanup redundant HTML
-    // @TODO: replace HTML elements with react-bootstrap components
     render () {
         if (this.props.location.state &&
             this.props.location.state.from ===
             `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`) {
-            // @TODO: InvoiceEntry without JiraIssues?
+            // InvoiceEntry without JiraIssues.
             return this.renderManualInvoiceEntryForm();
         } else if (this.props.location.state &&
             this.props.location.state.from !==
             `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`) {
-            // @TODO: InvoiceEntry with JiraIssues?
+            // InvoiceEntry with JiraIssues.
             return this.renderInvoiceEntryForm();
         } else {
             return (
