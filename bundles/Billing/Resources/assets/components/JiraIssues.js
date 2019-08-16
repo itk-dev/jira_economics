@@ -9,7 +9,8 @@ import rest from '../redux/utils/rest';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import matchSorter from 'match-sorter';
-// import DatePicker from 'react-datepicker';
+import DateRangePicker from 'react-bootstrap-daterangepicker';
+import 'bootstrap-daterangepicker/daterangepicker.css';
 import moment from 'moment';
 import Spinner from './Spinner';
 
@@ -52,12 +53,18 @@ class JiraIssues extends Component {
         this.state = {
             selected: [],
             selectAll: 0,
-            selectedIssues: {}
+            selectedIssues: {},
+            date: moment(),
+            locale: '',
+            startDate: moment(),
+            endDate: moment(),
+            dateLabel: ''
         };
         if (this.props.selectedIssues.selectedIssues && this.props.selectedIssues.selectedIssues.length > 0) {
             this.state.selected = this.props.selectedIssues.selectedIssues;
         }
         this.toggleRow = this.toggleRow.bind(this);
+        this.handleApply = this.handleApply.bind(this);
     }
 
     componentDidMount () {
@@ -70,6 +77,19 @@ class JiraIssues extends Component {
                 }
             });
         }
+    }
+
+    componentWillMount () {
+        const date = new Date().toISOString();
+
+        this.setState({
+            date: date,
+            locale: {
+                'format': 'YYYY-MM-DD'
+            },
+            startDate: moment(),
+            endDate: moment()
+        });
     }
 
     // @TODO: consider simplifying logic here
@@ -134,6 +154,25 @@ class JiraIssues extends Component {
         return options;
     }
 
+    handleApply (event, picker) {
+        let startDate = moment(picker.startDate._d).format('YYYY-MM-DD');
+        let endDate = moment(picker.endDate._d).format('YYYY-MM-DD');
+        this.setState((prevState, props) => ({
+            startDate: startDate,
+            endDate: endDate
+        }));
+        if (startDate === endDate) {
+            this.setState((prevState, props) => ({
+                dateLabel: prevState.startDate
+            }));
+        }
+        else {
+            this.setState((prevState, props) => ({
+                dateLabel: prevState.startDate + " til " + prevState.endDate
+        }));
+        }
+    }
+
     // @TODO: properly implement filtering
     createColumns () {
         return [
@@ -181,9 +220,8 @@ class JiraIssues extends Component {
                 accessor: d => {
                     return moment(d.created).format('YYYY-MM-DD HH:mm');
                 },
-                filterable: true,
                 filterMethod: (filter, row) => {
-                    const createdDate = moment(row.created).format('YYYY-MM-DD HH:mm');
+                    const createdDate = moment(row.created).format('YYYY-MM-DD');
                     if (filter.value === 'all') {
                         return true;
                     } else if (filter.value === createdDate) {
@@ -191,31 +229,22 @@ class JiraIssues extends Component {
                     } else {
                         return false;
                     }
-                }
-                /*
+                },
                 Filter: ({ filter, onChange }) =>
-                    <DatePicker
-                        selected={new Date("2019-08-15 00:00")}
-                        selectsStart
-                        startDate={new Date("2019-08-01 00:00")}
-                        endDate={new Date("2019-08-31 00:00")}
-                        onChange={this.handleChange}
-                        dateFormat="yyyy-mm-dd HH:mm"
-                        style={{ width: "100%" }}
-                        //value={filter ? filter.value : new Date("2019-08-10 00:00")}
-                    >
-                    </DatePicker>
-                    <DatePicker
-                        selected={"2019-08-10 00:00"}
-                        selectsEnd
-                        startDate={"2019-08-01 00:00"}
-                        endDate={"2019-08-01 00:00"}
-                        onChange={event => onChange(event.target.value)}
-                        dateFormat="YYYY-MM-DD HH:mm"
-                        style={{ width: "100%" }}
-                        value={filter ? filter.value : new Date("2019-08-10 00:00")}>
-                    </DatePicker>
-                    */
+                    <DateRangePicker
+                      startDate={this.state.startDate}
+                      endDate={this.state.endDate}
+                      style={{ width: '100%' }}
+                      onApply={this.handleApply}
+                      onEvent={event => onChange(event)} 
+                      value={filter ? filter.value : 'all'}>
+                    <input
+                      type="text" 
+                      readOnly 
+                      value={this.state.dateLabel} 
+                      placeholder="Vælg datoer">
+                    </input>
+                    </DateRangePicker>
             },
             {
                 Header: 'Færdiggjort',
@@ -311,6 +340,8 @@ class JiraIssues extends Component {
         });
         return timeSum;
     }
+
+    // @TODO: properly style the table
 
     render () {
         if (this.props.jiraIssues.data.data) {

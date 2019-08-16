@@ -78,10 +78,11 @@
     },
     "dependencies": {
         "bootstrap-datepicker": "^1.9.0",
+        "bootstrap-daterangepicker": "^3.0.5",
         "jquery-knob": "^1.2.11",
         "jquery-ui": "^1.12.1",
         "match-sorter": "^4.0.1",
-        "react-datepicker": "^2.8.0"
+        "react-bootstrap-daterangepicker": "^4.1.0"
     },
     "browserslist": [
         "> 0.5%",
