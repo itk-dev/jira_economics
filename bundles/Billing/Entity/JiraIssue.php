@@ -185,7 +185,7 @@ class JiraIssue
 
     public function setFixVersionId(int $fixVersionId): self
     {
-        $this->$fixVersionId = $fixVersionId;
+        $this->fixVersionId = $fixVersionId;
 
         return $this;
     }
