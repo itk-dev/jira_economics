@@ -165,11 +165,10 @@ class JiraIssues extends Component {
             this.setState((prevState, props) => ({
                 dateLabel: prevState.startDate
             }));
-        }
-        else {
+        } else {
             this.setState((prevState, props) => ({
-                dateLabel: prevState.startDate + " til " + prevState.endDate
-        }));
+                dateLabel: prevState.startDate + ' til ' + prevState.endDate
+            }));
         }
     }
 
@@ -232,18 +231,18 @@ class JiraIssues extends Component {
                 },
                 Filter: ({ filter, onChange }) =>
                     <DateRangePicker
-                      startDate={this.state.startDate}
-                      endDate={this.state.endDate}
-                      style={{ width: '100%' }}
-                      onApply={this.handleApply}
-                      onEvent={event => onChange(event)} 
-                      value={filter ? filter.value : 'all'}>
-                    <input
-                      type="text" 
-                      readOnly 
-                      value={this.state.dateLabel} 
-                      placeholder="Vælg datoer">
-                    </input>
+                        startDate={this.state.startDate}
+                        endDate={this.state.endDate}
+                        style={{ width: '100%' }}
+                        onApply={this.handleApply}
+                        onEvent={event => onChange(event)}
+                        value={filter ? filter.value : 'all'}>
+                        <input
+                            type="text"
+                            readOnly
+                            value={this.state.dateLabel}
+                            placeholder="Vælg datoer">
+                        </input>
                     </DateRangePicker>
             },
             {
