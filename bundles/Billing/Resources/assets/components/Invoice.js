@@ -57,6 +57,7 @@ class Invoice extends Component {
         this.state = {
             accounts: [],
             checkedEntries: {},
+            invoice: null,
             showModal: false,
             showDeleteModal: false,
             showRecordModal: false,
@@ -280,7 +281,11 @@ class Invoice extends Component {
                     </div>
                 </ContentWrapper>
             );
-        } else if (this.props.project.data.name && this.state.invoiceEntries.data) {
+        } else if (this.props.project.data.name && this.props.invoiceEntries.data) {
+            let accounts = this.props.accounts.data;
+            let invoice = this.props.invoice.data;
+            let account = accounts[invoice.accountId];
+
             return (
                 <ContentWrapper>
                     <PageTitle
@@ -380,16 +385,24 @@ class Invoice extends Component {
                         </div>
                         <div className="col-md-4">
                             <h4>Client information</h4>
-                            <ListGroup>
-                                <ListGroup.Item><span
-                                    className="text-muted d-inline-block w-25">Name</span> Customer name</ListGroup.Item>
-                                <ListGroup.Item><span
-                                    className="text-muted d-inline-block w-25">Contact</span> Customer contact</ListGroup.Item>
-                                <ListGroup.Item><span
-                                    className="text-muted d-inline-block w-25">CVR</span> XXXXXXXX</ListGroup.Item>
-                                <ListGroup.Item><span
-                                    className="text-muted d-inline-block w-25">EAN</span> XXXXXXXXXX</ListGroup.Item>
-                            </ListGroup>
+                            {
+                                (this.props.invoice && !account) &&
+                                <div>
+                                    Choose account.
+                                </div>
+                            }
+
+                            {
+                                account &&
+                                <ListGroup>
+                                    <ListGroup.Item><span
+                                        className="text-muted d-inline-block w-25">Name</span>{account.name}</ListGroup.Item>
+                                    <ListGroup.Item><span
+                                        className="text-muted d-inline-block w-25">Contact</span>{account.contact.name}</ListGroup.Item>
+                                    <ListGroup.Item><span
+                                        className="text-muted d-inline-block w-25">Default price</span>{account.defaultPrice}</ListGroup.Item>
+                                </ListGroup>
+                            }
                         </div>
                     </div>
                     <ContentFooter>
@@ -493,7 +506,7 @@ class Invoice extends Component {
 }
 
 Invoice.propTypes = {
-    account: PropTypes.array,
+    accounts: PropTypes.array,
     invoice: PropTypes.object,
     createdAt: PropTypes.string,
     invoiceEntries: PropTypes.object,

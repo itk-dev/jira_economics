@@ -134,6 +134,7 @@ class BillingService extends JiraService
             'name' => $invoice->getName(),
             'jiraId' => $invoice->getProject()->getJiraId(),
             'recorded' => $invoice->getRecorded(),
+            'accountId' => $invoice->getAccountId(),
             'created' => $invoice->getCreated(),
         ];
     }
@@ -211,6 +212,10 @@ class BillingService extends JiraService
             $invoice->setName($invoiceData['name']);
         }
 
+        if (!empty($invoiceData['accountId'])) {
+            $invoice->setAccountId($invoiceData['accountId']);
+        }
+
         if (isset($invoiceData['recorded'])) {
             $invoiceRecorded = $invoiceData['recorded'];
             $invoice->setRecorded($invoiceRecorded);
@@ -223,6 +228,7 @@ class BillingService extends JiraService
             'name' => $invoice->getName(),
             'jiraId' => $invoice->getProject()->getJiraId(),
             'recorded' => $invoice->getRecorded(),
+            'accountId' => $invoice->getAccountId(),
             'created' => $invoice->getCreated(),
         ];
     }
