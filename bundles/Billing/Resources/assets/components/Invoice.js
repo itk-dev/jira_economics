@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from '../components/ContentWrapper';
 import PageTitle from '../components/PageTitle';
-import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Moment from 'react-moment';
 import 'moment-timezone';
@@ -15,30 +14,6 @@ import Table from 'react-bootstrap/Table';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Modal from 'react-bootstrap/Modal';
 import Spinner from './Spinner';
-
-function makePriceData (invoiceEntries, jiraIssues) {
-    if (invoiceEntries.data.data === undefined) {
-        return [];
-    }
-    if (jiraIssues.data.data === undefined) {
-        return [];
-    }
-    let priceData = [];
-    invoiceEntries.data.data.forEach(invoiceEntry => {
-        let key = `row-${invoiceEntry.id}`;
-        const amount = invoiceEntry.amount;
-        // @TODO: unitPrice should be fetched from the customer instead
-        const unitPrice = invoiceEntry.price / amount;
-        const totalPrice = invoiceEntry.price;
-        priceData[key] = {
-            unitPrice: unitPrice,
-            amount: amount,
-            totalPrice: totalPrice
-        };
-    });
-
-    return priceData;
-}
 
 class Invoice extends Component {
     constructor (props) {
@@ -192,14 +167,6 @@ class Invoice extends Component {
         this.setState(stateCopy);
     };
 
-    getPriceData (invoiceEntryId, key) {
-        if (this.props.priceData[`row-${invoiceEntryId}`] && this.props.priceData[`row-${invoiceEntryId}`][key]) {
-            return this.props.priceData[`row-${invoiceEntryId}`][key];
-        } else {
-            return 0;
-        }
-    };
-
     handleModalClose () {
         this.setState({ showModal: false });
     };
@@ -282,6 +249,8 @@ class Invoice extends Component {
                 </ContentWrapper>
             );
         } else if (this.props.project.data.name && this.props.invoiceEntries.data) {
+            // @TODO: Assign account when creating the invoice.
+            // @TODO: Load the account together with the invoice.
             let accounts = this.props.accounts.data;
             let invoice = this.props.invoice.data;
             let account = accounts[invoice.accountId];
@@ -372,12 +341,11 @@ class Invoice extends Component {
                                                 onChange={this.handleCheckboxChange}/>
                                             </td>
                                             <td>{item.account}</td>
-                                            <td><Link
-                                                to={`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${item.id}`}>{item.product}</Link></td>
+                                            <td>{item.product}</td>
                                             <td>{item.description}</td>
-                                            <td>{this.getPriceData(item.id, 'amount')}</td>
-                                            <td>{this.getPriceData(item.id, 'unitPrice')}</td>
-                                            <td>{this.getPriceData(item.id, 'totalPrice')}</td>
+                                            <td>{item.amount}</td>
+                                            <td>{item.price}</td>
+                                            <td>{item.amount * item.price}</td>
                                         </tr>
                                     )}
                                 </tbody>
@@ -512,7 +480,6 @@ Invoice.propTypes = {
     invoiceEntries: PropTypes.object,
     jiraIssues: PropTypes.object,
     project: PropTypes.object,
-    priceData: PropTypes.array,
     dispatch: PropTypes.func.isRequired,
     match: PropTypes.shape({
         params: PropTypes.shape({
@@ -528,7 +495,6 @@ Invoice.propTypes = {
 };
 
 const mapStateToProps = state => {
-    let priceData = makePriceData(state.invoiceEntries, state.jiraIssues);
     let createdAt = '';
     if (state.invoice.data.created && state.invoice.data.created.date) {
         createdAt = state.invoice.data.created.date;
@@ -540,7 +506,6 @@ const mapStateToProps = state => {
         invoiceEntries: state.invoiceEntries,
         jiraIssues: state.jiraIssues,
         project: state.project,
-        priceData: priceData,
         accounts: state.accounts
     };
 };

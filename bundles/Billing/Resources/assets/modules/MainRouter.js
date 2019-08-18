@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import App from './App';
 import HomePage from '../pages/HomePage';
-import Customer from '../components/Customer';
 import Invoice from '../components/Invoice';
 import JiraIssues from '../components/JiraIssues';
 import InvoiceEntrySubmitter from '../components/InvoiceEntrySubmitter';
@@ -52,7 +51,6 @@ export default class MainRouter extends Component {
                 <Route exact
                     path="/project/:projectId/:invoiceId/submit/invoice_entry"
                     component={InvoiceEntrySubmitter}/>
-                <Route exact path="/customer" component={Customer}/>
             </Router>
         );
     }
