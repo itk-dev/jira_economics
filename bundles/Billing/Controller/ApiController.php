@@ -229,6 +229,17 @@ class ApiController extends Controller
     }
 
     /**
+     * @Route("/to_accounts", name="api_to_accounts", methods={"GET"})
+     */
+    public function toAccounts() {
+        return new JsonResponse(
+            [
+                'DEV' => '1234'
+            ]
+        );
+    }
+
+    /**
      * @Route("/customer", name="api_customer_post", methods={"POST"})
      */
     public function customerPostAction(

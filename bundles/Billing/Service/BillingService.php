@@ -135,6 +135,7 @@ class BillingService extends JiraService
         $account->defaultPrice = $this->getAccountDefaultPrice($invoice->getAccountId());
 
         return [
+            'id' => $invoice->getId(),
             'name' => $invoice->getName(),
             'jiraId' => $invoice->getProject()->getJiraId(),
             'recorded' => $invoice->getRecorded(),
@@ -291,7 +292,6 @@ class BillingService extends JiraService
 
             $invoiceEntry = [
                 'id' => $invoiceEntry->getId(),
-                'name' => $invoiceEntry->getName(),
                 'invoiceId' => $invoiceEntry->getInvoice()->getId(),
                 'description' => $invoiceEntry->getDescription(),
                 'account' => $invoiceEntry->getAccount(),
@@ -330,7 +330,6 @@ class BillingService extends JiraService
             $invoiceEntriesJson[] = [
                 'id' => $invoiceEntry->getId(),
                 'invoiceId' => $invoiceEntry->getInvoice()->getId(),
-                'name' => $invoiceEntry->getName(),
                 'description' => $invoiceEntry->getDescription(),
                 'account' => $invoiceEntry->getAccount(),
                 'product' => $invoiceEntry->getProduct(),
@@ -370,7 +369,6 @@ class BillingService extends JiraService
         }
 
         $invoiceEntry = [
-            'name' => $invoiceEntry->getName(),
             'invoiceId' => $invoiceEntry->getInvoice()->getId(),
             'description' => $invoiceEntry->getDescription(),
             'account' => $invoiceEntry->getAccount(),
@@ -419,10 +417,6 @@ class BillingService extends JiraService
         $invoiceEntry->setAmount($invoiceEntryData['amount']);
         $invoiceEntry->setPrice($invoiceEntryData['price']);
 
-        if (!empty($invoiceEntryData['name'])) {
-            $invoiceEntry->setName($invoiceEntryData['name']);
-        }
-
         if (!empty($invoiceEntryData['description'])) {
             $invoiceEntry->setDescription($invoiceEntryData['description']);
         }
@@ -437,7 +431,6 @@ class BillingService extends JiraService
 
         $response = [
             'id' => $invoiceEntry->getId(),
-            'name' => $invoiceEntry->getName(),
             'jiraProjectId' => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
             'invoiceId' => $invoiceEntry->getInvoice()->getId(),
             'description' => $invoiceEntry->getDescription(),
@@ -517,7 +510,6 @@ class BillingService extends JiraService
         }
 
         $response = [
-            'name' => $invoiceEntry->getName(),
             'jiraId' => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
             'invoiceId' => $invoiceEntry->getInvoice()->getId(),
             'description' => $invoiceEntry->getDescription(),

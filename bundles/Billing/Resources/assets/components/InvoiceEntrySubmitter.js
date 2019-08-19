@@ -6,24 +6,47 @@ import { setSelectedIssues } from '../redux/actions';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
 import Spinner from './Spinner';
+import Form from 'react-bootstrap/Form';
 
 export class InvoiceEntrySubmitter extends Component {
     constructor (props) {
         super(props);
-        this.state = { account: 'Vælg PSP', invoiceEntry: {} };
+
+        this.state = {
+            selectedIssues: {},
+            invoice: {},
+            invoiceEntry: {},
+            toAccounts: {},
+            selectedToAccount: ''
+        };
+
         this.handleSelectJiraIssues = this.handleSelectJiraIssues.bind(this);
         this.onAccountChange = this.onAccountChange.bind(this);
     }
 
     componentDidMount () {
         const { dispatch } = this.props;
+
+        console.log(this.props);
+
+        dispatch(rest.actions.getInvoice({ id: this.props.match.params.invoiceId }))
+            .then((response) => {
+                this.setState({ invoice: response });
+            })
+            .catch((reason) => console.log('isCanceled', reason));
+
+        dispatch(rest.actions.getToAccounts())
+            .then((response) => {
+                this.setState({ toAccounts: response });
+            })
+            .catch((reason) => console.log('isCanceled', reason));
+
         if (this.props.location.state && this.props.location.state.existingInvoiceEntryId) {
             dispatch(rest.actions.getInvoiceEntry({ id: this.props.location.state.existingInvoiceEntryId }))
                 .then((response) => {
-                    this.setState({ account: response.account });
                     this.setState({ invoiceEntry: response });
                 })
-                .catch((reason) => console.log('isCanceled', reason.isCanceled));
+                .catch((reason) => console.log('isCanceled', reason));
         }
     }
 
@@ -47,19 +70,6 @@ export class InvoiceEntrySubmitter extends Component {
         return timeSum;
     }
 
-    // @TODO: getUnitPrice functions are temporary and should be scrapped when customer data is available
-    getUnitPrice (account) {
-        const unitPrices = { 'PSP1': 560, 'PSP2': 760, 'PSP3': 820 };
-        return unitPrices[account] || 0;
-    }
-
-    getManualUnitPrice (invoiceEntry) {
-        if (invoiceEntry.price === undefined) {
-            return 0;
-        }
-        return Math.round(parseFloat(invoiceEntry.price / invoiceEntry.amount) * 1e2) / 1e2;
-    }
-
     onAccountChange (event) {
         this.setState({
             account: event.target.value
@@ -69,25 +79,22 @@ export class InvoiceEntrySubmitter extends Component {
     handleSubmit = (event) => {
         event.preventDefault();
         const { dispatch } = this.props;
-        const invoiceId = this.props.match.params.invoiceId;
-        // @TODO: should an invoice entry even have a name?
-        const name = 'dummy';
-        // @TODO: get these values from the event instead
-        const description = $('#invoice-entry-description').val();
-        const account = $('#invoice-entry-account').val();
-        const product = $('#invoice-entry-product').val();
-        const hoursSpent = $('#invoice-entry-hours-spent').val();
-        const unitPrice = $('#invoice-entry-unit-price').val();
-        const price = hoursSpent * unitPrice;
-        const amount = Math.round(parseFloat(hoursSpent) * 1e2) / 1e2;
+        const invoiceId = this.state.invoice.id;
+
+        let account = this.state.selectedToAccount;
+        let description = event.target.description.value;
+        let price = parseFloat(event.target.unitPrice.value);
+        let product = event.target.productName.value;
+        let amount = event.target.hoursSpent.value;
+
         let jiraIssueIds = [];
         if (this.props.selectedIssues && this.props.selectedIssues.selectedIssues && this.props.selectedIssues.selectedIssues.length > 0) {
             this.props.selectedIssues.selectedIssues.forEach(selectedIssue => {
                 jiraIssueIds.push(selectedIssue.id);
             });
         }
+
         let invoiceEntryData = {
-            name,
             invoiceId,
             description,
             account,
@@ -96,257 +103,165 @@ export class InvoiceEntrySubmitter extends Component {
             price,
             amount
         };
+
         invoiceEntryData.id = this.props.location.state.existingInvoiceEntryId;
         if (invoiceEntryData.id) {
             dispatch(rest.actions.updateInvoiceEntry({ id: invoiceEntryData.id }, {
                 body: JSON.stringify(invoiceEntryData)
-            }));
+            }))
+                .then((response) => {
+                    dispatch(setSelectedIssues([]));
+                    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
+                })
+                .catch((reason) => {
+                    // @TODO: Warn about error.
+                    console.log('isCanceled', reason.isCanceled);
+                });
         } else {
             dispatch(rest.actions.createInvoiceEntry({}, {
                 body: JSON.stringify(invoiceEntryData)
-            }));
+            }))
+                .then((response) => {
+                    dispatch(setSelectedIssues([]));
+                    this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
+                })
+                .catch((reason) => {
+                    // @TODO: Warn about error.
+                    console.log('isCanceled', reason.isCanceled);
+                });
         }
-        // @TODO: check that a new invoiceEntry was successfully created before navigating to invoice page
-        dispatch(setSelectedIssues({}));
-        this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
     };
 
     handleCancel = (event) => {
         event.preventDefault();
         const { dispatch } = this.props;
-        dispatch(setSelectedIssues({}));
+        dispatch(setSelectedIssues([]));
         this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
     };
 
-    // @TODO: Styling.
-    renderManualInvoiceEntryForm () {
-        let pageTitle;
-        // Editing an existing InvoiceEntry.
-        if (this.props.location.state.existingInvoiceEntryId) {
-            pageTitle = <PageTitle>Rediger manuel fakturalinje</PageTitle>;
-        } else {
-            // Creating a new InvoiceEntry.
-            pageTitle = <PageTitle>Opret fakturalinje manuelt</PageTitle>;
-        }
-        return (
-            <ContentWrapper>
-                {pageTitle}
-                <div>
-                    <form id="manual-invoice-entry-form">
-                        <div>
+    handleChange (event) {
+        let fieldName = event.target.name;
+        let fieldVal = event.target.value;
+        this.setState({ ...this.state, [fieldName]: fieldVal });
+    }
+
+    render () {
+        if (this.props.toAccounts !== {} && this.props.invoice !== {}) {
+            let pageTitle;
+            // Editing an existing InvoiceEntry.
+            if (this.props.location.state.existingInvoiceEntryId) {
+                pageTitle =
+                    <PageTitle>Rediger eksisterende fakturalinje</PageTitle>;
+            } else {
+                // Creating a new InvoiceEntry with JiraIssues.
+                pageTitle =
+                    <PageTitle>Opret fakturalinje med issues fra Jira</PageTitle>;
+            }
+
+            console.log('PROPS', this.props);
+
+            return (
+                <ContentWrapper>
+                    <div>{pageTitle}</div>
+                    <div>{Object.values(this.props.selectedIssues.selectedIssues).length + ' issue(s) valgt'}</div>
+                    <div>{'Total timer valgt: ' + this.getTimeSpent()}</div>
+                    <div>
+                        <form id="submitForm" onSubmit={this.handleSelectJiraIssues}>
+                            <button type="submit" className="btn btn-primary" id="submit">Rediger valg
+                            </button>
+                        </form>
+                    </div>
+                    {this.props.invoiceEntry && this.props.invoice.data !== {} && this.props.invoice.data.account && this.props.invoiceEntry.data.account &&
+                    <div>
+                        <Form onSubmit={this.handleSubmit}>
                             <label htmlFor="kontonr">
                                 Kontonr.
                             </label>
-                            <input
-                                type="text"
-                                name="enterKontonr"
-                                className="form-control"
-                                id="invoice-entry-account"
-                                aria-describedby="enterKontonr"
-                                defaultValue={this.state.invoiceEntry ? this.state.invoiceEntry.account : ''}
-                                placeholder="Kontonummer">
-                            </input>
-                        </div>
-                        <div>
-                            <label htmlFor="vare">
-                                Vare
-                            </label>
-                            <input
-                                type="text"
-                                name="enterVarenr"
-                                className="form-control"
-                                id="invoice-entry-product"
-                                aria-describedby="enterVarenr"
-                                defaultValue={this.state.invoiceEntry ? this.state.invoiceEntry.product : ''}
-                                placeholder="Varenavn">
-                            </input>
-                            <label htmlFor="beskrivelse">
-                                Beskrivelse
-                            </label>
-                            <input
-                                type="text"
-                                name="beskrivelse"
-                                className="form-control"
-                                id="invoice-entry-description"
-                                aria-describedby="enterBeskrivelse"
-                                defaultValue={this.state.invoiceEntry ? this.state.invoiceEntry.description : ''}
-                                placeholder="Varebeskrivelse">
-                            </input>
-                            <label htmlFor="antal">
-                                Antal
-                            </label>
-                            <input
-                                type="number"
-                                step="0.1"
-                                name="hoursSpent"
-                                className="form-control"
-                                id="invoice-entry-hours-spent"
-                                aria-describedby="enterHoursSpent"
-                                defaultValue={this.state.invoiceEntry ? this.state.invoiceEntry.amount : 0}
-                                placeholder="Vareantal">
-                            </input>
-                            <label htmlFor="beskrivelse">
-                                Stk. pris
-                            </label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                name="unitPrice"
-                                className="form-control"
-                                id="invoice-entry-unit-price"
-                                // Hack to force re-render when invoiceEntry is loaded, otherwise defaultValue won't be updated
-                                key={this.state.invoiceEntry.price ? 'notLoadedYet' : 'loaded'}
-                                aria-describedby="enterUnitPrice"
-                                defaultValue={this.getManualUnitPrice(this.state.invoiceEntry)}
-                            >
-                            </input>
-                        </div>
-                    </form>
-                    <form onSubmit={this.handleSubmit}>
-                        <button
-                            type="submit"
-                            className="btn btn-primary"
-                            id="create-invoice-entry">Overfør til faktura
-                        </button>
-                    </form>
-                    <form onSubmit={this.handleCancel}>
-                        <button
-                            type="submit"
-                            className="btn btn-secondary"
-                            id="cancel">Annuller
-                        </button>
-                    </form>
-                </div>
-            </ContentWrapper>
-        );
-    }
-
-    // @TODO: Styling.
-    renderInvoiceEntryForm () {
-        let pageTitle;
-        // Editing an existing InvoiceEntry.
-        if (this.props.location.state.existingInvoiceEntryId) {
-            pageTitle =
-                <PageTitle>Rediger eksisterende fakturalinje</PageTitle>;
-        } else {
-            // Creating a new InvoiceEntry with JiraIssues.
-            pageTitle =
-                <PageTitle>Opret fakturalinje med issues fra Jira</PageTitle>;
-        }
-        return (
-            <ContentWrapper>
-                {pageTitle}
-                <div>{Object.values(this.props.selectedIssues.selectedIssues).length + ' issue(s) valgt'}</div>
-                <div>{'Total timer valgt: ' + this.getTimeSpent()}</div>
-                <div>
-                    <form id="submitForm"
-                        onSubmit={this.handleSelectJiraIssues}>
-                        <button type="submit" className="btn btn-primary"
-                            id="submit">Rediger valg
-                        </button>
-                    </form>
-                </div>
-                <div>
-                    <form id="create-invoice-entry-form">
-                        <label htmlFor="kontonr">
-                            Kontonr.
-                        </label>
-                        <div>
-                            <select className="browser-default custom-select"
-                                value={this.state.account}
-                                id="invoice-entry-account"
-                                onChange={this.onAccountChange.bind(this)}>
-                                <option value="Vælg PSP" hidden>Vælg PSP
-                                </option>
-                                <option value="PSP1">PSP1</option>
-                                <option value="PSP2">PSP2</option>
-                                <option value="PSP3">PSP3</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label htmlFor="vare">
-                                Vare
-                            </label>
-                            <input
-                                type="text"
-                                name="enterVarenr"
-                                className="form-control"
-                                id="invoice-entry-product"
-                                aria-describedby="enterVarenr"
-                                defaultValue={this.state.invoiceEntry ? this.state.invoiceEntry.product : ''}
-                                placeholder="Varenavn">
-                            </input>
-                            <label htmlFor="beskrivelse">
-                                Beskrivelse
-                            </label>
-                            <input
-                                type="text"
-                                name="beskrivelse"
-                                className="form-control"
-                                id="invoice-entry-description"
-                                aria-describedby="enterBeskrivelse"
-                                defaultValue={this.state.invoiceEntry ? this.state.invoiceEntry.description : ''}
-                                placeholder="Varebeskrivelse">
-                            </input>
-                            <label htmlFor="antal">
-                                Timer
-                            </label>
-                            <input
-                                type="text"
-                                name="hoursSpent"
-                                className="form-control"
-                                id="invoice-entry-hours-spent"
-                                aria-describedby="enterHoursSpent"
-                                value={this.getTimeSpent()}
-                                readOnly>
-                            </input>
-                            <label htmlFor="beskrivelse">
-                                Stk. pris
-                            </label>
-                            <input
-                                type="text"
-                                name="unitPrice"
-                                className="form-control"
-                                id="invoice-entry-unit-price"
-                                aria-describedby="enterUnitPrice"
-                                value={this.getUnitPrice(this.state.account)}
-                                readOnly>
-                            </input>
-                        </div>
-                    </form>
-                    <form onSubmit={this.handleSubmit}>
-                        <button
-                            type="submit"
-                            className="btn btn-primary"
-                            id="create-invoice-entry">Overfør til faktura
-                        </button>
-                    </form>
-                    <form onSubmit={this.handleCancel}>
-                        <button
-                            type="submit"
-                            className="btn btn-secondary"
-                            id="cancel">Annuller
-                        </button>
-                    </form>
-                </div>
-            </ContentWrapper>
-        );
-    }
-
-    // @TODO: add type validation to input fields (decimals currently need to be specified with dot notation)
-    // @TODO: cleanup redundant HTML
-    render () {
-        if (this.props.location.state &&
-            this.props.location.state.from ===
-            `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`) {
-            // InvoiceEntry without JiraIssues.
-            return this.renderManualInvoiceEntryForm();
-        } else if (this.props.location.state &&
-            this.props.location.state.from !==
-            `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`) {
-            // InvoiceEntry with JiraIssues.
-            return this.renderInvoiceEntryForm();
+                            <div>
+                            </div>
+                            <div>
+                                <label htmlFor="accountInput">
+                                    To account
+                                </label>
+                                <div>
+                                    <Form.Control as="select" name={'selectedToAccount'} onChange={this.handleChange.bind(this)} defaultValue={this.props.invoiceEntry.data.account}>
+                                        <option value=''> </option>
+                                        {this.props.toAccounts !== {} && Object.keys(this.props.toAccounts.data)
+                                            .map((keyName) => (
+                                                this.props.toAccounts.data.hasOwnProperty(keyName) &&
+                                                <option
+                                                    key={this.props.toAccounts.data[keyName]}
+                                                    value={this.props.toAccounts.data[keyName]}>
+                                                    {keyName}: {this.props.toAccounts.data[keyName]}
+                                                </option>
+                                            ))}
+                                    </Form.Control>
+                                </div>
+                                <label htmlFor="vare">
+                                    Vare
+                                </label>
+                                <input
+                                    type="text"
+                                    name="productName"
+                                    className="form-control"
+                                    id="invoice-entry-product"
+                                    aria-describedby="enterVarenr"
+                                    defaultValue={ this.props.invoiceEntry.data.product }
+                                    placeholder="Varenavn">
+                                </input>
+                                <label htmlFor="beskrivelse">
+                                    Beskrivelse
+                                </label>
+                                <input
+                                    type="text"
+                                    name="description"
+                                    className="form-control"
+                                    id="invoice-entry-description"
+                                    aria-describedby="enterBeskrivelse"
+                                    defaultValue={ this.props.invoiceEntry.data.description }
+                                    placeholder="Varebeskrivelse">
+                                </input>
+                                <label htmlFor="antal">
+                                    Timer
+                                </label>
+                                <input
+                                    type="text"
+                                    name="hoursSpent"
+                                    className="form-control"
+                                    id="invoice-entry-hours-spent"
+                                    aria-describedby="enterHoursSpent"
+                                    value={this.getTimeSpent()}
+                                    readOnly>
+                                </input>
+                                <label htmlFor="beskrivelse">
+                                    Stk. pris
+                                </label>
+                                <input
+                                    type="text"
+                                    name="unitPrice"
+                                    className="form-control"
+                                    id="invoice-entry-unit-price"
+                                    aria-describedby="enterUnitPrice"
+                                    defaultValue={ this.props.invoiceEntry.data.price ? this.props.invoiceEntry.data.price : this.props.invoice.data.account.defaultPrice }>
+                                </input>
+                            </div>
+                            <button
+                                type="submit"
+                                className="btn btn-primary"
+                                id="create-invoice-entry">Overfør til faktura
+                            </button>
+                        </Form>
+                        <form onSubmit={this.handleCancel}>
+                            <button
+                                type="submit"
+                                className="btn btn-secondary"
+                                id="cancel">Annuller
+                            </button>
+                        </form>
+                    </div>
+                    }
+                </ContentWrapper>
+            );
         } else {
             return (
                 <ContentWrapper>
@@ -358,9 +273,11 @@ export class InvoiceEntrySubmitter extends Component {
 }
 
 InvoiceEntrySubmitter.propTypes = {
+    toAccounts: PropTypes.object,
     invoiceEntrySubmitter: PropTypes.object,
+    invoice: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
-    selectedIssues: PropTypes.object,
+    selectedIssues: PropTypes.array,
     invoiceEntries: PropTypes.object,
     invoiceEntry: PropTypes.object,
     match: PropTypes.shape({
@@ -373,7 +290,8 @@ InvoiceEntrySubmitter.propTypes = {
     location: PropTypes.object.isRequired,
     history: PropTypes.shape({
         push: PropTypes.func.isRequired
-    }).isRequired
+    }).isRequired,
+    ready: PropTypes.bool
 };
 
 const mapStateToProps = state => {
@@ -381,7 +299,10 @@ const mapStateToProps = state => {
         invoiceEntrySubmitter: state.invoiceEntrySubmitter,
         selectedIssues: state.selectedIssues,
         invoiceEntries: state.invoiceEntries,
-        invoiceEntry: state.invoiceEntry
+        invoiceEntry: state.invoiceEntry,
+        invoice: state.invoice,
+        toAccounts: state.toAccounts,
+        ready: state.ready
     };
 };
 
