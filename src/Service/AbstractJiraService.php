@@ -154,9 +154,13 @@ abstract class AbstractJiraService
 
         foreach ($results as $result) {
             if (!isset($result->projectCategory) || 'Lukket' !== $result->projectCategory->name) {
-                $result->url = parse_url($result->self,
-                        PHP_URL_SCHEME).'://'.parse_url($result->self,
-                        PHP_URL_HOST).'/browse/'.$result->key;
+                $result->url = parse_url(
+                    $result->self,
+                    PHP_URL_SCHEME
+                ).'://'.parse_url(
+                    $result->self,
+                    PHP_URL_HOST
+                ).'/browse/'.$result->key;
                 $projects[] = $result;
             }
         }
@@ -265,9 +269,8 @@ abstract class AbstractJiraService
     {
         $rateTable = $this->getRateTableByAccount($accountId);
 
-        foreach ($rateTable->rates as $rate)
-        {
-            if ($rate->link->type == 'DEFAULT_RATE') {
+        foreach ($rateTable->rates as $rate) {
+            if ('DEFAULT_RATE' === $rate->link->type) {
                 return $rate->amount;
             }
         }
@@ -281,6 +284,7 @@ abstract class AbstractJiraService
 
         return array_reduce($projectLinks, function ($carry, $item) {
             $carry[] = $item->accountId;
+
             return $carry;
         }, []);
     }
@@ -313,6 +317,7 @@ abstract class AbstractJiraService
      * Get customer by id.
      *
      * @param $id
+     *
      * @return mixed
      */
     public function getTempoCustomer($id)
@@ -418,10 +423,12 @@ abstract class AbstractJiraService
 
     public function updateExpenseCategory(ExpenseCategory $category)
     {
-        $result = $this->put('/rest/tempo-core/1/expense/category/'.$category->getId().'/',
+        $result = $this->put(
+            '/rest/tempo-core/1/expense/category/'.$category->getId().'/',
             [
                 'name' => $category->getName(),
-            ]);
+            ]
+        );
 
         return $result;
     }
@@ -457,7 +464,7 @@ abstract class AbstractJiraService
                 'scopeType' => $data['scope_type'],
                 'scopeId' => $data['scope_id'],
             ],
-            'amount' => (int)($data['quantity'] * $category->getUnitPrice()),
+            'amount' => (int) ($data['quantity'] * $category->getUnitPrice()),
             'description' => $data['description'],
             'date' => (new \DateTime())->format(\DateTime::ATOM),
         ];

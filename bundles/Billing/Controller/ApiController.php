@@ -293,7 +293,8 @@ class ApiController extends Controller
      * @Route("/account/project/{projectId}", name="get_customers")
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \Billing\Service\BillingService $billingService
+     * @param \Billing\Service\BillingService           $billingService
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function getAccountsByProjectId(
