@@ -130,11 +130,16 @@ class BillingService extends JiraService
             throw new HttpException(404, 'Invoice with id '.$invoiceId.' not found');
         }
 
+        // Get account information.
+        $account = $this->getAccount($invoice->getAccountId());
+        $account->defaultPrice = $this->getAccountDefaultPrice($invoice->getAccountId());
+
         return [
             'name' => $invoice->getName(),
             'jiraId' => $invoice->getProject()->getJiraId(),
             'recorded' => $invoice->getRecorded(),
             'accountId' => $invoice->getAccountId(),
+            'account' => $account,
             'created' => $invoice->getCreated(),
         ];
     }
@@ -171,6 +176,7 @@ class BillingService extends JiraService
         $invoice->setProject($project);
         $invoice->setRecorded(false);
         $invoice->setCreated(new \DateTime('now'));
+        $invoice->setAccountId($invoiceData['accountId']);
 
         $this->entityManager->persist($invoice);
         $this->entityManager->flush();

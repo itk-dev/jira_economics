@@ -30,7 +30,6 @@ class Invoice extends Component {
         this.handleDeleteEntryModalClose = this.handleDeleteEntryModalClose.bind(this);
 
         this.state = {
-            accounts: [],
             checkedEntries: {},
             invoice: null,
             showModal: false,
@@ -47,7 +46,6 @@ class Invoice extends Component {
         dispatch(rest.actions.getProject({ id: `${this.props.match.params.projectId}` }));
         dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
         dispatch(rest.actions.getInvoice({ id: `${this.props.match.params.invoiceId}` }));
-        dispatch(rest.actions.getProjectAccounts({ id: `${this.props.match.params.projectId}` }));
         dispatch(rest.actions.getInvoiceEntries({ id: `${this.props.match.params.invoiceId}` }))
             .then((response) => {
                 this.setState({ invoiceEntries: response });
@@ -249,12 +247,6 @@ class Invoice extends Component {
                 </ContentWrapper>
             );
         } else if (this.props.project.data.name && this.props.invoiceEntries.data) {
-            // @TODO: Assign account when creating the invoice.
-            // @TODO: Load the account together with the invoice.
-            let accounts = this.props.accounts.data;
-            let invoice = this.props.invoice.data;
-            let account = accounts[invoice.accountId];
-
             return (
                 <ContentWrapper>
                     <PageTitle
@@ -354,21 +346,14 @@ class Invoice extends Component {
                         <div className="col-md-4">
                             <h4>Client information</h4>
                             {
-                                (this.props.invoice && !account) &&
-                                <div>
-                                    Choose account.
-                                </div>
-                            }
-
-                            {
-                                account &&
+                                this.props.invoice.data.account &&
                                 <ListGroup>
                                     <ListGroup.Item><span
-                                        className="text-muted d-inline-block w-25">Name</span>{account.name}</ListGroup.Item>
+                                        className="text-muted d-inline-block w-25">Name</span>{this.props.invoice.data.account.name}</ListGroup.Item>
                                     <ListGroup.Item><span
-                                        className="text-muted d-inline-block w-25">Contact</span>{account.contact.name}</ListGroup.Item>
+                                        className="text-muted d-inline-block w-25">Contact</span>{this.props.invoice.data.account.contact.name}</ListGroup.Item>
                                     <ListGroup.Item><span
-                                        className="text-muted d-inline-block w-25">Default price</span>{account.defaultPrice}</ListGroup.Item>
+                                        className="text-muted d-inline-block w-25">Default price</span>{this.props.invoice.data.account.defaultPrice}</ListGroup.Item>
                                 </ListGroup>
                             }
                         </div>
@@ -474,7 +459,6 @@ class Invoice extends Component {
 }
 
 Invoice.propTypes = {
-    accounts: PropTypes.array,
     invoice: PropTypes.object,
     createdAt: PropTypes.string,
     invoiceEntries: PropTypes.object,
@@ -505,8 +489,7 @@ const mapStateToProps = state => {
         createdAt: createdAt,
         invoiceEntries: state.invoiceEntries,
         jiraIssues: state.jiraIssues,
-        project: state.project,
-        accounts: state.accounts
+        project: state.project
     };
 };
 
