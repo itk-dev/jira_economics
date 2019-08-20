@@ -371,6 +371,7 @@ class BillingService extends JiraService
                 'id' => $item->getIssueId(),
                 'timeSpent' => $item->getTimeSpent(),
             ];
+
             return $carry;
         }, []);
 

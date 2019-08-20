@@ -231,10 +231,12 @@ class ApiController extends Controller
     /**
      * @Route("/to_accounts", name="api_to_accounts", methods={"GET"})
      */
-    public function toAccounts() {
+    public function toAccounts()
+    {
+        // @TODO: Get values from database.
         return new JsonResponse(
             [
-                'DEV' => '1234'
+                'DEV' => '1234',
             ]
         );
     }
