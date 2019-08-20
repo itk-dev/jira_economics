@@ -5,7 +5,7 @@ import App from './App';
 import HomePage from '../pages/HomePage';
 import Invoice from '../components/Invoice';
 import JiraIssues from '../components/JiraIssues';
-import InvoiceEntrySubmitter from '../components/InvoiceEntrySubmitter';
+import InvoiceEntry from '../components/InvoiceEntry';
 import NewInvoice from '../components/NewInvoice';
 
 export default class MainRouter extends Component {
@@ -49,8 +49,8 @@ export default class MainRouter extends Component {
                     path="/project/:projectId/:invoiceId/invoice_entry/jira_issues"
                     component={JiraIssues}/>
                 <Route exact
-                    path="/project/:projectId/:invoiceId/submit/invoice_entry"
-                    component={InvoiceEntrySubmitter}/>
+                    path="/project/:projectId/:invoiceId/:invoiceEntryId"
+                    component={InvoiceEntry}/>
             </Router>
         );
     }

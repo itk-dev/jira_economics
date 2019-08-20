@@ -28,6 +28,7 @@ class Invoice extends Component {
         this.handleInvoiceRecordModalClose = this.handleInvoiceRecordModalClose.bind(this);
         this.handleDeleteEntryModalShow = this.handleDeleteEntryModalShow.bind(this);
         this.handleDeleteEntryModalClose = this.handleDeleteEntryModalClose.bind(this);
+        this.createEntry = this.createEntry.bind(this);
 
         this.state = {
             checkedEntries: {},
@@ -63,17 +64,36 @@ class Invoice extends Component {
         this.handleInvoiceDeleteModalShow();
     };
 
+    createEntry = (isJiraEntry) => {
+        const { dispatch } = this.props;
+
+        let invoiceId = this.props.match.params.invoiceId;
+
+        let invoiceEntryData = {
+            invoiceId,
+            isJiraEntry
+        };
+
+        dispatch(rest.actions.createInvoiceEntry({}, {
+            body: JSON.stringify(invoiceEntryData)
+        }))
+            .then((response) => {
+                this.props.history.push(`/project/${this.props.match.params.projectId}/${response.invoiceId}/${response.id}`);
+            })
+            .catch((reason) => {
+                // @TODO: Warn about error.
+                console.log('isCanceled', reason);
+            });
+    };
+
     handleAddFromJira = (event) => {
         event.preventDefault();
-        this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`);
+        this.createEntry(true);
     };
 
     handleAddManually = (event) => {
         event.preventDefault();
-        this.props.history.push({
-            pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
-            state: { from: this.props.location.pathname }
-        });
+        this.createEntry(false);
     };
 
     handleDeleteEntry = (event) => {
@@ -118,31 +138,9 @@ class Invoice extends Component {
             return;
         }
 
-        let invoiceEntry = {};
-
-        // Get the selected InvoiceEntry
-        if (this.props.invoiceEntries.data && this.props.invoiceEntries.data.data) {
-            invoiceEntry = this.props.invoiceEntries.data.data.filter(obj => {
-                return obj.id === selectedInvoiceEntryId;
-            }).pop();
-        }
-
-        if (invoiceEntry.jiraIssueIds) {
-            // InvoiceEntry with Jira issues?
-            this.props.history.push({
-                pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/invoice_entry/jira_issues`,
-                state: { existingInvoiceEntryId: selectedInvoiceEntryId }
-            });
-        } else {
-            // InvoiceEntry without Jira issues
-            this.props.history.push({
-                pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
-                state: {
-                    from: this.props.location.pathname,
-                    existingInvoiceEntryId: selectedInvoiceEntryId
-                }
-            });
-        }
+        this.props.history.push({
+            pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/${selectedInvoiceEntryId}`
+        });
     };
 
     handleEntryDelete = (event) => {
@@ -292,10 +290,10 @@ class Invoice extends Component {
                                 <div className="col-md-6">
                                     <Button variant="outline-success"
                                         type="submit" className="mr-3"
-                                        onClick={this.handleAddFromJira}>Add entry from Jira</Button>
+                                        onClick={this.handleAddFromJira}>Add from Jira</Button>
                                     <Button variant="outline-success"
                                         type="submit"
-                                        onClick={this.handleAddManually}>Add manual entry</Button>
+                                        onClick={this.handleAddManually}>Add manual</Button>
                                 </div>
                                 <div className="col-md-6 text-right">
                                     <ButtonGroup aria-label="Entry actions">

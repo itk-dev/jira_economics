@@ -45,7 +45,7 @@ class InvoiceEntry
     private $description;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $account;
 
@@ -55,14 +55,19 @@ class InvoiceEntry
     private $product;
 
     /**
-     * @ORM\Column(type="decimal", precision=10, scale=2)
+     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      */
     private $price;
 
     /**
-     * @ORM\Column(type="decimal", precision=10, scale=2)
+     * @ORM\Column(type="decimal", precision=10, scale=2, nullable=true)
      */
     private $amount;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isJiraEntry;
 
     public function __construct()
     {
@@ -173,6 +178,18 @@ class InvoiceEntry
     public function setAmount(float $amount): self
     {
         $this->amount = $amount;
+
+        return $this;
+    }
+
+    public function getIsJiraEntry(): ?bool
+    {
+        return $this->isJiraEntry;
+    }
+
+    public function setIsJiraEntry(?bool $isJiraEntry): self
+    {
+        $this->isJiraEntry = $isJiraEntry;
 
         return $this;
     }

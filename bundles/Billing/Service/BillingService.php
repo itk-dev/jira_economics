@@ -344,7 +344,7 @@ class BillingService extends JiraService
     /**
      * Get specific invoiceEntry by id.
      *
-     * @param invoiceEntryId
+     * @param $invoiceEntryId
      *
      * @return array
      */
@@ -361,27 +361,30 @@ class BillingService extends JiraService
             throw new HttpException(404, 'InvoiceEntry with id '.$invoiceEntryId.' not found');
         }
 
-        $jiraIssueIds = [];
-        $jiraIssues = $invoiceEntry->getJiraIssues();
+        return $this->getInvoiceEntryArray($invoiceEntry);
+    }
 
-        foreach ($jiraIssues as $jiraIssue) {
-            $jiraIssueIds[] = $jiraIssue->getIssueId();
-        }
+    private function getInvoiceEntryArray(InvoiceEntry $invoiceEntry)
+    {
+        $jiraIssues = array_reduce($invoiceEntry->getJiraIssues()->toArray(), function ($carry, JiraIssue $item) {
+            $carry[] = [
+                'id' => $item->getIssueId(),
+                'timeSpent' => $item->getTimeSpent(),
+            ];
+            return $carry;
+        }, []);
 
-        $invoiceEntry = [
+        return [
+            'id' => $invoiceEntry->getId(),
             'invoiceId' => $invoiceEntry->getInvoice()->getId(),
             'description' => $invoiceEntry->getDescription(),
             'account' => $invoiceEntry->getAccount(),
             'product' => $invoiceEntry->getProduct(),
+            'isJiraEntry' => $invoiceEntry->getIsJiraEntry(),
             'amount' => $invoiceEntry->getAmount(),
             'price' => $invoiceEntry->getPrice(),
+            'jiraIssues' => $jiraIssues,
         ];
-
-        if (\count($jiraIssueIds) > 0) {
-            $invoiceEntry['jiraIssueIds'] = $jiraIssueIds;
-        }
-
-        return $invoiceEntry;
     }
 
     /**
@@ -397,14 +400,6 @@ class BillingService extends JiraService
             throw new HttpException(400, "Expected integer value for 'invoiceId' in request");
         }
 
-        if (empty($invoiceEntryData['amount']) || !(float) ($invoiceEntryData['amount'])) {
-            throw new HttpException(400, "Expected numerical value for 'amount' in request");
-        }
-
-        if (empty($invoiceEntryData['price']) || !(float) ($invoiceEntryData['price'])) {
-            throw new HttpException(400, "Expected numerical value for 'price' in request");
-        }
-
         $invoiceRepository = $this->entityManager->getRepository(Invoice::class);
         $invoice = $invoiceRepository->findOneBy(['id' => $invoiceEntryData['invoiceId']]);
 
@@ -414,8 +409,18 @@ class BillingService extends JiraService
 
         $invoiceEntry = new InvoiceEntry();
         $invoiceEntry->setInvoice($invoice);
-        $invoiceEntry->setAmount($invoiceEntryData['amount']);
-        $invoiceEntry->setPrice($invoiceEntryData['price']);
+
+        if (!empty($invoiceEntryData['isJiraEntry'])) {
+            $invoiceEntry->setIsJiraEntry($invoiceEntryData['isJiraEntry']);
+        }
+
+        if (!empty($invoiceEntryData['amount'])) {
+            $invoiceEntry->setAmount($invoiceEntryData['amount']);
+        }
+
+        if (!empty($invoiceEntryData['price'])) {
+            $invoiceEntry->setPrice($invoiceEntryData['price']);
+        }
 
         if (!empty($invoiceEntryData['description'])) {
             $invoiceEntry->setDescription($invoiceEntryData['description']);
@@ -429,17 +434,6 @@ class BillingService extends JiraService
             $invoiceEntry->setProduct($invoiceEntryData['product']);
         }
 
-        $response = [
-            'id' => $invoiceEntry->getId(),
-            'jiraProjectId' => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
-            'invoiceId' => $invoiceEntry->getInvoice()->getId(),
-            'description' => $invoiceEntry->getDescription(),
-            'account' => $invoiceEntry->getAccount(),
-            'product' => $invoiceEntry->getProduct(),
-            'amount' => $invoiceEntry->getAmount(),
-            'price' => $invoiceEntry->getPrice(),
-        ];
-
         if (!empty($invoiceEntryData['jiraIssueIds'])) {
             $jiraIssueRepository = $this->entityManager->getRepository(JiraIssue::class);
 
@@ -452,14 +446,12 @@ class BillingService extends JiraService
 
                 $invoiceEntry->addJiraIssue($jiraIssue);
             }
-
-            $response['jiraIssueIds'] = $invoiceEntryData['jiraIssueIds'];
         }
 
         $this->entityManager->persist($invoiceEntry);
         $this->entityManager->flush();
 
-        return $response;
+        return $this->getInvoiceEntryArray($invoiceEntry);
     }
 
     /**
@@ -475,14 +467,6 @@ class BillingService extends JiraService
             throw new HttpException(400, "Expected integer value for 'id' in request");
         }
 
-        if (empty($invoiceEntryData['amount']) || !(float) ($invoiceEntryData['amount'])) {
-            throw new HttpException(400, "Expected numerical value for 'amount' in request");
-        }
-
-        if (empty($invoiceEntryData['price']) || !(float) ($invoiceEntryData['price'])) {
-            throw new HttpException(400, "Expected numerical value for 'price' in request");
-        }
-
         $repository = $this->entityManager->getRepository(InvoiceEntry::class);
         $invoiceEntry = $repository->findOneBy(['id' => $invoiceEntryData['id']]);
 
@@ -490,8 +474,13 @@ class BillingService extends JiraService
             throw new HttpException(404, 'Unable to update invoiceEntry with id '.$invoiceEntryData['id'].' as it does not already exist');
         }
 
-        $invoiceEntry->setAmount($invoiceEntryData['amount']);
-        $invoiceEntry->setPrice($invoiceEntryData['price']);
+        if (!empty($invoiceEntryData['amount'])) {
+            $invoiceEntry->setAmount($invoiceEntryData['amount']);
+        }
+
+        if (!empty($invoiceEntryData['price'])) {
+            $invoiceEntry->setPrice($invoiceEntryData['price']);
+        }
 
         if (!empty($invoiceEntryData['name'])) {
             $invoiceEntry->setName($invoiceEntryData['name']);
@@ -509,16 +498,6 @@ class BillingService extends JiraService
             $invoiceEntry->setProduct($invoiceEntryData['product']);
         }
 
-        $response = [
-            'jiraId' => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
-            'invoiceId' => $invoiceEntry->getInvoice()->getId(),
-            'description' => $invoiceEntry->getDescription(),
-            'account' => $invoiceEntry->getAccount(),
-            'product' => $invoiceEntry->getProduct(),
-            'amount' => $invoiceEntry->getAmount(),
-            'price' => $invoiceEntry->getPrice(),
-        ];
-
         if (!empty($invoiceEntryData['jiraIssueIds'])) {
             $jiraIssueRepository = $this->entityManager->getRepository(JiraIssue::class);
 
@@ -531,14 +510,12 @@ class BillingService extends JiraService
 
                 $invoiceEntry->addJiraIssue($jiraIssue);
             }
-
-            $response['jiraIssueIds'] = $invoiceEntryData['jiraIssueIds'];
         }
 
         $this->entityManager->persist($invoiceEntry);
         $this->entityManager->flush();
 
-        return $response;
+        return $this->getInvoiceEntryArray($invoiceEntry);
     }
 
     /**
