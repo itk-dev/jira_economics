@@ -133,7 +133,8 @@ class BillingService extends JiraService
         return $this->getInvoiceArray($invoice);
     }
 
-    private function getInvoiceArray(Invoice $invoice) {
+    private function getInvoiceArray(Invoice $invoice)
+    {
         // Get account information.
         $account = $this->getAccount($invoice->getAccountId());
         $account->defaultPrice = $this->getAccountDefaultPrice($invoice->getAccountId());
