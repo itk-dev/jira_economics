@@ -130,6 +130,10 @@ class BillingService extends JiraService
             throw new HttpException(404, 'Invoice with id '.$invoiceId.' not found');
         }
 
+        return $this->getInvoiceArray($invoice);
+    }
+
+    private function getInvoiceArray(Invoice $invoice) {
         // Get account information.
         $account = $this->getAccount($invoice->getAccountId());
         $account->defaultPrice = $this->getAccountDefaultPrice($invoice->getAccountId());
@@ -140,8 +144,9 @@ class BillingService extends JiraService
             'jiraId' => $invoice->getProject()->getJiraId(),
             'recorded' => $invoice->getRecorded(),
             'accountId' => $invoice->getAccountId(),
+            'description' => $invoice->getDescription(),
             'account' => $account,
-            'created' => $invoice->getCreated(),
+            'created' => $invoice->getCreated()->format('c'),
         ];
     }
 
@@ -182,13 +187,7 @@ class BillingService extends JiraService
         $this->entityManager->persist($invoice);
         $this->entityManager->flush();
 
-        return [
-            'invoiceId' => $invoice->getId(),
-            'name' => $invoice->getName(),
-            'jiraId' => $invoice->getProject()->getJiraId(),
-            'recorded' => $invoice->getRecorded(),
-            'created' => $invoice->getCreated(),
-        ];
+        return $this->getInvoiceArray($invoice);
     }
 
     /**
@@ -204,10 +203,6 @@ class BillingService extends JiraService
             throw new HttpException(400, "Expected integer value for 'id' in request");
         }
 
-        if (isset($invoiceData['recorded']) && !\in_array($invoiceData['recorded'], [true, false])) {
-            throw new HttpException(400, "Expected boolean value for 'recorded' in request");
-        }
-
         $repository = $this->entityManager->getRepository(Invoice::class);
         $invoice = $repository->findOneBy(['id' => $invoiceData['id']]);
 
@@ -219,6 +214,10 @@ class BillingService extends JiraService
             $invoice->setName($invoiceData['name']);
         }
 
+        if (!empty($invoiceData['description'])) {
+            $invoice->setDescription($invoiceData['description']);
+        }
+
         if (!empty($invoiceData['accountId'])) {
             $invoice->setAccountId($invoiceData['accountId']);
         }
@@ -228,16 +227,9 @@ class BillingService extends JiraService
             $invoice->setRecorded($invoiceRecorded);
         }
 
-        $this->entityManager->persist($invoice);
         $this->entityManager->flush();
 
-        return [
-            'name' => $invoice->getName(),
-            'jiraId' => $invoice->getProject()->getJiraId(),
-            'recorded' => $invoice->getRecorded(),
-            'accountId' => $invoice->getAccountId(),
-            'created' => $invoice->getCreated(),
-        ];
+        return $this->getInvoiceArray($invoice);
     }
 
     /**

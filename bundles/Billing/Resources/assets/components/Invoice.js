@@ -14,6 +14,7 @@ import Table from 'react-bootstrap/Table';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Modal from 'react-bootstrap/Modal';
 import Spinner from './Spinner';
+import nl2br from 'react-nl2br';
 
 class Invoice extends Component {
     constructor (props) {
@@ -38,20 +39,30 @@ class Invoice extends Component {
             showRecordModal: false,
             showDeleteEntryModal: false,
             checkedCount: 0,
+            editDescription: true,
             invoiceEntries: {}
         };
     };
 
     componentDidMount () {
         const { dispatch } = this.props;
-        dispatch(rest.actions.getProject({ id: `${this.props.match.params.projectId}` }));
-        dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
-        dispatch(rest.actions.getInvoice({ id: `${this.props.match.params.invoiceId}` }));
+        dispatch(rest.actions.getProject({ id: `${this.props.match.params.projectId}` }))
+            .then((response) => {
+                this.setState({ project: response });
+            })
+            .catch((reason) => console.log('isCanceled', reason));
+
+        dispatch(rest.actions.getInvoice({ id: `${this.props.match.params.invoiceId}` }))
+            .then((response) => {
+                this.setState({ invoice: response });
+            })
+            .catch((reason) => console.log('isCanceled', reason));
+
         dispatch(rest.actions.getInvoiceEntries({ id: `${this.props.match.params.invoiceId}` }))
             .then((response) => {
                 this.setState({ invoiceEntries: response });
             })
-            .catch((reason) => console.log('isCanceled', reason.isCanceled));
+            .catch((reason) => console.log('isCanceled', reason));
     };
 
     recordInvoice = (event) => {
@@ -197,12 +208,10 @@ class Invoice extends Component {
             const id = this.props.match.params.invoiceId;
             const name = this.props.invoice.data.name;
             const recorded = true;
-            const created = this.props.createdAt;
             const invoiceData = {
                 id,
                 name,
-                recorded,
-                created
+                recorded
             };
             dispatch(rest.actions.updateInvoice({ id: `${this.props.match.params.invoiceId}` }, {
                 body: JSON.stringify(invoiceData)
@@ -232,7 +241,45 @@ class Invoice extends Component {
         this.setState({ showDeleteEntryModal: false });
     };
 
+    saveEditDescription = (event) => {
+        event.preventDefault();
+
+        if (!this.state.invoice.id) {
+            return;
+        }
+
+        let fieldName = event.target.name;
+        let fieldVal = event.target.value;
+        if (fieldName === 'description') {
+            this.setState({
+                ...this.state,
+                invoice: {
+                    description: fieldVal
+                },
+                editDescription: false
+            });
+
+            let data = {
+                id: this.state.invoice.id,
+                description: fieldVal
+            };
+
+            const { dispatch } = this.props;
+            dispatch(rest.actions.updateInvoice({ id: this.state.invoice.id }, {
+                body: JSON.stringify(data)
+            }));
+        }
+    };
+
+    editDescription = (event) => {
+        this.setState({
+            editDescription: true
+        });
+    };
+
     render () {
+        console.log('RENDER', this.props);
+
         if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId !== parseInt(this.props.match.params.projectId)) {
             return (
                 <ContentWrapper>
@@ -258,20 +305,31 @@ class Invoice extends Component {
                                     className="pr-3">{this.props.match.params.invoiceId}</strong>
                                 Invoice recorded: <strong>{String(this.props.invoice.data.recorded)}</strong>
                             </p>
-                            <Form>
-                                <Form.Group>
-                                    <Form.Control id="invoice-description"
-                                        className={'invoice-description'}
-                                        type="text"
-                                        placeholder="Enter description for invoice here">
-                                    </Form.Control>
-                                </Form.Group>
-                            </Form>
+                            {this.props.invoice.loading &&
+                                <Spinner/>
+                            }
+                            {!this.state.editDescription && !this.props.invoice.loading &&
+                                <div onClick={this.editDescription} className={'mb-3'}>{nl2br(this.props.invoice.data.description)}</div>
+                            }
+                            {this.state.editDescription && !this.props.invoice.loading &&
+                                <Form onBlur={this.saveEditDescription}>
+                                    <Form.Group>
+                                        <Form.Control
+                                            id="invoice-description"
+                                            name={'description'}
+                                            className={'invoice-description mb-3'}
+                                            as="textarea" rows="5"
+                                            defaultValue={this.props.invoice.data.description}
+                                            placeholder="Enter description for invoice here. Leave textarea to save.">
+                                        </Form.Control>
+                                    </Form.Group>
+                                </Form>
+                            }
                         </div>
                         <div className="col-md-8 text-right">
                             <ButtonGroup aria-label="Invoice actions">
                                 <Button variant="primary" type="submit"
-                                    id="record-invoice" className="mr-3"
+                                    id="record-invoice"
                                     onClick={this.recordInvoice}>
                                     Record invoice
                                 </Button>
@@ -357,9 +415,13 @@ class Invoice extends Component {
                         </div>
                     </div>
                     <ContentFooter>
-                        Invoice created <strong><Moment
-                            format="YYYY-MM-DD HH:mm">{this.props.createdAt}</Moment></strong>
+                        Invoice created <strong>
+                            <Moment format="YYYY-MM-DD HH:mm">
+                                {this.props.invoice.data.created}
+                            </Moment>
+                        </strong>
                     </ContentFooter>
+
                     <Modal show={this.state.showModal}
                         onHide={this.handleModalClose}>
                         <Modal.Header>
@@ -458,9 +520,7 @@ class Invoice extends Component {
 
 Invoice.propTypes = {
     invoice: PropTypes.object,
-    createdAt: PropTypes.string,
     invoiceEntries: PropTypes.object,
-    jiraIssues: PropTypes.object,
     project: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
     match: PropTypes.shape({
@@ -477,16 +537,9 @@ Invoice.propTypes = {
 };
 
 const mapStateToProps = state => {
-    let createdAt = '';
-    if (state.invoice.data.created && state.invoice.data.created.date) {
-        createdAt = state.invoice.data.created.date;
-    }
-
     return {
         invoice: state.invoice,
-        createdAt: createdAt,
         invoiceEntries: state.invoiceEntries,
-        jiraIssues: state.jiraIssues,
         project: state.project
     };
 };
