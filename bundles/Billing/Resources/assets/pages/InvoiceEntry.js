@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import connect from 'react-redux/es/connect/connect';
-import ContentWrapper from './ContentWrapper';
-import PageTitle from './PageTitle';
+import ContentWrapper from '../components/ContentWrapper';
+import PageTitle from '../components/PageTitle';
 import PropTypes from 'prop-types';
 import rest from '../redux/utils/rest';
-import Spinner from './Spinner';
+import Spinner from '../components/Spinner';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import JiraIssues from './JiraIssues';
+import JiraIssues from '../components/JiraIssues';
 
 export class InvoiceEntry extends Component {
     constructor (props) {

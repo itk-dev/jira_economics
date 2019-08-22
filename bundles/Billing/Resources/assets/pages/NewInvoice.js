@@ -1,11 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ProjectList from '../components/ProjectList';
 import PageTitle from '../components/PageTitle';
 import ContentWrapper from '../components/ContentWrapper';
-import { useTranslation } from 'react-i18next';
+import { withTranslation } from 'react-i18next';
 
 function NewInvoice (props) {
-    const { t } = useTranslation();
+    const { t } = props;
 
     return (
         <ContentWrapper>
@@ -17,4 +18,8 @@ function NewInvoice (props) {
     );
 }
 
-export default NewInvoice;
+NewInvoice.propTypes = {
+    t: PropTypes.func.isRequired
+};
+
+export default withTranslation()(NewInvoice);
