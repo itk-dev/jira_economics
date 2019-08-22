@@ -101,34 +101,5 @@ export default reduxApi({
         reducerName: 'jiraIssues',
         url: '/jira/billing/jira_api/jira_issues/:id',
         cache: { expire: 5 * 60 }
-    },
-    getCustomer: {
-        reducerName: 'customer',
-        url: '/jira/billing/jira_api/customer/:id'
-    },
-    createCustomer: {
-        reducerName: 'customer',
-        url: '/jira/billing/jira_api/customer',
-        options: {
-            method: 'post'
-        }
-    },
-    updateCustomer: {
-        reducerName: 'customer',
-        url: '/jira/billing/jira_api/customer/:id',
-        options: {
-            method: 'put'
-        }
-    },
-    deleteCustomer: {
-        reducerName: 'customer',
-        url: '/jira/billing/jira_api/customer/:id',
-        options: {
-            method: 'delete',
-            headers: {
-                'Access-Control-Request-Method': 'DELETE'
-            }
-        }
     }
-
 }).use('fetch', adapterFetch(fetch));
