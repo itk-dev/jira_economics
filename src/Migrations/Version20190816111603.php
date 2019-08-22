@@ -31,7 +31,6 @@ final class Version20190816111603 extends AbstractMigration
         $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql('ALTER TABLE invoice ADD account_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE expense_category CHANGE id id INT NOT NULL');
     }
 
     public function down(Schema $schema): void
@@ -39,7 +38,6 @@ final class Version20190816111603 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf('mysql' !== $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE expense_category CHANGE id id INT AUTO_INCREMENT NOT NULL');
         $this->addSql('ALTER TABLE invoice DROP account_id');
     }
 }

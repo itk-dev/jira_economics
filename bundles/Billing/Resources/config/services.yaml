@@ -3,7 +3,7 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
-            $boundToAccounts: '%env(json:BILLING_TO_ACCOUNTS)%'
+            $boundToAccounts: '%env(json:file:resolve:BILLING_TO_ACCOUNTS_FILE)%'
 
     Billing\:
         resource: '../../*'

@@ -260,7 +260,7 @@ abstract class AbstractJiraService
     public function getRateTableByAccount($accountId)
     {
         return $this->get('/rest/tempo-accounts/1/ratetable', [
-            'scopeId' => ''.$accountId,
+            'scopeId' => $accountId,
             'scopeType' => 'ACCOUNT',
         ]);
     }

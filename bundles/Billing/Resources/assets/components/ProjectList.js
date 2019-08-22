@@ -94,12 +94,11 @@ class ProjectList extends Component {
         }))
             .then((response) => {
                 this.setState({ showModal: false });
-                console.log(response);
-                this.props.history.push(`/project/${projectId}/${response.invoiceId}`);
+                this.props.history.push(`/project/${projectId}/${response.id}`);
             })
             .catch((reason) => {
                 this.setState({ showModal: false });
-                console.log('isCanceled', reason.isCanceled);
+                console.log('isCanceled', reason);
             });
     }
 
