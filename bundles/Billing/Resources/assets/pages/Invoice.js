@@ -41,7 +41,7 @@ class Invoice extends Component {
             showDeleteModal: false,
             showRecordModal: false,
             showDeleteEntryModal: false,
-            editDescription: true,
+            editDescription: false,
             invoiceEntries: {},
             entryIdToDelete: null
         };
@@ -166,13 +166,13 @@ class Invoice extends Component {
 
         let fieldName = event.target.name;
         let fieldVal = event.target.value;
-        if (fieldName === 'description') {
+        if (fieldName === 'description' && fieldVal !== this.state.invoice.description) {
             this.setState({
                 ...this.state,
                 invoice: {
+                    ...this.state.invoice,
                     description: fieldVal
-                },
-                editDescription: false
+                }
             });
 
             let data = {
@@ -185,9 +185,13 @@ class Invoice extends Component {
                 body: JSON.stringify(data)
             }));
         }
+
+        this.setState({
+            editDescription: false
+        });
     };
 
-    editDescription = (event) => {
+    handleEditDescription = (event) => {
         this.setState({
             editDescription: true
         });
@@ -252,7 +256,7 @@ class Invoice extends Component {
                                 <Spinner/>
                             }
                             {!this.state.editDescription && !this.props.invoice.loading &&
-                                <div onClick={this.editDescription} className={'mb-3'}>{nl2br(this.props.invoice.data.description)}</div>
+                                <div onClick={this.handleEditDescription} className={'mb-3'}>{nl2br(this.props.invoice.data.description)}</div>
                             }
                             {this.state.editDescription && !this.props.invoice.loading &&
                                 <Form onBlur={this.saveEditDescription}>
