@@ -216,7 +216,9 @@ class ApiController extends Controller
 
     /**
      * @Route("/to_accounts", name="api_to_accounts", methods={"GET"})
+     *
      * @param $boundToAccounts
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function toAccounts($boundToAccounts)
