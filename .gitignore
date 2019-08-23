@@ -53,4 +53,4 @@ private/*
 /.php_cs.cache
 ###< friendsofphp/php-cs-fixer ###
 
-/config/*.local.yml
+/config/*.local.yaml
