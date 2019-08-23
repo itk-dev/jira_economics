@@ -128,5 +128,5 @@ OWNCLOUD_PASSWORD=""
 
 # Setup bundles/Billing
 
-Create an accounts.json with the accounts (key/value pairs between name and account number) that invoice entries can be sent to.
-And set `BILLING_TO_ACCOUNTS_FILE` in `.env.local` to point to your accounts file.
+If you do not have a `config/jira_economics.local.yaml` file, copy from `config/jira_economics.local.yaml.dist`.
+Set `billing_to_accounts` to your accounts.

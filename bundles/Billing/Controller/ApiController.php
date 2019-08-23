@@ -217,9 +217,11 @@ class ApiController extends Controller
     /**
      * @Route("/to_accounts", name="api_to_accounts", methods={"GET"})
      */
-    public function toAccounts($boundToAccounts)
+    public function toAccounts()
     {
-        return new JsonResponse($boundToAccounts);
+        $accounts = $this->getParameter('billing_to_accounts');
+
+        return new JsonResponse($accounts);
     }
 
     /**
