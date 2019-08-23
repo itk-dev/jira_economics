@@ -11,7 +11,6 @@
 namespace Billing\Service;
 
 use App\Service\JiraService;
-use Billing\Entity\Customer;
 use Billing\Entity\Invoice;
 use Billing\Entity\InvoiceEntry;
 use Billing\Entity\JiraIssue;
@@ -130,11 +129,24 @@ class BillingService extends JiraService
             throw new HttpException(404, 'Invoice with id '.$invoiceId.' not found');
         }
 
+        return $this->getInvoiceArray($invoice);
+    }
+
+    private function getInvoiceArray(Invoice $invoice)
+    {
+        // Get account information.
+        $account = $this->getAccount($invoice->getAccountId());
+        $account->defaultPrice = $this->getAccountDefaultPrice($invoice->getAccountId());
+
         return [
+            'id' => $invoice->getId(),
             'name' => $invoice->getName(),
             'jiraId' => $invoice->getProject()->getJiraId(),
             'recorded' => $invoice->getRecorded(),
-            'created' => $invoice->getCreated(),
+            'accountId' => $invoice->getAccountId(),
+            'description' => $invoice->getDescription(),
+            'account' => $account,
+            'created' => $invoice->getCreated()->format('c'),
         ];
     }
 
@@ -170,17 +182,12 @@ class BillingService extends JiraService
         $invoice->setProject($project);
         $invoice->setRecorded(false);
         $invoice->setCreated(new \DateTime('now'));
+        $invoice->setAccountId($invoiceData['accountId']);
 
         $this->entityManager->persist($invoice);
         $this->entityManager->flush();
 
-        return [
-            'invoiceId' => $invoice->getId(),
-            'name' => $invoice->getName(),
-            'jiraId' => $invoice->getProject()->getJiraId(),
-            'recorded' => $invoice->getRecorded(),
-            'created' => $invoice->getCreated(),
-        ];
+        return $this->getInvoiceArray($invoice);
     }
 
     /**
@@ -196,10 +203,6 @@ class BillingService extends JiraService
             throw new HttpException(400, "Expected integer value for 'id' in request");
         }
 
-        if (isset($invoiceData['recorded']) && !\in_array($invoiceData['recorded'], [true, false])) {
-            throw new HttpException(400, "Expected boolean value for 'recorded' in request");
-        }
-
         $repository = $this->entityManager->getRepository(Invoice::class);
         $invoice = $repository->findOneBy(['id' => $invoiceData['id']]);
 
@@ -211,20 +214,22 @@ class BillingService extends JiraService
             $invoice->setName($invoiceData['name']);
         }
 
+        if (!empty($invoiceData['description'])) {
+            $invoice->setDescription($invoiceData['description']);
+        }
+
+        if (!empty($invoiceData['accountId'])) {
+            $invoice->setAccountId($invoiceData['accountId']);
+        }
+
         if (isset($invoiceData['recorded'])) {
             $invoiceRecorded = $invoiceData['recorded'];
             $invoice->setRecorded($invoiceRecorded);
         }
 
-        $this->entityManager->persist($invoice);
         $this->entityManager->flush();
 
-        return [
-            'name' => $invoice->getName(),
-            'jiraId' => $invoice->getProject()->getJiraId(),
-            'recorded' => $invoice->getRecorded(),
-            'created' => $invoice->getCreated(),
-        ];
+        return $this->getInvoiceArray($invoice);
     }
 
     /**
@@ -279,7 +284,6 @@ class BillingService extends JiraService
 
             $invoiceEntry = [
                 'id' => $invoiceEntry->getId(),
-                'name' => $invoiceEntry->getName(),
                 'invoiceId' => $invoiceEntry->getInvoice()->getId(),
                 'description' => $invoiceEntry->getDescription(),
                 'account' => $invoiceEntry->getAccount(),
@@ -318,7 +322,6 @@ class BillingService extends JiraService
             $invoiceEntriesJson[] = [
                 'id' => $invoiceEntry->getId(),
                 'invoiceId' => $invoiceEntry->getInvoice()->getId(),
-                'name' => $invoiceEntry->getName(),
                 'description' => $invoiceEntry->getDescription(),
                 'account' => $invoiceEntry->getAccount(),
                 'product' => $invoiceEntry->getProduct(),
@@ -333,7 +336,7 @@ class BillingService extends JiraService
     /**
      * Get specific invoiceEntry by id.
      *
-     * @param invoiceEntryId
+     * @param $invoiceEntryId
      *
      * @return array
      */
@@ -350,28 +353,31 @@ class BillingService extends JiraService
             throw new HttpException(404, 'InvoiceEntry with id '.$invoiceEntryId.' not found');
         }
 
-        $jiraIssueIds = [];
-        $jiraIssues = $invoiceEntry->getJiraIssues();
+        return $this->getInvoiceEntryArray($invoiceEntry);
+    }
 
-        foreach ($jiraIssues as $jiraIssue) {
-            $jiraIssueIds[] = $jiraIssue->getIssueId();
-        }
+    private function getInvoiceEntryArray(InvoiceEntry $invoiceEntry)
+    {
+        $jiraIssues = array_reduce($invoiceEntry->getJiraIssues()->toArray(), function ($carry, JiraIssue $item) {
+            $carry[] = [
+                'id' => $item->getIssueId(),
+                'timeSpent' => $item->getTimeSpent(),
+            ];
 
-        $invoiceEntry = [
-            'name' => $invoiceEntry->getName(),
+            return $carry;
+        }, []);
+
+        return [
+            'id' => $invoiceEntry->getId(),
             'invoiceId' => $invoiceEntry->getInvoice()->getId(),
             'description' => $invoiceEntry->getDescription(),
             'account' => $invoiceEntry->getAccount(),
             'product' => $invoiceEntry->getProduct(),
+            'isJiraEntry' => $invoiceEntry->getIsJiraEntry(),
             'amount' => $invoiceEntry->getAmount(),
             'price' => $invoiceEntry->getPrice(),
+            'jiraIssues' => $jiraIssues,
         ];
-
-        if (\count($jiraIssueIds) > 0) {
-            $invoiceEntry['jiraIssueIds'] = $jiraIssueIds;
-        }
-
-        return $invoiceEntry;
     }
 
     /**
@@ -387,14 +393,6 @@ class BillingService extends JiraService
             throw new HttpException(400, "Expected integer value for 'invoiceId' in request");
         }
 
-        if (empty($invoiceEntryData['amount']) || !(float) ($invoiceEntryData['amount'])) {
-            throw new HttpException(400, "Expected numerical value for 'amount' in request");
-        }
-
-        if (empty($invoiceEntryData['price']) || !(float) ($invoiceEntryData['price'])) {
-            throw new HttpException(400, "Expected numerical value for 'price' in request");
-        }
-
         $invoiceRepository = $this->entityManager->getRepository(Invoice::class);
         $invoice = $invoiceRepository->findOneBy(['id' => $invoiceEntryData['invoiceId']]);
 
@@ -404,11 +402,17 @@ class BillingService extends JiraService
 
         $invoiceEntry = new InvoiceEntry();
         $invoiceEntry->setInvoice($invoice);
-        $invoiceEntry->setAmount($invoiceEntryData['amount']);
-        $invoiceEntry->setPrice($invoiceEntryData['price']);
 
-        if (!empty($invoiceEntryData['name'])) {
-            $invoiceEntry->setName($invoiceEntryData['name']);
+        if (!empty($invoiceEntryData['isJiraEntry'])) {
+            $invoiceEntry->setIsJiraEntry($invoiceEntryData['isJiraEntry']);
+        }
+
+        if (!empty($invoiceEntryData['amount'])) {
+            $invoiceEntry->setAmount($invoiceEntryData['amount']);
+        }
+
+        if (!empty($invoiceEntryData['price'])) {
+            $invoiceEntry->setPrice($invoiceEntryData['price']);
         }
 
         if (!empty($invoiceEntryData['description'])) {
@@ -423,18 +427,6 @@ class BillingService extends JiraService
             $invoiceEntry->setProduct($invoiceEntryData['product']);
         }
 
-        $response = [
-            'id' => $invoiceEntry->getId(),
-            'name' => $invoiceEntry->getName(),
-            'jiraProjectId' => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
-            'invoiceId' => $invoiceEntry->getInvoice()->getId(),
-            'description' => $invoiceEntry->getDescription(),
-            'account' => $invoiceEntry->getAccount(),
-            'product' => $invoiceEntry->getProduct(),
-            'amount' => $invoiceEntry->getAmount(),
-            'price' => $invoiceEntry->getPrice(),
-        ];
-
         if (!empty($invoiceEntryData['jiraIssueIds'])) {
             $jiraIssueRepository = $this->entityManager->getRepository(JiraIssue::class);
 
@@ -447,14 +439,12 @@ class BillingService extends JiraService
 
                 $invoiceEntry->addJiraIssue($jiraIssue);
             }
-
-            $response['jiraIssueIds'] = $invoiceEntryData['jiraIssueIds'];
         }
 
         $this->entityManager->persist($invoiceEntry);
         $this->entityManager->flush();
 
-        return $response;
+        return $this->getInvoiceEntryArray($invoiceEntry);
     }
 
     /**
@@ -470,14 +460,6 @@ class BillingService extends JiraService
             throw new HttpException(400, "Expected integer value for 'id' in request");
         }
 
-        if (empty($invoiceEntryData['amount']) || !(float) ($invoiceEntryData['amount'])) {
-            throw new HttpException(400, "Expected numerical value for 'amount' in request");
-        }
-
-        if (empty($invoiceEntryData['price']) || !(float) ($invoiceEntryData['price'])) {
-            throw new HttpException(400, "Expected numerical value for 'price' in request");
-        }
-
         $repository = $this->entityManager->getRepository(InvoiceEntry::class);
         $invoiceEntry = $repository->findOneBy(['id' => $invoiceEntryData['id']]);
 
@@ -485,8 +467,13 @@ class BillingService extends JiraService
             throw new HttpException(404, 'Unable to update invoiceEntry with id '.$invoiceEntryData['id'].' as it does not already exist');
         }
 
-        $invoiceEntry->setAmount($invoiceEntryData['amount']);
-        $invoiceEntry->setPrice($invoiceEntryData['price']);
+        if (!empty($invoiceEntryData['amount'])) {
+            $invoiceEntry->setAmount($invoiceEntryData['amount']);
+        }
+
+        if (!empty($invoiceEntryData['price'])) {
+            $invoiceEntry->setPrice($invoiceEntryData['price']);
+        }
 
         if (!empty($invoiceEntryData['name'])) {
             $invoiceEntry->setName($invoiceEntryData['name']);
@@ -504,17 +491,6 @@ class BillingService extends JiraService
             $invoiceEntry->setProduct($invoiceEntryData['product']);
         }
 
-        $response = [
-            'name' => $invoiceEntry->getName(),
-            'jiraId' => $invoiceEntry->getInvoice()->getProject()->getJiraId(),
-            'invoiceId' => $invoiceEntry->getInvoice()->getId(),
-            'description' => $invoiceEntry->getDescription(),
-            'account' => $invoiceEntry->getAccount(),
-            'product' => $invoiceEntry->getProduct(),
-            'amount' => $invoiceEntry->getAmount(),
-            'price' => $invoiceEntry->getPrice(),
-        ];
-
         if (!empty($invoiceEntryData['jiraIssueIds'])) {
             $jiraIssueRepository = $this->entityManager->getRepository(JiraIssue::class);
 
@@ -527,14 +503,12 @@ class BillingService extends JiraService
 
                 $invoiceEntry->addJiraIssue($jiraIssue);
             }
-
-            $response['jiraIssueIds'] = $invoiceEntryData['jiraIssueIds'];
         }
 
         $this->entityManager->persist($invoiceEntry);
         $this->entityManager->flush();
 
-        return $response;
+        return $this->getInvoiceEntryArray($invoiceEntry);
     }
 
     /**
@@ -691,143 +665,5 @@ class BillingService extends JiraService
         $this->entityManager->flush();
 
         return $jiraIssues;
-    }
-
-    /**
-     * Get specific customer by id.
-     *
-     * @param $customerId
-     *
-     * @return array
-     */
-    public function getCustomer($customerId)
-    {
-        if (!(int) $customerId) {
-            throw new HttpException(400, 'Expected integer in request');
-        }
-
-        $repository = $this->entityManager->getRepository(Customer::class);
-        $customer = $repository->findOneBy(['id' => $customerId]);
-
-        if (!$customer) {
-            throw new HttpException(404, 'Customer with id '.$customerId.' not found');
-        }
-
-        return [
-            'name' => $customer->getName(),
-            'att' => $customer->getAtt(),
-            'cvr' => $customer->getCVR(),
-            'ean' => $customer->getEAN(),
-            'debtor' => $customer->getDebtor(),
-        ];
-    }
-
-    /**
-     * Post new customer, creating a new entity referenced by the returned id.
-     *
-     * @param $customerData
-     *
-     * @return array customerData
-     */
-    public function postCustomer($customerData)
-    {
-        if (empty($customerData['name'])) {
-            throw new HttpException(400, "Expected 'name' in request");
-        } elseif (empty($customerData['att'])) {
-            throw new HttpException(400, "Expected 'att' in request");
-        } elseif (empty($customerData['cvr'])) {
-            throw new HttpException(400, "Expected 'cvr' in request");
-        } elseif (empty($customerData['ean'])) {
-            throw new HttpException(400, "Expected 'ean' in request");
-        } elseif (empty($customerData['debtor'])) {
-            throw new HttpException(400, "Expected 'debtor' in request");
-        }
-
-        $customer = new Customer();
-        $customer->setName($customerData['name']);
-        $customer->setAtt($customerData['att']);
-        $customer->setCVR($customerData['cvr']);
-        $customer->setEAN($customerData['ean']);
-        $customer->setDebtor($customerData['debtor']);
-
-        $this->entityManager->persist($customer);
-        $this->entityManager->flush();
-
-        return [
-            'customerId' => $customer->getId(),
-            'name' => $customer->getName(),
-            'att' => $customer->getAtt(),
-            'cvr' => $customer->getCVR(),
-            'ean' => $customer->getEAN(),
-            'debtor' => $customer->getDebtor(),
-        ];
-    }
-
-    /**
-     * Put specific customer, replacing the customer referenced by the given id.
-     *
-     * @param $customerData
-     *
-     * @return array customerData
-     */
-    public function putCustomer($customerData)
-    {
-        if (empty($customerData['name'])) {
-            throw new HttpException(400, "Expected 'name' in request");
-        } elseif (empty($customerData['att'])) {
-            throw new HttpException(400, "Expected 'att' in request");
-        } elseif (empty($customerData['cvr'])) {
-            throw new HttpException(400, "Expected 'cvr' in request");
-        } elseif (empty($customerData['ean'])) {
-            throw new HttpException(400, "Expected 'ean' in request");
-        } elseif (empty($customerData['debtor'])) {
-            throw new HttpException(400, "Expected 'debtor' in request");
-        }
-
-        $repository = $this->entityManager->getRepository(Customer::class);
-        $customer = $repository->findOneBy(['id' => $customerData['customerId']]);
-
-        if (!$customer) {
-            throw new HttpException(400, 'Customer with id '.$customerData['customerId'].' not found');
-        }
-
-        $customer->setName($customerData['name']);
-        $customer->setAtt($customerData['att']);
-        $customer->setCVR($customerData['cvr']);
-        $customer->setEAN($customerData['ean']);
-        $customer->setDebtor($customerData['debtor']);
-
-        $this->entityManager->persist($customer);
-        $this->entityManager->flush();
-
-        return [
-            'name' => $customer->getName(),
-            'att' => $customer->getAtt(),
-            'cvr' => $customer->getCVR(),
-            'ean' => $customer->getEAN(),
-            'debtor' => $customer->getDebtor(),
-        ];
-    }
-
-    /**
-     * Delete specific customer referenced by the given id.
-     *
-     * @param $customerId
-     */
-    public function deleteCustomer($customerId)
-    {
-        if (empty($customerId) || !(int) $customerId) {
-            throw new HttpException(400, 'Expected integer in request');
-        }
-
-        $repository = $this->entityManager->getRepository(Customer::class);
-        $customer = $repository->findOneBy(['id' => $customerId]);
-
-        if (!$customer) {
-            throw new HttpException(404, 'Customer with id '.$customerId.' did not exist');
-        }
-
-        $this->entityManager->remove($customer);
-        $this->entityManager->flush();
     }
 }

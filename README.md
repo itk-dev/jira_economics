@@ -125,3 +125,8 @@ OWNCLOUD_USERNAME=""
 OWNCLOUD_PASSWORD=""
 ###< ownCloudService ###
 ```
+
+# Setup bundles/Billing
+
+If you do not have a `config/jira_economics.local.yaml` file, copy from `config/jira_economics.local.yaml.dist`.
+Set `billing_to_accounts` to your accounts.

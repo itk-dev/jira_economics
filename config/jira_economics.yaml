@@ -1,4 +1,5 @@
 parameters:
+    billing_to_accounts: ~
     portal:
         menu:
             grafisk_service:

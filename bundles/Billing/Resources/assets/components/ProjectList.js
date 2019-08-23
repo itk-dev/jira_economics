@@ -29,18 +29,20 @@ const imageStyle = {
 };
 
 class ProjectList extends Component {
-    constructor () {
-        super();
+    constructor (props) {
+        super(props);
         this.state = {
+            accounts: {},
             inputFilter: '',
             showModal: false,
-            selectedProject: 0
+            selectedProject: null,
+            selectedAccount: ''
         };
 
         this.onFilterChange = this.onFilterChange.bind(this);
         this.handleModalShow = this.handleModalShow.bind(this);
         this.handleModalCancel = this.handleModalCancel.bind(this);
-        this.handleModalCreate = this.handleModalCreate.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
 
         this.textInput = React.createRef();
     }
@@ -68,30 +70,36 @@ class ProjectList extends Component {
     }
 
     handleModalShow (projectId) {
+        const { dispatch } = this.props;
         this.setState({ showModal: true, selectedProject: projectId });
+        dispatch(rest.actions.getProjectAccounts({ id: projectId }));
     }
 
-    handleModalCreate (event) {
+    handleSubmit (event) {
         event.preventDefault();
+
         const { dispatch } = this.props;
         const name = this.textInput.current.value;
         const projectId = this.state.selectedProject;
+        const accountId = this.state.selectedAccount;
         const invoiceData = {
-            name,
-            projectId
+            name: name,
+            projectId: projectId,
+            accountId: accountId
         };
+
+        // Create the new invoice.
         dispatch(rest.actions.createInvoice({}, {
             body: JSON.stringify(invoiceData)
         }))
             .then((response) => {
                 this.setState({ showModal: false });
-                this.props.history.push(`/project/${projectId}/${response.invoiceId}`);
+                this.props.history.push(`/project/${projectId}/${response.id}`);
             })
             .catch((reason) => {
                 this.setState({ showModal: false });
-                console.log('isCanceled', reason.isCanceled);
+                console.log('isCanceled', reason);
             });
-        // @TODO: verify that invoice creation was successful
     }
 
     displayProjects (items) {
@@ -110,6 +118,12 @@ class ProjectList extends Component {
         }
     }
 
+    handleChange (event) {
+        let fieldName = event.target.name;
+        let fieldVal = event.target.value;
+        this.setState({ ...this.state, [fieldName]: fieldVal });
+    }
+
     render () {
         const items = [];
 
@@ -117,8 +131,7 @@ class ProjectList extends Component {
 
         for (const [, project] of Object.entries(projects)) {
             items.push(
-                <ListGroup.Item key={project.rowKey} id={project.id} action
-                    onClick={() => this.handleModalShow(project.id)}>
+                <ListGroup.Item key={project.rowKey} id={project.id} action onClick={() => this.handleModalShow(project.id)}>
                     <span className="mr-2">{project.avatar}</span>
                     <span className="mr-2 lead d-inline">{project.name}</span>
                     <span className="text-muted">{project.key}</span>
@@ -126,8 +139,7 @@ class ProjectList extends Component {
             );
         }
 
-        // @TODO: Center modal text
-
+        // @TODO: Styling. Center modal text
         return (
             <div>
                 <Form>
@@ -145,28 +157,33 @@ class ProjectList extends Component {
 
                 {this.displayProjects(items)}
 
-                <Modal show={this.state.showModal}
-                    onHide={this.handleModalCancel}>
-                    <Modal.Header>
-                        <Modal.Title>Create Invoice</Modal.Title>
-                    </Modal.Header>
-                    <Form>
+                <Modal show={this.state.showModal} onHide={this.handleModalCancel}>
+                    <Form onSubmit={this.handleSubmit.bind(this)}>
+                        <Modal.Header>
+                            <Modal.Title>Create Invoice</Modal.Title>
+                        </Modal.Header>
                         <Form.Group>
                             <Form.Label>Invoice name</Form.Label>
-                            <Form.Control ref={this.textInput} type="text"
-                                placeholder="Enter new invoice name"></Form.Control>
+                            <Form.Control ref={this.textInput} type="text" placeholder="Enter new invoice name">
+                            </Form.Control>
+                            <Form.Label>Select Account</Form.Label>
+                            <Form.Control as="select" onChange={this.handleChange.bind(this)} name={'selectedAccount'}>
+                                <option value=''> </option>
+                                {this.props.accounts !== {} && Object.keys(this.props.accounts.data)
+                                    .map((keyName) => (
+                                        this.props.accounts.data.hasOwnProperty(keyName) &&
+                                        <option
+                                            key={this.props.accounts.data[keyName].id} value={this.props.accounts.data[keyName].id}>{this.props.accounts.data[keyName].name}</option>
+                                    ))}
+                            </Form.Control>
                         </Form.Group>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={this.handleModalCancel.bind(this)}>
+                                Cancel
+                            </Button>
+                            <input type="submit" value="Submit" className={'btn btn-primary'} />
+                        </Modal.Footer>
                     </Form>
-                    <Modal.Footer>
-                        <Button variant="secondary"
-                            onClick={this.handleModalCancel}>
-                            Cancel
-                        </Button>
-                        <Button variant="primary"
-                            onClick={this.handleModalCreate}>
-                            Create
-                        </Button>
-                    </Modal.Footer>
                 </Modal>
             </div>
         );
@@ -174,6 +191,7 @@ class ProjectList extends Component {
 }
 
 ProjectList.propTypes = {
+    accounts: PropTypes.object,
     projects: PropTypes.object,
     projectRows: PropTypes.array,
     dispatch: PropTypes.func.isRequired,
@@ -184,6 +202,7 @@ const mapStateToProps = state => {
     let projectRows = createRows(state.projects);
 
     return {
+        accounts: state.accounts,
         projects: state.projects,
         projectRows: projectRows
     };

@@ -28,8 +28,10 @@ class ApiController extends Controller
      * @Route("/project/{jiraProjectId}", name="api_project")
      * defaults={"jiraProjectId"="...."})
      */
-    public function projectAction(BillingService $billingService, Request $request)
-    {
+    public function projectAction(
+        BillingService $billingService,
+        Request $request
+    ) {
         $jiraProjectId = $request->get('jiraProjectId');
         $project = $billingService->getJiraProject($jiraProjectId);
 
@@ -54,8 +56,10 @@ class ApiController extends Controller
      * @Route("/invoice/{invoiceId}", name="api_invoice_get", methods={"GET"})
      * defaults={"invoiceId"="...."})
      */
-    public function invoiceGetAction(BillingService $billingService, Request $request)
-    {
+    public function invoiceGetAction(
+        BillingService $billingService,
+        Request $request
+    ) {
         $invoiceId = $request->get('invoiceId');
         $result = $billingService->getInvoice($invoiceId);
 
@@ -65,8 +69,10 @@ class ApiController extends Controller
     /**
      * @Route("/invoice", name="api_invoice_post", methods={"POST"})
      */
-    public function invoicePostAction(BillingService $billingService, Request $request)
-    {
+    public function invoicePostAction(
+        BillingService $billingService,
+        Request $request
+    ) {
         $invoiceData = json_decode($request->getContent(), true);
         $result = $billingService->postInvoice($invoiceData);
 
@@ -77,8 +83,10 @@ class ApiController extends Controller
      * @Route("/invoice/{invoiceId}", name="api_invoice_put", methods={"PUT"})
      * defaults={"invoiceId"="...."})
      */
-    public function invoicePutAction(BillingService $billingService, Request $request)
-    {
+    public function invoicePutAction(
+        BillingService $billingService,
+        Request $request
+    ) {
         $invoiceData = json_decode($request->getContent(), true);
         $result = $billingService->putInvoice($invoiceData);
 
@@ -89,8 +97,10 @@ class ApiController extends Controller
      * @Route("/invoice/{invoiceId}", name="api_invoice_delete", methods={"DELETE"})
      * defaults={"invoiceId"="...."})
      */
-    public function invoiceDeleteAction(BillingService $billingService, Request $request)
-    {
+    public function invoiceDeleteAction(
+        BillingService $billingService,
+        Request $request
+    ) {
         $invoiceId = $request->get('invoiceId');
         $result = $billingService->deleteInvoice($invoiceId);
 
@@ -101,8 +111,10 @@ class ApiController extends Controller
      * @Route("/invoices/{jiraProjectId}", name="api_invoices")
      * defaults={"jiraProjectId"="...."})
      */
-    public function invoicesAction(BillingService $billingService, Request $request)
-    {
+    public function invoicesAction(
+        BillingService $billingService,
+        Request $request
+    ) {
         $jiraProjectId = $request->get('jiraProjectId');
         $result = $billingService->getInvoices($jiraProjectId);
 
@@ -112,8 +124,10 @@ class ApiController extends Controller
     /**
      * @Route("/invoices_all", name="api_invoices_all")
      */
-    public function allInvoicesAction(BillingService $billingService, Request $request)
-    {
+    public function allInvoicesAction(
+        BillingService $billingService,
+        Request $request
+    ) {
         $result = $billingService->getAllInvoices();
 
         return new JsonResponse($result);
@@ -123,8 +137,10 @@ class ApiController extends Controller
      * @Route("/invoice_entry/{invoiceEntryId}", name="api_invoice_entry_get", methods={"GET"})
      * defaults={"invoiceEntryId"="...."})
      */
-    public function invoiceEntryGetAction(BillingService $billingService, Request $request)
-    {
+    public function invoiceEntryGetAction(
+        BillingService $billingService,
+        Request $request
+    ) {
         $invoiceEntryId = $request->get('invoiceEntryId');
         $result = $billingService->getInvoiceEntry($invoiceEntryId);
 
@@ -134,8 +150,10 @@ class ApiController extends Controller
     /**
      * @Route("/invoice_entry", name="api_invoice_entry_post", methods={"POST"})
      */
-    public function invoiceEntryPostAction(BillingService $billingService, Request $request)
-    {
+    public function invoiceEntryPostAction(
+        BillingService $billingService,
+        Request $request
+    ) {
         $invoiceEntryData = json_decode($request->getContent(), true);
         $result = $billingService->postInvoiceEntry($invoiceEntryData);
 
@@ -146,8 +164,10 @@ class ApiController extends Controller
      * @Route("/invoice_entry/{invoiceEntryId}", name="api_invoice_entry_put", methods={"PUT"})
      * defaults={"invoiceEntryId"="...."})
      */
-    public function invoiceEntryPutAction(BillingService $billingService, Request $request)
-    {
+    public function invoiceEntryPutAction(
+        BillingService $billingService,
+        Request $request
+    ) {
         $invoiceEntryData = json_decode($request->getContent(), true);
         $result = $billingService->putInvoiceEntry($invoiceEntryData);
 
@@ -158,8 +178,10 @@ class ApiController extends Controller
      * @Route("/invoice_entry/{invoiceEntryId}", name="api_invoice_entry_delete", methods={"DELETE"})
      * defaults={"invoiceEntryId"="...."})
      */
-    public function invoiceEntryDeleteAction(BillingService $billingService, Request $request)
-    {
+    public function invoiceEntryDeleteAction(
+        BillingService $billingService,
+        Request $request
+    ) {
         $invoiceEntryId = $request->get('invoiceEntryId');
         $result = $billingService->deleteInvoiceEntry($invoiceEntryId);
 
@@ -170,8 +192,10 @@ class ApiController extends Controller
      * @Route("/invoice_entries/{invoiceId}", name="api_invoice_entries")
      * defaults={"invoiceId"="...."})
      */
-    public function invoiceEntriesAction(BillingService $billingService, Request $request)
-    {
+    public function invoiceEntriesAction(
+        BillingService $billingService,
+        Request $request
+    ) {
         $invoiceId = $request->get('invoiceId');
         $result = $billingService->getInvoiceEntries($invoiceId);
 
@@ -181,56 +205,25 @@ class ApiController extends Controller
     /**
      * @Route("/invoice_entries_all", name="api_invoice_entries_all")
      */
-    public function allInvoiceEntriesAction(BillingService $billingService, Request $request)
-    {
+    public function allInvoiceEntriesAction(
+        BillingService $billingService,
+        Request $request
+    ) {
         $result = $billingService->getAllInvoiceEntries();
 
         return new JsonResponse($result);
     }
 
     /**
-     * @Route("/customer/{customerId}", name="api_customer")
-     * defaults={"customerId"="...."}
+     * @Route("/to_accounts", name="api_to_accounts", methods={"GET"})
+     *
+     * @param $boundToAccounts
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function customerGetAction(BillingService $billingService, Request $request)
+    public function toAccounts($boundToAccounts)
     {
-        $customerId = $request->get('customerId');
-        $result = $billingService->getCustomer($customerId);
-
-        return new JsonResponse($result);
-    }
-
-    /**
-     * @Route("/customer", name="api_customer_post", methods={"POST"})
-     */
-    public function customerPostAction(BillingService $billingService, Request $request)
-    {
-        $customerData = json_decode($request->getContent(), true);
-        $result = $billingService->postCustomer($customerData);
-
-        return new JsonResponse($result);
-    }
-
-    /**
-     * @Route("/customer/{customerId}", name="api_customer_put", methods={"PUT"})
-     */
-    public function customerPutAction(BillingService $billingService, Request $request)
-    {
-        $customerData = json_decode($request->getContent(), true);
-        $result = $billingService->putCustomer($customerData);
-
-        return new JsonResponse($result);
-    }
-
-    /**
-     * @Route("/customer/{customerId}", name="api_customer_delete", methods={"DELETE"})
-     */
-    public function customerDeleteAction(BillingService $billingService, Request $request)
-    {
-        $customerId = $request->get('customerId');
-        $result = $billingService->deleteCustomer($customerId);
-
-        return new JsonResponse($result);
+        return new JsonResponse($boundToAccounts);
     }
 
     /**
@@ -245,11 +238,36 @@ class ApiController extends Controller
      * @Route("/jira_issues/{jiraProjectId}", name="api_jira_issues")
      * defaults={"jiraProjectId"="...."})
      */
-    public function jiraIssuesAction(BillingService $billingService, Request $request)
-    {
+    public function jiraIssuesAction(
+        BillingService $billingService,
+        Request $request
+    ) {
         $jiraProjectId = $request->get('jiraProjectId');
         $result = $billingService->getJiraIssues($jiraProjectId);
 
         return new JsonResponse($result);
+    }
+
+    /**
+     * @Route("/account/project/{projectId}", name="get_accounts_by_project_id")
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Billing\Service\BillingService           $billingService
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function getAccountsByProjectId(
+        Request $request,
+        BillingService $billingService,
+        $projectId
+    ) {
+        $accountIds = $billingService->getAccountIdsByProject($projectId);
+        $accounts = [];
+        foreach ($accountIds as $accountId) {
+            $accounts[$accountId] = $billingService->getAccount($accountId);
+            $accounts[$accountId]->defaultPrice = $billingService->getAccountDefaultPrice($accountId);
+        }
+
+        return new JsonResponse($accounts);
     }
 }

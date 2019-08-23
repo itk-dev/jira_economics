@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
 import connect from 'react-redux/es/connect/connect';
 import ContentWrapper from '../components/ContentWrapper';
-import PageTitle from '../components/PageTitle';
-import { setSelectedIssues } from '../redux/actions';
 import PropTypes from 'prop-types';
 import 'moment-timezone';
-import rest from '../redux/utils/rest';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import moment from 'moment';
 import Spinner from './Spinner';
+import Button from 'react-bootstrap/Button';
 
 function makeIssueData (jiraIssues) {
     if (jiraIssues.data.data === undefined) {
@@ -49,24 +47,13 @@ class JiraIssues extends Component {
         this.state = {
             selected: [],
             selectAll: 0,
-            selectedIssues: {}
+            selectedIssues: {},
+            handleJiraIssuesSelected: null
         };
-        if (this.props.selectedIssues.selectedIssues && this.props.selectedIssues.selectedIssues.length > 0) {
-            this.state.selected = this.props.selectedIssues.selectedIssues;
-        }
-        this.toggleRow = this.toggleRow.bind(this);
-    }
 
-    componentDidMount () {
-        const { dispatch } = this.props;
-        dispatch(rest.actions.getJiraIssues({ id: `${this.props.match.params.projectId}` }));
-        if (this.props.location.state && this.props.location.state.existingInvoiceEntryId) {
-            this.props.issueData.forEach(issue => {
-                if (issue.invoiceEntryId === this.props.location.state.existingInvoiceEntryId) {
-                    this.toggleRow(issue);
-                }
-            });
-        }
+        this.toggleRow = this.toggleRow.bind(this);
+        this.handleAccept = this.handleAccept.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
     }
 
     // @TODO: consider simplifying logic here
@@ -184,34 +171,6 @@ class JiraIssues extends Component {
         ];
     }
 
-    handleSubmitIssues = (event) => {
-        event.preventDefault();
-        const { dispatch } = this.props;
-        dispatch(setSelectedIssues(this.state.selected));
-        if (this.props.location.state &&
-            this.props.location.state.existingInvoiceEntryId) {
-            this.props.history.push({
-                pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
-                state: {
-                    from: this.props.location.pathname,
-                    existingInvoiceEntryId: this.props.location.state.existingInvoiceEntryId
-                }
-            });
-        } else {
-            this.props.history.push({
-                pathname: `/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}/submit/invoice_entry`,
-                state: { from: this.props.location.pathname }
-            });
-        }
-    };
-
-    handleCancel = (event) => {
-        event.preventDefault();
-        const { dispatch } = this.props;
-        dispatch(setSelectedIssues({}));
-        this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
-    };
-
     getTimeSpent () {
         if (this.state.selected === undefined) {
             return 0;
@@ -225,12 +184,18 @@ class JiraIssues extends Component {
         return timeSum;
     }
 
+    handleAccept = () => {
+        this.props.handleSelectJiraIssues(this.state.selected);
+    };
+
+    handleCancel = () => {
+        this.props.handleCancelSelectJiraIssues();
+    };
+
     render () {
         if (this.props.jiraIssues.data.data) {
             return (
                 <ContentWrapper>
-                    <PageTitle>Jira Issues</PageTitle>
-                    <div>Vælg issues fra Jira</div>
                     <ReactTable
                         data={this.props.issueData}
                         columns={this.createColumns()}
@@ -239,16 +204,9 @@ class JiraIssues extends Component {
                     />
                     <div>{Object.values(this.state.selected).length + ' issue(s) valgt'}</div>
                     <div>{'Total timer valgt: ' + this.getTimeSpent()}</div>
-                    <form id="submitForm" onSubmit={this.handleSubmitIssues}>
-                        <button type="submit" className="btn btn-primary"
-                            id="submit">Fortsæt med valgte issues
-                        </button>
-                    </form>
-                    <form id="cancelForm" onSubmit={this.handleCancel}>
-                        <button type="submit" className="btn btn-danger"
-                            id="cancel">Annuller
-                        </button>
-                    </form>
+
+                    <Button variant={'primary'} onClick={this.handleAccept}>Overfør til fakturaindgang.</Button>
+                    <Button variant={'warning'} onClick={this.handleCancel}>Annullér</Button>
                 </ContentWrapper>
             );
         } else {
@@ -265,18 +223,8 @@ JiraIssues.propTypes = {
     jiraIssues: PropTypes.object,
     issueData: PropTypes.array,
     selectedIssues: PropTypes.object,
-    dispatch: PropTypes.func.isRequired,
-    match: PropTypes.shape({
-        params: PropTypes.shape({
-            id: PropTypes.node,
-            projectId: PropTypes.string,
-            invoiceId: PropTypes.string
-        }).isRequired
-    }).isRequired,
-    location: PropTypes.object.isRequired,
-    history: PropTypes.shape({
-        push: PropTypes.func.isRequired
-    }).isRequired
+    handleSelectJiraIssues: PropTypes.func.isRequired,
+    handleCancelSelectJiraIssues: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => {
