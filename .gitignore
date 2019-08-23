@@ -22,7 +22,6 @@ npm-debug.log
 /public/bundles/
 /var/
 /vendor/
-/config/create_project_config.local.yml
 ###< symfony/framework-bundle ###
 ###> symfony/phpunit-bridge ###
 .phpunit
@@ -53,3 +52,5 @@ private/*
 /.php_cs
 /.php_cs.cache
 ###< friendsofphp/php-cs-fixer ###
+
+/config/*.local.yaml

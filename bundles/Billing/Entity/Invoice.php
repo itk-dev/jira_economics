@@ -59,6 +59,11 @@ class Invoice
      */
     private $created;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $accountId;
+
     public function __construct()
     {
         $this->invoiceEntries = new ArrayCollection();
@@ -156,6 +161,18 @@ class Invoice
     public function setCreated(\DateTimeInterface $created): self
     {
         $this->created = $created;
+
+        return $this;
+    }
+
+    public function getAccountId(): ?int
+    {
+        return $this->accountId;
+    }
+
+    public function setAccountId(?int $accountId): self
+    {
+        $this->accountId = $accountId;
 
         return $this;
     }

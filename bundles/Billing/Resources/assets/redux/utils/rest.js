@@ -3,6 +3,10 @@ import adapterFetch from 'redux-api/lib/adapters/fetch';
 import fetch from 'cross-fetch';
 
 export default reduxApi({
+    getToAccounts: {
+        reducerName: 'toAccounts',
+        url: '/jira/billing/jira_api/to_accounts'
+    },
     getProject: {
         reducerName: 'project',
         url: '/jira/billing/jira_api/project/:id'
@@ -10,6 +14,10 @@ export default reduxApi({
     getInvoice: {
         reducerName: 'invoice',
         url: '/jira/billing/jira_api/invoice/:id'
+    },
+    getProjectAccounts: {
+        reducerName: 'accounts',
+        url: '/jira/billing/jira_api/account/project/:id'
     },
     updateInvoice: {
         reducerName: 'invoice',
@@ -93,34 +101,5 @@ export default reduxApi({
         reducerName: 'jiraIssues',
         url: '/jira/billing/jira_api/jira_issues/:id',
         cache: { expire: 5 * 60 }
-    },
-    getCustomer: {
-        reducerName: 'customer',
-        url: '/jira/billing/jira_api/customer/:id'
-    },
-    createCustomer: {
-        reducerName: 'customer',
-        url: '/jira/billing/jira_api/customer',
-        options: {
-            method: 'post'
-        }
-    },
-    updateCustomer: {
-        reducerName: 'customer',
-        url: '/jira/billing/jira_api/customer/:id',
-        options: {
-            method: 'put'
-        }
-    },
-    deleteCustomer: {
-        reducerName: 'customer',
-        url: '/jira/billing/jira_api/customer/:id',
-        options: {
-            method: 'delete',
-            headers: {
-                'Access-Control-Request-Method': 'DELETE'
-            }
-        }
     }
-
 }).use('fetch', adapterFetch(fetch));
