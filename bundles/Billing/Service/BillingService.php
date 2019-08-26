@@ -13,8 +13,8 @@ namespace Billing\Service;
 use App\Service\JiraService;
 use Billing\Entity\Invoice;
 use Billing\Entity\InvoiceEntry;
-use Billing\Entity\JiraIssue;
 use Billing\Entity\Project;
+use Billing\Entity\Worklog;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -275,26 +275,7 @@ class BillingService extends JiraService
         $invoiceEntriesJson = [];
 
         foreach ($invoiceEntries as $invoiceEntry) {
-            $jiraIssueIds = [];
-            $jiraIssues = $invoiceEntry->getJiraIssues();
-
-            foreach ($jiraIssues as $jiraIssue) {
-                $jiraIssueIds[] = $jiraIssue->getIssueId();
-            }
-
-            $invoiceEntry = [
-                'id' => $invoiceEntry->getId(),
-                'invoiceId' => $invoiceEntry->getInvoice()->getId(),
-                'description' => $invoiceEntry->getDescription(),
-                'account' => $invoiceEntry->getAccount(),
-                'product' => $invoiceEntry->getProduct(),
-                'amount' => $invoiceEntry->getAmount(),
-                'price' => $invoiceEntry->getPrice(),
-            ];
-
-            if (\count($jiraIssueIds) > 0) {
-                $invoiceEntry['jiraIssueIds'] = $jiraIssueIds;
-            }
+            $invoiceEntry = $this->getInvoiceEntryArray($invoiceEntry);
 
             $invoiceEntriesJson[] = $invoiceEntry;
         }
@@ -358,15 +339,6 @@ class BillingService extends JiraService
 
     private function getInvoiceEntryArray(InvoiceEntry $invoiceEntry)
     {
-        $jiraIssues = array_reduce($invoiceEntry->getJiraIssues()->toArray(), function ($carry, JiraIssue $item) {
-            $carry[] = [
-                'id' => $item->getIssueId(),
-                'timeSpent' => $item->getTimeSpent(),
-            ];
-
-            return $carry;
-        }, []);
-
         return [
             'id' => $invoiceEntry->getId(),
             'invoiceId' => $invoiceEntry->getInvoice()->getId(),
@@ -376,7 +348,7 @@ class BillingService extends JiraService
             'isJiraEntry' => $invoiceEntry->getIsJiraEntry(),
             'amount' => $invoiceEntry->getAmount(),
             'price' => $invoiceEntry->getPrice(),
-            'jiraIssues' => $jiraIssues,
+            'worklogs' => $invoiceEntry->getWorklogs()->toArray(),
         ];
     }
 
@@ -427,20 +399,6 @@ class BillingService extends JiraService
             $invoiceEntry->setProduct($invoiceEntryData['product']);
         }
 
-        if (!empty($invoiceEntryData['jiraIssueIds'])) {
-            $jiraIssueRepository = $this->entityManager->getRepository(JiraIssue::class);
-
-            foreach ($invoiceEntryData['jiraIssueIds'] as $jiraIssueId) {
-                $jiraIssue = $jiraIssueRepository->findOneBy(['issueId' => $jiraIssueId]);
-
-                if (!$jiraIssue) {
-                    throw new HttpException(400, 'JiraIssue with id '.$jiraIssueId.' not found');
-                }
-
-                $invoiceEntry->addJiraIssue($jiraIssue);
-            }
-        }
-
         $this->entityManager->persist($invoiceEntry);
         $this->entityManager->flush();
 
@@ -489,20 +447,6 @@ class BillingService extends JiraService
 
         if (!empty($invoiceEntryData['product'])) {
             $invoiceEntry->setProduct($invoiceEntryData['product']);
-        }
-
-        if (!empty($invoiceEntryData['jiraIssueIds'])) {
-            $jiraIssueRepository = $this->entityManager->getRepository(JiraIssue::class);
-
-            foreach ($invoiceEntryData['jiraIssueIds'] as $jiraIssueId) {
-                $jiraIssue = $jiraIssueRepository->findOneBy(['issueId' => $jiraIssueId]);
-
-                if (!$jiraIssue) {
-                    throw new HttpException(400, 'JiraIssue with id '.$jiraIssueId.' not found');
-                }
-
-                $invoiceEntry->addJiraIssue($jiraIssue);
-            }
         }
 
         $this->entityManager->persist($invoiceEntry);
@@ -574,96 +518,47 @@ class BillingService extends JiraService
     /**
      * Get jiraIssues for project.
      *
-     * @param $jiraProjectId
+     * @param $projectId
      *
      * @return array
      *
      * @throws \Exception
      */
-    public function getJiraIssues($jiraProjectId)
+    public function getJiraIssues($projectId)
     {
-        $jiraIssues = [];
-
-        if (!(int) $jiraProjectId) {
+        if (!(int) $projectId) {
             throw new HttpException(400, 'Expected integer in request');
         }
 
-        $repository = $this->entityManager->getRepository(Project::class);
-        $project = $repository->findOneBy(['jiraId' => $jiraProjectId]);
+        $startAt = 0;
+        $issues = [];
 
-        if (!$project) {
-            throw new HttpException(404, 'Project with id '.$jiraProjectId.' not found');
+        do {
+            $results = $this->get('rest/api/2/search', [
+                'jql' => 'project='.$projectId,
+                'startAt' => $startAt,
+                'maxResults' => 100,
+            ]);
+
+            $issues = array_merge($results->issues, $issues);
+            $startAt =+ 100;
+        } while ($startAt < $results->total);
+
+        $resultIssues = [];
+
+        foreach ($issues as $issue) {
+            $resultIssues[] = [
+                'issueId' => $issue->id,
+                'summary' => $issue->fields->summary,
+                'status' => $issue->fields->status->name,
+                'created' => $issue->fields->created,
+                'updated' => $issue->fields->updated,
+                'finished' => $issue->fields->resolutiondate,
+                'assignee' => isset($issue->fields->assignee) ? $issue->fields->assignee->displayName : null,
+                'worklogs' => $this->getIssueWorklogs($issue->id),
+            ];
         }
 
-        $start = 0;
-        $params = [
-            'jql' => 'project='.$jiraProjectId,
-            'startAt' => $start,
-            'maxResults' => 100,
-        ];
-
-        while (true) {
-            try {
-                $results = $this->get('rest/api/2/search', $params);
-            } catch (HttpException $e) {
-                throw $e;
-            }
-            foreach ($results->issues as $jiraIssueResult) {
-                $issueStatus = $jiraIssueResult->fields->status->statusCategory->name;
-                if ('Done' !== $issueStatus) {
-                    continue;
-                }
-                $repository = $this->entityManager->getRepository(JiraIssue::class);
-                $jiraIssue = $repository->findOneBy(['issueId' => $jiraIssueResult->id]);
-
-                if (!$jiraIssue) {
-                    $jiraIssue = new JiraIssue();
-                }
-
-                $jiraIssue->setIssueId($jiraIssueResult->id);
-                $jiraIssue->setProject($project);
-
-                if (!empty($jiraIssueResult->fields->timespent)) {
-                    $jiraIssue->setTimeSpent($jiraIssueResult->fields->timespent);
-                }
-
-                $jiraIssue->setCreated(new \DateTime($jiraIssueResult->fields->created));
-                $jiraIssue->setFinished(new \DateTime($jiraIssueResult->fields->resolutiondate));
-                $jiraIssue->setSummary($jiraIssueResult->fields->summary);
-
-                // @TODO: should we add other users than the assignee?
-                if (!empty($jiraIssueResult->fields->assignee->key)) {
-                    $jiraIssue->setJiraUsers([$jiraIssueResult->fields->assignee->key]);
-                }
-
-                $issue = [
-                    'issueId' => $jiraIssue->getIssueId(),
-                    'summary' => $jiraIssue->getSummary(),
-                    'created' => $jiraIssue->getCreated(),
-                    'finished' => $jiraIssue->getFinished(),
-                    'jiraUsers' => $jiraIssue->getJiraUsers(),
-                    'timeSpent' => $jiraIssue->getTimeSpent(),
-                ];
-
-                if (null !== $jiraIssue->getInvoiceEntryId()) {
-                    // @TODO: fix misleading getInvoiceEntryId naming - the function actually returns an InvoiceEntry object
-                    $issue['invoiceEntryId'] = $jiraIssue->getInvoiceEntryId()->getId();
-                } else {
-                    $issue['invoiceEntryId'] = null;
-                }
-
-                $jiraIssues[] = $issue;
-                $this->entityManager->persist($jiraIssue);
-            }
-
-            $start += 100;
-
-            if ($start > $results->total) {
-                break;
-            }
-        }
-        $this->entityManager->flush();
-
-        return $jiraIssues;
+        return $resultIssues;
     }
 }

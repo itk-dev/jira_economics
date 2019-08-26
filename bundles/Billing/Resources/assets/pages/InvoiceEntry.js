@@ -7,35 +7,39 @@ import rest from '../redux/utils/rest';
 import Spinner from '../components/Spinner';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import JiraIssues from '../components/JiraIssues';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import Moment from 'react-moment';
 
 export class InvoiceEntry extends Component {
     constructor (props) {
         super(props);
 
         this.state = {
-            jiraIssues: {},
             invoice: {},
             invoiceEntry: {
                 account: '',
                 amount: 0
             },
-            selectJiraIssues: false,
-            toAccounts: {},
 
+            toAccounts: {},
             selectedToAccount: null,
+
+            jiraIssues: {},
+            selectedWorklogs: {},
+            displaySelectWorklogs: false,
+
             amount: null,
             price: null,
             product: null,
             description: null
         };
 
-        this.selectJiraIssues = this.selectJiraIssues.bind(this);
+        this.handleOpenSelectWorklogs = this.handleOpenSelectWorklogs.bind(this);
         this.onAccountChange = this.onAccountChange.bind(this);
-        this.handleSelectJiraIssues = this.handleSelectJiraIssues.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.setDefaultValues = this.setDefaultValues.bind(this);
+        this.handleWorklogToggle = this.handleWorklogToggle.bind(this);
     }
 
     componentDidMount () {
@@ -102,11 +106,13 @@ export class InvoiceEntry extends Component {
         let product = this.state.product;
         let amount = this.state.amount;
         let id = this.state.invoiceEntry.id;
-
-        let jiraIssueIds = this.state.invoiceEntry.jiraIssues.reduce(function (carry, item) {
-            carry.push(item.id);
-            return carry;
-        }, []);
+        let worklogIds = Object.keys(this.state.selectedWorklogs).reduce(
+            (carry, worklogKey) => {
+                if (this.state.selectedWorklogs[worklogKey]) {
+                    carry.push(worklogKey);
+                }
+                return carry;
+            }, []);
 
         let invoiceEntryData = {
             id,
@@ -114,7 +120,7 @@ export class InvoiceEntry extends Component {
             description,
             account,
             product,
-            jiraIssueIds,
+            worklogIds,
             price,
             amount
         };
@@ -137,47 +143,101 @@ export class InvoiceEntry extends Component {
     };
 
     handleChange (event) {
-        let fieldName = event.target.name;
-        let fieldVal = event.target.value;
-        this.setState({ ...this.state, [fieldName]: fieldVal });
+        const fieldName = event.target.name;
+        const fieldVal = event.target.value;
+
+        this.setState(prevState => ({ ...prevState, [fieldName]: fieldVal }));
     }
 
-    selectJiraIssues = () => {
-        this.setState({ selectJiraIssues: true });
-    };
-
-    handleSelectJiraIssues = (issues) => {
-        let timeSpent = issues.reduce((carry, item) => {
-            return carry + item.timeSpent;
-        }, 0);
-
+    handleOpenSelectWorklogs = () => {
         this.setState({
-            invoiceEntry: {
-                ...this.state.invoiceEntry,
-                jiraIssues: issues
-            },
-            amount: timeSpent,
-            selectJiraIssues: false
+            displaySelectWorklogs: true
         });
     };
 
-    handleCancelSelectJiraIssues = () => {
-        this.setState({ selectJiraIssues: false });
+    handleSelectWorklogs = () => {
+        let timeSpent = 0;
+
+        this.state.jiraIssues.data.map(
+            (issue) => {
+                for (let worklogKey in issue.worklogs) {
+                    if (issue.worklogs.hasOwnProperty(worklogKey)) {
+                        let worklog = issue.worklogs[worklogKey];
+
+                        if (this.state.selectedWorklogs.hasOwnProperty(worklog.id)) {
+                            timeSpent = timeSpent + worklog.timeSpentSeconds;
+                        }
+                    }
+                }
+            }
+        );
+
+        this.setState({
+            amount: timeSpent / 60 / 60,
+            displaySelectWorklogs: false
+        });
+    };
+
+    handleWorklogToggle = (worklog) => {
+        let selectedWorklogs = this.state.selectedWorklogs;
+        selectedWorklogs[worklog.id] = !selectedWorklogs[worklog.id];
+
+        this.setState({
+            selectedWorklogs: selectedWorklogs
+        });
     };
 
     render () {
-        if (this.state.selectJiraIssues) {
+        if (this.state.displaySelectWorklogs) {
+            if (!this.state.jiraIssues.data || this.state.jiraIssues.loading) {
+                return (
+                    <ContentWrapper>
+                        <Spinner/>
+                    </ContentWrapper>
+                );
+            }
+
             return (
                 <ContentWrapper>
-                    <JiraIssues
-                        jiraIssues={this.state.jiraIssues}
-                        selectedIssues={this.state.invoiceEntry.jiraIssues}
-                        handleSelectJiraIssues={this.handleSelectJiraIssues}
-                        handleCancelSelectJiraIssues={this.handleCancelSelectJiraIssues}
-                    />
+                    <table className={'table'}>
+                        <thead>
+                            <tr>
+                                <th> </th>
+                                <th>Issue</th>
+                                <th>Worklog id</th>
+                                <th>Worklog comment</th>
+                                <th>Time spent (hours)</th>
+                                <th>Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.state.jiraIssues.data && this.state.jiraIssues.data.map((issue) => (
+                                issue.worklogs.map((worklog) => (
+                                    <tr key={worklog.id}>
+                                        <td><input
+                                            name={'worklog-toggle-' + worklog.id}
+                                            type="checkbox"
+                                            checked={ this.state.selectedWorklogs.hasOwnProperty(worklog.id) ? this.state.selectedWorklogs[worklog.id] : false }
+                                            onChange={ () => { this.handleWorklogToggle(worklog); } }/></td>
+                                        <td>{issue.summary}</td>
+                                        <td>{worklog.id}</td>
+                                        <td>{worklog.comment}</td>
+                                        <td>{worklog.timeSpent}</td>
+                                        <td>
+                                            <Moment format="DD-MM-YYYY">{worklog.updated}</Moment>
+                                        </td>
+                                    </tr>
+                                ))))
+                            }
+                        </tbody>
+                    </table>
+                    <ButtonGroup>
+                        <Button onClick={this.handleSelectWorklogs.bind(this)}>Gem valg</Button>
+                    </ButtonGroup>
                 </ContentWrapper>
             );
         } else if (
+            // @TODO: Cleanup existence checks.
             this.state.toAccounts !== {} &&
             this.state.invoice !== {} &&
             this.state.invoiceEntry &&
@@ -194,7 +254,7 @@ export class InvoiceEntry extends Component {
                     <div><PageTitle>Udfyld fakturalinje</PageTitle></div>
                     {this.state.invoiceEntry.isJiraEntry &&
                     <div>
-                        <Button onClick={this.selectJiraIssues}>Vælg Jira issues</Button>
+                        <Button onClick={this.handleOpenSelectWorklogs}>Vælg worklogs</Button>
                     </div>
                     }
                     <div>

@@ -205,6 +205,32 @@ abstract class AbstractJiraService
     }
 
     /**
+     * Get all worklogs for issue.
+     *
+     * @param $issueId
+     * @return array
+     */
+    public function getIssueWorklogs($issueId)
+    {
+        $worklogs = [];
+        $startAt = 0;
+
+        do {
+            $result = $this->get('/rest/api/2/issue/'.$issueId.'/worklog', [
+                'startAt' => $startAt,
+                'maxResults' => 50,
+            ]);
+
+            $worklogs = array_merge($result->worklogs, $worklogs);
+
+            $startAt =+ 50;
+        }
+        while ($result->total > $startAt);
+
+        return $worklogs;
+    }
+
+    /**
      * Get all projects, including archived.
      *
      * @return array
