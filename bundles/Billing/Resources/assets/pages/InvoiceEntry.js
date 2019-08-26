@@ -84,7 +84,8 @@ export class InvoiceEntry extends Component {
                 amount: this.state.invoiceEntry.amount ? this.state.invoiceEntry.amount : 0,
                 price: this.state.invoiceEntry.price ? this.state.invoiceEntry.price : this.state.invoice.account.defaultPrice,
                 product: this.state.invoiceEntry.product ? this.state.invoiceEntry.product : '',
-                description: this.state.invoiceEntry.description ? this.state.invoiceEntry.description : ''
+                description: this.state.invoiceEntry.description ? this.state.invoiceEntry.description : '',
+                selectedWorklogs: this.state.invoiceEntry.worklogIds
             });
         }
     };
@@ -164,7 +165,8 @@ export class InvoiceEntry extends Component {
                     if (issue.worklogs.hasOwnProperty(worklogKey)) {
                         let worklog = issue.worklogs[worklogKey];
 
-                        if (this.state.selectedWorklogs.hasOwnProperty(worklog.id)) {
+                        if (this.state.selectedWorklogs.hasOwnProperty(worklog.id) &&
+                            this.state.selectedWorklogs[worklog.id]) {
                             timeSpent = timeSpent + worklog.timeSpentSeconds;
                         }
                     }

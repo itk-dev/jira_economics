@@ -15,12 +15,15 @@ use Billing\Entity\Invoice;
 use Billing\Entity\InvoiceEntry;
 use Billing\Entity\Project;
 use Billing\Entity\Worklog;
+use Billing\Repository\WorklogRepository;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 
 class BillingService extends JiraService
 {
     private $entityManager;
+    private $worklogRepository;
 
     /**
      * Constructor.
@@ -30,17 +33,20 @@ class BillingService extends JiraService
      * @param $tokenStorage
      * @param $customerKey
      * @param $pemPath
+     * @param \Billing\Repository\WorklogRepository $worklogRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         $jiraUrl,
         $tokenStorage,
         $customerKey,
-        $pemPath
+        $pemPath,
+        WorklogRepository $worklogRepository
     ) {
         parent::__construct($jiraUrl, $tokenStorage, $customerKey, $pemPath);
 
         $this->entityManager = $entityManager;
+        $this->worklogRepository = $worklogRepository;
     }
 
     /**
@@ -337,6 +343,23 @@ class BillingService extends JiraService
         return $this->getInvoiceEntryArray($invoiceEntry);
     }
 
+    private function getWorklogsArray(Collection $collection)
+    {
+        $worklogs = [];
+
+        /* @var Worklog $worklog */
+        foreach ($collection as $worklog) {
+            $worklogs[] = [
+                'id' => $worklog->getId(),
+                'worklogId' => $worklog->getWorklogId(),
+                'invoiceEntryId' => $worklog->getInvoiceEntry()->getId(),
+                'billed' => $worklog->getIsBilled(),
+            ];
+        }
+
+        return $worklogs;
+    }
+
     private function getInvoiceEntryArray(InvoiceEntry $invoiceEntry)
     {
         return [
@@ -348,7 +371,10 @@ class BillingService extends JiraService
             'isJiraEntry' => $invoiceEntry->getIsJiraEntry(),
             'amount' => $invoiceEntry->getAmount(),
             'price' => $invoiceEntry->getPrice(),
-            'worklogs' => $invoiceEntry->getWorklogs()->toArray(),
+            'worklogIds' => array_reduce($invoiceEntry->getWorklogs()->toArray(), function ($carry, Worklog $worklog) {
+                $carry[$worklog->getWorklogId()] = true;
+                return $carry;
+            }, []),
         ];
     }
 
@@ -375,6 +401,23 @@ class BillingService extends JiraService
         $invoiceEntry = new InvoiceEntry();
         $invoiceEntry->setInvoice($invoice);
 
+        $this->setInvoiceEntryValuesFromData($invoiceEntry, $invoiceEntryData);
+
+        $this->entityManager->persist($invoiceEntry);
+        $this->entityManager->flush();
+
+        return $this->getInvoiceEntryArray($invoiceEntry);
+    }
+
+    /**
+     * Set invoiceEntry from data array.
+     *
+     * @param \Billing\Entity\InvoiceEntry $invoiceEntry
+     * @param array $invoiceEntryData
+     * @return \Billing\Entity\InvoiceEntry
+     */
+    private function setInvoiceEntryValuesFromData(InvoiceEntry $invoiceEntry, array $invoiceEntryData)
+    {
         if (!empty($invoiceEntryData['isJiraEntry'])) {
             $invoiceEntry->setIsJiraEntry($invoiceEntryData['isJiraEntry']);
         }
@@ -399,10 +442,39 @@ class BillingService extends JiraService
             $invoiceEntry->setProduct($invoiceEntryData['product']);
         }
 
-        $this->entityManager->persist($invoiceEntry);
-        $this->entityManager->flush();
+        // If worklogIds has been changed.
+        if (isset($invoiceEntryData['worklogIds'])) {
+            $worklogs = $invoiceEntry->getWorklogs();
 
-        return $this->getInvoiceEntryArray($invoiceEntry);
+            // Remove de-selected worklogs.
+            foreach ($worklogs as $worklog) {
+                if (!in_array($worklog->getId(), $invoiceEntryData['worklogIds'])) {
+                    $this->entityManager->remove($worklog);
+                }
+            }
+
+            // Add not-added worklogs.
+            foreach ($invoiceEntryData['worklogIds'] as $worklogId) {
+                $worklog = $this->worklogRepository->find($worklogId);
+
+                if ($worklog === null) {
+                    $worklog = new Worklog();
+                    $worklog->setWorklogId($worklogId);
+                    $worklog->setInvoiceEntry($invoiceEntry);
+
+                    $this->entityManager->persist($worklog);
+                }
+                else {
+                    if ($worklog->getInvoiceEntry() !== $invoiceEntry) {
+                        throw new HttpException(
+                            'Used by other invoice entry.'
+                        );
+                    }
+                }
+            }
+        }
+
+        return $invoiceEntry;
     }
 
     /**
@@ -425,29 +497,7 @@ class BillingService extends JiraService
             throw new HttpException(404, 'Unable to update invoiceEntry with id '.$invoiceEntryData['id'].' as it does not already exist');
         }
 
-        if (!empty($invoiceEntryData['amount'])) {
-            $invoiceEntry->setAmount($invoiceEntryData['amount']);
-        }
-
-        if (!empty($invoiceEntryData['price'])) {
-            $invoiceEntry->setPrice($invoiceEntryData['price']);
-        }
-
-        if (!empty($invoiceEntryData['name'])) {
-            $invoiceEntry->setName($invoiceEntryData['name']);
-        }
-
-        if (!empty($invoiceEntryData['description'])) {
-            $invoiceEntry->setDescription($invoiceEntryData['description']);
-        }
-
-        if (!empty($invoiceEntryData['account'])) {
-            $invoiceEntry->setAccount($invoiceEntryData['account']);
-        }
-
-        if (!empty($invoiceEntryData['product'])) {
-            $invoiceEntry->setProduct($invoiceEntryData['product']);
-        }
+        $invoiceEntry = $this->setInvoiceEntryValuesFromData($invoiceEntry, $invoiceEntryData);
 
         $this->entityManager->persist($invoiceEntry);
         $this->entityManager->flush();
