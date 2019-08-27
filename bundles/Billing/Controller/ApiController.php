@@ -215,6 +215,24 @@ class ApiController extends Controller
     }
 
     /**
+     * @Route("/project_worklogs/{projectId}", name="api_project_worklogs")
+     * @param \Billing\Service\BillingService $billingService
+     * @param $projectId
+     * @return mixed
+     */
+    public function getProjectWorklogs(BillingService $billingService, $projectId)
+    {
+        return new JsonResponse($billingService->getProjectWorklogs($projectId));
+    }
+
+    public function recordInvoice(BillingService $billingService, $invoiceId)
+    {
+        $billingService->recordInvoice($invoiceId);
+
+        return new JsonResponse([]);
+    }
+
+    /**
      * @Route("/to_accounts", name="api_to_accounts", methods={"GET"})
      *
      * @param $boundToAccounts

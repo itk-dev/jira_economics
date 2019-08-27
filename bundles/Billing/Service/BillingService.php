@@ -527,6 +527,16 @@ class BillingService extends JiraService
         $this->entityManager->flush();
     }
 
+    public function recordInvoice($invoiceId)
+    {
+        $invoice = $this->entityManager->getRepository(Invoice::class)
+            ->find($invoiceId);
+
+        $invoice->setRecorded(true);
+
+        $this->entityManager->flush();
+    }
+
     /**
      * Get specific project by Jira project ID.
      *

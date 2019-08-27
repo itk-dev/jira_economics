@@ -9,6 +9,8 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Moment from 'react-moment';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export class InvoiceEntry extends Component {
     constructor (props) {
@@ -25,13 +27,19 @@ export class InvoiceEntry extends Component {
             selectedToAccount: null,
 
             jiraIssues: {},
+            worklogs: [],
             selectedWorklogs: {},
             displaySelectWorklogs: false,
 
             amount: null,
             price: null,
             product: null,
-            description: null
+            description: null,
+
+            billedFilter: 'not_billed',
+            workerFilter: '',
+            startDateFilter: '',
+            endDateFilter: ''
         };
 
         this.handleOpenSelectWorklogs = this.handleOpenSelectWorklogs.bind(this);
@@ -45,20 +53,17 @@ export class InvoiceEntry extends Component {
     componentDidMount () {
         const { dispatch } = this.props;
 
+        dispatch(rest.actions.getProjectWorklogs({ id: this.props.match.params.projectId }))
+            .then((response) => {
+                this.setState({ projectWorklogs: response });
+            })
+            .catch((reason) => console.log('isCancelled', reason));
+
         dispatch(rest.actions.getInvoiceEntry({ id: this.props.match.params.invoiceEntryId }))
             .then((response) => {
                 this.setState({ invoiceEntry: response }, () => {
                     this.setDefaultValues();
                 });
-
-                // Load jira issues for project if this is a jira invoice entry.
-                if (response.isJiraEntry) {
-                    dispatch(rest.actions.getJiraIssues({ id: this.props.match.params.projectId }))
-                        .then((response) => {
-                            this.setState({ jiraIssues: response });
-                        })
-                        .catch((reason) => console.log('isCanceled', reason));
-                }
             })
             .catch((reason) => console.log('isCanceled', reason));
 
@@ -189,9 +194,53 @@ export class InvoiceEntry extends Component {
         });
     };
 
+    filterWorklogs = (worklog) => {
+        if (this.state.billedFilter !== '') {
+            if (this.state.billedFilter === 'not_billed' &&
+                worklog.attributes.hasOwnProperty('_Billed_') &&
+                worklog.attributes['_Billed_'].value === 'true') {
+                return false;
+            }
+
+            if (this.state.billedFilter === 'billed' && (
+                !worklog.attributes.hasOwnProperty('_Billed_') ||
+                worklog.attributes['_Billed_'].value === 'true')) {
+                return false;
+            }
+        }
+
+        if (this.state.workerFilter !== '') {
+            if (worklog.worker !== this.state.workerFilter) {
+                return false;
+            }
+        }
+
+        let worklogUpdatedTimestamp = (new Date(worklog.dateUpdated)).getTime();
+
+        if (this.state.startDateFilter !== null && this.state.startDateFilter !== '') {
+            let startFilterTimestamp = this.state.startDateFilter.getTime();
+
+            if (startFilterTimestamp > worklogUpdatedTimestamp) {
+                return false;
+            }
+        }
+
+        if (this.state.endDateFilter !== null && this.state.endDateFilter !== '') {
+            let endDate = this.state.endDateFilter;
+            endDate.setHours(23, 59, 59);
+            let endFilterTimestamp = endDate.getTime();
+
+            if (endFilterTimestamp < worklogUpdatedTimestamp) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
     render () {
         if (this.state.displaySelectWorklogs) {
-            if (!this.state.jiraIssues.data || this.state.jiraIssues.loading) {
+            if (!this.state.projectWorklogs || !this.state.projectWorklogs.data || this.state.projectWorklogs.loading) {
                 return (
                     <ContentWrapper>
                         <Spinner/>
@@ -201,35 +250,85 @@ export class InvoiceEntry extends Component {
 
             return (
                 <ContentWrapper>
+                    <DatePicker className={'form-control'} selected={this.state.startDateFilter} isClearable onChange={(newDate) => { this.setState({ startDateFilter: newDate }); }} />
+                    <DatePicker className={'form-control'} selected={this.state.endDateFilter} isClearable onChange={(newDate) => { this.setState({ endDateFilter: newDate }); }} />
+
+                    <Form.Group>
+                        <label htmlFor={'billedFilter'}>Billed</label>
+                        <select
+                            name={'billedFilter'}
+                            className={'form-control'}
+                            value={this.state.billedFilter}
+                            onChange={this.handleChange}>
+                            <option value={''}>
+                                All
+                            </option>
+                            <option value={'not_billed'}>
+                                Not billed
+                            </option>
+                            <option value={'billed'}>
+                                Billed
+                            </option>
+                        </select>
+
+                        <label htmlFor={'workerFilter'}>Worker</label>
+                        <select
+                            name={'workerFilter'}
+                            className={'form-control'}
+                            value={this.state.workerFilter}
+                            onChange={this.handleChange}>
+                            <option value={''}>
+                                All
+                            </option>
+                            {this.state.projectWorklogs.data
+                                .reduce((carry, worklog) => {
+                                    if (carry.indexOf(worklog.worker) === -1) {
+                                        carry.push(worklog.worker);
+                                    }
+                                    return carry;
+                                }, [])
+                                .map((worker) => (
+                                    <option key={worker} value={worker}>
+                                        {worker}
+                                    </option>
+                                ))
+                            }
+                        </select>
+                    </Form.Group>
+
                     <table className={'table'}>
                         <thead>
                             <tr>
                                 <th> </th>
-                                <th>Issue</th>
-                                <th>Worklog id</th>
-                                <th>Worklog comment</th>
+                                <th>Worklog</th>
+                                <th>Billed</th>
+                                <th>User</th>
                                 <th>Time spent (hours)</th>
                                 <th>Updated</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {this.state.jiraIssues.data && this.state.jiraIssues.data.map((issue) => (
-                                issue.worklogs.map((worklog) => (
-                                    <tr key={worklog.id}>
+                            {
+                                /* @TODO: Links to issues and worklogs in Jira */
+                                this.state.projectWorklogs.data.filter(this.filterWorklogs.bind(this)).map((worklog) => (
+                                    <tr key={worklog.tempoWorklogId}>
                                         <td><input
                                             name={'worklog-toggle-' + worklog.id}
                                             type="checkbox"
                                             checked={ this.state.selectedWorklogs.hasOwnProperty(worklog.id) ? this.state.selectedWorklogs[worklog.id] : false }
                                             onChange={ () => { this.handleWorklogToggle(worklog); } }/></td>
-                                        <td>{issue.summary}</td>
-                                        <td>{worklog.id}</td>
-                                        <td>{worklog.comment}</td>
+                                        <td>
+                                            <div>{worklog.comment} ({worklog.tempoWorklogId})</div>
+                                            <div><i>{worklog.issue.summary} ({worklog.issue.id})</i></div>
+                                        </td>
+                                        <td>{worklog.attributes.hasOwnProperty('_Billed_') && worklog.attributes['_Billed_'].value === 'true' ? 'Yes' : ''}</td>
+                                        <td>{worklog.worker}</td>
                                         <td>{worklog.timeSpent}</td>
                                         <td>
-                                            <Moment format="DD-MM-YYYY">{worklog.updated}</Moment>
+                                            <Moment format="DD-MM-YYYY">{worklog.dateUpdated}</Moment>
                                         </td>
                                     </tr>
-                                ))))
+                                ))
                             }
                         </tbody>
                     </table>

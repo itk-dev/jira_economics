@@ -3,6 +3,10 @@ import adapterFetch from 'redux-api/lib/adapters/fetch';
 import fetch from 'cross-fetch';
 
 export default reduxApi({
+    getProjectWorklogs: {
+        reducerName: 'projectWorklogs',
+        url: '/jira/billing/jira_api/project_worklogs/:id'
+    },
     getToAccounts: {
         reducerName: 'toAccounts',
         url: '/jira/billing/jira_api/to_accounts'

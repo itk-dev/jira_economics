@@ -205,27 +205,39 @@ abstract class AbstractJiraService
     }
 
     /**
+     * Get all worklogs for project.
+     *
+     * @param $projectId
+     * @param string $from
+     * @param string $to
+     * @return mixed
+     */
+    public function getProjectWorklogs($projectId, $from = '2000-01-01', $to = '3000-01-01')
+    {
+        $worklogs = $this->post('rest/tempo-timesheets/4/worklogs/search', [
+            'from' => $from,
+            'to' => $to,
+            'projectId' => [$projectId],
+        ]);
+
+        return $worklogs;
+    }
+
+    /**
      * Get all worklogs for issue.
      *
      * @param $issueId
+     * @param string $from
+     * @param string $to
      * @return array
      */
-    public function getIssueWorklogs($issueId)
+    public function getIssueWorklogs($issueId, $from = '2000-01-01', $to = '3000-01-01')
     {
-        $worklogs = [];
-        $startAt = 0;
-
-        do {
-            $result = $this->get('/rest/api/2/issue/'.$issueId.'/worklog', [
-                'startAt' => $startAt,
-                'maxResults' => 50,
-            ]);
-
-            $worklogs = array_merge($result->worklogs, $worklogs);
-
-            $startAt =+ 50;
-        }
-        while ($result->total > $startAt);
+        $worklogs = $this->post('rest/tempo-timesheets/4/worklogs/search', [
+            'from' => $from,
+            'to' => $to,
+            'taskId' => [$issueId],
+        ]);
 
         return $worklogs;
     }
