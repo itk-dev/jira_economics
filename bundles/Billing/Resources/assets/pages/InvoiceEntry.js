@@ -26,9 +26,6 @@ export class InvoiceEntry extends Component {
 
             toAccounts: {},
             selectedToAccount: null,
-
-            jiraIssues: {},
-            worklogs: [],
             selectedWorklogs: {},
             displaySelectWorklogs: false,
 
@@ -165,20 +162,14 @@ export class InvoiceEntry extends Component {
     handleSelectWorklogs = () => {
         let timeSpent = 0;
 
-        this.state.jiraIssues.data.map(
-            (issue) => {
-                for (let worklogKey in issue.worklogs) {
-                    if (issue.worklogs.hasOwnProperty(worklogKey)) {
-                        let worklog = issue.worklogs[worklogKey];
+        for (let worklogKey in this.state.projectWorklogs.data) {
+            let worklog = this.state.projectWorklogs.data[worklogKey];
 
-                        if (this.state.selectedWorklogs.hasOwnProperty(worklog.id) &&
-                            this.state.selectedWorklogs[worklog.id]) {
-                            timeSpent = timeSpent + worklog.timeSpentSeconds;
-                        }
-                    }
-                }
+            if (this.state.selectedWorklogs.hasOwnProperty(worklog.tempoWorklogId) &&
+                this.state.selectedWorklogs[worklog.tempoWorklogId]) {
+                timeSpent = timeSpent + worklog.timeSpentSeconds;
             }
-        );
+        }
 
         this.setState({
             amount: timeSpent / 60 / 60,
@@ -188,7 +179,7 @@ export class InvoiceEntry extends Component {
 
     handleWorklogToggle = (worklog) => {
         let selectedWorklogs = this.state.selectedWorklogs;
-        selectedWorklogs[worklog.id] = !selectedWorklogs[worklog.id];
+        selectedWorklogs[worklog.tempoWorklogId] = !selectedWorklogs[worklog.tempoWorklogId];
 
         this.setState({
             selectedWorklogs: selectedWorklogs
@@ -317,9 +308,9 @@ export class InvoiceEntry extends Component {
                                 this.state.projectWorklogs.data.filter(this.filterWorklogs.bind(this)).map((worklog) => (
                                     <tr key={worklog.tempoWorklogId}>
                                         <td><input
-                                            name={'worklog-toggle-' + worklog.id}
+                                            name={'worklog-toggle-' + worklog.tempoWorklogId}
                                             type="checkbox"
-                                            checked={ this.state.selectedWorklogs.hasOwnProperty(worklog.id) ? this.state.selectedWorklogs[worklog.id] : false }
+                                            checked={ this.state.selectedWorklogs.hasOwnProperty(worklog.tempoWorklogId) ? this.state.selectedWorklogs[worklog.tempoWorklogId] : false }
                                             onChange={ () => { this.handleWorklogToggle(worklog); } }/></td>
                                         <td>
                                             <div>{worklog.comment} ({worklog.tempoWorklogId})</div>
