@@ -263,20 +263,6 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/jira_issues/{jiraProjectId}", name="api_jira_issues")
-     * defaults={"jiraProjectId"="...."})
-     */
-    public function jiraIssuesAction(
-        BillingService $billingService,
-        Request $request
-    ) {
-        $jiraProjectId = $request->get('jiraProjectId');
-        $result = $billingService->getJiraIssues($jiraProjectId);
-
-        return new JsonResponse($result);
-    }
-
-    /**
      * @Route("/account/project/{projectId}", name="get_accounts_by_project_id")
      *
      * @param \Symfony\Component\HttpFoundation\Request $request

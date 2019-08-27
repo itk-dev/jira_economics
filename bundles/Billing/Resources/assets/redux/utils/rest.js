@@ -100,10 +100,5 @@ export default reduxApi({
         reducerName: 'currentUser',
         url: '/jira/billing/jira_api/current_user',
         cache: { expire: 5 * 60 }
-    },
-    getJiraIssues: {
-        reducerName: 'jiraIssues',
-        url: '/jira/billing/jira_api/jira_issues/:id',
-        cache: { expire: 5 * 60 }
     }
 }).use('fetch', adapterFetch(fetch));
