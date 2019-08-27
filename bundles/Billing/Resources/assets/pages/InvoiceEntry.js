@@ -11,6 +11,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Moment from 'react-moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import '../css/react-datepicker.css';
 
 export class InvoiceEntry extends Component {
     constructor (props) {
@@ -250,10 +251,13 @@ export class InvoiceEntry extends Component {
 
             return (
                 <ContentWrapper>
-                    <DatePicker className={'form-control'} selected={this.state.startDateFilter} isClearable onChange={(newDate) => { this.setState({ startDateFilter: newDate }); }} />
-                    <DatePicker className={'form-control'} selected={this.state.endDateFilter} isClearable onChange={(newDate) => { this.setState({ endDateFilter: newDate }); }} />
-
                     <Form.Group>
+                        <label htmlFor={'startDateFilter'}>Start date</label>
+                        <DatePicker name={'startDateFilter'} className={'form-control'} selected={this.state.startDateFilter} isClearable onChange={(newDate) => { this.setState({ startDateFilter: newDate }); }} />
+
+                        <label htmlFor={'startDateFilter'}>Start date</label>
+                        <DatePicker name={'endDateFilter'} className={'form-control'} selected={this.state.endDateFilter} isClearable onChange={(newDate) => { this.setState({ endDateFilter: newDate }); }} />
+
                         <label htmlFor={'billedFilter'}>Billed</label>
                         <select
                             name={'billedFilter'}
