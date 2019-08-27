@@ -210,6 +210,7 @@ abstract class AbstractJiraService
      * @param $projectId
      * @param string $from
      * @param string $to
+     *
      * @return mixed
      */
     public function getProjectWorklogs($projectId, $from = '2000-01-01', $to = '3000-01-01')
@@ -229,6 +230,7 @@ abstract class AbstractJiraService
      * @param $issueId
      * @param string $from
      * @param string $to
+     *
      * @return array
      */
     public function getIssueWorklogs($issueId, $from = '2000-01-01', $to = '3000-01-01')

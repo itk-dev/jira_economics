@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of aakb/jira_economics.
+ *
+ * (c) 2019 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace Billing\Repository;
 
 use Billing\Entity\Worklog;
@@ -18,33 +26,4 @@ class WorklogRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Worklog::class);
     }
-
-    // /**
-    //  * @return Worklog[] Returns an array of Worklog objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('w')
-            ->andWhere('w.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('w.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Worklog
-    {
-        return $this->createQueryBuilder('w')
-            ->andWhere('w.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

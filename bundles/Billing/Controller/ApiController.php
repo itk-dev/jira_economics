@@ -216,8 +216,10 @@ class ApiController extends Controller
 
     /**
      * @Route("/project_worklogs/{projectId}", name="api_project_worklogs")
+     *
      * @param \Billing\Service\BillingService $billingService
      * @param $projectId
+     *
      * @return mixed
      */
     public function getProjectWorklogs(BillingService $billingService, $projectId)
@@ -227,8 +229,10 @@ class ApiController extends Controller
 
     /**
      * @Route("/record_invoice/{invoiceId}", name="api_record_invoice")
+     *
      * @param \Billing\Service\BillingService $billingService
      * @param $invoiceId
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function recordInvoice(BillingService $billingService, $invoiceId)

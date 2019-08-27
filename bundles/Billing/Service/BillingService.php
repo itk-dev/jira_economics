@@ -373,6 +373,7 @@ class BillingService extends JiraService
             'price' => $invoiceEntry->getPrice(),
             'worklogIds' => array_reduce($invoiceEntry->getWorklogs()->toArray(), function ($carry, Worklog $worklog) {
                 $carry[$worklog->getWorklogId()] = true;
+
                 return $carry;
             }, []),
         ];
@@ -413,7 +414,8 @@ class BillingService extends JiraService
      * Set invoiceEntry from data array.
      *
      * @param \Billing\Entity\InvoiceEntry $invoiceEntry
-     * @param array $invoiceEntryData
+     * @param array                        $invoiceEntryData
+     *
      * @return \Billing\Entity\InvoiceEntry
      */
     private function setInvoiceEntryValuesFromData(InvoiceEntry $invoiceEntry, array $invoiceEntryData)
@@ -448,7 +450,7 @@ class BillingService extends JiraService
 
             // Remove de-selected worklogs.
             foreach ($worklogs as $worklog) {
-                if (!in_array($worklog->getId(), $invoiceEntryData['worklogIds'])) {
+                if (!\in_array($worklog->getId(), $invoiceEntryData['worklogIds'])) {
                     $this->entityManager->remove($worklog);
                 }
             }
@@ -457,14 +459,13 @@ class BillingService extends JiraService
             foreach ($invoiceEntryData['worklogIds'] as $worklogId) {
                 $worklog = $this->worklogRepository->find($worklogId);
 
-                if ($worklog === null) {
+                if (null === $worklog) {
                     $worklog = new Worklog();
                     $worklog->setWorklogId($worklogId);
                     $worklog->setInvoiceEntry($invoiceEntry);
 
                     $this->entityManager->persist($worklog);
-                }
-                else {
+                } else {
                     if ($worklog->getInvoiceEntry() !== $invoiceEntry) {
                         throw new HttpException(
                             'Used by other invoice entry.'
@@ -610,7 +611,7 @@ class BillingService extends JiraService
             ]);
 
             $issues = array_merge($results->issues, $issues);
-            $startAt =+ 100;
+            $startAt = +100;
         } while ($startAt < $results->total);
 
         $resultIssues = [];
