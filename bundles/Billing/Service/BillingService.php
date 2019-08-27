@@ -527,10 +527,19 @@ class BillingService extends JiraService
         $this->entityManager->flush();
     }
 
+    /**
+     * Record an invoice.
+     *
+     * @param $invoiceId
+     */
     public function recordInvoice($invoiceId)
     {
         $invoice = $this->entityManager->getRepository(Invoice::class)
             ->find($invoiceId);
+
+        // Make sure all amounts are calculated correctly.
+        // Check each worklog and the amounts calculated.
+        // Avoid duplicated use of worklog.
 
         $invoice->setRecorded(true);
 

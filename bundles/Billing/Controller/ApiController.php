@@ -225,6 +225,12 @@ class ApiController extends Controller
         return new JsonResponse($billingService->getProjectWorklogs($projectId));
     }
 
+    /**
+     * @Route("/record_invoice/{invoiceId}", name="api_record_invoice")
+     * @param \Billing\Service\BillingService $billingService
+     * @param $invoiceId
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function recordInvoice(BillingService $billingService, $invoiceId)
     {
         $billingService->recordInvoice($invoiceId);
