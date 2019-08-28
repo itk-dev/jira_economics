@@ -585,6 +585,12 @@ class BillingService extends JiraService
         return $project;
     }
 
+    /**
+     * Get project worklogs with extra metadata.
+     *
+     * @param $projectId
+     * @return mixed
+     */
     public function getProjectWorklogsWithMetadata($projectId)
     {
         $worklogs = $this->getProjectWorklogs($projectId);
@@ -605,7 +611,6 @@ class BillingService extends JiraService
         foreach ($worklogs as $worklog) {
             $issue = $worklog->issue;
 
-            // @TODO: Replace with function.
             foreach ($epics as $epic) {
                 if ($epic->key === $issue->epicKey) {
                     $issue->epicName = $epic->fields->{$epicNameCustomFieldId};
@@ -636,11 +641,24 @@ class BillingService extends JiraService
         return $worklogs;
     }
 
+    /**
+     * Get epics for project.
+     *
+     * @param $projectId
+     * @return array
+     */
     public function getProjectEpics($projectId)
     {
         return $this->getProjectIssues($projectId, 'Epic');
     }
 
+    /**
+     * Get project issues of a given issue type.
+     *
+     * @param $projectId
+     * @param null $issueType
+     * @return array
+     */
     public function getProjectIssues($projectId, $issueType = null)
     {
         $epics = [];
