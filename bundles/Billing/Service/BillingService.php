@@ -589,6 +589,7 @@ class BillingService extends JiraService
      * Get project worklogs with extra metadata.
      *
      * @param $projectId
+     *
      * @return mixed
      */
     public function getProjectWorklogsWithMetadata($projectId)
@@ -645,6 +646,7 @@ class BillingService extends JiraService
      * Get epics for project.
      *
      * @param $projectId
+     *
      * @return array
      */
     public function getProjectEpics($projectId)
@@ -657,6 +659,7 @@ class BillingService extends JiraService
      *
      * @param $projectId
      * @param null $issueType
+     *
      * @return array
      */
     public function getProjectIssues($projectId, $issueType = null)
