@@ -628,7 +628,7 @@ class BillingService extends JiraService
 
             $worklogEntity = $this->worklogRepository->findOneBy(['worklogId' => $worklog->tempoWorklogId]);
 
-            if ($worklogEntity !== null) {
+            if (null !== $worklogEntity) {
                 $worklog->addedToInvoiceEntryId = $worklogEntity->getInvoiceEntry()->getId();
             }
         }
@@ -647,7 +647,7 @@ class BillingService extends JiraService
 
         $jql = 'project='.$projectId;
 
-        if ($issueType !== null) {
+        if (null !== $issueType) {
             $jql = $jql.' and issuetype='.$issueType;
         }
 
