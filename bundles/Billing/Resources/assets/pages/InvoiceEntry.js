@@ -11,7 +11,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Moment from 'react-moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import '../css/react-datepicker.css';
+import '../css/react-datepicker.scss';
 
 export class InvoiceEntry extends Component {
     constructor (props) {
