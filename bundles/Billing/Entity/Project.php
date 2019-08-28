@@ -60,15 +60,9 @@ class Project
      */
     private $avatarUrl;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Billing\Entity\JiraIssue", mappedBy="project")
-     */
-    private $jiraIssues;
-
     public function __construct()
     {
         $this->invoices = new ArrayCollection();
-        $this->jiraIssues = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -163,37 +157,6 @@ class Project
     public function setAvatarUrl(string $avatarUrl): self
     {
         $this->avatarUrl = $avatarUrl;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|JiraIssue[]
-     */
-    public function getJiraIssues(): Collection
-    {
-        return $this->jiraIssues;
-    }
-
-    public function addJiraIssue(JiraIssue $jiraIssue): self
-    {
-        if (!$this->jiraIssues->contains($jiraIssue)) {
-            $this->jiraIssues[] = $jiraIssue;
-            $jiraIssue->setProject($this);
-        }
-
-        return $this;
-    }
-
-    public function removeJiraIssue(JiraIssue $jiraIssue): self
-    {
-        if ($this->jiraIssues->contains($jiraIssue)) {
-            $this->jiraIssues->removeElement($jiraIssue);
-            // set the owning side to null (unless already changed)
-            if ($jiraIssue->getProject() === $this) {
-                $jiraIssue->setProject(null);
-            }
-        }
 
         return $this;
     }

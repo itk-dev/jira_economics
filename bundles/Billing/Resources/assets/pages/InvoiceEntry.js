@@ -7,54 +7,61 @@ import rest from '../redux/utils/rest';
 import Spinner from '../components/Spinner';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import JiraIssues from '../components/JiraIssues';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import Moment from 'react-moment';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import '../css/react-datepicker.scss';
 
 export class InvoiceEntry extends Component {
     constructor (props) {
         super(props);
 
         this.state = {
-            jiraIssues: {},
             invoice: {},
             invoiceEntry: {
                 account: '',
                 amount: 0
             },
-            selectJiraIssues: false,
-            toAccounts: {},
 
+            toAccounts: {},
             selectedToAccount: null,
+            selectedWorklogs: {},
+            displaySelectWorklogs: false,
+
             amount: null,
             price: null,
             product: null,
-            description: null
+            description: null,
+
+            billedFilter: 'not_billed',
+            workerFilter: '',
+            startDateFilter: '',
+            endDateFilter: ''
         };
 
-        this.selectJiraIssues = this.selectJiraIssues.bind(this);
+        this.handleOpenSelectWorklogs = this.handleOpenSelectWorklogs.bind(this);
         this.onAccountChange = this.onAccountChange.bind(this);
-        this.handleSelectJiraIssues = this.handleSelectJiraIssues.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.setDefaultValues = this.setDefaultValues.bind(this);
+        this.handleWorklogToggle = this.handleWorklogToggle.bind(this);
     }
 
     componentDidMount () {
         const { dispatch } = this.props;
+
+        dispatch(rest.actions.getProjectWorklogs({ id: this.props.match.params.projectId }))
+            .then((response) => {
+                this.setState({ projectWorklogs: response });
+            })
+            .catch((reason) => console.log('isCancelled', reason));
 
         dispatch(rest.actions.getInvoiceEntry({ id: this.props.match.params.invoiceEntryId }))
             .then((response) => {
                 this.setState({ invoiceEntry: response }, () => {
                     this.setDefaultValues();
                 });
-
-                // Load jira issues for project if this is a jira invoice entry.
-                if (response.isJiraEntry) {
-                    dispatch(rest.actions.getJiraIssues({ id: this.props.match.params.projectId }))
-                        .then((response) => {
-                            this.setState({ jiraIssues: response });
-                        })
-                        .catch((reason) => console.log('isCanceled', reason));
-                }
             })
             .catch((reason) => console.log('isCanceled', reason));
 
@@ -80,7 +87,8 @@ export class InvoiceEntry extends Component {
                 amount: this.state.invoiceEntry.amount ? this.state.invoiceEntry.amount : 0,
                 price: this.state.invoiceEntry.price ? this.state.invoiceEntry.price : this.state.invoice.account.defaultPrice,
                 product: this.state.invoiceEntry.product ? this.state.invoiceEntry.product : '',
-                description: this.state.invoiceEntry.description ? this.state.invoiceEntry.description : ''
+                description: this.state.invoiceEntry.description ? this.state.invoiceEntry.description : '',
+                selectedWorklogs: this.state.invoiceEntry.worklogIds
             });
         }
     };
@@ -102,11 +110,13 @@ export class InvoiceEntry extends Component {
         let product = this.state.product;
         let amount = this.state.amount;
         let id = this.state.invoiceEntry.id;
-
-        let jiraIssueIds = this.state.invoiceEntry.jiraIssues.reduce(function (carry, item) {
-            carry.push(item.id);
-            return carry;
-        }, []);
+        let worklogIds = Object.keys(this.state.selectedWorklogs).reduce(
+            (carry, worklogKey) => {
+                if (this.state.selectedWorklogs[worklogKey]) {
+                    carry.push(worklogKey);
+                }
+                return carry;
+            }, []);
 
         let invoiceEntryData = {
             id,
@@ -114,7 +124,7 @@ export class InvoiceEntry extends Component {
             description,
             account,
             product,
-            jiraIssueIds,
+            worklogIds,
             price,
             amount
         };
@@ -137,47 +147,193 @@ export class InvoiceEntry extends Component {
     };
 
     handleChange (event) {
-        let fieldName = event.target.name;
-        let fieldVal = event.target.value;
-        this.setState({ ...this.state, [fieldName]: fieldVal });
+        const fieldName = event.target.name;
+        const fieldVal = event.target.value;
+
+        this.setState(prevState => ({ ...prevState, [fieldName]: fieldVal }));
     }
 
-    selectJiraIssues = () => {
-        this.setState({ selectJiraIssues: true });
-    };
-
-    handleSelectJiraIssues = (issues) => {
-        let timeSpent = issues.reduce((carry, item) => {
-            return carry + item.timeSpent;
-        }, 0);
-
+    handleOpenSelectWorklogs = () => {
         this.setState({
-            invoiceEntry: {
-                ...this.state.invoiceEntry,
-                jiraIssues: issues
-            },
-            amount: timeSpent,
-            selectJiraIssues: false
+            displaySelectWorklogs: true
         });
     };
 
-    handleCancelSelectJiraIssues = () => {
-        this.setState({ selectJiraIssues: false });
+    handleSelectWorklogs = () => {
+        let timeSpent = 0;
+
+        for (let worklogKey in this.state.projectWorklogs.data) {
+            let worklog = this.state.projectWorklogs.data[worklogKey];
+
+            if (this.state.selectedWorklogs.hasOwnProperty(worklog.tempoWorklogId) &&
+                this.state.selectedWorklogs[worklog.tempoWorklogId]) {
+                timeSpent = timeSpent + worklog.timeSpentSeconds;
+            }
+        }
+
+        this.setState({
+            amount: timeSpent / 60 / 60,
+            displaySelectWorklogs: false
+        });
+    };
+
+    handleWorklogToggle = (worklog) => {
+        let selectedWorklogs = this.state.selectedWorklogs;
+        selectedWorklogs[worklog.tempoWorklogId] = !selectedWorklogs[worklog.tempoWorklogId];
+
+        this.setState({
+            selectedWorklogs: selectedWorklogs
+        });
+    };
+
+    filterWorklogs = (worklog) => {
+        if (this.state.billedFilter !== '') {
+            if (this.state.billedFilter === 'not_billed' &&
+                worklog.attributes.hasOwnProperty('_Billed_') &&
+                worklog.attributes['_Billed_'].value === 'true') {
+                return false;
+            }
+
+            if (this.state.billedFilter === 'billed' && (
+                !worklog.attributes.hasOwnProperty('_Billed_') ||
+                worklog.attributes['_Billed_'].value === 'true')) {
+                return false;
+            }
+        }
+
+        if (this.state.workerFilter !== '') {
+            if (worklog.worker !== this.state.workerFilter) {
+                return false;
+            }
+        }
+
+        let worklogUpdatedTimestamp = (new Date(worklog.dateUpdated)).getTime();
+
+        if (this.state.startDateFilter !== null && this.state.startDateFilter !== '') {
+            let startFilterTimestamp = this.state.startDateFilter.getTime();
+
+            if (startFilterTimestamp > worklogUpdatedTimestamp) {
+                return false;
+            }
+        }
+
+        if (this.state.endDateFilter !== null && this.state.endDateFilter !== '') {
+            let endDate = this.state.endDateFilter;
+            endDate.setHours(23, 59, 59);
+            let endFilterTimestamp = endDate.getTime();
+
+            if (endFilterTimestamp < worklogUpdatedTimestamp) {
+                return false;
+            }
+        }
+
+        return true;
     };
 
     render () {
-        if (this.state.selectJiraIssues) {
+        if (this.state.displaySelectWorklogs) {
+            if (!this.state.projectWorklogs || !this.state.projectWorklogs.data || this.state.projectWorklogs.loading) {
+                return (
+                    <ContentWrapper>
+                        <Spinner/>
+                    </ContentWrapper>
+                );
+            }
+
             return (
                 <ContentWrapper>
-                    <JiraIssues
-                        jiraIssues={this.state.jiraIssues}
-                        selectedIssues={this.state.invoiceEntry.jiraIssues}
-                        handleSelectJiraIssues={this.handleSelectJiraIssues}
-                        handleCancelSelectJiraIssues={this.handleCancelSelectJiraIssues}
-                    />
+                    <Form.Group>
+                        <label htmlFor={'startDateFilter'}>Start date</label>
+                        <DatePicker name={'startDateFilter'} className={'form-control'} selected={this.state.startDateFilter} isClearable onChange={(newDate) => { this.setState({ startDateFilter: newDate }); }} />
+
+                        <label htmlFor={'startDateFilter'}>Start date</label>
+                        <DatePicker name={'endDateFilter'} className={'form-control'} selected={this.state.endDateFilter} isClearable onChange={(newDate) => { this.setState({ endDateFilter: newDate }); }} />
+
+                        <label htmlFor={'billedFilter'}>Billed</label>
+                        <select
+                            name={'billedFilter'}
+                            className={'form-control'}
+                            value={this.state.billedFilter}
+                            onChange={this.handleChange}>
+                            <option value={''}>
+                                All
+                            </option>
+                            <option value={'not_billed'}>
+                                Not billed
+                            </option>
+                            <option value={'billed'}>
+                                Billed
+                            </option>
+                        </select>
+
+                        <label htmlFor={'workerFilter'}>Worker</label>
+                        <select
+                            name={'workerFilter'}
+                            className={'form-control'}
+                            value={this.state.workerFilter}
+                            onChange={this.handleChange}>
+                            <option value={''}>
+                                All
+                            </option>
+                            {this.state.projectWorklogs.data
+                                .reduce((carry, worklog) => {
+                                    if (carry.indexOf(worklog.worker) === -1) {
+                                        carry.push(worklog.worker);
+                                    }
+                                    return carry;
+                                }, [])
+                                .map((worker) => (
+                                    <option key={worker} value={worker}>
+                                        {worker}
+                                    </option>
+                                ))
+                            }
+                        </select>
+                    </Form.Group>
+
+                    <table className={'table'}>
+                        <thead>
+                            <tr>
+                                <th> </th>
+                                <th>Worklog</th>
+                                <th>Billed</th>
+                                <th>User</th>
+                                <th>Time spent (hours)</th>
+                                <th>Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                /* @TODO: Links to issues and worklogs in Jira */
+                                this.state.projectWorklogs.data.filter(this.filterWorklogs.bind(this)).map((worklog) => (
+                                    <tr key={worklog.tempoWorklogId}>
+                                        <td><input
+                                            name={'worklog-toggle-' + worklog.tempoWorklogId}
+                                            type="checkbox"
+                                            checked={ this.state.selectedWorklogs.hasOwnProperty(worklog.tempoWorklogId) ? this.state.selectedWorklogs[worklog.tempoWorklogId] : false }
+                                            onChange={ () => { this.handleWorklogToggle(worklog); } }/></td>
+                                        <td>
+                                            <div>{worklog.comment} ({worklog.tempoWorklogId})</div>
+                                            <div><i>{worklog.issue.summary} ({worklog.issue.id})</i></div>
+                                        </td>
+                                        <td>{worklog.attributes.hasOwnProperty('_Billed_') && worklog.attributes['_Billed_'].value === 'true' ? 'Yes' : ''}</td>
+                                        <td>{worklog.worker}</td>
+                                        <td>{worklog.timeSpent}</td>
+                                        <td>
+                                            <Moment format="DD-MM-YYYY">{worklog.dateUpdated}</Moment>
+                                        </td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                    <ButtonGroup>
+                        <Button onClick={this.handleSelectWorklogs.bind(this)}>Gem valg</Button>
+                    </ButtonGroup>
                 </ContentWrapper>
             );
         } else if (
+            // @TODO: Cleanup existence checks.
             this.state.toAccounts !== {} &&
             this.state.invoice !== {} &&
             this.state.invoiceEntry &&
@@ -194,7 +350,7 @@ export class InvoiceEntry extends Component {
                     <div><PageTitle>Udfyld fakturalinje</PageTitle></div>
                     {this.state.invoiceEntry.isJiraEntry &&
                     <div>
-                        <Button onClick={this.selectJiraIssues}>Vælg Jira issues</Button>
+                        <Button onClick={this.handleOpenSelectWorklogs}>Vælg worklogs</Button>
                     </div>
                     }
                     <div>

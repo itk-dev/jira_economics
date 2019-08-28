@@ -215,6 +215,34 @@ class ApiController extends Controller
     }
 
     /**
+     * @Route("/project_worklogs/{projectId}", name="api_project_worklogs")
+     *
+     * @param \Billing\Service\BillingService $billingService
+     * @param $projectId
+     *
+     * @return mixed
+     */
+    public function getProjectWorklogs(BillingService $billingService, $projectId)
+    {
+        return new JsonResponse($billingService->getProjectWorklogs($projectId));
+    }
+
+    /**
+     * @Route("/record_invoice/{invoiceId}", name="api_record_invoice")
+     *
+     * @param \Billing\Service\BillingService $billingService
+     * @param $invoiceId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function recordInvoice(BillingService $billingService, $invoiceId)
+    {
+        $billingService->recordInvoice($invoiceId);
+
+        return new JsonResponse([]);
+    }
+
+    /**
      * @Route("/to_accounts", name="api_to_accounts", methods={"GET"})
      *
      * @param $boundToAccounts
@@ -232,20 +260,6 @@ class ApiController extends Controller
     public function currentUserAction(JiraService $jiraService)
     {
         return new JsonResponse($jiraService->getCurrentUser());
-    }
-
-    /**
-     * @Route("/jira_issues/{jiraProjectId}", name="api_jira_issues")
-     * defaults={"jiraProjectId"="...."})
-     */
-    public function jiraIssuesAction(
-        BillingService $billingService,
-        Request $request
-    ) {
-        $jiraProjectId = $request->get('jiraProjectId');
-        $result = $billingService->getJiraIssues($jiraProjectId);
-
-        return new JsonResponse($result);
     }
 
     /**
