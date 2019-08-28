@@ -37,7 +37,9 @@ export class InvoiceEntry extends Component {
             billedFilter: 'not_billed',
             workerFilter: '',
             startDateFilter: '',
-            endDateFilter: ''
+            endDateFilter: '',
+            epicFilter: '',
+            versionFilter: ''
         };
 
         this.handleOpenSelectWorklogs = this.handleOpenSelectWorklogs.bind(this);
@@ -196,7 +198,7 @@ export class InvoiceEntry extends Component {
 
             if (this.state.billedFilter === 'billed' && (
                 !worklog.attributes.hasOwnProperty('_Billed_') ||
-                worklog.attributes['_Billed_'].value === 'true')) {
+                worklog.attributes['_Billed_'].value !== 'true')) {
                 return false;
             }
         }
@@ -227,6 +229,18 @@ export class InvoiceEntry extends Component {
             }
         }
 
+        if (this.state.versionFilter !== null && this.state.versionFilter !== '') {
+            if (!worklog.issue.versions.hasOwnProperty(this.state.versionFilter)) {
+                return false;
+            }
+        }
+
+        if (this.state.epicFilter !== null && this.state.epicFilter !== '') {
+            if (worklog.issue.epicKey !== this.state.epicFilter) {
+                return false;
+            }
+        }
+
         return true;
     };
 
@@ -239,6 +253,26 @@ export class InvoiceEntry extends Component {
                     </ContentWrapper>
                 );
             }
+
+            const epics = this.state.projectWorklogs.data
+                .reduce((carry, worklog) => {
+                    if (worklog.issue.epicKey && !carry.hasOwnProperty(worklog.issue.epicKey)) {
+                        carry[worklog.issue.epicKey] = worklog.issue.epicName;
+                    }
+
+                    return carry;
+                }, {});
+
+            const versions = this.state.projectWorklogs.data
+                .reduce((carry, worklog) => {
+                    for (let versionKey in worklog.issue.versions) {
+                        if (worklog.issue.versions.hasOwnProperty(versionKey) &&
+                            !carry.hasOwnProperty(versionKey)) {
+                            carry[versionKey] = worklog.issue.versions[versionKey];
+                        }
+                    }
+                    return carry;
+                }, {});
 
             return (
                 <ContentWrapper>
@@ -289,6 +323,38 @@ export class InvoiceEntry extends Component {
                                 ))
                             }
                         </select>
+
+                        <label htmlFor={'epicFilter'}>Epic</label>
+                        <select
+                            name={'epicFilter'}
+                            className={'form-control'}
+                            value={this.state.epicFilter}
+                            onChange={this.handleChange}>
+                            <option value={''}>
+                                All
+                            </option>
+                            {Object.keys(epics).map((epicKey) => (
+                                <option key={epicKey} value={epicKey}>
+                                    {epics[epicKey]}
+                                </option>
+                            ))}
+                        </select>
+
+                        <label htmlFor={'versionFilter'}>Version</label>
+                        <select
+                            name={'versionFilter'}
+                            className={'form-control'}
+                            value={this.state.versionFilter}
+                            onChange={this.handleChange}>
+                            <option value={''}>
+                                All
+                            </option>
+                            {Object.keys(versions).map((versionKey) => (
+                                <option key={versionKey} value={versionKey}>
+                                    {versions[versionKey]}
+                                </option>
+                            ))}
+                        </select>
                     </Form.Group>
 
                     <table className={'table'}>
@@ -297,6 +363,8 @@ export class InvoiceEntry extends Component {
                                 <th> </th>
                                 <th>Worklog</th>
                                 <th>Billed</th>
+                                <th>Epic</th>
+                                <th>Version</th>
                                 <th>User</th>
                                 <th>Time spent (hours)</th>
                                 <th>Updated</th>
@@ -306,8 +374,13 @@ export class InvoiceEntry extends Component {
                             {
                                 /* @TODO: Links to issues and worklogs in Jira */
                                 this.state.projectWorklogs.data.filter(this.filterWorklogs.bind(this)).map((worklog) => (
-                                    <tr key={worklog.tempoWorklogId}>
+                                    <tr key={worklog.tempoWorklogId}
+                                        className={
+                                            (worklog.hasOwnProperty('addedToInvoiceEntryId') &&
+                                             worklog.addedToInvoiceEntryId !== this.state.invoiceEntry.id) ? 'bg-secondary' : ''}
+                                    >
                                         <td><input
+                                            disabled={worklog.hasOwnProperty('addedToInvoiceEntryId') && worklog.addedToInvoiceEntryId !== this.state.invoiceEntry.id}
                                             name={'worklog-toggle-' + worklog.tempoWorklogId}
                                             type="checkbox"
                                             checked={ this.state.selectedWorklogs.hasOwnProperty(worklog.tempoWorklogId) ? this.state.selectedWorklogs[worklog.tempoWorklogId] : false }
@@ -317,6 +390,10 @@ export class InvoiceEntry extends Component {
                                             <div><i>{worklog.issue.summary} ({worklog.issue.id})</i></div>
                                         </td>
                                         <td>{worklog.attributes.hasOwnProperty('_Billed_') && worklog.attributes['_Billed_'].value === 'true' ? 'Yes' : ''}</td>
+                                        <td>{worklog.issue.epicName}</td>
+                                        <td>{Object.keys(worklog.issue.versions).map((versionId) => (
+                                            <span key={versionId} className={'p-1'}>{worklog.issue.versions[versionId]}</span>
+                                        ))}</td>
                                         <td>{worklog.worker}</td>
                                         <td>{worklog.timeSpent}</td>
                                         <td>

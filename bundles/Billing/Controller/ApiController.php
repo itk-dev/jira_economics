@@ -224,7 +224,7 @@ class ApiController extends Controller
      */
     public function getProjectWorklogs(BillingService $billingService, $projectId)
     {
-        return new JsonResponse($billingService->getProjectWorklogs($projectId));
+        return new JsonResponse($billingService->getProjectWorklogsWithMetadata($projectId));
     }
 
     /**

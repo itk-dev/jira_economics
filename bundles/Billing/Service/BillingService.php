@@ -420,27 +420,27 @@ class BillingService extends JiraService
      */
     private function setInvoiceEntryValuesFromData(InvoiceEntry $invoiceEntry, array $invoiceEntryData)
     {
-        if (!empty($invoiceEntryData['isJiraEntry'])) {
+        if (isset($invoiceEntryData['isJiraEntry'])) {
             $invoiceEntry->setIsJiraEntry($invoiceEntryData['isJiraEntry']);
         }
 
-        if (!empty($invoiceEntryData['amount'])) {
+        if (isset($invoiceEntryData['amount'])) {
             $invoiceEntry->setAmount($invoiceEntryData['amount']);
         }
 
-        if (!empty($invoiceEntryData['price'])) {
+        if (isset($invoiceEntryData['price'])) {
             $invoiceEntry->setPrice($invoiceEntryData['price']);
         }
 
-        if (!empty($invoiceEntryData['description'])) {
+        if (isset($invoiceEntryData['description'])) {
             $invoiceEntry->setDescription($invoiceEntryData['description']);
         }
 
-        if (!empty($invoiceEntryData['account'])) {
+        if (isset($invoiceEntryData['account'])) {
             $invoiceEntry->setAccount($invoiceEntryData['account']);
         }
 
-        if (!empty($invoiceEntryData['product'])) {
+        if (isset($invoiceEntryData['product'])) {
             $invoiceEntry->setProduct($invoiceEntryData['product']);
         }
 
@@ -466,7 +466,7 @@ class BillingService extends JiraService
 
                     $this->entityManager->persist($worklog);
                 } else {
-                    if ($worklog->getInvoiceEntry() !== $invoiceEntry) {
+                    if ($worklog->getInvoiceEntry()->getId() === $invoiceEntry->getId()) {
                         throw new HttpException(
                             'Used by other invoice entry.'
                         );
@@ -583,5 +583,90 @@ class BillingService extends JiraService
         $this->entityManager->flush();
 
         return $project;
+    }
+
+    public function getProjectWorklogsWithMetadata($projectId)
+    {
+        $worklogs = $this->getProjectWorklogs($projectId);
+        $project = $this->getProject($projectId);
+        $versions = $project->versions;
+        $epics = $this->getProjectEpics($projectId);
+
+        // Get custom fields.
+        $customFields = $customFields = $this->get('/rest/api/2/field');
+
+        // Get Epic name field id.
+        $customFieldEpicName = $customFieldEpicLink = array_search(
+            'Epic Name',
+            array_column($customFields, 'name')
+        );
+        $epicNameCustomFieldId = $customFields[$customFieldEpicName]->{'id'};
+
+        foreach ($worklogs as $worklog) {
+            $issue = $worklog->issue;
+
+            // @TODO: Replace with function.
+            foreach ($epics as $epic) {
+                if ($epic->key === $issue->epicKey) {
+                    $issue->epicName = $epic->fields->{$epicNameCustomFieldId};
+                    break;
+                }
+            }
+
+            $issueVersions = [];
+            $issueVersionKeys = array_values($issue->versions);
+
+            foreach ($issueVersionKeys as $issueVersionKey) {
+                foreach ($versions as $version) {
+                    if ((int) $version->id === $issueVersionKey) {
+                        $issueVersions[$issueVersionKey] = $version->name;
+                    }
+                }
+            }
+
+            $issue->versions = $issueVersions;
+
+            $worklogEntity = $this->worklogRepository->findOneBy(['worklogId' => $worklog->tempoWorklogId]);
+
+            if ($worklogEntity !== null) {
+                $worklog->addedToInvoiceEntryId = $worklogEntity->getInvoiceEntry()->getId();
+            }
+        }
+
+        return $worklogs;
+    }
+
+    public function getProjectEpics($projectId)
+    {
+        return $this->getProjectIssues($projectId, 'Epic');
+    }
+
+    public function getProjectIssues($projectId, $issueType = null)
+    {
+        $epics = [];
+
+        $jql = 'project='.$projectId;
+
+        if ($issueType !== null) {
+            $jql = $jql.' and issuetype='.$issueType;
+        }
+
+        $startAt = 0;
+        while (true) {
+            $result = $this->get('/rest/api/2/search', [
+                'jql' => $jql,
+                'maxResults' => 50,
+                'startAt' => $startAt,
+            ]);
+            $epics = array_merge($epics, $result->issues);
+
+            $startAt = $startAt + 50;
+
+            if ($startAt > $result->total) {
+                break;
+            }
+        }
+
+        return $epics;
     }
 }
