@@ -12,7 +12,6 @@ import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Table from 'react-bootstrap/Table';
 import ListGroup from 'react-bootstrap/ListGroup';
-import Modal from 'react-bootstrap/Modal';
 import Spinner from '../components/Spinner';
 import nl2br from 'react-nl2br';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
@@ -26,22 +25,13 @@ class Invoice extends Component {
 
         this.handleInvoiceEntryDelete = this.handleInvoiceEntryDelete.bind(this);
 
-        this.recordInvoice = this.recordInvoice.bind(this);
-        this.deleteInvoice = this.deleteInvoice.bind(this);
-        this.handleModalClose = this.handleModalClose.bind(this);
-        this.handleInvoiceDeleteModalShow = this.handleInvoiceDeleteModalShow.bind(this);
-        this.handleInvoiceDeleteModalClose = this.handleInvoiceDeleteModalClose.bind(this);
-        this.handleInvoiceRecordModalShow = this.handleInvoiceRecordModalShow.bind(this);
-        this.handleInvoiceRecordModalClose = this.handleInvoiceRecordModalClose.bind(this);
-        this.createEntry = this.createEntry.bind(this);
-
         this.state = {
-            invoice: null,
-            showModal: false,
             showDeleteModal: false,
             showRecordModal: false,
             showDeleteEntryModal: false,
             editDescription: false,
+
+            invoice: null,
             invoiceEntries: {},
             entryIdToDelete: null
         };
@@ -66,16 +56,6 @@ class Invoice extends Component {
                 this.setState({ invoiceEntries: response });
             })
             .catch((reason) => console.log('isCanceled', reason));
-    };
-
-    recordInvoice = (event) => {
-        event.preventDefault();
-        this.handleInvoiceRecordModalShow();
-    };
-
-    deleteInvoice = (event) => {
-        event.preventDefault();
-        this.handleInvoiceDeleteModalShow();
     };
 
     createEntry = (isJiraEntry) => {
@@ -110,54 +90,43 @@ class Invoice extends Component {
         this.createEntry(false);
     };
 
-    handleDeleteEntry = (event) => {
+    handleDeleteAccept = (event) => {
         event.preventDefault();
-        this.handleDeleteEntryModalShow();
-    };
 
-    handleModalClose () {
-        this.setState({ showModal: false });
-    };
-
-    handleInvoiceDeleteModalShow () {
-        this.setState({ showDeleteModal: true });
-    };
-
-    handleInvoiceDeleteModalClose = (event) => {
-        event.preventDefault();
-        if (event.target.id === 'delete-invoice-btn') {
-            const { dispatch } = this.props;
-            dispatch(rest.actions.deleteInvoice({ id: `${this.props.match.params.invoiceId}` }));
-            // @TODO: Check that deletion is successful before navigating back to main billing page
-            this.props.history.push(`/`);
-        }
         this.setState({ showDeleteModal: false });
+
+        const { dispatch } = this.props;
+        dispatch(rest.actions.deleteInvoice({ id: `${this.props.match.params.invoiceId}` }))
+            .then((response) => {
+                this.props.history.push(`/`);
+            })
+            .catch((reason) => {
+                console.log(reason);
+            });
     };
 
-    handleInvoiceRecordModalShow () {
-        this.setState({ showRecordModal: true });
-    };
-
-    handleInvoiceRecordModalClose = (event) => {
+    handleRecordAccept = (event) => {
         event.preventDefault();
-        if (event.target.id === 'record-invoice-btn') {
-            const { dispatch } = this.props;
-            const id = this.props.match.params.invoiceId;
-            const name = this.props.invoice.data.name;
-            const recorded = true;
-            const invoiceData = {
-                id,
-                name,
-                recorded
-            };
-            dispatch(rest.actions.updateInvoice({ id: `${this.props.match.params.invoiceId}` }, {
-                body: JSON.stringify(invoiceData)
-            }));
-        }
+
         this.setState({ showRecordModal: false });
+
+        const { dispatch } = this.props;
+        const id = this.props.match.params.invoiceId;
+        const name = this.props.invoice.data.name;
+        const recorded = true;
+        const invoiceData = {
+            id,
+            name,
+            recorded
+        };
+        dispatch(rest.actions.updateInvoice({ id: `${this.props.match.params.invoiceId}` }, {
+            body: JSON.stringify(invoiceData)
+        }));
+
+        // @TODO: Handle situation after invoice has been recorded.
     };
 
-    saveEditDescription = (event) => {
+    handleSaveEditDescription = (event) => {
         event.preventDefault();
 
         if (!this.state.invoice.id) {
@@ -188,12 +157,6 @@ class Invoice extends Component {
 
         this.setState({
             editDescription: false
-        });
-    };
-
-    handleEditDescription = (event) => {
-        this.setState({
-            editDescription: true
         });
     };
 
@@ -256,10 +219,12 @@ class Invoice extends Component {
                                 <Spinner/>
                             }
                             {!this.state.editDescription && !this.props.invoice.loading &&
-                                <div onClick={this.handleEditDescription} className={'mb-3'}>{nl2br(this.props.invoice.data.description)}</div>
+                                <div onClick={() => { this.setState({ editDescription: true }); }} className={'mb-3'}>
+                                    {nl2br(this.props.invoice.data.description)}
+                                </div>
                             }
                             {this.state.editDescription && !this.props.invoice.loading &&
-                                <Form onBlur={this.saveEditDescription}>
+                                <Form onBlur={this.handleSaveEditDescription.bind(this)}>
                                     <Form.Group>
                                         <Form.Control
                                             id="invoice-description"
@@ -302,12 +267,12 @@ class Invoice extends Component {
                             <ButtonGroup aria-label="Invoice actions">
                                 <Button variant="primary" type="submit"
                                     id="record-invoice"
-                                    onClick={this.recordInvoice}>
+                                    onClick={() => { this.setState({ showRecordModal: true }); }}>
                                     {t('invoice.record_invoice')}
                                 </Button>
                                 <Button variant="danger" type="submit"
                                     id="delete" className="mr-3"
-                                    onClick={this.deleteInvoice}>
+                                    onClick={() => { this.setState({ showDeleteModal: true }); }}>
                                     {t('invoice.delete_invoice')}
                                 </Button>
                             </ButtonGroup>
@@ -423,59 +388,35 @@ class Invoice extends Component {
                         onConfirm={ this.handleInvoiceEntryDelete.bind(this) }
                     />
 
-                    <Modal show={this.state.showModal}
-                        onHide={this.handleModalClose}>
-                        <Modal.Header>
-                            <Modal.Title>Error</Modal.Title>
-                        </Modal.Header>
-                        {this.state.checkedCount > 1 &&
-                        <Modal.Body>Cannot edit more than one InvoiceEntry at a time!</Modal.Body>
+                    {/* Confirm delete modal */}
+                    <ConfirmModal
+                        showModal={this.state.showDeleteModal}
+                        variant={'danger'}
+                        title={t('invoice.modals.delete.title')}
+                        body={
+                            <div>{t('invoice.modals.delete.body')}</div>
                         }
-                        {this.state.checkedCount === 0 &&
-                        <Modal.Body>Please select an InvoiceEntry for editing</Modal.Body>
-                        }
-                        <Modal.Footer>
-                            <Button variant="secondary"
-                                onClick={this.handleModalClose}>
-                                Ok
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
+                        cancelText={t('common.modal.cancel')}
+                        confirmText={t('common.modal.confirm')}
+                        onHide={() => {}}
+                        onCancel={() => { this.setState({ showDeleteModal: false }); } }
+                        onConfirm={this.handleDeleteAccept.bind(this)}
+                    />
 
-                    <Modal show={this.state.showDeleteModal}
-                        onHide={this.handleInvoiceDeleteModalClose}>
-                        <Modal.Header>
-                            <Modal.Title>Confirm deletion</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>Are you sure you want to delete this invoice?</Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary"
-                                onClick={this.handleInvoiceDeleteModalClose}>
-                                Cancel
-                            </Button>
-                            <Button id="delete-invoice-btn" variant="danger"
-                                onClick={this.handleInvoiceDeleteModalClose}>
-                                Delete
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
-                    <Modal show={this.state.showRecordModal}
-                        onHide={this.handleInvoiceRecordModalClose}>
-                        <Modal.Header>
-                            <Modal.Title>Confirm recording</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>Are you sure you want to record this invoice?</Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary"
-                                onClick={this.handleInvoiceRecordModalClose}>
-                                Cancel
-                            </Button>
-                            <Button id="record-invoice-btn" variant="primary"
-                                onClick={this.handleInvoiceRecordModalClose}>
-                                Record
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
+                    {/* Confirm record modal */}
+                    <ConfirmModal
+                        showModal={this.state.showRecordModal}
+                        variant={'warning'}
+                        title={t('invoice.modals.record.title')}
+                        body={
+                            <div>{t('invoice.modals.record.body')}</div>
+                        }
+                        cancelText={t('common.modal.cancel')}
+                        confirmText={t('common.modal.confirm')}
+                        onHide={() => {}}
+                        onCancel={() => { this.setState({ showRecordModal: false }); } }
+                        onConfirm={this.handleRecordAccept.bind(this)}
+                    />
                 </ContentWrapper>
             );
         } else {

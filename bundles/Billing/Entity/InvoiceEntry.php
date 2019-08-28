@@ -35,11 +35,6 @@ class InvoiceEntry
     private $invoice;
 
     /**
-     * @ORM\OneToMany(targetEntity="Billing\Entity\JiraIssue", mappedBy="InvoiceEntryId")
-     */
-    private $jiraIssues;
-
-    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $description;
@@ -69,9 +64,14 @@ class InvoiceEntry
      */
     private $isJiraEntry;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Billing\Entity\Worklog", mappedBy="invoiceEntry", orphanRemoval=true)
+     */
+    private $worklogs;
+
     public function __construct()
     {
-        $this->jiraIssues = new ArrayCollection();
+        $this->worklogs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -87,37 +87,6 @@ class InvoiceEntry
     public function setInvoice(?Invoice $invoice): self
     {
         $this->invoice = $invoice;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|JiraIssue[]
-     */
-    public function getJiraIssues(): Collection
-    {
-        return $this->jiraIssues;
-    }
-
-    public function addJiraIssue(JiraIssue $jiraIssue): self
-    {
-        if (!$this->jiraIssues->contains($jiraIssue)) {
-            $this->jiraIssues[] = $jiraIssue;
-            $jiraIssue->setInvoiceEntryId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeJiraIssue(JiraIssue $jiraIssue): self
-    {
-        if ($this->jiraIssues->contains($jiraIssue)) {
-            $this->jiraIssues->removeElement($jiraIssue);
-            // set the owning side to null (unless already changed)
-            if ($jiraIssue->getInvoiceEntryId() === $this) {
-                $jiraIssue->setInvoiceEntryId(null);
-            }
-        }
 
         return $this;
     }
@@ -190,6 +159,37 @@ class InvoiceEntry
     public function setIsJiraEntry(?bool $isJiraEntry): self
     {
         $this->isJiraEntry = $isJiraEntry;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Worklog[]
+     */
+    public function getWorklogs(): Collection
+    {
+        return $this->worklogs;
+    }
+
+    public function addWorklog(Worklog $worklog): self
+    {
+        if (!$this->worklogs->contains($worklog)) {
+            $this->worklogs[] = $worklog;
+            $worklog->setInvoiceEntry($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWorklog(Worklog $worklog): self
+    {
+        if ($this->worklogs->contains($worklog)) {
+            $this->worklogs->removeElement($worklog);
+            // set the owning side to null (unless already changed)
+            if ($worklog->getInvoiceEntry() === $this) {
+                $worklog->setInvoiceEntry(null);
+            }
+        }
 
         return $this;
     }
