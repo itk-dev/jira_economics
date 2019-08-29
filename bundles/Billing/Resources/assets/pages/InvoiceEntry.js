@@ -12,6 +12,7 @@ import Moment from 'react-moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../css/react-datepicker.scss';
+import { withTranslation } from 'react-i18next';
 
 export class InvoiceEntry extends Component {
     constructor (props) {
@@ -245,6 +246,8 @@ export class InvoiceEntry extends Component {
     };
 
     render () {
+        const { t } = this.props;
+
         if (this.state.displaySelectWorklogs) {
             if (!this.state.projectWorklogs || !this.state.projectWorklogs.data || this.state.projectWorklogs.loading) {
                 return (
@@ -277,37 +280,37 @@ export class InvoiceEntry extends Component {
             return (
                 <ContentWrapper>
                     <Form.Group>
-                        <label htmlFor={'startDateFilter'}>Start date</label>
+                        <label htmlFor={'startDateFilter'}>{t('invoice_entry.filter.start_date')}</label>
                         <DatePicker name={'startDateFilter'} className={'form-control'} selected={this.state.startDateFilter} isClearable onChange={(newDate) => { this.setState({ startDateFilter: newDate }); }} />
 
-                        <label htmlFor={'startDateFilter'}>Start date</label>
+                        <label htmlFor={'endDateFilter'}>{t('invoice_entry.filter.end_date')}</label>
                         <DatePicker name={'endDateFilter'} className={'form-control'} selected={this.state.endDateFilter} isClearable onChange={(newDate) => { this.setState({ endDateFilter: newDate }); }} />
 
-                        <label htmlFor={'billedFilter'}>Billed</label>
+                        <label htmlFor={'billedFilter'}>{t('invoice_entry.filter.billed')}</label>
                         <select
                             name={'billedFilter'}
                             className={'form-control'}
                             value={this.state.billedFilter}
                             onChange={this.handleChange}>
                             <option value={''}>
-                                All
+                                {t('invoice_entry.filter.billed_option.all')}
                             </option>
                             <option value={'not_billed'}>
-                                Not billed
+                                {t('invoice_entry.filter.billed_option.not_billed')}
                             </option>
                             <option value={'billed'}>
-                                Billed
+                                {t('invoice_entry.filter.billed_option.billed')}
                             </option>
                         </select>
 
-                        <label htmlFor={'workerFilter'}>Worker</label>
+                        <label htmlFor={'workerFilter'}>{t('invoice_entry.filter.worker')}</label>
                         <select
                             name={'workerFilter'}
                             className={'form-control'}
                             value={this.state.workerFilter}
                             onChange={this.handleChange}>
                             <option value={''}>
-                                All
+                                {t('invoice_entry.filter.worker_option.all')}
                             </option>
                             {this.state.projectWorklogs.data
                                 .reduce((carry, worklog) => {
@@ -324,14 +327,14 @@ export class InvoiceEntry extends Component {
                             }
                         </select>
 
-                        <label htmlFor={'epicFilter'}>Epic</label>
+                        <label htmlFor={'epicFilter'}>{t('invoice_entry.filter.epic')}</label>
                         <select
                             name={'epicFilter'}
                             className={'form-control'}
                             value={this.state.epicFilter}
                             onChange={this.handleChange}>
                             <option value={''}>
-                                All
+                                {t('invoice_entry.filter.epic_option.all')}
                             </option>
                             {Object.keys(epics).map((epicKey) => (
                                 <option key={epicKey} value={epicKey}>
@@ -340,14 +343,14 @@ export class InvoiceEntry extends Component {
                             ))}
                         </select>
 
-                        <label htmlFor={'versionFilter'}>Version</label>
+                        <label htmlFor={'versionFilter'}>{t('invoice_entry.filter.version')}</label>
                         <select
                             name={'versionFilter'}
                             className={'form-control'}
                             value={this.state.versionFilter}
                             onChange={this.handleChange}>
                             <option value={''}>
-                                All
+                                {t('invoice_entry.filter.version_option.all')}
                             </option>
                             {Object.keys(versions).map((versionKey) => (
                                 <option key={versionKey} value={versionKey}>
@@ -361,13 +364,13 @@ export class InvoiceEntry extends Component {
                         <thead>
                             <tr>
                                 <th> </th>
-                                <th>Worklog</th>
-                                <th>Billed</th>
-                                <th>Epic</th>
-                                <th>Version</th>
-                                <th>User</th>
-                                <th>Time spent (hours)</th>
-                                <th>Updated</th>
+                                <th>{t('invoice_entry.table.worklog')}</th>
+                                <th>{t('invoice_entry.table.billed')}</th>
+                                <th>{t('invoice_entry.table.epic')}</th>
+                                <th>{t('invoice_entry.table.version')}</th>
+                                <th>{t('invoice_entry.table.user')}</th>
+                                <th>{t('invoice_entry.table.hours_spent')}</th>
+                                <th>{t('invoice_entry.table.updated')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -389,7 +392,7 @@ export class InvoiceEntry extends Component {
                                             <div>{worklog.comment} ({worklog.tempoWorklogId})</div>
                                             <div><i>{worklog.issue.summary} ({worklog.issue.id})</i></div>
                                         </td>
-                                        <td>{worklog.attributes.hasOwnProperty('_Billed_') && worklog.attributes['_Billed_'].value === 'true' ? 'Yes' : ''}</td>
+                                        <td>{worklog.attributes.hasOwnProperty('_Billed_') && worklog.attributes['_Billed_'].value === 'true' ? t('invoice_entry.billed_text') : ''}</td>
                                         <td>{worklog.issue.epicName}</td>
                                         <td>{Object.keys(worklog.issue.versions).map((versionId) => (
                                             <span key={versionId} className={'p-1'}>{worklog.issue.versions[versionId]}</span>
@@ -405,7 +408,7 @@ export class InvoiceEntry extends Component {
                         </tbody>
                     </table>
                     <ButtonGroup>
-                        <Button onClick={this.handleSelectWorklogs.bind(this)}>Gem valg</Button>
+                        <Button onClick={this.handleSelectWorklogs.bind(this)}>{t('invoice_entry.save_choices')}</Button>
                     </ButtonGroup>
                 </ContentWrapper>
             );
@@ -424,22 +427,17 @@ export class InvoiceEntry extends Component {
         ) {
             return (
                 <ContentWrapper>
-                    <div><PageTitle>Udfyld fakturalinje</PageTitle></div>
+                    <div><PageTitle>{t('invoice_entry.title')}</PageTitle></div>
                     {this.state.invoiceEntry.isJiraEntry &&
                     <div>
-                        <Button onClick={this.handleOpenSelectWorklogs}>Vælg worklogs</Button>
+                        <Button onClick={this.handleOpenSelectWorklogs}>{t('invoice_entry.choose_worklogs')}</Button>
                     </div>
                     }
                     <div>
                         <Form onSubmit={this.handleSubmit}>
-                            <label htmlFor="kontonr">
-                                Kontonr.
-                            </label>
                             <div>
-                            </div>
-                            <div>
-                                <label htmlFor="accountInput">
-                                    To account
+                                <label htmlFor="selectedToAccount">
+                                    {t('invoice_entry.form.toAccount')}
                                 </label>
                                 <div>
                                     <Form.Control as="select" name={'selectedToAccount'} onChange={this.handleChange} defaultValue={this.state.account ? this.state.account : this.state.invoiceEntry.account}>
@@ -455,8 +453,8 @@ export class InvoiceEntry extends Component {
                                             ))}
                                     </Form.Control>
                                 </div>
-                                <label htmlFor="vare">
-                                    Vare
+                                <label htmlFor="product">
+                                    {t('invoice_entry.form.product')}
                                 </label>
                                 <input
                                     type="text"
@@ -466,10 +464,10 @@ export class InvoiceEntry extends Component {
                                     aria-describedby="enterVarenr"
                                     onChange={this.handleChange}
                                     defaultValue={ this.state.product }
-                                    placeholder="Varenavn">
+                                    placeholder={t('invoice_entry.form.product_placeholder')}>
                                 </input>
-                                <label htmlFor="beskrivelse">
-                                    Beskrivelse
+                                <label htmlFor="description">
+                                    {t('invoice_entry.form.description')}
                                 </label>
                                 <input
                                     type="text"
@@ -479,10 +477,10 @@ export class InvoiceEntry extends Component {
                                     aria-describedby="enterBeskrivelse"
                                     onChange={this.handleChange}
                                     defaultValue={ this.state.description }
-                                    placeholder="Varebeskrivelse">
+                                    placeholder={t('invoice_entry.form.description_placeholder')}>
                                 </input>
-                                <label htmlFor="antal">
-                                    Timer
+                                <label htmlFor="amount">
+                                    {t('invoice_entry.form.amount')}
                                 </label>
                                 <input
                                     type="text"
@@ -494,8 +492,8 @@ export class InvoiceEntry extends Component {
                                     defaultValue={ this.state.amount }
                                     readOnly={ this.state.invoiceEntry.isJiraEntry }>
                                 </input>
-                                <label htmlFor="beskrivelse">
-                                    Stk. pris
+                                <label htmlFor="price">
+                                    {t('invoice_entry.form.price')}
                                 </label>
                                 <input
                                     type="text"
@@ -510,14 +508,14 @@ export class InvoiceEntry extends Component {
                             <button
                                 type="submit"
                                 className="btn btn-primary"
-                                id="create-invoice-entry">Overfør til faktura
+                                id="create-invoice-entry">{t('invoice_entry.form.submit')}
                             </button>
                         </Form>
                         <form onSubmit={this.handleCancel}>
                             <button
                                 type="submit"
                                 className="btn btn-secondary"
-                                id="cancel">Annuller
+                                id="cancel">{t('invoice_entry.form.cancel')}
                             </button>
                         </form>
                     </div>
@@ -546,7 +544,8 @@ InvoiceEntry.propTypes = {
     location: PropTypes.object.isRequired,
     history: PropTypes.shape({
         push: PropTypes.func.isRequired
-    }).isRequired
+    }).isRequired,
+    t: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => {
@@ -555,4 +554,4 @@ const mapStateToProps = state => {
 
 export default connect(
     mapStateToProps
-)(InvoiceEntry);
+)(withTranslation()(InvoiceEntry));
