@@ -16,7 +16,6 @@ use Billing\Entity\InvoiceEntry;
 use Billing\Entity\Project;
 use Billing\Entity\Worklog;
 use Billing\Repository\WorklogRepository;
-use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -125,6 +124,13 @@ class BillingService extends JiraService
         return $this->getInvoiceArray($invoice);
     }
 
+    /**
+     * Get invoice as array.
+     *
+     * @param \Billing\Entity\Invoice $invoice
+     *
+     * @return array
+     */
     private function getInvoiceArray(Invoice $invoice)
     {
         // Get account information.
@@ -337,23 +343,13 @@ class BillingService extends JiraService
         return $this->getInvoiceEntryArray($invoiceEntry);
     }
 
-    private function getWorklogsArray(Collection $collection)
-    {
-        $worklogs = [];
-
-        /* @var Worklog $worklog */
-        foreach ($collection as $worklog) {
-            $worklogs[] = [
-                'id' => $worklog->getId(),
-                'worklogId' => $worklog->getWorklogId(),
-                'invoiceEntryId' => $worklog->getInvoiceEntry()->getId(),
-                'billed' => $worklog->getIsBilled(),
-            ];
-        }
-
-        return $worklogs;
-    }
-
+    /**
+     * Get invoice entry as array.
+     *
+     * @param \Billing\Entity\InvoiceEntry $invoiceEntry
+     *
+     * @return array
+     */
     private function getInvoiceEntryArray(InvoiceEntry $invoiceEntry)
     {
         return [
