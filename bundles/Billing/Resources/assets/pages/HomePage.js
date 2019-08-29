@@ -24,7 +24,6 @@ class HomePage extends Component {
 
         this.state = {
             allInvoices: {},
-            allInvoiceEntries: {},
             showModal: false,
             invoiceIdToDelete: null,
             sortOrder: 'asc'
@@ -38,13 +37,7 @@ class HomePage extends Component {
             .then((response) => {
                 this.setState({ allInvoices: response });
             })
-            .catch((reason) => console.log('isCanceled', reason.isCanceled));
-
-        dispatch(rest.actions.getAllInvoiceEntries())
-            .then((response) => {
-                this.setState({ allInvoiceEntries: response });
-            })
-            .catch((reason) => console.log('isCanceled', reason.isCanceled));
+            .catch((reason) => console.log('isCanceled', reason));
     };
 
     handleInvoiceDeleteConfirm = (event) => {
@@ -67,27 +60,10 @@ class HomePage extends Component {
 
     removeInvoiceFromState (invoiceId) {
         let filteredInvoices = this.state.allInvoices.data.filter((invoice) => {
-            return invoiceId !== invoice.invoiceId;
+            return invoiceId !== invoice.id;
         });
         let remainingInvoices = { 'data': filteredInvoices };
         this.setState({ allInvoices: remainingInvoices });
-    };
-
-    getPriceForInvoice (invoiceId) {
-        if (!this.state.allInvoiceEntries.data) {
-            return 0;
-        }
-        let invoiceEntries = this.state.allInvoiceEntries.data.filter((invoiceEntry) => {
-            return invoiceEntry.invoiceId === invoiceId;
-        });
-        if (invoiceEntries === undefined) {
-            return 'N/A';
-        }
-        let totalPrice = 0;
-        invoiceEntries.forEach(invoiceEntry => {
-            totalPrice += invoiceEntry.price;
-        });
-        return totalPrice.toFixed(2);
     };
 
     toggleSort () {
@@ -140,8 +116,8 @@ class HomePage extends Component {
                         >
                             <Button
                                 className="btn-primary"
-                                href={'/jira/billing/project/' + item.jiraProjectId + '/' + item.invoiceId}>
-                                <i className="fas fa-edit mx-2"></i>
+                                href={'/jira/billing/project/' + item.projectId + '/' + item.id}>
+                                <i className="fas fa-edit mx-2" />
                                 <span className="sr-only">{t('home_page.sr_only.edit_invoice')}</span>
                             </Button>
                         </OverlayTrigger>
@@ -157,8 +133,8 @@ class HomePage extends Component {
                         >
                             <Button
                                 className="btn-danger"
-                                onClick={() => { this.handleInvoiceDelete(item.invoiceId); }}>
-                                <i className="fas fa-trash-alt mx-2"></i>
+                                onClick={() => { this.handleInvoiceDelete(item.id); }}>
+                                <i className="fas fa-trash-alt mx-2" />
                                 <span
                                     className="sr-only">{t('home_page.sr_only.delete_invoice')}</span>
                             </Button>
@@ -173,7 +149,7 @@ class HomePage extends Component {
                     .filter((item) => {
                         return item.recorded === true;
                     }),
-                actions: (item) => (
+                actions: () => (
                     <ButtonGroup
                         className="btn-group-sm float-right"
                         aria-label="Invoice functions">
@@ -188,7 +164,7 @@ class HomePage extends Component {
                             }
                         >
                             <Button>
-                                <i className="fas fa-file-csv mx-2"></i>
+                                <i className="fas fa-file-csv mx-2" />
                                 <span
                                     className="sr-only">{t('home_page.sr_only.download_csv')}</span>
                             </Button>
@@ -226,16 +202,16 @@ class HomePage extends Component {
                                 </thead>
                                 <tbody>
                                     {tab.items.map((item) => (
-                                        <tr key={item.invoiceId}>
+                                        <tr key={item.id}>
                                             <td><a
-                                                href={'/jira/billing/project/' + item.jiraProjectId + '/' + item.invoiceId}><strong>{item.invoiceName}</strong></a>
+                                                href={'/jira/billing/project/' + item.projectId + '/' + item.id}><strong>{item.name}</strong></a>
                                             </td>
-                                            <td>{item.jiraProjectName}</td>
+                                            <td>{item.projectName}</td>
                                             <td><Moment
                                                 format="DD-MM-YYYY">{item.created.date}</Moment>
                                             </td>
                                             <td>
-                                                <strong>{this.getPriceForInvoice(item.invoiceId)}</strong>
+                                                <strong>{item.totalPrice}</strong>
                                             </td>
                                             <td className="text-right">
                                                 {tab.actions(item)}
@@ -261,21 +237,19 @@ class HomePage extends Component {
                     onConfirm={ this.handleInvoiceDeleteConfirm.bind(this) }
                 />
             </ContentWrapper>
-        )
+        );
     }
 }
 
 HomePage.propTypes = {
     allInvoices: PropTypes.object,
-    allInvoiceEntries: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
     t: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => {
     return {
-        allInvoices: state.allInvoices,
-        allInvoiceEntries: state.allInvoiceEntries
+        allInvoices: state.allInvoices
     };
 };
 

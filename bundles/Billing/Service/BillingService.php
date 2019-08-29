@@ -70,19 +70,13 @@ class BillingService extends JiraService
         }
 
         $invoices = $project->getInvoices();
-        $invoicesJson = [];
+        $invoicesArray = [];
 
         foreach ($invoices as $invoice) {
-            $invoicesJson[] = [
-                'invoiceId' => $invoice->getId(),
-                'name' => $invoice->getName(),
-                'jiraId' => $invoice->getProject()->getJiraId(),
-                'recorded' => $invoice->getRecorded(),
-                'created' => $invoice->getCreated(),
-            ];
+            $invoicesArray[] = $this->getInvoiceArray($invoice);
         }
 
-        return $invoicesJson;
+        return $invoicesArray;
     }
 
     /**
@@ -99,20 +93,13 @@ class BillingService extends JiraService
             return [];
         }
 
-        $invoicesJson = [];
+        $invoicesArray = [];
 
         foreach ($invoices as $invoice) {
-            $invoicesJson[] = [
-                'invoiceId' => $invoice->getId(),
-                'invoiceName' => $invoice->getName(),
-                'jiraProjectId' => $invoice->getProject()->getJiraId(),
-                'jiraProjectName' => $invoice->getProject()->getName(),
-                'recorded' => $invoice->getRecorded(),
-                'created' => $invoice->getCreated(),
-            ];
+            $invoicesArray[] = $this->getInvoiceArray($invoice);
         }
 
-        return $invoicesJson;
+        return $invoicesArray;
     }
 
     /**
@@ -144,14 +131,21 @@ class BillingService extends JiraService
         $account = $this->getAccount($invoice->getAccountId());
         $account->defaultPrice = $this->getAccountDefaultPrice($invoice->getAccountId());
 
+        $totalPrice = array_reduce($invoice->getInvoiceEntries()->toArray(), function ($carry, InvoiceEntry $entry) {
+            return $carry + $entry->getAmount() * $entry->getPrice();
+        }, 0);
+
         return [
             'id' => $invoice->getId(),
             'name' => $invoice->getName(),
+            'projectId' => $invoice->getProject()->getJiraId(),
+            'projectName' => $invoice->getProject()->getName(),
             'jiraId' => $invoice->getProject()->getJiraId(),
             'recorded' => $invoice->getRecorded(),
             'accountId' => $invoice->getAccountId(),
             'description' => $invoice->getDescription(),
             'account' => $account,
+            'totalPrice' => $totalPrice,
             'created' => $invoice->getCreated()->format('c'),
         ];
     }
