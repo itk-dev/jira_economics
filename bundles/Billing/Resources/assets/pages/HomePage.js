@@ -26,7 +26,8 @@ class HomePage extends Component {
             allInvoices: {},
             allInvoiceEntries: {},
             showModal: false,
-            invoiceIdToDelete: null
+            invoiceIdToDelete: null,
+            sortOrder: 'asc'
         };
     };
 
@@ -35,8 +36,7 @@ class HomePage extends Component {
 
         dispatch(rest.actions.getAllInvoices())
             .then((response) => {
-                let sortedInvoices = { data: this.sortInvoices(response.data, 'desc') };
-                this.setState({ allInvoices: sortedInvoices });
+                this.setState({ allInvoices: response });
             })
             .catch((reason) => console.log('isCanceled', reason.isCanceled));
 
@@ -91,31 +91,38 @@ class HomePage extends Component {
         return totalPrice.toFixed(2);
     };
 
-    onSort (event) {
-        let sortOrder = event.target.value;
-        let sortedInvoices = { data: this.sortInvoices(this.state.allInvoices.data, sortOrder) };
-
-        this.setState({ allInvoices: sortedInvoices });
+    toggleSort () {
+        this.setState((prevState) => ({
+            sortOrder: prevState.sortOrder === 'asc' ? 'desc' : 'asc'
+        }));
     };
-
-    sortInvoices (invoices, sortOrder) {
-        return invoices.sort(function (i1, i2) {
-            if (sortOrder === 'asc') {
-                return i1.created.date > i2.created.date;
-            } else {
-                return i1.created.date < i2.created.date;
-            }
-        });
-    }
 
     render () {
         const { t } = this.props;
+
+        if (!this.state.allInvoices.data || this.state.allInvoices.loading) {
+            return (
+                <ContentWrapper>
+                    <Spinner/>
+                </ContentWrapper>
+            );
+        }
+
+        let sortOrder = this.state.sortOrder;
+        let invoices = [].concat(this.state.allInvoices.data)
+            .sort((i1, i2) => {
+                if (sortOrder === 'asc') {
+                    return i1.created.date > i2.created.date ? 1 : -1;
+                } else {
+                    return i1.created.date < i2.created.date ? 1 : -1;
+                }
+            });
 
         const tabs = [
             {
                 title: t('home_page.tab.not_recorded'),
                 keyEvent: 'drafts',
-                items: this.state.allInvoices.data && this.state.allInvoices.data
+                items: invoices
                     .filter((item) => {
                         return item.recorded === false;
                     }),
@@ -163,7 +170,7 @@ class HomePage extends Component {
             {
                 title: t('home_page.tab.recorded'),
                 keyEvent: 'posted',
-                items: this.state.allInvoices.data && this.state.allInvoices.data
+                items: invoices
                     .filter((item) => {
                         return item.recorded === true;
                     }),
@@ -192,78 +199,70 @@ class HomePage extends Component {
             }
         ];
 
-        if (this.state.allInvoices.data && this.state.allInvoiceEntries.data) {
-            return (
-                <ContentWrapper>
-                    <PageTitle breadcrumb="">{t('home_page.invoices')}</PageTitle>
-                    <Tabs defaultActiveKey="drafts"
-                        id="uncontrolled-tab-example">
-                        {tabs && tabs.map((tab, index) => (
-                            <Tab key={index} eventKey={tab.keyEvent} title={tab.title}>
-                                <Form className="mt-3 mb-1 w-25">
-                                    <Form.Group className="mb-0">
-                                        <Form.Label className="sr-only">{t('home_page.sort')}</Form.Label>
-                                        <Form.Control size="sm" as="select" onChange={this.onSort.bind(this)}>
-                                            <option value={'desc'}>{t('home_page.sorting.newest')}</option>
-                                            <option value={'asc'}>{t('home_page.sorting.oldest')}</option>
-                                        </Form.Control>
-                                    </Form.Group>
-                                </Form>
-                                <Table responsive striped hover borderless>
-                                    <thead>
-                                        <tr>
-                                            <th>{t('home_page.table.invoice')}</th>
-                                            <th>{t('home_page.table.project')}</th>
-                                            <th>{t('home_page.table.date')}</th>
-                                            <th>{t('home_page.table.amount')}</th>
-                                            <th className="text-right">{t('home_page.table.functions')}</th>
+        return (
+            <ContentWrapper>
+                <PageTitle breadcrumb="">{t('home_page.invoices')}</PageTitle>
+                <Tabs defaultActiveKey="drafts"
+                    id="uncontrolled-tab-example">
+                    {tabs && tabs.map((tab, index) => (
+                        <Tab key={index} eventKey={tab.keyEvent} title={tab.title}>
+                            <Form className="mt-3 mb-1 w-25">
+                                <Form.Group className="mb-0">
+                                    <Form.Label className="sr-only">{t('home_page.sort')}</Form.Label>
+                                    <Form.Control size="sm" as="select" value={this.state.sortOrder} onChange={this.toggleSort.bind(this) }>
+                                        <option value={'desc'}>{t('home_page.sorting.newest')}</option>
+                                        <option value={'asc'}>{t('home_page.sorting.oldest')}</option>
+                                    </Form.Control>
+                                </Form.Group>
+                            </Form>
+                            <Table responsive striped hover borderless>
+                                <thead>
+                                    <tr>
+                                        <th>{t('home_page.table.invoice')}</th>
+                                        <th>{t('home_page.table.project')}</th>
+                                        <th>{t('home_page.table.date')}</th>
+                                        <th>{t('home_page.table.amount')}</th>
+                                        <th className="text-right">{t('home_page.table.functions')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {tab.items.map((item) => (
+                                        <tr key={item.invoiceId}>
+                                            <td><a
+                                                href={'/jira/billing/project/' + item.jiraProjectId + '/' + item.invoiceId}><strong>{item.invoiceName}</strong></a>
+                                            </td>
+                                            <td>{item.jiraProjectName}</td>
+                                            <td><Moment
+                                                format="DD-MM-YYYY">{item.created.date}</Moment>
+                                            </td>
+                                            <td>
+                                                <strong>{this.getPriceForInvoice(item.invoiceId)}</strong>
+                                            </td>
+                                            <td className="text-right">
+                                                {tab.actions(item)}
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {tab.items.map((item) => (
-                                            <tr key={item.invoiceId}>
-                                                <td><a
-                                                    href={'/jira/billing/project/' + item.jiraProjectId + '/' + item.invoiceId}><strong>{item.invoiceName}</strong></a>
-                                                </td>
-                                                <td>{item.jiraProjectName}</td>
-                                                <td><Moment
-                                                    format="DD-MM-YYYY">{item.created.date}</Moment>
-                                                </td>
-                                                <td>
-                                                    <strong>{this.getPriceForInvoice(item.invoiceId)}</strong>
-                                                </td>
-                                                <td className="text-right">
-                                                    {tab.actions(item)}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </Table>
-                            </Tab>
-                        ))}
-                    </Tabs>
-                    <ConfirmModal
-                        showModal={this.state.showModal}
-                        variant={'danger'}
-                        title={t('home_page.modal.title')}
-                        cancelText={t('common.modal.cancel')}
-                        confirmText={t('common.modal.confirm')}
-                        body={
-                            <div>{t('home_page.modal.body')}</div>
-                        }
-                        onHide={() => { this.setState({ showModal: false }); }}
-                        onCancel={() => { this.setState({ showModal: false }); }}
-                        onConfirm={ this.handleInvoiceDeleteConfirm.bind(this) }
-                    />
-                </ContentWrapper>
-            );
-        } else {
-            return (
-                <ContentWrapper>
-                    <Spinner/>
-                </ContentWrapper>
-            );
-        }
+                                    ))}
+                                </tbody>
+                            </Table>
+                        </Tab>
+                    ))}
+                </Tabs>
+                <ConfirmModal
+                    showModal={this.state.showModal}
+                    variant={'danger'}
+                    title={t('home_page.modal.title')}
+                    cancelText={t('common.modal.cancel')}
+                    confirmText={t('common.modal.confirm')}
+                    body={
+                        <div>{t('home_page.modal.body')}</div>
+                    }
+                    onHide={() => { this.setState({ showModal: false }); }}
+                    onCancel={() => { this.setState({ showModal: false }); }}
+                    onConfirm={ this.handleInvoiceDeleteConfirm.bind(this) }
+                />
+            </ContentWrapper>
+        )
     }
 }
 

@@ -10,7 +10,7 @@ const resources = {
             'home_page.modal.title': 'Slet faktura?',
             'home_page.modal.body': 'Er du sikker på at du vil slette denne faktura?',
             'home_page.tab.not_recorded': 'Ikke bogførte',
-            'home_page.tab.recorded': 'Ikke bogførte',
+            'home_page.tab.recorded': 'Bogførte',
             'home_page.tooltip.edit_invoice': 'Rediger faktura',
             'home_page.sr_only.edit_invoice': 'Rediger faktura',
             'home_page.tooltip.delete_invoice': 'Slet faktura',
