@@ -111,19 +111,9 @@ class Invoice extends Component {
         this.setState({ showRecordModal: false });
 
         const { dispatch } = this.props;
-        const id = this.props.match.params.invoiceId;
-        const name = this.props.invoice.data.name;
-        const recorded = true;
-        const invoiceData = {
-            id,
-            name,
-            recorded
-        };
-        dispatch(rest.actions.updateInvoice({ id: `${this.props.match.params.invoiceId}` }, {
-            body: JSON.stringify(invoiceData)
-        }));
-
-        // @TODO: Handle situation after invoice has been recorded.
+        dispatch(rest.actions.recordInvoice({ id: `${this.props.match.params.invoiceId}` }))
+            .then(response => console.log(response))
+            .catch(reason => console.log(reason));
     };
 
     handleSaveEditDescription = (event) => {

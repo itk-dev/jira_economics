@@ -30,6 +30,13 @@ export default reduxApi({
             method: 'put'
         }
     },
+    recordInvoice: {
+        reducerName: 'invoice',
+        url: '/jira/billing/jira_api/record_invoice/:id',
+        options: {
+            method: 'put'
+        }
+    },
     createInvoice: {
         reducerName: 'invoice',
         url: '/jira/billing/jira_api/invoice',

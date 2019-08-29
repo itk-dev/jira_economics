@@ -228,7 +228,7 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/record_invoice/{invoiceId}", name="api_record_invoice")
+     * @Route("/record_invoice/{invoiceId}", name="api_record_invoice", methods={"PUT"})
      *
      * @param \Billing\Service\BillingService $billingService
      * @param $invoiceId
@@ -237,9 +237,9 @@ class ApiController extends Controller
      */
     public function recordInvoice(BillingService $billingService, $invoiceId)
     {
-        $billingService->recordInvoice($invoiceId);
+        $invoiceArray = $billingService->recordInvoice($invoiceId);
 
-        return new JsonResponse([]);
+        return new JsonResponse($invoiceArray);
     }
 
     /**

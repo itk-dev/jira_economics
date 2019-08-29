@@ -522,19 +522,29 @@ class BillingService extends JiraService
      * Record an invoice.
      *
      * @param $invoiceId
+     * @return array
      */
     public function recordInvoice($invoiceId)
     {
         $invoice = $this->entityManager->getRepository(Invoice::class)
             ->find($invoiceId);
-
-        // Make sure all amounts are calculated correctly.
-        // Check each worklog and the amounts calculated.
-        // Avoid duplicated use of worklog.
-
         $invoice->setRecorded(true);
-
         $this->entityManager->flush();
+
+        // Set billed field in Jira for each worklog.
+        foreach ($invoice->getInvoiceEntries() as $invoiceEntry) {
+            foreach ($invoiceEntry->getWorklogs() as $worklog) {
+                $this->put('/rest/tempo-timesheets/4/worklogs/'.$worklog->getWorklogId(), [
+                    'attributes' => [
+                        '_Billed_' => [
+                            'value' => true
+                        ]
+                    ]
+                ]);
+            }
+        }
+
+        return $this->getInvoiceArray($invoice);
     }
 
     /**
