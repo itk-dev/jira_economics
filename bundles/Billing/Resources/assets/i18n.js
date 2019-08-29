@@ -30,7 +30,7 @@ const resources = {
             'invoice.recorded_false': 'Ikke bogført',
             'invoice.recorded_true': 'Bogført',
             'invoice.invoice_id': 'Faktura: <1>{{ invoiceId }}</1>',
-            'invoice.recorded': 'Invoice recorded: <1>{{ invoiceRecorded }}</1>'
+            'invoice.invoice_recorded': 'Status: <1>{{ invoiceRecorded }}</1>'
         }
     }
 };

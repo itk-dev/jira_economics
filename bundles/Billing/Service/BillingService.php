@@ -13,14 +13,17 @@ namespace Billing\Service;
 use App\Service\JiraService;
 use Billing\Entity\Invoice;
 use Billing\Entity\InvoiceEntry;
-use Billing\Entity\JiraIssue;
 use Billing\Entity\Project;
+use Billing\Entity\Worklog;
+use Billing\Repository\WorklogRepository;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 
 class BillingService extends JiraService
 {
     private $entityManager;
+    private $worklogRepository;
 
     /**
      * Constructor.
@@ -30,17 +33,20 @@ class BillingService extends JiraService
      * @param $tokenStorage
      * @param $customerKey
      * @param $pemPath
+     * @param \Billing\Repository\WorklogRepository $worklogRepository
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         $jiraUrl,
         $tokenStorage,
         $customerKey,
-        $pemPath
+        $pemPath,
+        WorklogRepository $worklogRepository
     ) {
         parent::__construct($jiraUrl, $tokenStorage, $customerKey, $pemPath);
 
         $this->entityManager = $entityManager;
+        $this->worklogRepository = $worklogRepository;
     }
 
     /**
@@ -275,26 +281,7 @@ class BillingService extends JiraService
         $invoiceEntriesJson = [];
 
         foreach ($invoiceEntries as $invoiceEntry) {
-            $jiraIssueIds = [];
-            $jiraIssues = $invoiceEntry->getJiraIssues();
-
-            foreach ($jiraIssues as $jiraIssue) {
-                $jiraIssueIds[] = $jiraIssue->getIssueId();
-            }
-
-            $invoiceEntry = [
-                'id' => $invoiceEntry->getId(),
-                'invoiceId' => $invoiceEntry->getInvoice()->getId(),
-                'description' => $invoiceEntry->getDescription(),
-                'account' => $invoiceEntry->getAccount(),
-                'product' => $invoiceEntry->getProduct(),
-                'amount' => $invoiceEntry->getAmount(),
-                'price' => $invoiceEntry->getPrice(),
-            ];
-
-            if (\count($jiraIssueIds) > 0) {
-                $invoiceEntry['jiraIssueIds'] = $jiraIssueIds;
-            }
+            $invoiceEntry = $this->getInvoiceEntryArray($invoiceEntry);
 
             $invoiceEntriesJson[] = $invoiceEntry;
         }
@@ -356,17 +343,25 @@ class BillingService extends JiraService
         return $this->getInvoiceEntryArray($invoiceEntry);
     }
 
+    private function getWorklogsArray(Collection $collection)
+    {
+        $worklogs = [];
+
+        /* @var Worklog $worklog */
+        foreach ($collection as $worklog) {
+            $worklogs[] = [
+                'id' => $worklog->getId(),
+                'worklogId' => $worklog->getWorklogId(),
+                'invoiceEntryId' => $worklog->getInvoiceEntry()->getId(),
+                'billed' => $worklog->getIsBilled(),
+            ];
+        }
+
+        return $worklogs;
+    }
+
     private function getInvoiceEntryArray(InvoiceEntry $invoiceEntry)
     {
-        $jiraIssues = array_reduce($invoiceEntry->getJiraIssues()->toArray(), function ($carry, JiraIssue $item) {
-            $carry[] = [
-                'id' => $item->getIssueId(),
-                'timeSpent' => $item->getTimeSpent(),
-            ];
-
-            return $carry;
-        }, []);
-
         return [
             'id' => $invoiceEntry->getId(),
             'invoiceId' => $invoiceEntry->getInvoice()->getId(),
@@ -376,7 +371,11 @@ class BillingService extends JiraService
             'isJiraEntry' => $invoiceEntry->getIsJiraEntry(),
             'amount' => $invoiceEntry->getAmount(),
             'price' => $invoiceEntry->getPrice(),
-            'jiraIssues' => $jiraIssues,
+            'worklogIds' => array_reduce($invoiceEntry->getWorklogs()->toArray(), function ($carry, Worklog $worklog) {
+                $carry[$worklog->getWorklogId()] = true;
+
+                return $carry;
+            }, []),
         ];
     }
 
@@ -403,48 +402,80 @@ class BillingService extends JiraService
         $invoiceEntry = new InvoiceEntry();
         $invoiceEntry->setInvoice($invoice);
 
-        if (!empty($invoiceEntryData['isJiraEntry'])) {
-            $invoiceEntry->setIsJiraEntry($invoiceEntryData['isJiraEntry']);
-        }
-
-        if (!empty($invoiceEntryData['amount'])) {
-            $invoiceEntry->setAmount($invoiceEntryData['amount']);
-        }
-
-        if (!empty($invoiceEntryData['price'])) {
-            $invoiceEntry->setPrice($invoiceEntryData['price']);
-        }
-
-        if (!empty($invoiceEntryData['description'])) {
-            $invoiceEntry->setDescription($invoiceEntryData['description']);
-        }
-
-        if (!empty($invoiceEntryData['account'])) {
-            $invoiceEntry->setAccount($invoiceEntryData['account']);
-        }
-
-        if (!empty($invoiceEntryData['product'])) {
-            $invoiceEntry->setProduct($invoiceEntryData['product']);
-        }
-
-        if (!empty($invoiceEntryData['jiraIssueIds'])) {
-            $jiraIssueRepository = $this->entityManager->getRepository(JiraIssue::class);
-
-            foreach ($invoiceEntryData['jiraIssueIds'] as $jiraIssueId) {
-                $jiraIssue = $jiraIssueRepository->findOneBy(['issueId' => $jiraIssueId]);
-
-                if (!$jiraIssue) {
-                    throw new HttpException(400, 'JiraIssue with id '.$jiraIssueId.' not found');
-                }
-
-                $invoiceEntry->addJiraIssue($jiraIssue);
-            }
-        }
+        $this->setInvoiceEntryValuesFromData($invoiceEntry, $invoiceEntryData);
 
         $this->entityManager->persist($invoiceEntry);
         $this->entityManager->flush();
 
         return $this->getInvoiceEntryArray($invoiceEntry);
+    }
+
+    /**
+     * Set invoiceEntry from data array.
+     *
+     * @param \Billing\Entity\InvoiceEntry $invoiceEntry
+     * @param array                        $invoiceEntryData
+     *
+     * @return \Billing\Entity\InvoiceEntry
+     */
+    private function setInvoiceEntryValuesFromData(InvoiceEntry $invoiceEntry, array $invoiceEntryData)
+    {
+        if (isset($invoiceEntryData['isJiraEntry'])) {
+            $invoiceEntry->setIsJiraEntry($invoiceEntryData['isJiraEntry']);
+        }
+
+        if (isset($invoiceEntryData['amount'])) {
+            $invoiceEntry->setAmount($invoiceEntryData['amount']);
+        }
+
+        if (isset($invoiceEntryData['price'])) {
+            $invoiceEntry->setPrice($invoiceEntryData['price']);
+        }
+
+        if (isset($invoiceEntryData['description'])) {
+            $invoiceEntry->setDescription($invoiceEntryData['description']);
+        }
+
+        if (isset($invoiceEntryData['account'])) {
+            $invoiceEntry->setAccount($invoiceEntryData['account']);
+        }
+
+        if (isset($invoiceEntryData['product'])) {
+            $invoiceEntry->setProduct($invoiceEntryData['product']);
+        }
+
+        // If worklogIds has been changed.
+        if (isset($invoiceEntryData['worklogIds'])) {
+            $worklogs = $invoiceEntry->getWorklogs();
+
+            // Remove de-selected worklogs.
+            foreach ($worklogs as $worklog) {
+                if (!\in_array($worklog->getId(), $invoiceEntryData['worklogIds'])) {
+                    $this->entityManager->remove($worklog);
+                }
+            }
+
+            // Add not-added worklogs.
+            foreach ($invoiceEntryData['worklogIds'] as $worklogId) {
+                $worklog = $this->worklogRepository->find($worklogId);
+
+                if (null === $worklog) {
+                    $worklog = new Worklog();
+                    $worklog->setWorklogId($worklogId);
+                    $worklog->setInvoiceEntry($invoiceEntry);
+
+                    $this->entityManager->persist($worklog);
+                } else {
+                    if ($worklog->getInvoiceEntry()->getId() === $invoiceEntry->getId()) {
+                        throw new HttpException(
+                            'Used by other invoice entry.'
+                        );
+                    }
+                }
+            }
+        }
+
+        return $invoiceEntry;
     }
 
     /**
@@ -467,43 +498,7 @@ class BillingService extends JiraService
             throw new HttpException(404, 'Unable to update invoiceEntry with id '.$invoiceEntryData['id'].' as it does not already exist');
         }
 
-        if (!empty($invoiceEntryData['amount'])) {
-            $invoiceEntry->setAmount($invoiceEntryData['amount']);
-        }
-
-        if (!empty($invoiceEntryData['price'])) {
-            $invoiceEntry->setPrice($invoiceEntryData['price']);
-        }
-
-        if (!empty($invoiceEntryData['name'])) {
-            $invoiceEntry->setName($invoiceEntryData['name']);
-        }
-
-        if (!empty($invoiceEntryData['description'])) {
-            $invoiceEntry->setDescription($invoiceEntryData['description']);
-        }
-
-        if (!empty($invoiceEntryData['account'])) {
-            $invoiceEntry->setAccount($invoiceEntryData['account']);
-        }
-
-        if (!empty($invoiceEntryData['product'])) {
-            $invoiceEntry->setProduct($invoiceEntryData['product']);
-        }
-
-        if (!empty($invoiceEntryData['jiraIssueIds'])) {
-            $jiraIssueRepository = $this->entityManager->getRepository(JiraIssue::class);
-
-            foreach ($invoiceEntryData['jiraIssueIds'] as $jiraIssueId) {
-                $jiraIssue = $jiraIssueRepository->findOneBy(['issueId' => $jiraIssueId]);
-
-                if (!$jiraIssue) {
-                    throw new HttpException(400, 'JiraIssue with id '.$jiraIssueId.' not found');
-                }
-
-                $invoiceEntry->addJiraIssue($jiraIssue);
-            }
-        }
+        $invoiceEntry = $this->setInvoiceEntryValuesFromData($invoiceEntry, $invoiceEntryData);
 
         $this->entityManager->persist($invoiceEntry);
         $this->entityManager->flush();
@@ -530,6 +525,25 @@ class BillingService extends JiraService
         }
 
         $this->entityManager->remove($invoiceEntry);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * Record an invoice.
+     *
+     * @param $invoiceId
+     */
+    public function recordInvoice($invoiceId)
+    {
+        $invoice = $this->entityManager->getRepository(Invoice::class)
+            ->find($invoiceId);
+
+        // Make sure all amounts are calculated correctly.
+        // Check each worklog and the amounts calculated.
+        // Avoid duplicated use of worklog.
+
+        $invoice->setRecorded(true);
+
         $this->entityManager->flush();
     }
 
@@ -572,98 +586,108 @@ class BillingService extends JiraService
     }
 
     /**
-     * Get jiraIssues for project.
+     * Get project worklogs with extra metadata.
      *
-     * @param $jiraProjectId
+     * @param $projectId
+     *
+     * @return mixed
+     */
+    public function getProjectWorklogsWithMetadata($projectId)
+    {
+        $worklogs = $this->getProjectWorklogs($projectId);
+        $project = $this->getProject($projectId);
+        $versions = $project->versions;
+        $epics = $this->getProjectEpics($projectId);
+
+        // Get custom fields.
+        $customFields = $customFields = $this->get('/rest/api/2/field');
+
+        // Get Epic name field id.
+        $customFieldEpicName = $customFieldEpicLink = array_search(
+            'Epic Name',
+            array_column($customFields, 'name')
+        );
+        $epicNameCustomFieldId = $customFields[$customFieldEpicName]->{'id'};
+
+        foreach ($worklogs as $worklog) {
+            $issue = $worklog->issue;
+
+            foreach ($epics as $epic) {
+                if ($epic->key === $issue->epicKey) {
+                    $issue->epicName = $epic->fields->{$epicNameCustomFieldId};
+                    break;
+                }
+            }
+
+            $issueVersions = [];
+            $issueVersionKeys = array_values($issue->versions);
+
+            foreach ($issueVersionKeys as $issueVersionKey) {
+                foreach ($versions as $version) {
+                    if ((int) $version->id === $issueVersionKey) {
+                        $issueVersions[$issueVersionKey] = $version->name;
+                    }
+                }
+            }
+
+            $issue->versions = $issueVersions;
+
+            $worklogEntity = $this->worklogRepository->findOneBy(['worklogId' => $worklog->tempoWorklogId]);
+
+            if (null !== $worklogEntity) {
+                $worklog->addedToInvoiceEntryId = $worklogEntity->getInvoiceEntry()->getId();
+            }
+        }
+
+        return $worklogs;
+    }
+
+    /**
+     * Get epics for project.
+     *
+     * @param $projectId
      *
      * @return array
-     *
-     * @throws \Exception
      */
-    public function getJiraIssues($jiraProjectId)
+    public function getProjectEpics($projectId)
     {
-        $jiraIssues = [];
+        return $this->getProjectIssues($projectId, 'Epic');
+    }
 
-        if (!(int) $jiraProjectId) {
-            throw new HttpException(400, 'Expected integer in request');
+    /**
+     * Get project issues of a given issue type.
+     *
+     * @param $projectId
+     * @param null $issueType
+     *
+     * @return array
+     */
+    public function getProjectIssues($projectId, $issueType = null)
+    {
+        $epics = [];
+
+        $jql = 'project='.$projectId;
+
+        if (null !== $issueType) {
+            $jql = $jql.' and issuetype='.$issueType;
         }
 
-        $repository = $this->entityManager->getRepository(Project::class);
-        $project = $repository->findOneBy(['jiraId' => $jiraProjectId]);
-
-        if (!$project) {
-            throw new HttpException(404, 'Project with id '.$jiraProjectId.' not found');
-        }
-
-        $start = 0;
-        $params = [
-            'jql' => 'project='.$jiraProjectId,
-            'startAt' => $start,
-            'maxResults' => 100,
-        ];
-
+        $startAt = 0;
         while (true) {
-            try {
-                $results = $this->get('rest/api/2/search', $params);
-            } catch (HttpException $e) {
-                throw $e;
-            }
-            foreach ($results->issues as $jiraIssueResult) {
-                $issueStatus = $jiraIssueResult->fields->status->statusCategory->name;
-                if ('Done' !== $issueStatus) {
-                    continue;
-                }
-                $repository = $this->entityManager->getRepository(JiraIssue::class);
-                $jiraIssue = $repository->findOneBy(['issueId' => $jiraIssueResult->id]);
+            $result = $this->get('/rest/api/2/search', [
+                'jql' => $jql,
+                'maxResults' => 50,
+                'startAt' => $startAt,
+            ]);
+            $epics = array_merge($epics, $result->issues);
 
-                if (!$jiraIssue) {
-                    $jiraIssue = new JiraIssue();
-                }
+            $startAt = $startAt + 50;
 
-                $jiraIssue->setIssueId($jiraIssueResult->id);
-                $jiraIssue->setProject($project);
-
-                if (!empty($jiraIssueResult->fields->timespent)) {
-                    $jiraIssue->setTimeSpent($jiraIssueResult->fields->timespent);
-                }
-
-                $jiraIssue->setCreated(new \DateTime($jiraIssueResult->fields->created));
-                $jiraIssue->setFinished(new \DateTime($jiraIssueResult->fields->resolutiondate));
-                $jiraIssue->setSummary($jiraIssueResult->fields->summary);
-
-                // @TODO: should we add other users than the assignee?
-                if (!empty($jiraIssueResult->fields->assignee->key)) {
-                    $jiraIssue->setJiraUsers([$jiraIssueResult->fields->assignee->key]);
-                }
-
-                $issue = [
-                    'issueId' => $jiraIssue->getIssueId(),
-                    'summary' => $jiraIssue->getSummary(),
-                    'created' => $jiraIssue->getCreated(),
-                    'finished' => $jiraIssue->getFinished(),
-                    'jiraUsers' => $jiraIssue->getJiraUsers(),
-                    'timeSpent' => $jiraIssue->getTimeSpent(),
-                ];
-
-                if (null !== $jiraIssue->getInvoiceEntryId()) {
-                    // @TODO: fix misleading getInvoiceEntryId naming - the function actually returns an InvoiceEntry object
-                    $issue['invoiceEntryId'] = $jiraIssue->getInvoiceEntryId()->getId();
-                } else {
-                    $issue['invoiceEntryId'] = null;
-                }
-
-                $jiraIssues[] = $issue;
-                $this->entityManager->persist($jiraIssue);
-            }
-
-            $start += 100;
-
-            if ($start > $results->total) {
+            if ($startAt > $result->total) {
                 break;
             }
         }
-        $this->entityManager->flush();
 
-        return $jiraIssues;
+        return $epics;
     }
 }
