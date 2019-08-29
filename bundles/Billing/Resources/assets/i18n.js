@@ -28,6 +28,8 @@ const resources = {
             'invoice.choose_project': 'Vælg projekt',
             'invoice.modals.delete_entry.title': 'Slet fakturaindgang',
             'invoice.modals.delete_entry.body': 'Er du sikker på du vil slette denne fakturaindgang?',
+            'invoice.modals.record.title': 'Bogfør faktura',
+            'invoice.modals.record.body': 'Er du sikker på at du vil bogføre fakturaen?',
             'invoice.new': 'Ny faktura',
             'invoice.invoice_entries_list_title': 'Fakturaindgange',
             'invoice.client_information': 'Klientinformationer',
