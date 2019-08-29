@@ -237,9 +237,7 @@ class ApiController extends Controller
      */
     public function recordInvoice(BillingService $billingService, $invoiceId)
     {
-        $invoiceArray = $billingService->recordInvoice($invoiceId);
-
-        return new JsonResponse($invoiceArray);
+        return new JsonResponse($billingService->recordInvoice($invoiceId));
     }
 
     /**

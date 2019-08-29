@@ -68,14 +68,13 @@ class BillingService extends JiraService
             throw new HttpException(404, 'Project with id '.$jiraProjectId.' not found');
         }
 
-        $invoices = $project->getInvoices();
-        $invoicesArray = [];
+        $invoices = [];
 
-        foreach ($invoices as $invoice) {
-            $invoicesArray[] = $this->getInvoiceArray($invoice);
+        foreach ($project->getInvoices() as $invoice) {
+            $invoices[] = $this->getInvoiceArray($invoice);
         }
 
-        return $invoicesArray;
+        return $invoices;
     }
 
     /**
