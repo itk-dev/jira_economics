@@ -522,6 +522,7 @@ class BillingService extends JiraService
      * Record an invoice.
      *
      * @param $invoiceId
+     *
      * @return array
      */
     public function recordInvoice($invoiceId)
@@ -537,9 +538,9 @@ class BillingService extends JiraService
                 $this->put('/rest/tempo-timesheets/4/worklogs/'.$worklog->getWorklogId(), [
                     'attributes' => [
                         '_Billed_' => [
-                            'value' => true
-                        ]
-                    ]
+                            'value' => true,
+                        ],
+                    ],
                 ]);
             }
         }
