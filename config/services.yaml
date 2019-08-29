@@ -2,7 +2,7 @@
 # Files in the packages/ subdirectory configure your dependencies.
 
 imports:
-    - { resource: create_project_config.local.yml, ignore_errors: true }
+    - { resource: create_project_config.local.yaml, ignore_errors: true }
     - { resource: jira_economics.yaml, ignore_errors: true }
     - { resource: jira_economics.local.yaml, ignore_errors: true }
 
