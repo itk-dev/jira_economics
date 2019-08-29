@@ -6,6 +6,25 @@ const resources = {
         translation: {
             'common.modal.cancel': 'Annullér',
             'common.modal.confirm': 'Bekræft',
+            'home_page.invoices': 'Fakturaer',
+            'home_page.modal.title': 'Slet faktura?',
+            'home_page.modal.body': 'Er du sikker på at du vil slette denne faktura?',
+            'home_page.tab.not_recorded': 'Ikke bogførte',
+            'home_page.tab.recorded': 'Ikke bogførte',
+            'home_page.tooltip.edit_invoice': 'Rediger faktura',
+            'home_page.sr_only.edit_invoice': 'Rediger faktura',
+            'home_page.tooltip.delete_invoice': 'Slet faktura',
+            'home_page.sr_only.delete_invoice': 'Slet faktura',
+            'home_page.tooltip.download_csv': 'Download csv',
+            'home_page.sr_only.download_csv': 'Download csv',
+            'home_page.sort': 'Sorter',
+            'home_page.sorting.newest': 'Nyeste først',
+            'home_page.sorting.oldest': 'Ældste først',
+            'home_page.table.invoice': 'Faktura',
+            'home_page.table.project': 'Projekt',
+            'home_page.table.date': 'Dato',
+            'home_page.table.amount': 'Beløb (DKK)',
+            'home_page.table.functions': '',
             'invoice.choose_project': 'Vælg projekt',
             'invoice.modals.delete_entry.title': 'Slet fakturaindgang',
             'invoice.modals.delete_entry.body': 'Er du sikker på du vil slette denne fakturaindgang?',
@@ -30,7 +49,8 @@ const resources = {
             'invoice.recorded_false': 'Ikke bogført',
             'invoice.recorded_true': 'Bogført',
             'invoice.invoice_id': 'Faktura: <1>{{ invoiceId }}</1>',
-            'invoice.invoice_recorded': 'Status: <1>{{ invoiceRecorded }}</1>'
+            'invoice.invoice_recorded': 'Status: <1>{{ invoiceRecorded }}</1>',
+            'spinner.loading': 'Indlæser...'
         }
     }
 };
