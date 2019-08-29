@@ -61,8 +61,7 @@ class HomePage extends Component {
         this.setState({ showModal: false, invoiceIdToDelete: null });
     };
 
-    handleInvoiceDelete = (event, invoiceId) => {
-        event.preventDefault();
+    handleInvoiceDelete = (invoiceId) => {
         this.setState({ invoiceIdToDelete: invoiceId, showModal: true });
     };
 
@@ -158,7 +157,7 @@ class HomePage extends Component {
                         >
                             <Button
                                 className="btn-danger"
-                                onClick={this.handleInvoiceDelete.bind(this, item.invoiceId)}>
+                                onClick={() => { this.handleInvoiceDelete(item.invoiceId); }}>
                                 <i className="fas fa-trash-alt mx-2"></i>
                                 <span
                                     className="sr-only">{t('home_page.sr_only.delete_invoice')}</span>
