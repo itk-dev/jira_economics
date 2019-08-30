@@ -111,19 +111,9 @@ class Invoice extends Component {
         this.setState({ showRecordModal: false });
 
         const { dispatch } = this.props;
-        const id = this.props.match.params.invoiceId;
-        const name = this.props.invoice.data.name;
-        const recorded = true;
-        const invoiceData = {
-            id,
-            name,
-            recorded
-        };
-        dispatch(rest.actions.updateInvoice({ id: `${this.props.match.params.invoiceId}` }, {
-            body: JSON.stringify(invoiceData)
-        }));
-
-        // @TODO: Handle situation after invoice has been recorded.
+        dispatch(rest.actions.recordInvoice({ id: `${this.props.match.params.invoiceId}` }))
+            .then(response => console.log(response))
+            .catch(reason => console.log(reason));
     };
 
     handleSaveEditDescription = (event) => {
@@ -262,22 +252,24 @@ class Invoice extends Component {
                             }
                         </div>
                     </div>
-                    <div className="row mb-3">
-                        <div className="col-md-12 text-right">
-                            <ButtonGroup aria-label="Invoice actions">
-                                <Button variant="primary" type="submit"
-                                    id="record-invoice"
-                                    onClick={() => { this.setState({ showRecordModal: true }); }}>
-                                    {t('invoice.record_invoice')}
-                                </Button>
-                                <Button variant="danger" type="submit"
-                                    id="delete" className="mr-3"
-                                    onClick={() => { this.setState({ showDeleteModal: true }); }}>
-                                    {t('invoice.delete_invoice')}
-                                </Button>
-                            </ButtonGroup>
+                    {!this.props.invoice.data.recorded &&
+                        <div className="row mb-3">
+                            <div className="col-md-12 text-right">
+                                <ButtonGroup aria-label="Invoice actions">
+                                    <Button variant="primary" type="submit"
+                                        id="record-invoice"
+                                        onClick={() => { this.setState({ showRecordModal: true }); }}>
+                                        {t('invoice.record_invoice')}
+                                    </Button>
+                                    <Button variant="danger" type="submit"
+                                        id="delete" className="mr-3"
+                                        onClick={() => { this.setState({ showDeleteModal: true }); }}>
+                                        {t('invoice.delete_invoice')}
+                                    </Button>
+                                </ButtonGroup>
+                            </div>
                         </div>
-                    </div>
+                    }
                     <div className="row">
                         <div className="col-md-12">
                             <h2>{t('invoice.invoice_entries_list_title')}</h2>
