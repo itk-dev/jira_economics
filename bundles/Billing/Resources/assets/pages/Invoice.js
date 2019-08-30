@@ -58,14 +58,14 @@ class Invoice extends Component {
             .catch((reason) => console.log('isCanceled', reason));
     };
 
-    createEntry = (isJiraEntry) => {
+    createEntry = (entryType) => {
         const { dispatch } = this.props;
 
         let invoiceId = this.props.match.params.invoiceId;
 
         let invoiceEntryData = {
             invoiceId,
-            isJiraEntry
+            entryType
         };
 
         dispatch(rest.actions.createInvoiceEntry({}, {
@@ -80,14 +80,19 @@ class Invoice extends Component {
             });
     };
 
-    handleAddFromJira = (event) => {
+    handleAddFromWorklog = (event) => {
         event.preventDefault();
-        this.createEntry(true);
+        this.createEntry('worklog');
     };
 
     handleAddManually = (event) => {
         event.preventDefault();
-        this.createEntry(false);
+        this.createEntry('manual');
+    };
+
+    handleAddFromExpense = (event) => {
+        event.preventDefault();
+        this.createEntry('expense');
     };
 
     handleDeleteAccept = (event) => {
@@ -277,7 +282,10 @@ class Invoice extends Component {
                                 <div className="col-md-12">
                                     <Button variant="outline-success"
                                         type="submit" className="mr-3"
-                                        onClick={this.handleAddFromJira}>{t('invoice.add_new_jira_entry')}</Button>
+                                        onClick={this.handleAddFromWorklog}>{t('invoice.add_from_worklog')}</Button>
+                                    <Button variant="outline-success"
+                                        type="submit" className="mr-3"
+                                        onClick={this.handleAddFromExpense}>{t('invoice.add_from_expense')}</Button>
                                     <Button variant="outline-success"
                                         type="submit"
                                         onClick={this.handleAddManually}>{t('invoice.add_new_manual_entry')}</Button>

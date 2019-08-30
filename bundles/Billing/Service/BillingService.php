@@ -357,7 +357,7 @@ class BillingService extends JiraService
             'description' => $invoiceEntry->getDescription(),
             'account' => $invoiceEntry->getAccount(),
             'product' => $invoiceEntry->getProduct(),
-            'isJiraEntry' => $invoiceEntry->getIsJiraEntry(),
+            'entryType' => $invoiceEntry->getEntryType(),
             'amount' => $invoiceEntry->getAmount(),
             'price' => $invoiceEntry->getPrice(),
             'worklogIds' => array_reduce($invoiceEntry->getWorklogs()->toArray(), function ($carry, Worklog $worklog) {
@@ -409,8 +409,8 @@ class BillingService extends JiraService
      */
     private function setInvoiceEntryValuesFromData(InvoiceEntry $invoiceEntry, array $invoiceEntryData)
     {
-        if (isset($invoiceEntryData['isJiraEntry'])) {
-            $invoiceEntry->setIsJiraEntry($invoiceEntryData['isJiraEntry']);
+        if (isset($invoiceEntryData['entryType'])) {
+            $invoiceEntry->setEntryType($invoiceEntryData['entryType']);
         }
 
         if (isset($invoiceEntryData['amount'])) {
@@ -640,6 +640,67 @@ class BillingService extends JiraService
         }
 
         return $worklogs;
+    }
+
+    public function getProjectExpenses($projectId)
+    {
+        $allExpenses = $this->getExpenses();
+        $issues = array_reduce($this->getProjectIssues($projectId), function ($carry, $issue) {
+            $carry[$issue->id] = $issue;
+            return $carry;
+        }, []);
+
+        $expenses = [];
+        foreach ($allExpenses as $key => $expense) {
+            if ($expense->scope->scopeType == 'ISSUE') {
+                if (in_array($expense->scope->scopeId, array_keys($issues))) {
+                    $expense->issue = $issues[$expense->scope->scopeId];
+                    $expenses[] = $expense;
+                }
+            }
+        }
+
+        return $expenses;
+    }
+
+    public function getProjectExpensesWithMetadata($projectId)
+    {
+        $expenses = $this->getProjectExpenses($projectId);
+        $epics = $this->getProjectEpics($projectId);
+
+        // Get custom fields.
+        $customFields = $customFields = $this->get('/rest/api/2/field');
+
+        // Get Epic name field id.
+        $customFieldEpicId = $customFieldEpicLink = array_search(
+            'Epic Link',
+            array_column($customFields, 'name')
+        );
+        $epicNameCustomFieldIdId = $customFields[$customFieldEpicId]->{'id'};
+
+        // Get Epic name field id.
+        $customFieldEpicName = $customFieldEpicLink = array_search(
+            'Epic Name',
+            array_column($customFields, 'name')
+        );
+        $epicNameCustomFieldId = $customFields[$customFieldEpicName]->{'id'};
+
+        foreach ($expenses as $expense) {
+            foreach ($epics as $epic) {
+                if ($epic->key === $expense->issue->fields->{$epicNameCustomFieldIdId}) {
+                    $expense->issue->epicId = $epic->key;
+                    $expense->issue->epicName = $epic->fields->{$epicNameCustomFieldId};
+                    break;
+                }
+            }
+        }
+
+        $expense->issue->versions = array_reduce($expense->issue->fields->fixVersions, function ($carry, $version) {
+            $carry->{$version->id} = $version->name;
+            return $carry;
+        }, (object)[]);
+
+        return $expenses;
     }
 
     /**

@@ -7,6 +7,10 @@ export default reduxApi({
         reducerName: 'projectWorklogs',
         url: '/jira/billing/jira_api/project_worklogs/:id'
     },
+    getProjectExpenses: {
+        reducerName: 'projectExpenses',
+        url: '/jira/billing/jira_api/project_expenses/:id'
+    },
     getToAccounts: {
         reducerName: 'toAccounts',
         url: '/jira/billing/jira_api/to_accounts'

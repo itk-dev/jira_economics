@@ -60,14 +60,14 @@ class InvoiceEntry
     private $amount;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $isJiraEntry;
-
-    /**
      * @ORM\OneToMany(targetEntity="Billing\Entity\Worklog", mappedBy="invoiceEntry", orphanRemoval=true)
      */
     private $worklogs;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $entryType;
 
     public function __construct()
     {
@@ -151,18 +151,6 @@ class InvoiceEntry
         return $this;
     }
 
-    public function getIsJiraEntry(): ?bool
-    {
-        return $this->isJiraEntry;
-    }
-
-    public function setIsJiraEntry(?bool $isJiraEntry): self
-    {
-        $this->isJiraEntry = $isJiraEntry;
-
-        return $this;
-    }
-
     /**
      * @return Collection|Worklog[]
      */
@@ -190,6 +178,18 @@ class InvoiceEntry
                 $worklog->setInvoiceEntry(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEntryType(): ?string
+    {
+        return $this->entryType;
+    }
+
+    public function setEntryType(string $entryType): self
+    {
+        $this->entryType = $entryType;
 
         return $this;
     }
