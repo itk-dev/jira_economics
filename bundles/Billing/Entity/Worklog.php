@@ -30,11 +30,6 @@ class Worklog
     private $worklogId;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $isBilled;
-
-    /**
      * @ORM\ManyToOne(targetEntity="Billing\Entity\InvoiceEntry", inversedBy="worklogs")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -53,18 +48,6 @@ class Worklog
     public function setWorklogId(int $worklogId): self
     {
         $this->worklogId = $worklogId;
-
-        return $this;
-    }
-
-    public function getIsBilled(): ?bool
-    {
-        return $this->isBilled;
-    }
-
-    public function setIsBilled(?bool $isBilled): self
-    {
-        $this->isBilled = $isBilled;
 
         return $this;
     }

@@ -16,7 +16,6 @@ use Billing\Entity\InvoiceEntry;
 use Billing\Entity\Project;
 use Billing\Entity\Worklog;
 use Billing\Repository\WorklogRepository;
-use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -69,20 +68,13 @@ class BillingService extends JiraService
             throw new HttpException(404, 'Project with id '.$jiraProjectId.' not found');
         }
 
-        $invoices = $project->getInvoices();
-        $invoicesJson = [];
+        $invoices = [];
 
-        foreach ($invoices as $invoice) {
-            $invoicesJson[] = [
-                'invoiceId' => $invoice->getId(),
-                'name' => $invoice->getName(),
-                'jiraId' => $invoice->getProject()->getJiraId(),
-                'recorded' => $invoice->getRecorded(),
-                'created' => $invoice->getCreated(),
-            ];
+        foreach ($project->getInvoices() as $invoice) {
+            $invoices[] = $this->getInvoiceArray($invoice);
         }
 
-        return $invoicesJson;
+        return $invoices;
     }
 
     /**
@@ -99,20 +91,13 @@ class BillingService extends JiraService
             return [];
         }
 
-        $invoicesJson = [];
+        $invoicesArray = [];
 
         foreach ($invoices as $invoice) {
-            $invoicesJson[] = [
-                'invoiceId' => $invoice->getId(),
-                'invoiceName' => $invoice->getName(),
-                'jiraProjectId' => $invoice->getProject()->getJiraId(),
-                'jiraProjectName' => $invoice->getProject()->getName(),
-                'recorded' => $invoice->getRecorded(),
-                'created' => $invoice->getCreated(),
-            ];
+            $invoicesArray[] = $this->getInvoiceArray($invoice);
         }
 
-        return $invoicesJson;
+        return $invoicesArray;
     }
 
     /**
@@ -138,20 +123,34 @@ class BillingService extends JiraService
         return $this->getInvoiceArray($invoice);
     }
 
+    /**
+     * Get invoice as array.
+     *
+     * @param \Billing\Entity\Invoice $invoice
+     *
+     * @return array
+     */
     private function getInvoiceArray(Invoice $invoice)
     {
         // Get account information.
         $account = $this->getAccount($invoice->getAccountId());
         $account->defaultPrice = $this->getAccountDefaultPrice($invoice->getAccountId());
 
+        $totalPrice = array_reduce($invoice->getInvoiceEntries()->toArray(), function ($carry, InvoiceEntry $entry) {
+            return $carry + $entry->getAmount() * $entry->getPrice();
+        }, 0);
+
         return [
             'id' => $invoice->getId(),
             'name' => $invoice->getName(),
+            'projectId' => $invoice->getProject()->getJiraId(),
+            'projectName' => $invoice->getProject()->getName(),
             'jiraId' => $invoice->getProject()->getJiraId(),
             'recorded' => $invoice->getRecorded(),
             'accountId' => $invoice->getAccountId(),
             'description' => $invoice->getDescription(),
             'account' => $account,
+            'totalPrice' => $totalPrice,
             'created' => $invoice->getCreated()->format('c'),
         ];
     }
@@ -343,23 +342,13 @@ class BillingService extends JiraService
         return $this->getInvoiceEntryArray($invoiceEntry);
     }
 
-    private function getWorklogsArray(Collection $collection)
-    {
-        $worklogs = [];
-
-        /* @var Worklog $worklog */
-        foreach ($collection as $worklog) {
-            $worklogs[] = [
-                'id' => $worklog->getId(),
-                'worklogId' => $worklog->getWorklogId(),
-                'invoiceEntryId' => $worklog->getInvoiceEntry()->getId(),
-                'billed' => $worklog->getIsBilled(),
-            ];
-        }
-
-        return $worklogs;
-    }
-
+    /**
+     * Get invoice entry as array.
+     *
+     * @param \Billing\Entity\InvoiceEntry $invoiceEntry
+     *
+     * @return array
+     */
     private function getInvoiceEntryArray(InvoiceEntry $invoiceEntry)
     {
         return [
@@ -532,19 +521,30 @@ class BillingService extends JiraService
      * Record an invoice.
      *
      * @param $invoiceId
+     *
+     * @return array
      */
     public function recordInvoice($invoiceId)
     {
         $invoice = $this->entityManager->getRepository(Invoice::class)
             ->find($invoiceId);
-
-        // Make sure all amounts are calculated correctly.
-        // Check each worklog and the amounts calculated.
-        // Avoid duplicated use of worklog.
-
         $invoice->setRecorded(true);
-
         $this->entityManager->flush();
+
+        // Set billed field in Jira for each worklog.
+        foreach ($invoice->getInvoiceEntries() as $invoiceEntry) {
+            foreach ($invoiceEntry->getWorklogs() as $worklog) {
+                $this->put('/rest/tempo-timesheets/4/worklogs/'.$worklog->getWorklogId(), [
+                    'attributes' => [
+                        '_Billed_' => [
+                            'value' => true,
+                        ],
+                    ],
+                ]);
+            }
+        }
+
+        return $this->getInvoiceArray($invoice);
     }
 
     /**
