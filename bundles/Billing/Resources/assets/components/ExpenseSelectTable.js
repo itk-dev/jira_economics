@@ -14,8 +14,7 @@ const ExpenseSelectTable = (props) => {
                     <th>{t('invoice_entry.table.expense')}</th>
                     <th>{t('invoice_entry.table.category')}</th>
                     <th>{t('invoice_entry.table.billed')}</th>
-                    <th>{t('invoice_entry.table.user')}</th>
-                    <th>{t('invoice_entry.table.hours_spent')}</th>
+                    <th>{t('invoice_entry.table.amount')}</th>
                     <th>{t('invoice_entry.table.updated')}</th>
                 </tr>
             </thead>
@@ -32,13 +31,12 @@ const ExpenseSelectTable = (props) => {
                                 onChange={ () => { this.handleSelectOnChange(expense); } }/>
                             </td>
                             <td>
-                                <div>{expense.comment} ({expense.id})</div>
+                                <div>{expense.summary} ({expense.id})</div>
                                 <div><i>{expense.issueSummary} ({expense.issueId})</i></div>
                             </td>
                             <td>{expense.category}</td>
                             <td>{expense.billed}</td>
-                            <td>{expense.worker}</td>
-                            <td>{expense.timeSpent}</td>
+                            <td>{expense.amount}</td>
                             <td>
                                 <Moment format="DD-MM-YYYY">{expense.dateUpdated}</Moment>
                             </td>
@@ -48,9 +46,9 @@ const ExpenseSelectTable = (props) => {
             </tbody>
         </table>
     );
-}
+};
 
-ExpenseSelectTable.js.propTypes = {
+ExpenseSelectTable.propTypes = {
     t: PropTypes.func.isRequired,
     expenses: PropTypes.array.isRequired,
     handleSelectOnChange: PropTypes.func.isRequired

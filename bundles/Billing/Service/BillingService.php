@@ -688,17 +688,17 @@ class BillingService extends JiraService
         foreach ($expenses as $expense) {
             foreach ($epics as $epic) {
                 if ($epic->key === $expense->issue->fields->{$epicNameCustomFieldIdId}) {
-                    $expense->issue->epicId = $epic->key;
+                    $expense->issue->epicKey = $epic->key;
                     $expense->issue->epicName = $epic->fields->{$epicNameCustomFieldId};
                     break;
                 }
             }
-        }
 
-        $expense->issue->versions = array_reduce($expense->issue->fields->fixVersions, function ($carry, $version) {
-            $carry->{$version->id} = $version->name;
-            return $carry;
-        }, (object)[]);
+            $expense->issue->versions = array_reduce($expense->issue->fields->fixVersions, function ($carry, $version) {
+                $carry->{$version->id} = $version->name;
+                return $carry;
+            }, (object)[]);
+        }
 
         return $expenses;
     }

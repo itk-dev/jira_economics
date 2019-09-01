@@ -7,12 +7,11 @@ import rest from '../redux/utils/rest';
 import Spinner from '../components/Spinner';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../css/react-datepicker.scss';
 import { withTranslation } from 'react-i18next';
-import InvoiceEntryJiraFilter from '../components/InvoiceEntryJiraFilter';
-import WorklogSelectTable from '../components/WorklogSelectTable';
+import WorklogSelect from '../components/WorklogSelect';
+import ExpenseSelect from '../components/ExpenseSelect';
 
 export class InvoiceEntry extends Component {
     constructor (props) {
@@ -34,6 +33,7 @@ export class InvoiceEntry extends Component {
             // Selections:
             selectedToAccount: null,
             selectedWorklogs: {},
+            selectedExpenses: {},
 
             // Form values:
             amount: null,
@@ -41,28 +41,19 @@ export class InvoiceEntry extends Component {
             product: null,
             description: null,
 
-            // Filter values:
-            filterValues: {
-                billedFilter: 'not_billed',
-                workerFilter: '',
-                startDateFilter: '',
-                endDateFilter: '',
-                epicFilter: '',
-                versionFilter: ''
-            },
-
             // UI state:
             displaySelectionScreen: false,
-            initialized: false
+            initialized: false,
+            worklogsInitialized: false,
+            expensesInitialized: false
         };
 
-        this.handleOpenSelectWorklogs = this.handleOpenSelectWorklogs.bind(this);
+        this.handleOpenSelectJiraEntries = this.handleOpenSelectJiraEntries.bind(this);
         this.onAccountChange = this.onAccountChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.setDefaultValues = this.setDefaultValues.bind(this);
         this.handleWorklogToggle = this.handleWorklogToggle.bind(this);
-        this.isReady = this.isReady.bind(this);
     }
 
     componentDidMount () {
@@ -73,13 +64,17 @@ export class InvoiceEntry extends Component {
                 if (response.entryType === 'worklog') {
                     dispatch(rest.actions.getProjectWorklogs({ id: this.props.match.params.projectId }))
                         .then((response) => {
-                            this.setState({ projectWorklogs: response });
+                            this.setState({
+                                projectWorklogs: response
+                            });
                         })
                         .catch((reason) => console.log('isCancelled', reason));
                 } else if (response.entryType === 'expense') {
                     dispatch(rest.actions.getProjectExpenses({ id: this.props.match.params.projectId }))
                         .then((response) => {
-                            this.setState({ projectExpenses: response });
+                            this.setState({
+                                projectExpenses: response
+                            });
                         })
                         .catch((reason) => console.log('isCancelled', reason));
                 }
@@ -113,7 +108,8 @@ export class InvoiceEntry extends Component {
                 price: this.state.invoiceEntry.price ? this.state.invoiceEntry.price : this.state.invoice.account.defaultPrice,
                 product: this.state.invoiceEntry.product ? this.state.invoiceEntry.product : '',
                 selectedToAccount: this.state.invoiceEntry.account ? this.state.invoiceEntry.account : '',
-                selectedWorklogs: this.state.invoiceEntry.worklogIds
+                selectedWorklogs: this.state.invoiceEntry.worklogIds,
+                initialized: true
             });
         }
     };
@@ -178,7 +174,7 @@ export class InvoiceEntry extends Component {
         this.setState(prevState => ({ ...prevState, [fieldName]: fieldVal }));
     }
 
-    handleOpenSelectWorklogs = () => {
+    handleOpenSelectJiraEntries = () => {
         this.setState({
             displaySelectionScreen: true
         });
@@ -211,84 +207,38 @@ export class InvoiceEntry extends Component {
         });
     };
 
-    filterWorklogs = (worklog) => {
-        if (this.state.filterValues.billedFilter !== '') {
-            if (this.state.filterValues.billedFilter === 'not_billed' &&
-                worklog.attributes.hasOwnProperty('_Billed_') &&
-                worklog.attributes['_Billed_'].value === 'true') {
-                return false;
-            }
+    handleExpensesToggle = (expense) => {
+        let selectedExpenses = this.state.selectedExpenses;
+        selectedExpenses[expense.id] = !selectedExpenses[expense.id];
 
-            if (this.state.filterValues.billedFilter === 'billed' && (
-                !worklog.attributes.hasOwnProperty('_Billed_') ||
-                worklog.attributes['_Billed_'].value !== 'true')) {
-                return false;
-            }
-        }
-
-        if (this.state.filterValues.workerFilter !== '') {
-            if (worklog.worker !== this.state.filterValues.workerFilter) {
-                return false;
-            }
-        }
-
-        let worklogUpdatedTimestamp = (new Date(worklog.dateUpdated)).getTime();
-
-        if (this.state.filterValues.startDateFilter !== null && this.state.filterValues.startDateFilter !== '') {
-            let startFilterTimestamp = this.state.filterValues.startDateFilter.getTime();
-
-            if (startFilterTimestamp > worklogUpdatedTimestamp) {
-                return false;
-            }
-        }
-
-        if (this.state.filterValues.endDateFilter !== null && this.state.filterValues.endDateFilter !== '') {
-            let endDate = this.state.filterValues.endDateFilter;
-            endDate.setHours(23, 59, 59);
-            let endFilterTimestamp = endDate.getTime();
-
-            if (endFilterTimestamp < worklogUpdatedTimestamp) {
-                return false;
-            }
-        }
-
-        if (this.state.filterValues.versionFilter !== null && this.state.filterValues.versionFilter !== '') {
-            if (!worklog.issue.versions.hasOwnProperty(this.state.filterValues.versionFilter)) {
-                return false;
-            }
-        }
-
-        if (this.state.filterValues.epicFilter !== null && this.state.filterValues.epicFilter !== '') {
-            if (worklog.issue.epicKey !== this.state.filterValues.epicFilter) {
-                return false;
-            }
-        }
-
-        return true;
+        this.setState({
+            selectedExpenses: selectedExpenses
+        });
     };
 
-    handleFilterChange (event) {
-        const fieldName = event.target.name;
-        const fieldVal = event.target.value;
+    handleSelectExpenses = () => {
+        let amount = 0;
 
-        this.setState(prevState => ({
-            ...prevState,
-            filterValues: {
-                ...prevState.filterValues,
-                [fieldName]: fieldVal
+        for (let expenseKey in this.state.projectExpenses.data) {
+            let expense = this.state.projectExpenses.data[expenseKey];
+
+            if (this.state.selectedExpenses.hasOwnProperty(expense.id) &&
+                this.state.selectedExpenses[expense.id]) {
+                amount = amount + expense.amount;
             }
-        }));
-    }
+        }
 
-    isReady = () => {
-        return this.state.initialized;
+        this.setState({
+            amount: amount,
+            displaySelectionScreen: false
+        });
     };
 
     render () {
         const { t } = this.props;
 
         // Show spinner if data is not ready.
-        if (!this.isReady()) {
+        if (!this.state.initialized) {
             return (
                 <ContentWrapper>
                     <Spinner/>
@@ -299,94 +249,40 @@ export class InvoiceEntry extends Component {
         // Test for whether invoice entry form or worklog/expenses selection
         // should be displayed.
         if (this.state.displaySelectionScreen) {
-            if (this.state.invoiceEntry.entryType === 'worklog') {
+            if (this.state.invoiceEntry.entryType === 'worklog' && this.state.projectWorklogs !== null) {
+                return (
+                    <WorklogSelect
+                        handleSelectOnChange={this.handleWorklogToggle.bind(this)}
+                        worklogs={this.state.projectWorklogs.data}
+                        selectedWorklogs={this.state.selectedWorklogs}
+                        invoiceEntryId={this.state.invoiceEntry.id}
+                        handleAccept={this.handleSelectWorklogs.bind(this)}
+                    />
+                );
+            } else if (this.state.invoiceEntry.entryType === 'expense' && this.state.projectExpenses !== null) {
+                return (
+                    <ExpenseSelect
+                        handleSelectOnChange={this.handleExpensesToggle.bind(this)}
+                        expenses={this.state.projectExpenses.data}
+                        selectedExpenses={this.state.selectedExpenses}
+                        invoiceEntryId={this.state.invoiceEntry.id}
+                        handleAccept={this.handleSelectExpenses.bind(this)}
+                    />
+                );
+            } else {
                 return (
                     <ContentWrapper>
-                        <InvoiceEntryJiraFilter
-                            handleChange={this.handleFilterChange.bind(this)}
-                            handleStartDateChange={(newDate) => {
-                                this.setState((prevState) => ({
-                                    filterValues: {
-                                        ...prevState.filterValues,
-                                        startDateFilter: newDate
-                                    }
-                                }));
-                            }}
-                            handleEndDateChange={(newDate) => {
-                                this.setState((prevState) => ({
-                                    filterValues: {
-                                        ...prevState.filterValues,
-                                        endDateFilter: newDate
-                                    }
-                                }));
-                            }}
-                            filterValues={this.state.filterValues}
-                            epics={this.state.projectWorklogs.data
-                                .reduce((carry, worklog) => {
-                                    if (worklog.issue.epicKey && !carry.hasOwnProperty(worklog.issue.epicKey)) {
-                                        carry[worklog.issue.epicKey] = worklog.issue.epicName;
-                                    }
-
-                                    return carry;
-                                }, {})}
-                            versions={this.state.projectWorklogs.data
-                                .reduce((carry, worklog) => {
-                                    for (let versionKey in worklog.issue.versions) {
-                                        if (worklog.issue.versions.hasOwnProperty(versionKey) &&
-                                            !carry.hasOwnProperty(versionKey)) {
-                                            carry[versionKey] = worklog.issue.versions[versionKey];
-                                        }
-                                    }
-                                    return carry;
-                                }, {})}
-                            workers={this.state.projectWorklogs.data
-                                .reduce((carry, worklog) => {
-                                    if (carry.indexOf(worklog.worker) === -1) {
-                                        carry.push(worklog.worker);
-                                    }
-                                    return carry;
-                                }, [])}
-                        />
-
-                        <WorklogSelectTable
-                            worklogs={this.state.projectWorklogs.data.filter(this.filterWorklogs.bind(this))
-                                .map((worklog) => {
-                                    return {
-                                        tempoWorklogId: worklog.tempoWorklogId,
-                                        className: (worklog.hasOwnProperty('addedToInvoiceEntryId') &&
-                                            worklog.addedToInvoiceEntryId !== this.state.invoiceEntry.id) ? 'bg-secondary' : '',
-                                        disabled: worklog.hasOwnProperty('addedToInvoiceEntryId') && worklog.addedToInvoiceEntryId !== this.state.invoiceEntry.id,
-                                        checked: this.state.selectedWorklogs.hasOwnProperty(worklog.tempoWorklogId) ? this.state.selectedWorklogs[worklog.tempoWorklogId] : false,
-                                        issueSummary: worklog.issue.summary,
-                                        comment: worklog.comment,
-                                        issueId: worklog.issue.id,
-                                        epicName: worklog.issue.epicName,
-                                        versions: worklog.issue.versions,
-                                        worker: worklog.worker,
-                                        billed: worklog.attributes.hasOwnProperty('_Billed_') && worklog.attributes['_Billed_'].value === 'true' ? t('invoice_entry.billed_text') : '',
-                                        timeSpent: worklog.timeSpent,
-                                        dateUpdated: worklog.dateUpdated
-                                    };
-                                })}
-                            handleSelectOnChange={this.handleWorklogToggle.bind(this)}
-                        />
-
-                        <ButtonGroup>
-                            <Button
-                                onClick={this.handleSelectWorklogs.bind(this)}>{t('invoice_entry.save_choices')}</Button>
-                        </ButtonGroup>
+                        <Spinner/>
                     </ContentWrapper>
                 );
-            } else if (this.state.invoiceEntry.entryType === 'expense') {
-
             }
         } else {
             return (
                 <ContentWrapper>
                     <div><PageTitle>{t('invoice_entry.title')}</PageTitle></div>
-                    {this.state.invoiceEntry.entryType === 'worklog' &&
+                    {this.state.invoiceEntry.entryType !== 'manual' &&
                         <div>
-                            <Button onClick={this.handleOpenSelectWorklogs}>{t('invoice_entry.choose_worklogs')}</Button>
+                            <Button onClick={this.handleOpenSelectJiraEntries}>{t('invoice_entry.select_jira_items')}</Button>
                         </div>
                     }
                     {/* @TODO: Move to component */}

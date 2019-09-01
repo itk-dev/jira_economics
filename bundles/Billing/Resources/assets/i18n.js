@@ -86,7 +86,8 @@ const resources = {
             'invoice_entry.form.amount': 'Timer',
             'invoice_entry.form.price': 'Stk. pris',
             'invoice_entry.form.submit': 'Overfør til faktura',
-            'invoice_entry.form.cancel': 'Annullér'
+            'invoice_entry.form.cancel': 'Annullér',
+            'invoice_entry.filter.category_option.all': 'Alle'
         }
     }
 };
