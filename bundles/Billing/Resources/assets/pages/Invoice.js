@@ -372,8 +372,8 @@ class Invoice extends Component {
                         </div>
                     </div>
                     <ContentFooter>
-                        Invoice created <strong>
-                            <Moment format="YYYY-MM-DD HH:mm">
+                        {t('invoice.date_created')} <strong>
+                            <Moment format="DD/MM YYYY HH:mm">
                                 {this.props.invoice.data.created}
                             </Moment>
                         </strong>
