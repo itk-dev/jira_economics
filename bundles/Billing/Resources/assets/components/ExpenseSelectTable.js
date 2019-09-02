@@ -14,7 +14,7 @@ const ExpenseSelectTable = (props) => {
                     <th>{t('invoice_entry.table.expense')}</th>
                     <th>{t('invoice_entry.table.category')}</th>
                     <th>{t('invoice_entry.table.billed')}</th>
-                    <th>{t('invoice_entry.table.amount')}</th>
+                    <th>{t('invoice_entry.table.total_price')}</th>
                     <th>{t('invoice_entry.table.updated')}</th>
                 </tr>
             </thead>
@@ -38,7 +38,7 @@ const ExpenseSelectTable = (props) => {
                             <td>{expense.billed}</td>
                             <td>{expense.amount}</td>
                             <td>
-                                <Moment format="DD-MM-YYYY">{expense.dateUpdated}</Moment>
+                                <Moment format="DD-MM-YYYY">{expense.date}</Moment>
                             </td>
                         </tr>
                     ))

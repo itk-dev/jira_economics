@@ -304,7 +304,8 @@ class Invoice extends Component {
                                             <th>{t('invoice.form.amount')}</th>
                                             <th>{t('invoice.form.price')}</th>
                                             <th>{t('invoice.form.total_price')}</th>
-                                            <th></th>
+                                            <th>{t('invoice.form.type')}</th>
+                                            <th> </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -316,6 +317,11 @@ class Invoice extends Component {
                                                 <td>{item.amount}</td>
                                                 <td>{item.price}</td>
                                                 <td>{item.amount * item.price}</td>
+                                                <td>
+                                                    {item.entryType === 'expense' && t('invoice.form.types.expense')}
+                                                    {item.entryType === 'worklog' && t('invoice.form.types.worklog')}
+                                                    {item.entryType === 'manual' && t('invoice.form.types.manual')}
+                                                </td>
                                                 <td className="text-right">
                                                     <ButtonGroup size="sm" className="float-right" aria-label="Invoice entry functions">
                                                         <OverlayTrigger key="edit" placement="top"

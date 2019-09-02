@@ -67,7 +67,7 @@ const ExpenseSelect = (props) => {
             }
         }
 
-        let worklogUpdatedTimestamp = (new Date(item.dateUpdated)).getTime();
+        let worklogUpdatedTimestamp = (new Date(item.date)).getTime();
 
         if (filterValues.startDateFilter !== null && filterValues.startDateFilter !== '') {
             let startFilterTimestamp = filterValues.startDateFilter.getTime();
@@ -148,7 +148,7 @@ const ExpenseSelect = (props) => {
                             versions: expense.issue.versions,
                             billed: expense.billed ? t('invoice_entry.billed_text') : '',
                             amount: expense.amount,
-                            dateUpdated: expense.dateUpdated
+                            date: expense.date
                         };
                     })}
                 handleSelectOnChange={props.handleSelectOnChange}
