@@ -58,14 +58,14 @@ class Invoice extends Component {
             .catch((reason) => console.log('isCanceled', reason));
     };
 
-    createEntry = (isJiraEntry) => {
+    createEntry = (entryType) => {
         const { dispatch } = this.props;
 
         let invoiceId = this.props.match.params.invoiceId;
 
         let invoiceEntryData = {
             invoiceId,
-            isJiraEntry
+            entryType
         };
 
         dispatch(rest.actions.createInvoiceEntry({}, {
@@ -80,14 +80,19 @@ class Invoice extends Component {
             });
     };
 
-    handleAddFromJira = (event) => {
+    handleAddFromWorklog = (event) => {
         event.preventDefault();
-        this.createEntry(true);
+        this.createEntry('worklog');
     };
 
     handleAddManually = (event) => {
         event.preventDefault();
-        this.createEntry(false);
+        this.createEntry('manual');
+    };
+
+    handleAddFromExpense = (event) => {
+        event.preventDefault();
+        this.createEntry('expense');
     };
 
     handleDeleteAccept = (event) => {
@@ -210,7 +215,12 @@ class Invoice extends Component {
                             }
                             {!this.state.editDescription && !this.props.invoice.loading &&
                                 <div onClick={() => { this.setState({ editDescription: true }); }} className={'mb-3'}>
-                                    {nl2br(this.props.invoice.data.description)}
+                                    {!this.props.invoice.data.description &&
+                                        <div className={'text-muted'}>{t('invoice.click_to_edit_description')}</div>
+                                    }
+                                    {this.props.invoice.data.description &&
+                                        nl2br(this.props.invoice.data.description)
+                                    }
                                 </div>
                             }
                             {this.state.editDescription && !this.props.invoice.loading &&
@@ -222,7 +232,7 @@ class Invoice extends Component {
                                             className={'mb-3 border-0'}
                                             as="textarea" rows="5"
                                             defaultValue={this.props.invoice.data.description}
-                                            placeholder="Enter description for invoice here. Leave textarea to save.">
+                                            placeholder={t('invoice.click_to_edit_description')}>
                                         </Form.Control>
                                     </Form.Group>
                                 </Form>
@@ -277,7 +287,10 @@ class Invoice extends Component {
                                 <div className="col-md-12">
                                     <Button variant="outline-success"
                                         type="submit" className="mr-3"
-                                        onClick={this.handleAddFromJira}>{t('invoice.add_new_jira_entry')}</Button>
+                                        onClick={this.handleAddFromWorklog}>{t('invoice.add_from_worklog')}</Button>
+                                    <Button variant="outline-success"
+                                        type="submit" className="mr-3"
+                                        onClick={this.handleAddFromExpense}>{t('invoice.add_from_expense')}</Button>
                                     <Button variant="outline-success"
                                         type="submit"
                                         onClick={this.handleAddManually}>{t('invoice.add_new_manual_entry')}</Button>
@@ -296,7 +309,8 @@ class Invoice extends Component {
                                             <th>{t('invoice.form.amount')}</th>
                                             <th>{t('invoice.form.price')}</th>
                                             <th>{t('invoice.form.total_price')}</th>
-                                            <th></th>
+                                            <th>{t('invoice.form.type')}</th>
+                                            <th> </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -308,6 +322,11 @@ class Invoice extends Component {
                                                 <td>{item.amount}</td>
                                                 <td>{item.price}</td>
                                                 <td>{item.amount * item.price}</td>
+                                                <td>
+                                                    {item.entryType === 'expense' && t('invoice.form.types.expense')}
+                                                    {item.entryType === 'worklog' && t('invoice.form.types.worklog')}
+                                                    {item.entryType === 'manual' && t('invoice.form.types.manual')}
+                                                </td>
                                                 <td className="text-right">
                                                     <ButtonGroup size="sm" className="float-right" aria-label="Invoice entry functions">
                                                         <OverlayTrigger key="edit" placement="top"
@@ -358,8 +377,8 @@ class Invoice extends Component {
                         </div>
                     </div>
                     <ContentFooter>
-                        Invoice created <strong>
-                            <Moment format="YYYY-MM-DD HH:mm">
+                        {t('invoice.date_created')} <strong>
+                            <Moment format="DD/MM YYYY HH:mm">
                                 {this.props.invoice.data.created}
                             </Moment>
                         </strong>

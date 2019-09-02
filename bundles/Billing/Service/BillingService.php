@@ -15,6 +15,8 @@ use Billing\Entity\Invoice;
 use Billing\Entity\InvoiceEntry;
 use Billing\Entity\Project;
 use Billing\Entity\Worklog;
+use Billing\Entity\Expense;
+use Billing\Repository\ExpenseRepository;
 use Billing\Repository\WorklogRepository;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,6 +25,7 @@ class BillingService extends JiraService
 {
     private $entityManager;
     private $worklogRepository;
+    private $expenseRepository;
 
     /**
      * Constructor.
@@ -40,12 +43,14 @@ class BillingService extends JiraService
         $tokenStorage,
         $customerKey,
         $pemPath,
-        WorklogRepository $worklogRepository
+        WorklogRepository $worklogRepository,
+        ExpenseRepository $expenseRepository
     ) {
         parent::__construct($jiraUrl, $tokenStorage, $customerKey, $pemPath);
 
         $this->entityManager = $entityManager;
         $this->worklogRepository = $worklogRepository;
+        $this->expenseRepository = $expenseRepository;
     }
 
     /**
@@ -357,11 +362,16 @@ class BillingService extends JiraService
             'description' => $invoiceEntry->getDescription(),
             'account' => $invoiceEntry->getAccount(),
             'product' => $invoiceEntry->getProduct(),
-            'isJiraEntry' => $invoiceEntry->getIsJiraEntry(),
+            'entryType' => $invoiceEntry->getEntryType(),
             'amount' => $invoiceEntry->getAmount(),
             'price' => $invoiceEntry->getPrice(),
             'worklogIds' => array_reduce($invoiceEntry->getWorklogs()->toArray(), function ($carry, Worklog $worklog) {
                 $carry[$worklog->getWorklogId()] = true;
+
+                return $carry;
+            }, []),
+            'expenseIds' => array_reduce($invoiceEntry->getExpenses()->toArray(), function ($carry, Expense $expense) {
+                $carry[$expense->getExpenseId()] = true;
 
                 return $carry;
             }, []),
@@ -409,8 +419,8 @@ class BillingService extends JiraService
      */
     private function setInvoiceEntryValuesFromData(InvoiceEntry $invoiceEntry, array $invoiceEntryData)
     {
-        if (isset($invoiceEntryData['isJiraEntry'])) {
-            $invoiceEntry->setIsJiraEntry($invoiceEntryData['isJiraEntry']);
+        if (isset($invoiceEntryData['entryType'])) {
+            $invoiceEntry->setEntryType($invoiceEntryData['entryType']);
         }
 
         if (isset($invoiceEntryData['amount'])) {
@@ -439,14 +449,14 @@ class BillingService extends JiraService
 
             // Remove de-selected worklogs.
             foreach ($worklogs as $worklog) {
-                if (!\in_array($worklog->getId(), $invoiceEntryData['worklogIds'])) {
+                if (!\in_array($worklog->getWorklogId(), $invoiceEntryData['worklogIds'])) {
                     $this->entityManager->remove($worklog);
                 }
             }
 
             // Add not-added worklogs.
             foreach ($invoiceEntryData['worklogIds'] as $worklogId) {
-                $worklog = $this->worklogRepository->find($worklogId);
+                $worklog = $this->worklogRepository->findOneBy(['worklogId' => $worklogId]);
 
                 if (null === $worklog) {
                     $worklog = new Worklog();
@@ -456,6 +466,37 @@ class BillingService extends JiraService
                     $this->entityManager->persist($worklog);
                 } else {
                     if ($worklog->getInvoiceEntry()->getId() === $invoiceEntry->getId()) {
+                        throw new HttpException(
+                            'Used by other invoice entry.'
+                        );
+                    }
+                }
+            }
+        }
+
+        // If expenseIds has been changed.
+        if (isset($invoiceEntryData['expenseIds'])) {
+            $expenses = $invoiceEntry->getExpenses();
+
+            // Remove de-selected expenses.
+            foreach ($expenses as $expense) {
+                if (!\in_array($expense->getExpenseId(), $invoiceEntryData['expenseIds'])) {
+                    $this->entityManager->remove($expense);
+                }
+            }
+
+            // Add not-added expenses.
+            foreach ($invoiceEntryData['expenseIds'] as $expenseId) {
+                $expense = $this->expenseRepository->findOneBy(['expenseId' => $expenseId]);
+
+                if (null === $expense) {
+                    $expense = new Expense();
+                    $expense->setExpenseId($expenseId);
+                    $expense->setInvoiceEntry($invoiceEntry);
+
+                    $this->entityManager->persist($expense);
+                } else {
+                    if ($expense->getInvoiceEntry()->getId() === $invoiceEntry->getId()) {
                         throw new HttpException(
                             'Used by other invoice entry.'
                         );
@@ -529,7 +570,6 @@ class BillingService extends JiraService
         $invoice = $this->entityManager->getRepository(Invoice::class)
             ->find($invoiceId);
         $invoice->setRecorded(true);
-        $this->entityManager->flush();
 
         // Set billed field in Jira for each worklog.
         foreach ($invoice->getInvoiceEntries() as $invoiceEntry) {
@@ -541,8 +581,17 @@ class BillingService extends JiraService
                         ],
                     ],
                 ]);
+
+                $worklog->setIsBilled(true);
+            }
+
+            // @TODO: Record billed in Jira if possible.
+            foreach ($invoiceEntry->getExpenses() as $expens) {
+                $expens->setIsBilled(true);
             }
         }
+
+        $this->entityManager->flush();
 
         return $this->getInvoiceArray($invoice);
     }
@@ -636,10 +685,97 @@ class BillingService extends JiraService
 
             if (null !== $worklogEntity) {
                 $worklog->addedToInvoiceEntryId = $worklogEntity->getInvoiceEntry()->getId();
+
+                $worklog->billed = $worklogEntity->getIsBilled();
             }
         }
 
         return $worklogs;
+    }
+
+    /**
+     * Get project expenses.
+     *
+     * @param $projectId
+     *
+     * @return array
+     */
+    public function getProjectExpenses($projectId)
+    {
+        $allExpenses = $this->getExpenses();
+        $issues = array_reduce($this->getProjectIssues($projectId), function ($carry, $issue) {
+            $carry[$issue->id] = $issue;
+
+            return $carry;
+        }, []);
+
+        $expenses = [];
+        foreach ($allExpenses as $key => $expense) {
+            if ('ISSUE' === $expense->scope->scopeType) {
+                if (\in_array($expense->scope->scopeId, array_keys($issues))) {
+                    $expense->issue = $issues[$expense->scope->scopeId];
+                    $expenses[] = $expense;
+                }
+            }
+        }
+
+        return $expenses;
+    }
+
+    /**
+     * Get project expenses with metadata about version, epic, etc.
+     *
+     * @param $projectId
+     *
+     * @return array
+     */
+    public function getProjectExpensesWithMetadata($projectId)
+    {
+        $expenses = $this->getProjectExpenses($projectId);
+        $epics = $this->getProjectEpics($projectId);
+
+        // Get custom fields.
+        $customFields = $customFields = $this->get('/rest/api/2/field');
+
+        // Get Epic link field id.
+        $customFieldEpicId = $customFieldEpicLink = array_search(
+            'Epic Link',
+            array_column($customFields, 'name')
+        );
+        $epicNameCustomFieldIdId = $customFields[$customFieldEpicId]->{'id'};
+
+        // Get Epic name field id.
+        $customFieldEpicName = $customFieldEpicLink = array_search(
+            'Epic Name',
+            array_column($customFields, 'name')
+        );
+        $epicNameCustomFieldId = $customFields[$customFieldEpicName]->{'id'};
+
+        foreach ($expenses as $expense) {
+            foreach ($epics as $epic) {
+                if ($epic->key === $expense->issue->fields->{$epicNameCustomFieldIdId}) {
+                    $expense->issue->epicKey = $epic->key;
+                    $expense->issue->epicName = $epic->fields->{$epicNameCustomFieldId};
+                    break;
+                }
+            }
+
+            $expense->issue->versions = array_reduce($expense->issue->fields->fixVersions, function ($carry, $version) {
+                $carry->{$version->id} = $version->name;
+
+                return $carry;
+            }, (object) []);
+
+            $expenseEntity = $this->expenseRepository->findOneBy(['expenseId' => $expense->id]);
+
+            if (null !== $expenseEntity) {
+                $expense->addedToInvoiceEntryId = $expenseEntity->getInvoiceEntry()->getId();
+
+                $expense->billed = $expenseEntity->getIsBilled();
+            }
+        }
+
+        return $expenses;
     }
 
     /**

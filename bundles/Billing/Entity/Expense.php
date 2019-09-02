@@ -13,9 +13,9 @@ namespace Billing\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="Billing\Repository\WorklogRepository")
+ * @ORM\Entity(repositoryClass="Billing\Repository\ExpenseRepository")
  */
-class Worklog
+class Expense
 {
     /**
      * @ORM\Id()
@@ -25,34 +25,34 @@ class Worklog
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="boolean", nullable=true)
      */
-    private $worklogId;
+    private $isBilled;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Billing\Entity\InvoiceEntry", inversedBy="worklogs")
+     * @ORM\ManyToOne(targetEntity="Billing\Entity\InvoiceEntry", inversedBy="expenses")
      * @ORM\JoinColumn(nullable=false)
      */
     private $invoiceEntry;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\Column(type="integer")
      */
-    private $isBilled;
+    private $expenseId;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getWorklogId(): ?int
+    public function getIsBilled(): ?bool
     {
-        return $this->worklogId;
+        return $this->isBilled;
     }
 
-    public function setWorklogId(int $worklogId): self
+    public function setIsBilled(?bool $isBilled): self
     {
-        $this->worklogId = $worklogId;
+        $this->isBilled = $isBilled;
 
         return $this;
     }
@@ -69,14 +69,14 @@ class Worklog
         return $this;
     }
 
-    public function getIsBilled(): ?bool
+    public function getExpenseId(): ?int
     {
-        return $this->isBilled;
+        return $this->expenseId;
     }
 
-    public function setIsBilled(?bool $isBilled): self
+    public function setExpenseId(int $expenseId): self
     {
-        $this->isBilled = $isBilled;
+        $this->expenseId = $expenseId;
 
         return $this;
     }

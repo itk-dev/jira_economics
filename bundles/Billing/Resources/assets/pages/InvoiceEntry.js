@@ -7,43 +7,48 @@ import rest from '../redux/utils/rest';
 import Spinner from '../components/Spinner';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
-import Moment from 'react-moment';
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../css/react-datepicker.scss';
 import { withTranslation } from 'react-i18next';
+import WorklogSelect from '../components/WorklogSelect';
+import ExpenseSelect from '../components/ExpenseSelect';
 
 export class InvoiceEntry extends Component {
     constructor (props) {
         super(props);
 
         this.state = {
+            // Entities:
             invoice: {},
             invoiceEntry: {
                 account: '',
                 amount: 0
             },
 
+            // Lists:
+            projectExpenses: null,
+            projectWorklogs: null,
             toAccounts: {},
+
+            // Selections:
             selectedToAccount: null,
             selectedWorklogs: {},
-            displaySelectWorklogs: false,
+            selectedExpenses: {},
 
+            // Form values:
             amount: null,
             price: null,
             product: null,
             description: null,
 
-            billedFilter: 'not_billed',
-            workerFilter: '',
-            startDateFilter: '',
-            endDateFilter: '',
-            epicFilter: '',
-            versionFilter: ''
+            // UI state:
+            displaySelectionScreen: false,
+            initialized: false,
+            worklogsInitialized: false,
+            expensesInitialized: false
         };
 
-        this.handleOpenSelectWorklogs = this.handleOpenSelectWorklogs.bind(this);
+        this.handleOpenSelectJiraEntries = this.handleOpenSelectJiraEntries.bind(this);
         this.onAccountChange = this.onAccountChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -54,14 +59,26 @@ export class InvoiceEntry extends Component {
     componentDidMount () {
         const { dispatch } = this.props;
 
-        dispatch(rest.actions.getProjectWorklogs({ id: this.props.match.params.projectId }))
-            .then((response) => {
-                this.setState({ projectWorklogs: response });
-            })
-            .catch((reason) => console.log('isCancelled', reason));
-
         dispatch(rest.actions.getInvoiceEntry({ id: this.props.match.params.invoiceEntryId }))
             .then((response) => {
+                if (response.entryType === 'worklog') {
+                    dispatch(rest.actions.getProjectWorklogs({ id: this.props.match.params.projectId }))
+                        .then((response) => {
+                            this.setState({
+                                projectWorklogs: response
+                            });
+                        })
+                        .catch((reason) => console.log('isCancelled', reason));
+                } else if (response.entryType === 'expense') {
+                    dispatch(rest.actions.getProjectExpenses({ id: this.props.match.params.projectId }))
+                        .then((response) => {
+                            this.setState({
+                                projectExpenses: response
+                            });
+                        })
+                        .catch((reason) => console.log('isCancelled', reason));
+                }
+
                 this.setState({ invoiceEntry: response }, () => {
                     this.setDefaultValues();
                 });
@@ -86,12 +103,14 @@ export class InvoiceEntry extends Component {
     setDefaultValues = () => {
         if (this.state.invoice.hasOwnProperty('account') && this.state.invoiceEntry.hasOwnProperty('product')) {
             this.setState({
-                selectedToAccount: this.state.invoiceEntry.account ? this.state.invoiceEntry.account : '',
                 amount: this.state.invoiceEntry.amount ? this.state.invoiceEntry.amount : 0,
+                description: this.state.invoiceEntry.description ? this.state.invoiceEntry.description : '',
                 price: this.state.invoiceEntry.price ? this.state.invoiceEntry.price : this.state.invoice.account.defaultPrice,
                 product: this.state.invoiceEntry.product ? this.state.invoiceEntry.product : '',
-                description: this.state.invoiceEntry.description ? this.state.invoiceEntry.description : '',
-                selectedWorklogs: this.state.invoiceEntry.worklogIds
+                selectedToAccount: this.state.invoiceEntry.account ? this.state.invoiceEntry.account : '',
+                selectedWorklogs: this.state.invoiceEntry.worklogIds,
+                selectedExpenses: this.state.invoiceEntry.expenseIds,
+                initialized: true
             });
         }
     };
@@ -109,31 +128,50 @@ export class InvoiceEntry extends Component {
 
         let account = this.state.selectedToAccount;
         let description = this.state.description;
-        let price = parseFloat(this.state.price);
         let product = this.state.product;
+        let price = parseFloat(this.state.price);
         let amount = this.state.amount;
         let id = this.state.invoiceEntry.id;
-        let worklogIds = Object.keys(this.state.selectedWorklogs).reduce(
-            (carry, worklogKey) => {
-                if (this.state.selectedWorklogs[worklogKey]) {
-                    carry.push(worklogKey);
-                }
-                return carry;
-            }, []);
 
-        let invoiceEntryData = {
+        let entryData = {
             id,
             invoiceId,
             description,
             account,
             product,
-            worklogIds,
             price,
             amount
         };
 
-        dispatch(rest.actions.updateInvoiceEntry({ id: invoiceEntryData.id }, {
-            body: JSON.stringify(invoiceEntryData)
+        switch (this.state.invoiceEntry.entryType) {
+        case 'worklog':
+            let worklogIds = Object.keys(this.state.selectedWorklogs).reduce(
+                (carry, worklogKey) => {
+                    if (this.state.selectedWorklogs[worklogKey]) {
+                        carry.push(worklogKey);
+                    }
+                    return carry;
+                }, []);
+
+            entryData['worklogIds'] = worklogIds;
+
+            break;
+        case 'expense':
+            let expenseIds = Object.keys(this.state.selectedExpenses).reduce(
+                (carry, expenseKey) => {
+                    if (this.state.selectedExpenses[expenseKey]) {
+                        carry.push(expenseKey);
+                    }
+                    return carry;
+                }, []);
+
+            entryData['expenseIds'] = expenseIds;
+
+            break;
+        }
+
+        dispatch(rest.actions.updateInvoiceEntry({ id: entryData.id }, {
+            body: JSON.stringify(entryData)
         }))
             .then((response) => {
                 this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
@@ -156,9 +194,9 @@ export class InvoiceEntry extends Component {
         this.setState(prevState => ({ ...prevState, [fieldName]: fieldVal }));
     }
 
-    handleOpenSelectWorklogs = () => {
+    handleOpenSelectJiraEntries = () => {
         this.setState({
-            displaySelectWorklogs: true
+            displaySelectionScreen: true
         });
     };
 
@@ -176,7 +214,7 @@ export class InvoiceEntry extends Component {
 
         this.setState({
             amount: timeSpent / 60 / 60,
-            displaySelectWorklogs: false
+            displaySelectionScreen: false
         });
     };
 
@@ -189,342 +227,179 @@ export class InvoiceEntry extends Component {
         });
     };
 
-    filterWorklogs = (worklog) => {
-        if (this.state.billedFilter !== '') {
-            if (this.state.billedFilter === 'not_billed' &&
-                worklog.attributes.hasOwnProperty('_Billed_') &&
-                worklog.attributes['_Billed_'].value === 'true') {
-                return false;
-            }
+    handleExpensesToggle = (expense) => {
+        let selectedExpenses = this.state.selectedExpenses;
+        selectedExpenses[expense.id] = !selectedExpenses[expense.id];
 
-            if (this.state.billedFilter === 'billed' && (
-                !worklog.attributes.hasOwnProperty('_Billed_') ||
-                worklog.attributes['_Billed_'].value !== 'true')) {
-                return false;
-            }
-        }
-
-        if (this.state.workerFilter !== '') {
-            if (worklog.worker !== this.state.workerFilter) {
-                return false;
-            }
-        }
-
-        let worklogUpdatedTimestamp = (new Date(worklog.dateUpdated)).getTime();
-
-        if (this.state.startDateFilter !== null && this.state.startDateFilter !== '') {
-            let startFilterTimestamp = this.state.startDateFilter.getTime();
-
-            if (startFilterTimestamp > worklogUpdatedTimestamp) {
-                return false;
-            }
-        }
-
-        if (this.state.endDateFilter !== null && this.state.endDateFilter !== '') {
-            let endDate = this.state.endDateFilter;
-            endDate.setHours(23, 59, 59);
-            let endFilterTimestamp = endDate.getTime();
-
-            if (endFilterTimestamp < worklogUpdatedTimestamp) {
-                return false;
-            }
-        }
-
-        if (this.state.versionFilter !== null && this.state.versionFilter !== '') {
-            if (!worklog.issue.versions.hasOwnProperty(this.state.versionFilter)) {
-                return false;
-            }
-        }
-
-        if (this.state.epicFilter !== null && this.state.epicFilter !== '') {
-            if (worklog.issue.epicKey !== this.state.epicFilter) {
-                return false;
-            }
-        }
-
-        return true;
+        this.setState({
+            selectedExpenses: selectedExpenses
+        });
     };
+
+    handleSelectExpenses = () => {
+        let price = 0;
+
+        for (let expenseKey in this.state.projectExpenses.data) {
+            let expense = this.state.projectExpenses.data[expenseKey];
+
+            if (this.state.selectedExpenses.hasOwnProperty(expense.id) &&
+                this.state.selectedExpenses[expense.id]) {
+                price = price + expense.amount;
+            }
+        }
+
+        this.setState({
+            price: price,
+            amount: 1,
+            displaySelectionScreen: false
+        });
+    };
+
+    spinner = () => (
+        <ContentWrapper>
+            <Spinner/>
+        </ContentWrapper>
+    );
 
     render () {
         const { t } = this.props;
 
-        if (this.state.displaySelectWorklogs) {
-            if (!this.state.projectWorklogs || !this.state.projectWorklogs.data || this.state.projectWorklogs.loading) {
+        // Show spinner if data is not ready.
+        if (!this.state.initialized) {
+            return this.spinner();
+        }
+
+        // Test for whether invoice entry form or worklog/expenses selection
+        // should be displayed.
+        if (this.state.displaySelectionScreen) {
+            if (this.state.invoiceEntry.entryType === 'worklog' && this.state.projectWorklogs !== null) {
                 return (
-                    <ContentWrapper>
-                        <Spinner/>
-                    </ContentWrapper>
+                    <WorklogSelect
+                        handleSelectOnChange={this.handleWorklogToggle.bind(this)}
+                        worklogs={this.state.projectWorklogs.data}
+                        selectedWorklogs={this.state.selectedWorklogs}
+                        invoiceEntryId={this.state.invoiceEntry.id}
+                        handleAccept={this.handleSelectWorklogs.bind(this)}
+                    />
                 );
+            } else if (this.state.invoiceEntry.entryType === 'expense' && this.state.projectExpenses !== null) {
+                return (
+                    <ExpenseSelect
+                        handleSelectOnChange={this.handleExpensesToggle.bind(this)}
+                        expenses={this.state.projectExpenses.data}
+                        selectedExpenses={this.state.selectedExpenses}
+                        invoiceEntryId={this.state.invoiceEntry.id}
+                        handleAccept={this.handleSelectExpenses.bind(this)}
+                    />
+                );
+            } else {
+                return this.spinner();
             }
-
-            const epics = this.state.projectWorklogs.data
-                .reduce((carry, worklog) => {
-                    if (worklog.issue.epicKey && !carry.hasOwnProperty(worklog.issue.epicKey)) {
-                        carry[worklog.issue.epicKey] = worklog.issue.epicName;
-                    }
-
-                    return carry;
-                }, {});
-
-            const versions = this.state.projectWorklogs.data
-                .reduce((carry, worklog) => {
-                    for (let versionKey in worklog.issue.versions) {
-                        if (worklog.issue.versions.hasOwnProperty(versionKey) &&
-                            !carry.hasOwnProperty(versionKey)) {
-                            carry[versionKey] = worklog.issue.versions[versionKey];
-                        }
-                    }
-                    return carry;
-                }, {});
-
-            return (
-                <ContentWrapper>
-                    <Form.Group>
-                        <label htmlFor={'startDateFilter'}>{t('invoice_entry.filter.start_date')}</label>
-                        <DatePicker name={'startDateFilter'} className={'form-control'} selected={this.state.startDateFilter} isClearable onChange={(newDate) => { this.setState({ startDateFilter: newDate }); }} />
-
-                        <label htmlFor={'endDateFilter'}>{t('invoice_entry.filter.end_date')}</label>
-                        <DatePicker name={'endDateFilter'} className={'form-control'} selected={this.state.endDateFilter} isClearable onChange={(newDate) => { this.setState({ endDateFilter: newDate }); }} />
-
-                        <label htmlFor={'billedFilter'}>{t('invoice_entry.filter.billed')}</label>
-                        <select
-                            name={'billedFilter'}
-                            className={'form-control'}
-                            value={this.state.billedFilter}
-                            onChange={this.handleChange}>
-                            <option value={''}>
-                                {t('invoice_entry.filter.billed_option.all')}
-                            </option>
-                            <option value={'not_billed'}>
-                                {t('invoice_entry.filter.billed_option.not_billed')}
-                            </option>
-                            <option value={'billed'}>
-                                {t('invoice_entry.filter.billed_option.billed')}
-                            </option>
-                        </select>
-
-                        <label htmlFor={'workerFilter'}>{t('invoice_entry.filter.worker')}</label>
-                        <select
-                            name={'workerFilter'}
-                            className={'form-control'}
-                            value={this.state.workerFilter}
-                            onChange={this.handleChange}>
-                            <option value={''}>
-                                {t('invoice_entry.filter.worker_option.all')}
-                            </option>
-                            {this.state.projectWorklogs.data
-                                .reduce((carry, worklog) => {
-                                    if (carry.indexOf(worklog.worker) === -1) {
-                                        carry.push(worklog.worker);
-                                    }
-                                    return carry;
-                                }, [])
-                                .map((worker) => (
-                                    <option key={worker} value={worker}>
-                                        {worker}
-                                    </option>
-                                ))
-                            }
-                        </select>
-
-                        <label htmlFor={'epicFilter'}>{t('invoice_entry.filter.epic')}</label>
-                        <select
-                            name={'epicFilter'}
-                            className={'form-control'}
-                            value={this.state.epicFilter}
-                            onChange={this.handleChange}>
-                            <option value={''}>
-                                {t('invoice_entry.filter.epic_option.all')}
-                            </option>
-                            {Object.keys(epics).map((epicKey) => (
-                                <option key={epicKey} value={epicKey}>
-                                    {epics[epicKey]}
-                                </option>
-                            ))}
-                        </select>
-
-                        <label htmlFor={'versionFilter'}>{t('invoice_entry.filter.version')}</label>
-                        <select
-                            name={'versionFilter'}
-                            className={'form-control'}
-                            value={this.state.versionFilter}
-                            onChange={this.handleChange}>
-                            <option value={''}>
-                                {t('invoice_entry.filter.version_option.all')}
-                            </option>
-                            {Object.keys(versions).map((versionKey) => (
-                                <option key={versionKey} value={versionKey}>
-                                    {versions[versionKey]}
-                                </option>
-                            ))}
-                        </select>
-                    </Form.Group>
-
-                    <table className={'table'}>
-                        <thead>
-                            <tr>
-                                <th> </th>
-                                <th>{t('invoice_entry.table.worklog')}</th>
-                                <th>{t('invoice_entry.table.billed')}</th>
-                                <th>{t('invoice_entry.table.epic')}</th>
-                                <th>{t('invoice_entry.table.version')}</th>
-                                <th>{t('invoice_entry.table.user')}</th>
-                                <th>{t('invoice_entry.table.hours_spent')}</th>
-                                <th>{t('invoice_entry.table.updated')}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                /* @TODO: Links to issues and worklogs in Jira */
-                                this.state.projectWorklogs.data.filter(this.filterWorklogs.bind(this)).map((worklog) => (
-                                    <tr key={worklog.tempoWorklogId}
-                                        className={
-                                            (worklog.hasOwnProperty('addedToInvoiceEntryId') &&
-                                             worklog.addedToInvoiceEntryId !== this.state.invoiceEntry.id) ? 'bg-secondary' : ''}
-                                    >
-                                        <td><input
-                                            disabled={worklog.hasOwnProperty('addedToInvoiceEntryId') && worklog.addedToInvoiceEntryId !== this.state.invoiceEntry.id}
-                                            name={'worklog-toggle-' + worklog.tempoWorklogId}
-                                            type="checkbox"
-                                            checked={ this.state.selectedWorklogs.hasOwnProperty(worklog.tempoWorklogId) ? this.state.selectedWorklogs[worklog.tempoWorklogId] : false }
-                                            onChange={ () => { this.handleWorklogToggle(worklog); } }/></td>
-                                        <td>
-                                            <div>{worklog.comment} ({worklog.tempoWorklogId})</div>
-                                            <div><i>{worklog.issue.summary} ({worklog.issue.id})</i></div>
-                                        </td>
-                                        <td>{worklog.attributes.hasOwnProperty('_Billed_') && worklog.attributes['_Billed_'].value === 'true' ? t('invoice_entry.billed_text') : ''}</td>
-                                        <td>{worklog.issue.epicName}</td>
-                                        <td>{Object.keys(worklog.issue.versions).map((versionId) => (
-                                            <span key={versionId} className={'p-1'}>{worklog.issue.versions[versionId]}</span>
-                                        ))}</td>
-                                        <td>{worklog.worker}</td>
-                                        <td>{worklog.timeSpent}</td>
-                                        <td>
-                                            <Moment format="DD-MM-YYYY">{worklog.dateUpdated}</Moment>
-                                        </td>
-                                    </tr>
-                                ))
-                            }
-                        </tbody>
-                    </table>
-                    <ButtonGroup>
-                        <Button onClick={this.handleSelectWorklogs.bind(this)}>{t('invoice_entry.save_choices')}</Button>
-                    </ButtonGroup>
-                </ContentWrapper>
-            );
-        } else if (
-            // @TODO: Cleanup existence checks.
-            this.state.toAccounts !== {} &&
-            this.state.invoice !== {} &&
-            this.state.invoiceEntry &&
-            this.state.invoiceEntry !== {} &&
-            this.state.invoice.account &&
-            this.state.amount !== null &&
-            this.state.price !== null &&
-            this.state.description !== null &&
-            this.state.selectedToAccount !== null &&
-            this.state.product !== null
-        ) {
-            return (
-                <ContentWrapper>
-                    <div><PageTitle>{t('invoice_entry.title')}</PageTitle></div>
-                    {this.state.invoiceEntry.isJiraEntry &&
-                    <div>
-                        <Button onClick={this.handleOpenSelectWorklogs}>{t('invoice_entry.choose_worklogs')}</Button>
-                    </div>
-                    }
-                    <div>
-                        <Form onSubmit={this.handleSubmit}>
-                            <div>
-                                <label htmlFor="selectedToAccount">
-                                    {t('invoice_entry.form.toAccount')}
-                                </label>
-                                <div>
-                                    <Form.Control as="select" name={'selectedToAccount'} onChange={this.handleChange} defaultValue={this.state.account ? this.state.account : this.state.invoiceEntry.account}>
-                                        <option value=""> </option>
-                                        {this.state.hasOwnProperty('toAccounts') && Object.keys(this.state.toAccounts)
-                                            .map((keyName) => (
-                                                this.state.toAccounts.hasOwnProperty(keyName) &&
-                                                <option
-                                                    key={this.state.toAccounts[keyName]}
-                                                    value={this.state.toAccounts[keyName]}>
-                                                    {keyName}: {this.state.toAccounts[keyName]}
-                                                </option>
-                                            ))}
-                                    </Form.Control>
-                                </div>
-                                <label htmlFor="product">
-                                    {t('invoice_entry.form.product')}
-                                </label>
-                                <input
-                                    type="text"
-                                    name={'product'}
-                                    className="form-control"
-                                    id="invoice-entry-product"
-                                    aria-describedby="enterVarenr"
-                                    onChange={this.handleChange}
-                                    defaultValue={ this.state.product }
-                                    placeholder={t('invoice_entry.form.product_placeholder')}>
-                                </input>
-                                <label htmlFor="description">
-                                    {t('invoice_entry.form.description')}
-                                </label>
-                                <input
-                                    type="text"
-                                    name={'description'}
-                                    className="form-control"
-                                    id="invoice-entry-description"
-                                    aria-describedby="enterBeskrivelse"
-                                    onChange={this.handleChange}
-                                    defaultValue={ this.state.description }
-                                    placeholder={t('invoice_entry.form.description_placeholder')}>
-                                </input>
-                                <label htmlFor="amount">
-                                    {t('invoice_entry.form.amount')}
-                                </label>
-                                <input
-                                    type="text"
-                                    name={'amount'}
-                                    className="form-control"
-                                    id="invoice-entry-hours-spent"
-                                    aria-describedby="enterHoursSpent"
-                                    onChange={this.handleChange}
-                                    defaultValue={ this.state.amount }
-                                    readOnly={ this.state.invoiceEntry.isJiraEntry }>
-                                </input>
-                                <label htmlFor="price">
-                                    {t('invoice_entry.form.price')}
-                                </label>
-                                <input
-                                    type="text"
-                                    name={'price'}
-                                    className="form-control"
-                                    id="invoice-entry-unit-price"
-                                    aria-describedby="enterUnitPrice"
-                                    onChange={this.handleChange}
-                                    defaultValue={ this.state.price }>
-                                </input>
-                            </div>
-                            <button
-                                type="submit"
-                                className="btn btn-primary"
-                                id="create-invoice-entry">{t('invoice_entry.form.submit')}
-                            </button>
-                        </Form>
-                        <form onSubmit={this.handleCancel}>
-                            <button
-                                type="submit"
-                                className="btn btn-secondary"
-                                id="cancel">{t('invoice_entry.form.cancel')}
-                            </button>
-                        </form>
-                    </div>
-                </ContentWrapper>
-            );
         } else {
             return (
                 <ContentWrapper>
-                    <Spinner/>
+                    <div><PageTitle>{t('invoice_entry.title')}</PageTitle></div>
+                    {this.state.invoiceEntry.entryType !== 'manual' &&
+                        <div>
+                            <Button onClick={this.handleOpenSelectJiraEntries}>{t('invoice_entry.select_jira_items')}</Button>
+                        </div>
+                    }
+                    {/* @TODO: Move to component */}
+                    <Form onSubmit={this.handleSubmit}>
+                        <div>
+                            <label htmlFor="selectedToAccount">
+                                {t('invoice_entry.form.toAccount')}
+                            </label>
+                            <Form.Control as="select" name={'selectedToAccount'} onChange={this.handleChange} defaultValue={this.state.account ? this.state.account : this.state.invoiceEntry.account}>
+                                <option value=""> </option>
+                                {this.state.hasOwnProperty('toAccounts') && Object.keys(this.state.toAccounts)
+                                    .map((keyName) => (
+                                        this.state.toAccounts.hasOwnProperty(keyName) &&
+                                        <option
+                                            key={this.state.toAccounts[keyName]}
+                                            value={this.state.toAccounts[keyName]}>
+                                            {keyName}: {this.state.toAccounts[keyName]}
+                                        </option>
+                                    ))}
+                            </Form.Control>
+                            <label htmlFor="product">
+                                {t('invoice_entry.form.product')}
+                            </label>
+                            <input
+                                type="text"
+                                name={'product'}
+                                className="form-control"
+                                id="invoice-entry-product"
+                                aria-describedby="enterVarenr"
+                                onChange={this.handleChange}
+                                defaultValue={ this.state.product }
+                                placeholder={t('invoice_entry.form.product_placeholder')}>
+                            </input>
+                            <label htmlFor="description">
+                                {t('invoice_entry.form.description')}
+                            </label>
+                            <input
+                                type="text"
+                                name={'description'}
+                                className="form-control"
+                                id="invoice-entry-description"
+                                aria-describedby="enterBeskrivelse"
+                                onChange={this.handleChange}
+                                defaultValue={ this.state.description }
+                                placeholder={t('invoice_entry.form.description_placeholder')}>
+                            </input>
+                            <label htmlFor="amount">
+                                {t('invoice_entry.form.amount')}
+                            </label>
+                            <input
+                                type="text"
+                                name={'amount'}
+                                className="form-control"
+                                id="invoice-entry-hours-spent"
+                                aria-describedby="enterHoursSpent"
+                                onChange={this.handleChange}
+                                defaultValue={this.state.amount}
+                                readOnly={['worklog', 'expense'].indexOf(this.state.invoiceEntry.entryType) !== -1}>
+                            </input>
+                            <label htmlFor="price">
+                                {t('invoice_entry.form.price')}
+                            </label>
+                            <input
+                                type="text"
+                                name={'price'}
+                                className="form-control"
+                                id="invoice-entry-unit-price"
+                                aria-describedby="enterUnitPrice"
+                                onChange={this.handleChange}
+                                defaultValue={this.state.price}
+                                readOnly={['expense'].indexOf(this.state.invoiceEntry.entryType) !== -1}>
+                            </input>
+                            <label htmlFor="totalPrice">
+                                {t('invoice_entry.form.total_price')}
+                            </label>
+                            <input
+                                type="text"
+                                name={'totalPrice'}
+                                className="form-control"
+                                id="invoice-entry-unit-price"
+                                aria-describedby="enterUnitPrice"
+                                disabled={true}
+                                defaultValue={ this.state.price * this.state.amount }>
+                            </input>
+                        </div>
+                        <button
+                            type="submit"
+                            className="btn btn-primary"
+                            id="create-invoice-entry">{t('invoice_entry.form.submit')}
+                        </button>
+                    </Form>
+                    <form onSubmit={this.handleCancel}>
+                        <button
+                            type="submit"
+                            className="btn btn-secondary"
+                            id="cancel">{t('invoice_entry.form.cancel')}
+                        </button>
+                    </form>
                 </ContentWrapper>
             );
         }
