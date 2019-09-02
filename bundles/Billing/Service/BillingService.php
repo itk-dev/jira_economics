@@ -697,6 +697,7 @@ class BillingService extends JiraService
      * Get project expenses.
      *
      * @param $projectId
+     *
      * @return array
      */
     public function getProjectExpenses($projectId)
@@ -704,13 +705,14 @@ class BillingService extends JiraService
         $allExpenses = $this->getExpenses();
         $issues = array_reduce($this->getProjectIssues($projectId), function ($carry, $issue) {
             $carry[$issue->id] = $issue;
+
             return $carry;
         }, []);
 
         $expenses = [];
         foreach ($allExpenses as $key => $expense) {
-            if ($expense->scope->scopeType == 'ISSUE') {
-                if (in_array($expense->scope->scopeId, array_keys($issues))) {
+            if ('ISSUE' === $expense->scope->scopeType) {
+                if (\in_array($expense->scope->scopeId, array_keys($issues))) {
                     $expense->issue = $issues[$expense->scope->scopeId];
                     $expenses[] = $expense;
                 }
@@ -724,6 +726,7 @@ class BillingService extends JiraService
      * Get project expenses with metadata about version, epic, etc.
      *
      * @param $projectId
+     *
      * @return array
      */
     public function getProjectExpensesWithMetadata($projectId)
@@ -759,8 +762,9 @@ class BillingService extends JiraService
 
             $expense->issue->versions = array_reduce($expense->issue->fields->fixVersions, function ($carry, $version) {
                 $carry->{$version->id} = $version->name;
+
                 return $carry;
-            }, (object)[]);
+            }, (object) []);
 
             $expenseEntity = $this->expenseRepository->findOneBy(['expenseId' => $expense->id]);
 

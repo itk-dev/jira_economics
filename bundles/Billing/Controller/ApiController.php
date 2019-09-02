@@ -264,6 +264,7 @@ class ApiController extends Controller
      * @Route("/project_expenses/{projectId}", name="api_expenses_for_project")
      *
      * @param \Billing\Service\BillingService $billingService
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function getExpensesForProject(BillingService $billingService, $projectId)
