@@ -17,8 +17,6 @@ const WorklogSelect = (props) => {
         versionFilter: ''
     });
 
-    console.log(props);
-
     const { t } = props;
 
     const epics = props.worklogs

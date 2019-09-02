@@ -28,7 +28,7 @@ const ExpenseSelectTable = (props) => {
                                 name={'expense-toggle-' + expense.id}
                                 type="checkbox"
                                 checked={ expense.selected }
-                                onChange={ () => { this.handleSelectOnChange(expense); } }/>
+                                onChange={ () => { props.handleSelectOnChange(expense); } }/>
                             </td>
                             <td>
                                 <div>{expense.summary} ({expense.id})</div>

@@ -139,7 +139,7 @@ const ExpenseSelect = (props) => {
                             className: (expense.hasOwnProperty('addedToInvoiceEntryId') &&
                                 expense.addedToInvoiceEntryId !== props.invoiceEntryId) ? 'bg-secondary' : '',
                             disabled: expense.hasOwnProperty('addedToInvoiceEntryId') && expense.addedToInvoiceEntryId !== props.invoiceEntryId,
-                            checked: props.selectedExpenses.hasOwnProperty(expense.id) ? props.selectedExpenses[expense.id] : false,
+                            selected: props.selectedExpenses.hasOwnProperty(expense.id) ? props.selectedExpenses[expense.id] : false,
                             summary: expense.description,
                             issueId: expense.issue.id,
                             issueSummary: expense.issue.fields.summary,

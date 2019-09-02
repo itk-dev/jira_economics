@@ -109,6 +109,7 @@ export class InvoiceEntry extends Component {
                 product: this.state.invoiceEntry.product ? this.state.invoiceEntry.product : '',
                 selectedToAccount: this.state.invoiceEntry.account ? this.state.invoiceEntry.account : '',
                 selectedWorklogs: this.state.invoiceEntry.worklogIds,
+                selectedExpenses: this.state.invoiceEntry.expenseIds,
                 initialized: true
             });
         }
@@ -127,31 +128,50 @@ export class InvoiceEntry extends Component {
 
         let account = this.state.selectedToAccount;
         let description = this.state.description;
-        let price = parseFloat(this.state.price);
         let product = this.state.product;
+        let price = parseFloat(this.state.price);
         let amount = this.state.amount;
         let id = this.state.invoiceEntry.id;
-        let worklogIds = Object.keys(this.state.selectedWorklogs).reduce(
-            (carry, worklogKey) => {
-                if (this.state.selectedWorklogs[worklogKey]) {
-                    carry.push(worklogKey);
-                }
-                return carry;
-            }, []);
 
-        let invoiceEntryData = {
+        let entryData = {
             id,
             invoiceId,
             description,
             account,
             product,
-            worklogIds,
             price,
             amount
         };
 
-        dispatch(rest.actions.updateInvoiceEntry({ id: invoiceEntryData.id }, {
-            body: JSON.stringify(invoiceEntryData)
+        switch (this.state.invoiceEntry.entryType) {
+        case 'worklog':
+            let worklogIds = Object.keys(this.state.selectedWorklogs).reduce(
+                (carry, worklogKey) => {
+                    if (this.state.selectedWorklogs[worklogKey]) {
+                        carry.push(worklogKey);
+                    }
+                    return carry;
+                }, []);
+
+            entryData['worklogIds'] = worklogIds;
+
+            break;
+        case 'expense':
+            let expenseIds = Object.keys(this.state.selectedExpenses).reduce(
+                (carry, expenseKey) => {
+                    if (this.state.selectedExpenses[expenseKey]) {
+                        carry.push(expenseKey);
+                    }
+                    return carry;
+                }, []);
+
+            entryData['expenseIds'] = expenseIds;
+
+            break;
+        }
+
+        dispatch(rest.actions.updateInvoiceEntry({ id: entryData.id }, {
+            body: JSON.stringify(entryData)
         }))
             .then((response) => {
                 this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
@@ -217,33 +237,36 @@ export class InvoiceEntry extends Component {
     };
 
     handleSelectExpenses = () => {
-        let amount = 0;
+        let price = 0;
 
         for (let expenseKey in this.state.projectExpenses.data) {
             let expense = this.state.projectExpenses.data[expenseKey];
 
             if (this.state.selectedExpenses.hasOwnProperty(expense.id) &&
                 this.state.selectedExpenses[expense.id]) {
-                amount = amount + expense.amount;
+                price = price + expense.amount;
             }
         }
 
         this.setState({
-            amount: amount,
+            price: price,
+            amount: 1,
             displaySelectionScreen: false
         });
     };
+
+    spinner = () => (
+        <ContentWrapper>
+            <Spinner/>
+        </ContentWrapper>
+    );
 
     render () {
         const { t } = this.props;
 
         // Show spinner if data is not ready.
         if (!this.state.initialized) {
-            return (
-                <ContentWrapper>
-                    <Spinner/>
-                </ContentWrapper>
-            );
+            return this.spinner();
         }
 
         // Test for whether invoice entry form or worklog/expenses selection
@@ -270,11 +293,7 @@ export class InvoiceEntry extends Component {
                     />
                 );
             } else {
-                return (
-                    <ContentWrapper>
-                        <Spinner/>
-                    </ContentWrapper>
-                );
+                return this.spinner();
             }
         } else {
             return (
@@ -339,8 +358,8 @@ export class InvoiceEntry extends Component {
                                 id="invoice-entry-hours-spent"
                                 aria-describedby="enterHoursSpent"
                                 onChange={this.handleChange}
-                                defaultValue={ this.state.amount }
-                                readOnly={ ['worklog', 'expense'].indexOf(this.state.invoiceEntry.entryType) !== -1 }>
+                                defaultValue={this.state.amount}
+                                readOnly={['worklog', 'expense'].indexOf(this.state.invoiceEntry.entryType) !== -1}>
                             </input>
                             <label htmlFor="price">
                                 {t('invoice_entry.form.price')}
@@ -352,7 +371,20 @@ export class InvoiceEntry extends Component {
                                 id="invoice-entry-unit-price"
                                 aria-describedby="enterUnitPrice"
                                 onChange={this.handleChange}
-                                defaultValue={ this.state.price }>
+                                defaultValue={this.state.price}
+                                readOnly={['expense'].indexOf(this.state.invoiceEntry.entryType) !== -1}>
+                            </input>
+                            <label htmlFor="totalPrice">
+                                {t('invoice_entry.form.total_price')}
+                            </label>
+                            <input
+                                type="text"
+                                name={'totalPrice'}
+                                className="form-control"
+                                id="invoice-entry-unit-price"
+                                aria-describedby="enterUnitPrice"
+                                disabled={true}
+                                defaultValue={ this.state.price * this.state.amount }>
                             </input>
                         </div>
                         <button

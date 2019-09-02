@@ -51,7 +51,7 @@ const WorklogSelectTable = (props) => {
             </tbody>
         </table>
     );
-}
+};
 
 WorklogSelectTable.propTypes = {
     t: PropTypes.func.isRequired,

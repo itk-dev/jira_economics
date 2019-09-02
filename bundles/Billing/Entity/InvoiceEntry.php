@@ -69,9 +69,15 @@ class InvoiceEntry
      */
     private $entryType;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Billing\Entity\Expense", mappedBy="invoiceEntry", orphanRemoval=true)
+     */
+    private $expenses;
+
     public function __construct()
     {
         $this->worklogs = new ArrayCollection();
+        $this->expenses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -190,6 +196,37 @@ class InvoiceEntry
     public function setEntryType(string $entryType): self
     {
         $this->entryType = $entryType;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Expense[]
+     */
+    public function getExpenses(): Collection
+    {
+        return $this->expenses;
+    }
+
+    public function addExpense(Expense $expense): self
+    {
+        if (!$this->expenses->contains($expense)) {
+            $this->expenses[] = $expense;
+            $expense->setInvoiceEntry($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExpense(Expense $expense): self
+    {
+        if ($this->expenses->contains($expense)) {
+            $this->expenses->removeElement($expense);
+            // set the owning side to null (unless already changed)
+            if ($expense->getInvoiceEntry() === $this) {
+                $expense->setInvoiceEntry(null);
+            }
+        }
 
         return $this;
     }

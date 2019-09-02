@@ -35,6 +35,11 @@ class Worklog
      */
     private $invoiceEntry;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isBilled;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -60,6 +65,18 @@ class Worklog
     public function setInvoiceEntry(?InvoiceEntry $invoiceEntry): self
     {
         $this->invoiceEntry = $invoiceEntry;
+
+        return $this;
+    }
+
+    public function getIsBilled(): ?bool
+    {
+        return $this->isBilled;
+    }
+
+    public function setIsBilled(?bool $isBilled): self
+    {
+        $this->isBilled = $isBilled;
 
         return $this;
     }
