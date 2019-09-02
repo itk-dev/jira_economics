@@ -56,6 +56,7 @@ const resources = {
             'invoice.invoice_id': 'Faktura: <1>{{ invoiceId }}</1>',
             'invoice.invoice_recorded': 'Status: <1>{{ invoiceRecorded }}</1>',
             'invoice.date_created': 'Oprettet',
+            'invoice.click_to_edit_description': 'Klik for at redigere beskrivelsen',
             'spinner.loading': 'Indlæser...',
             'invoice_entry.filter.start_date': 'Startdato',
             'invoice_entry.filter.end_date': 'Slutdato',

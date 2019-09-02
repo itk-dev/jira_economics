@@ -215,7 +215,12 @@ class Invoice extends Component {
                             }
                             {!this.state.editDescription && !this.props.invoice.loading &&
                                 <div onClick={() => { this.setState({ editDescription: true }); }} className={'mb-3'}>
-                                    {nl2br(this.props.invoice.data.description)}
+                                    {!this.props.invoice.data.description &&
+                                        <div className={'text-muted'}>{t('invoice.click_to_edit_description')}</div>
+                                    }
+                                    {this.props.invoice.data.description &&
+                                        nl2br(this.props.invoice.data.description)
+                                    }
                                 </div>
                             }
                             {this.state.editDescription && !this.props.invoice.loading &&
@@ -227,7 +232,7 @@ class Invoice extends Component {
                                             className={'mb-3 border-0'}
                                             as="textarea" rows="5"
                                             defaultValue={this.props.invoice.data.description}
-                                            placeholder="Enter description for invoice here. Leave textarea to save.">
+                                            placeholder={t('invoice.click_to_edit_description')}>
                                         </Form.Control>
                                     </Form.Group>
                                 </Form>
