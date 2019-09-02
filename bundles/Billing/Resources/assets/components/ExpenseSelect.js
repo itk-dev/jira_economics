@@ -78,8 +78,10 @@ const ExpenseSelect = (props) => {
         }
 
         if (filterValues.endDateFilter !== null && filterValues.endDateFilter !== '') {
-            let endDate = filterValues.endDateFilter;
-            endDate.setHours(23, 59, 59);
+            // Add one day since the selected end date from the datepicker is at 00:00.
+            let endDate = new Date(filterValues.endDateFilter);
+            endDate.setDate(endDate.getDate() + 1);
+
             let endFilterTimestamp = endDate.getTime();
 
             if (endFilterTimestamp < worklogUpdatedTimestamp) {

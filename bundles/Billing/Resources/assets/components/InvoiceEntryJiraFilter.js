@@ -10,10 +10,10 @@ const InvoiceEntryJiraFilter = (props) => {
     return (
         <Form.Group>
             <label htmlFor={'startDateFilter'}>{t('invoice_entry.filter.start_date')}</label>
-            <DatePicker name={'startDateFilter'} className={'form-control'} selected={props.filterValues.startDateFilter} isClearable onChange={props.handleStartDateChange} />
+            <DatePicker name={'startDateFilter'} dateFormat={'dd/MM yyyy'} className={'form-control'} selected={props.filterValues.startDateFilter} isClearable onChange={props.handleStartDateChange} />
 
             <label htmlFor={'endDateFilter'}>{t('invoice_entry.filter.end_date')}</label>
-            <DatePicker name={'endDateFilter'} className={'form-control'} selected={props.filterValues.endDateFilter} isClearable onChange={props.handleEndDateChange} />
+            <DatePicker name={'endDateFilter'} dateFormat={'dd/MM yyyy'} className={'form-control'} selected={props.filterValues.endDateFilter} isClearable onChange={props.handleEndDateChange} />
 
             {!props.billedFilterDisable &&
                 <div>
