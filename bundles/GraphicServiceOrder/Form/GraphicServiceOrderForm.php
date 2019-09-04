@@ -10,7 +10,7 @@
 
 namespace GraphicServiceOrder\Form;
 
-use App\Service\JiraService;
+use App\Service\HammerService;
 use GraphicServiceOrder\Entity\GsOrder;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -33,12 +33,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class GraphicServiceOrderForm extends AbstractType
 {
-    private $jiraService;
+    private $hammerService;
     private $container;
 
-    public function __construct(JiraService $jiraService, ContainerInterface $container, array $options = [])
+    public function __construct(HammerService $hammerService, ContainerInterface $container, array $options = [])
     {
-        $this->jiraService = $jiraService;
+        $this->hammerService = $hammerService;
         $this->container = $container;
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);

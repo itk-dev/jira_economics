@@ -10,6 +10,7 @@
 
 namespace GraphicServiceOrder\Service;
 
+use App\Service\HammerService;
 use App\Service\JiraService;
 use App\Service\OwnCloudService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,7 +22,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class OrderService
 {
-    private $jiraService;
+    private $hammerService;
     private $ownCloudService;
     private $gsOrderRepository;
     private $appKernel;
@@ -33,7 +34,7 @@ class OrderService
      * OrderService constructor.
      *
      * @param \Doctrine\ORM\EntityManagerInterface              $entityManager
-     * @param \App\Service\JiraService                          $jiraService
+     * @param \App\Service\HammerService                        $hammerService
      * @param \App\Service\OwnCloudService                      $ownCloudService
      * @param \GraphicServiceOrder\Repository\GsOrderRepository $gsOrderRepository
      * @param \Symfony\Component\HttpKernel\KernelInterface     $appKernel
@@ -42,7 +43,7 @@ class OrderService
      */
     public function __construct(
         EntityManagerInterface $entityManager,
-        JiraService $jiraService,
+        HammerService $hammerService,
         OwnCloudService $ownCloudService,
         GsOrderRepository $gsOrderRepository,
         KernelInterface $appKernel,
@@ -51,7 +52,7 @@ class OrderService
     ) {
         $this->entityManager = $entityManager;
         $this->gsOrderRepository = $gsOrderRepository;
-        $this->jiraService = $jiraService;
+        $this->hammerService = $hammerService;
         $this->ownCloudService = $ownCloudService;
         $this->gsOrderRepository = $gsOrderRepository;
         $this->appKernel = $appKernel;
@@ -160,7 +161,7 @@ class OrderService
                 ],
             ],
         ];
-        $response = $this->jiraService->post('/rest/api/2/issue', $data);
+        $response = $this->hammerService->post('/rest/api/2/issue', $data);
 
         return $response;
     }
