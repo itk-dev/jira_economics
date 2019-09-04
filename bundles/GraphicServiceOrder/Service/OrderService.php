@@ -11,7 +11,6 @@
 namespace GraphicServiceOrder\Service;
 
 use App\Service\HammerService;
-use App\Service\JiraService;
 use App\Service\OwnCloudService;
 use Doctrine\ORM\EntityManagerInterface;
 use GraphicServiceOrder\Entity\GsOrder;
