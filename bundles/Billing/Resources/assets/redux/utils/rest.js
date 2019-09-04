@@ -15,6 +15,10 @@ export default reduxApi({
         reducerName: 'toAccounts',
         url: '/jira/billing/jira_api/to_accounts'
     },
+    getMaterialNumbers: {
+        reducerName: 'materialNumbers',
+        url: '/jira/billing/jira_api/material_numbers'
+    },
     getProject: {
         reducerName: 'project',
         url: '/jira/billing/jira_api/project/:id'

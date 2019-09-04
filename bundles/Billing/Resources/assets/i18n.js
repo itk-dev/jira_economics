@@ -6,6 +6,7 @@ const resources = {
         translation: {
             'common.modal.cancel': 'Annullér',
             'common.modal.confirm': 'Bekræft',
+            'common.modal.create': 'Opret',
             'home_page.invoices': 'Fakturaer',
             'home_page.modal.title': 'Slet faktura?',
             'home_page.modal.body': 'Er du sikker på at du vil slette denne faktura?',
@@ -100,7 +101,14 @@ const resources = {
             'invoice.form.type': 'Type',
             'invoice.form.types.manual': '',
             'invoice.form.types.expense': 'Udgift',
-            'invoice.form.types.worklog': 'Worklog'
+            'invoice.form.types.worklog': 'Worklog',
+            'new_invoice.filter_title': 'Vælg projekt',
+            'new_invoice.filter_title_placeholder': 'Skriv for at filtrére',
+            'new_invoice.create': 'Opret ny faktura',
+            'new_invoice.form.name': 'Fakturaoverskrift',
+            'new_invoice.form.name_placeholder': 'Vælg fakturaoverskrift',
+            'new_invoice.select_customer_account': 'Kundekonto',
+            'new_invoice.select_our_account': 'Modtagerkonto'
         }
     }
 };

@@ -258,6 +258,17 @@ class Invoice extends Component {
                                             {t('invoice.client_default_price')}
                                         </span>{this.props.invoice.data.account.defaultPrice}
                                     </ListGroup.Item>
+                                    <ListGroup.Item>
+                                        <span className="text-muted d-inline-block w-25">
+                                            {t('invoice.client_type')}
+                                        </span>{this.props.invoice.data.account.category.name}
+                                    </ListGroup.Item>
+                                    <ListGroup.Item>
+                                        <span
+                                            className="text-muted d-inline-block w-25">
+                                            {t('invoice.client_account')}
+                                        </span>{this.props.invoice.data.account.customer.key}
+                                    </ListGroup.Item>
                                 </ListGroup>
                             }
                         </div>
@@ -303,7 +314,8 @@ class Invoice extends Component {
                                 <Table responsive hover className="table-borderless bg-light">
                                     <thead>
                                         <tr>
-                                            <th>{t('invoice.form.to_account')}</th>
+                                            <th>{t('invoice.form.account')}</th>
+                                            <th>{t('invoice.form.material_number')}</th>
                                             <th>{t('invoice.form.product')}</th>
                                             <th>{t('invoice.form.description')}</th>
                                             <th>{t('invoice.form.amount')}</th>
@@ -317,6 +329,7 @@ class Invoice extends Component {
                                         {this.state.invoiceEntries.data && this.state.invoiceEntries.data.map((item) =>
                                             <tr key={item.id}>
                                                 <td>{item.account}</td>
+                                                <td>{item.materialNumber}</td>
                                                 <td>{item.product}</td>
                                                 <td>{item.description}</td>
                                                 <td>{item.amount}</td>

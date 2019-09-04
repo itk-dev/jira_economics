@@ -74,6 +74,11 @@ class InvoiceEntry
      */
     private $expenses;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $materialNumber;
+
     public function __construct()
     {
         $this->worklogs = new ArrayCollection();
@@ -227,6 +232,18 @@ class InvoiceEntry
                 $expense->setInvoiceEntry(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getMaterialNumber(): ?string
+    {
+        return $this->materialNumber;
+    }
+
+    public function setMaterialNumber(?string $materialNumber): self
+    {
+        $this->materialNumber = $materialNumber;
 
         return $this;
     }

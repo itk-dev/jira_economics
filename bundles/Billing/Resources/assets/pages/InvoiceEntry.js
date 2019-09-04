@@ -29,6 +29,7 @@ export class InvoiceEntry extends Component {
             projectExpenses: null,
             projectWorklogs: null,
             toAccounts: {},
+            materialNumbers: {},
 
             // Selections:
             selectedToAccount: null,
@@ -40,6 +41,7 @@ export class InvoiceEntry extends Component {
             price: null,
             product: null,
             description: null,
+            materialNumber: null,
 
             // UI state:
             displaySelectionScreen: false,
@@ -98,6 +100,12 @@ export class InvoiceEntry extends Component {
                 this.setState({ toAccounts: response });
             })
             .catch((reason) => console.log('isCanceled', reason));
+
+        dispatch(rest.actions.getMaterialNumbers())
+            .then((response) => {
+                this.setState({ materialNumbers: response });
+            })
+            .catch((reason) => console.log('isCanceled', reason));
     }
 
     setDefaultValues = () => {
@@ -108,6 +116,7 @@ export class InvoiceEntry extends Component {
                 price: this.state.invoiceEntry.price ? this.state.invoiceEntry.price : this.state.invoice.account.defaultPrice,
                 product: this.state.invoiceEntry.product ? this.state.invoiceEntry.product : '',
                 selectedToAccount: this.state.invoiceEntry.account ? this.state.invoiceEntry.account : '',
+                materialNumber: this.state.invoiceEntry.materialNumber ? this.state.invoiceEntry.materialNumber : '',
                 selectedWorklogs: this.state.invoiceEntry.worklogIds,
                 selectedExpenses: this.state.invoiceEntry.expenseIds,
                 initialized: true
@@ -132,6 +141,7 @@ export class InvoiceEntry extends Component {
         let price = parseFloat(this.state.price);
         let amount = this.state.amount;
         let id = this.state.invoiceEntry.id;
+        let materialNumber = this.state.materialNumber;
 
         let entryData = {
             id,
@@ -140,7 +150,8 @@ export class InvoiceEntry extends Component {
             account,
             product,
             price,
-            amount
+            amount,
+            materialNumber
         };
 
         switch (this.state.invoiceEntry.entryType) {
@@ -316,9 +327,24 @@ export class InvoiceEntry extends Component {
                                     .map((keyName) => (
                                         this.state.toAccounts.hasOwnProperty(keyName) &&
                                         <option
-                                            key={this.state.toAccounts[keyName]}
-                                            value={this.state.toAccounts[keyName]}>
-                                            {keyName}: {this.state.toAccounts[keyName]}
+                                            key={keyName + '-' + this.state.toAccounts[keyName].name}
+                                            value={keyName}>
+                                            {keyName}: {this.state.toAccounts[keyName].name}
+                                        </option>
+                                    ))}
+                            </Form.Control>
+                            <label htmlFor="materialNumber">
+                                {t('invoice_entry.form.materialNumber')}
+                            </label>
+                            <Form.Control as="select" name={'materialNumber'} onChange={this.handleChange} defaultValue={this.state.materialNumber ? this.state.materialNumber : this.state.invoiceEntry.materialNumber}>
+                                <option value=""> </option>
+                                {this.state.hasOwnProperty('materialNumbers') && Object.keys(this.state.materialNumbers)
+                                    .map((keyName) => (
+                                        this.state.materialNumbers.hasOwnProperty(keyName) &&
+                                        <option
+                                            key={keyName + '-' + this.state.materialNumbers[keyName]}
+                                            value={this.state.materialNumbers[keyName]}>
+                                            {keyName}: {this.state.materialNumbers[keyName]}
                                         </option>
                                     ))}
                             </Form.Control>
