@@ -48,7 +48,7 @@ class IndexController extends AbstractController
                 continue;
             }
             if ('table' === $child->tagName) {
-                $child->setAttribute('class', 'table table-bordered');
+                $child->setAttribute('class', 'table table-responsive table-bordered');
             }
             $mock->appendChild($mock->importNode($child, true));
         }
