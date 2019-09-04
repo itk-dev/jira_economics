@@ -60,18 +60,29 @@ class InvoiceEntry
     private $amount;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $isJiraEntry;
-
-    /**
      * @ORM\OneToMany(targetEntity="Billing\Entity\Worklog", mappedBy="invoiceEntry", orphanRemoval=true)
      */
     private $worklogs;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $entryType;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Billing\Entity\Expense", mappedBy="invoiceEntry", orphanRemoval=true)
+     */
+    private $expenses;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $materialNumber;
+
     public function __construct()
     {
         $this->worklogs = new ArrayCollection();
+        $this->expenses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -151,18 +162,6 @@ class InvoiceEntry
         return $this;
     }
 
-    public function getIsJiraEntry(): ?bool
-    {
-        return $this->isJiraEntry;
-    }
-
-    public function setIsJiraEntry(?bool $isJiraEntry): self
-    {
-        $this->isJiraEntry = $isJiraEntry;
-
-        return $this;
-    }
-
     /**
      * @return Collection|Worklog[]
      */
@@ -190,6 +189,61 @@ class InvoiceEntry
                 $worklog->setInvoiceEntry(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEntryType(): ?string
+    {
+        return $this->entryType;
+    }
+
+    public function setEntryType(string $entryType): self
+    {
+        $this->entryType = $entryType;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Expense[]
+     */
+    public function getExpenses(): Collection
+    {
+        return $this->expenses;
+    }
+
+    public function addExpense(Expense $expense): self
+    {
+        if (!$this->expenses->contains($expense)) {
+            $this->expenses[] = $expense;
+            $expense->setInvoiceEntry($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExpense(Expense $expense): self
+    {
+        if ($this->expenses->contains($expense)) {
+            $this->expenses->removeElement($expense);
+            // set the owning side to null (unless already changed)
+            if ($expense->getInvoiceEntry() === $this) {
+                $expense->setInvoiceEntry(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getMaterialNumber(): ?string
+    {
+        return $this->materialNumber;
+    }
+
+    public function setMaterialNumber(?string $materialNumber): self
+    {
+        $this->materialNumber = $materialNumber;
 
         return $this;
     }

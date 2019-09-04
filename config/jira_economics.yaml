@@ -1,5 +1,6 @@
 parameters:
-    billing_to_accounts: ~
+    billing_receiver_account: ~
+    billing_material_numbers: ~
     portal:
         menu:
             grafisk_service:

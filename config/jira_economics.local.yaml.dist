@@ -1,4 +1,6 @@
 parameters:
-    billing_to_accounts:
-#        test1: 1234
-#        test2: 5678
+#    billing_receiver_account: 1234
+#    billing_material_numbers:
+#        'Interne': 000000
+#        'Eksterne m/moms': 111111
+#        'Eksterne u/moms': 222222

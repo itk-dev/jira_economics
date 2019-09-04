@@ -11,9 +11,11 @@
 namespace Billing\Controller;
 
 use App\Service\JiraService;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Billing\Service\BillingService;
 
@@ -234,6 +236,8 @@ class ApiController extends Controller
      * @param $invoiceId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
+     *
+     * @throws \Exception
      */
     public function recordInvoice(BillingService $billingService, $invoiceId)
     {
@@ -241,15 +245,76 @@ class ApiController extends Controller
     }
 
     /**
-     * @Route("/to_accounts", name="api_to_accounts", methods={"GET"})
+     * @Route("/export_invoices", name="api_export_invoices", methods={"GET"})
      *
-     * @param $boundToAccounts
+     * @param \Billing\Service\BillingService $billingService
+     *
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     *
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     */
+    public function exportInvoices(Request $request, BillingService $billingService)
+    {
+        $ids = $request->query->get('ids');
+
+        foreach ($ids as $id) {
+            $billingService->markInvoiceAsExported($id);
+        }
+
+        $spreadsheet = $billingService->exportInvoicesToSpreadsheet($ids);
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Csv');
+        $writer->setDelimiter(';');
+        $writer->setEnclosure('');
+        $writer->setLineEnding("\r\n");
+        $writer->setSheetIndex(0);
+        $filename = 'invoices-'.date('d-m-Y').'.csv';
+
+        $contentType = 'text/csv';
+
+        $response = new StreamedResponse(
+            function () use ($writer) {
+                $writer->save('php://output');
+            }
+        );
+        $response->headers->set('Content-Type', $contentType);
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+        $response->headers->set('Cache-Control', 'max-age=0');
+
+        return $response;
+    }
+
+    /**
+     * @Route("/to_accounts", name="api_to_accounts", methods={"GET"})
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function toAccounts($boundToAccounts)
+    public function toAccounts(BillingService $billingService)
     {
-        return new JsonResponse($boundToAccounts);
+        $toAccounts = [];
+        $allAccounts = $billingService->getAllAccounts();
+
+        foreach ($allAccounts as $account) {
+            if ('INTERN' === $account->category->name) {
+                if ('XG' === substr($account->key, 0, 2) || 'XD' === substr($account->key, 0, 2)) {
+                    $toAccounts[$account->key] = $account;
+                }
+            }
+        }
+
+        return new JsonResponse($toAccounts);
+    }
+
+    /**
+     * @Route("/material_numbers", name="api_material_numbers", methods={"GET"})
+     *
+     * @param $boundMaterialNumbers
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function materialNumbers($boundMaterialNumbers)
+    {
+        return new JsonResponse($boundMaterialNumbers);
     }
 
     /**
@@ -258,6 +323,18 @@ class ApiController extends Controller
     public function currentUserAction(JiraService $jiraService)
     {
         return new JsonResponse($jiraService->getCurrentUser());
+    }
+
+    /**
+     * @Route("/project_expenses/{projectId}", name="api_expenses_for_project")
+     *
+     * @param \Billing\Service\BillingService $billingService
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function getExpensesForProject(BillingService $billingService, $projectId)
+    {
+        return new JsonResponse($billingService->getProjectExpensesWithMetadata($projectId));
     }
 
     /**

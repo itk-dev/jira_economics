@@ -60,9 +60,44 @@ class Invoice
     private $created;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="integer")
      */
-    private $accountId;
+    private $customerAccountId;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $recordedDate;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $exportedDate;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $lockedCustomerKey;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $lockedContactName;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $lockedType;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $lockedAccountKey;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $lockedSalesChannel;
 
     public function __construct()
     {
@@ -165,14 +200,98 @@ class Invoice
         return $this;
     }
 
-    public function getAccountId(): ?int
+    public function getCustomerAccountId(): ?int
     {
-        return $this->accountId;
+        return $this->customerAccountId;
     }
 
-    public function setAccountId(?int $accountId): self
+    public function setCustomerAccountId(?int $customerAccountId): self
     {
-        $this->accountId = $accountId;
+        $this->customerAccountId = $customerAccountId;
+
+        return $this;
+    }
+
+    public function getRecordedDate(): ?\DateTimeInterface
+    {
+        return $this->recordedDate;
+    }
+
+    public function setRecordedDate(?\DateTimeInterface $recordedDate): self
+    {
+        $this->recordedDate = $recordedDate;
+
+        return $this;
+    }
+
+    public function getExportedDate(): ?\DateTimeInterface
+    {
+        return $this->exportedDate;
+    }
+
+    public function setExportedDate(?\DateTimeInterface $exportedDate): self
+    {
+        $this->exportedDate = $exportedDate;
+
+        return $this;
+    }
+
+    public function getLockedCustomerKey(): ?string
+    {
+        return $this->lockedCustomerKey;
+    }
+
+    public function setLockedCustomerKey(?string $lockedCustomerKey): self
+    {
+        $this->lockedCustomerKey = $lockedCustomerKey;
+
+        return $this;
+    }
+
+    public function getLockedContactName(): ?string
+    {
+        return $this->lockedContactName;
+    }
+
+    public function setLockedContactName(?string $lockedContactName): self
+    {
+        $this->lockedContactName = $lockedContactName;
+
+        return $this;
+    }
+
+    public function getLockedType(): ?string
+    {
+        return $this->lockedType;
+    }
+
+    public function setLockedType(?string $lockedType): self
+    {
+        $this->lockedType = $lockedType;
+
+        return $this;
+    }
+
+    public function getLockedAccountKey(): ?string
+    {
+        return $this->lockedAccountKey;
+    }
+
+    public function setLockedAccountKey(?string $lockedAccountKey): self
+    {
+        $this->lockedAccountKey = $lockedAccountKey;
+
+        return $this;
+    }
+
+    public function getLockedSalesChannel(): ?string
+    {
+        return $this->lockedSalesChannel;
+    }
+
+    public function setLockedSalesChannel(?string $lockedSalesChannel): self
+    {
+        $this->lockedSalesChannel = $lockedSalesChannel;
 
         return $this;
     }
