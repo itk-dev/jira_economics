@@ -26,7 +26,8 @@ class HomePage extends Component {
             allInvoices: {},
             showModal: false,
             invoiceIdToDelete: null,
-            sortOrder: 'asc'
+            sortOrder: 'asc',
+            selectedItems: {}
         };
     };
 
@@ -69,6 +70,31 @@ class HomePage extends Component {
     toggleSort () {
         this.setState((prevState) => ({
             sortOrder: prevState.sortOrder === 'asc' ? 'desc' : 'asc'
+        }));
+    };
+
+    exportInvoices = () => {
+        const items = Object.keys(this.state.selectedItems).reduce((carry, key) => {
+            if (
+                carry.indexOf(key) === -1 &&
+                this.state.selectedItems.hasOwnProperty(key) &&
+                this.state.selectedItems[key]
+            ) {
+                carry.push(key);
+            }
+
+            return carry;
+        }, []);
+
+        window.open(`/jira/billing/jira_api/export_invoices?` + jQuery.param({ ids: items }), '_blank');
+    };
+
+    toggleItem = (itemId) => {
+        this.setState((prevState) => ({
+            selectedItems: {
+                ...prevState.selectedItems,
+                [itemId]: !prevState.selectedItems[itemId]
+            }
         }));
     };
 
@@ -122,6 +148,22 @@ class HomePage extends Component {
                             </Button>
                         </OverlayTrigger>
                         <OverlayTrigger
+                            key="show_export_invoice"
+                            placement="top"
+                            overlay={
+                                <Tooltip id="tooltip-show_export_invoice">
+                                    {t('home_page.tooltip.show_export_invoice')}
+                                </Tooltip>
+                            }
+                        >
+                            <Button
+                                className="btn-secondary"
+                                href={'/jira/billing/show_export_invoice/' + item.id}>
+                                <i className="fas fa-list-alt mx-2" />
+                                <span className="sr-only">{t('home_page.sr_only.show_export_invoice')}</span>
+                            </Button>
+                        </OverlayTrigger>
+                        <OverlayTrigger
                             key="delete"
                             placement="top"
                             overlay={
@@ -147,8 +189,17 @@ class HomePage extends Component {
                 keyEvent: 'posted',
                 items: invoices
                     .filter((item) => {
-                        return item.recorded === true;
+                        return item.recorded === true && item.exportedDate === null;
                     }),
+                invoiceActions: (
+                    <ButtonGroup
+                        className="btn-group-sm float-right"
+                        aria-label="Invoice functions">
+                        <Button onClick={this.exportInvoices.bind(this)}>
+                            Eksportér fakturaer til CSV
+                        </Button>
+                    </ButtonGroup>
+                ),
                 actions: () => (
                     <ButtonGroup
                         className="btn-group-sm float-right"
@@ -193,6 +244,9 @@ class HomePage extends Component {
                             <Table responsive striped hover borderless>
                                 <thead>
                                     <tr>
+                                        {tab.keyEvent === 'posted' &&
+                                            <th> </th>
+                                        }
                                         <th>{t('home_page.table.invoice')}</th>
                                         <th>{t('home_page.table.project')}</th>
                                         <th>{t('home_page.table.date')}</th>
@@ -203,12 +257,24 @@ class HomePage extends Component {
                                 <tbody>
                                     {tab.items.map((item) => (
                                         <tr key={item.id}>
-                                            <td><a
-                                                href={'/jira/billing/project/' + item.projectId + '/' + item.id}><strong>{item.name}</strong></a>
+                                            {tab.keyEvent === 'posted' &&
+                                                <td>
+                                                    <input
+                                                        name={'item-toggle-' + item.id}
+                                                        type="checkbox"
+                                                        value={ this.state.selectedItems[item.id] }
+                                                        onChange={ () => { this.toggleItem(item.id); } }
+                                                    />
+                                                </td>
+                                            }
+                                            <td>
+                                                <a href={'/jira/billing/project/' + item.projectId + '/' + item.id}>
+                                                    <strong>{item.name}</strong>
+                                                </a>
                                             </td>
                                             <td>{item.projectName}</td>
-                                            <td><Moment
-                                                format="DD-MM-YYYY">{item.created.date}</Moment>
+                                            <td>
+                                                <Moment format="DD-MM-YYYY">{item.created.date}</Moment>
                                             </td>
                                             <td>
                                                 <strong>{item.totalPrice}</strong>
@@ -220,6 +286,8 @@ class HomePage extends Component {
                                     ))}
                                 </tbody>
                             </Table>
+
+                            {tab.invoiceActions}
                         </Tab>
                     ))}
                 </Tabs>
@@ -244,6 +312,9 @@ class HomePage extends Component {
 HomePage.propTypes = {
     allInvoices: PropTypes.object,
     dispatch: PropTypes.func.isRequired,
+    history: PropTypes.shape({
+        push: PropTypes.func.isRequired
+    }).isRequired,
     t: PropTypes.func.isRequired
 };
 

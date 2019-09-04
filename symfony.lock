@@ -192,6 +192,12 @@
     "jms/metadata": {
         "version": "2.0.0"
     },
+    "markbaker/complex": {
+        "version": "1.4.7"
+    },
+    "markbaker/matrix": {
+        "version": "1.1.4"
+    },
     "microsoft/tolerant-php-parser": {
         "version": "v0.0.17"
     },
@@ -298,6 +304,9 @@
     "phpmd/phpmd": {
         "version": "2.6.0"
     },
+    "phpoffice/phpspreadsheet": {
+        "version": "1.9.0"
+    },
     "pimple/pimple": {
         "version": "v3.2.3"
     },
@@ -315,6 +324,9 @@
     },
     "psr/log": {
         "version": "1.1.0"
+    },
+    "psr/simple-cache": {
+        "version": "1.0.1"
     },
     "ralouphie/getallheaders": {
         "version": "2.0.5"
