@@ -70,11 +70,6 @@ class Invoice
     private $recordedDate;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $exportFilename;
-
-    /**
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $exportedDate;
@@ -225,18 +220,6 @@ class Invoice
     public function setRecordedDate(?\DateTimeInterface $recordedDate): self
     {
         $this->recordedDate = $recordedDate;
-
-        return $this;
-    }
-
-    public function getExportFilename(): ?string
-    {
-        return $this->exportFilename;
-    }
-
-    public function setExportFilename(?string $exportFilename): self
-    {
-        $this->exportFilename = $exportFilename;
 
         return $this;
     }
