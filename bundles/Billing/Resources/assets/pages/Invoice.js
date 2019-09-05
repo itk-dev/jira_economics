@@ -31,12 +31,13 @@ class Invoice extends Component {
 
             formDescription: null,
             formPayedByAccount: null,
+            formAccount: null,
 
             invoice: null,
             invoiceEntries: {},
             entryIdToDelete: null,
             toAccounts: {},
-            accounts: {}
+            accounts: null
         };
     };
 
@@ -60,7 +61,8 @@ class Invoice extends Component {
                 this.setState({
                     invoice: response,
                     formDescription: response.description ? response.description : '',
-                    formPayedByAccount: response.payedByAccount ? response.payedByAccount : ''
+                    formPayedByAccount: response.payedByAccount ? response.payedByAccount : '',
+                    formAccount: response.accountId ? response.accountId : ''
                 });
             })
             .catch((reason) => console.log('isCanceled', reason));
@@ -151,7 +153,8 @@ class Invoice extends Component {
         let data = {
             id: this.state.invoice.id,
             description: this.state.formDescription,
-            payedByAccount: this.state.formPayedByAccount
+            payedByAccount: this.state.formPayedByAccount,
+            customerAccountId: this.state.formAccount
         };
 
         const { dispatch } = this.props;
@@ -228,7 +231,7 @@ class Invoice extends Component {
                             {this.props.invoice.loading &&
                                 <Spinner/>
                             }
-                            {this.state.formPayedByAccount !== null && this.state.description !== null &&
+                            {this.state.formPayedByAccount !== null &&
                                 <Form onSubmit={this.handleSubmit.bind(this)}>
                                     <Form.Group>
                                         <Form.Label htmlFor={'formDescription'}>
@@ -245,6 +248,30 @@ class Invoice extends Component {
                                         </Form.Control>
                                         <small className="form-text text-muted mb-3">
                                             {t('invoice.form.helptext.description')}
+                                        </small>
+
+                                        <Form.Label htmlFor={'formAccount'}>
+                                            {t('invoice.form.label.customer_account')}
+                                        </Form.Label>
+                                        <Form.Control
+                                            as="select"
+                                            name={'formAccount'}
+                                            onChange={this.handleChange.bind(this)}
+                                            value={this.state.formAccount}
+                                        >
+                                            <option value=""> </option>
+                                            {this.state.accounts && Object.keys(this.state.accounts)
+                                                .map((keyName) => (
+                                                    this.state.accounts.hasOwnProperty(keyName) &&
+                                                    <option
+                                                        key={keyName + '-' + this.state.accounts[keyName].name}
+                                                        value={keyName}>
+                                                        {keyName}: {this.state.accounts[keyName].name}
+                                                    </option>
+                                                ))}
+                                        </Form.Control>
+                                        <small className="form-text text-muted mb-3">
+                                            {t('invoice.form.helptext.customer_account')}
                                         </small>
 
                                         <Form.Label htmlFor={'formPayedByAccount'}>
@@ -329,6 +356,22 @@ class Invoice extends Component {
                                             {t('invoice.client_account')}
                                         </span>{this.props.invoice.data.account.customer.key}
                                     </ListGroup.Item>
+                                    {this.props.invoice.data.account.category.name === 'INTERN' &&
+                                        <ListGroup.Item>
+                                            <span
+                                                className="text-muted d-inline-block w-25">
+                                                {t('invoice.client_psp')}
+                                            </span>{this.props.invoice.data.account.key}
+                                        </ListGroup.Item>
+                                    }
+                                    {this.props.invoice.data.account.category.name === 'EKSTERN' &&
+                                        <ListGroup.Item>
+                                            <span
+                                                className="text-muted d-inline-block w-25">
+                                                {t('invoice.client_ean')}
+                                            </span>{this.props.invoice.data.account.key}
+                                        </ListGroup.Item>
+                                    }
                                 </ListGroup>
                             }
                         </div>
