@@ -277,6 +277,11 @@ class Invoice extends Component {
                                                 id="record-invoice" onClick={() => { this.setState({ showRecordModal: true }); }}>
                                                 {t('invoice.record_invoice')}
                                             </Button>
+                                            <Button
+                                                variant={'secondary'}
+                                                href={'/jira/billing/show_export_invoice/' + this.state.invoice.id}>
+                                                {t('invoice.show_export_invoice')}
+                                            </Button>
                                             <Button variant="danger" type="submit"
                                                 id="delete" onClick={() => { this.setState({ showDeleteModal: true }); }}>
                                                 {t('invoice.delete_invoice')}
