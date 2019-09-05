@@ -136,21 +136,31 @@ class BillingService extends JiraService
             throw new HttpException(404, 'Invoice with id '.$invoiceId.' not found');
         }
 
-        return $this->getInvoiceArray($invoice);
+        return $this->getInvoiceArray($invoice, true);
     }
 
     /**
      * Get invoice as array.
      *
      * @param \Billing\Entity\Invoice $invoice
+     * @param bool                    $withAccount
      *
      * @return array
      */
-    private function getInvoiceArray(Invoice $invoice)
+    private function getInvoiceArray(Invoice $invoice, bool $withAccount = false)
     {
+        $account = null;
+        $totalPrice = null;
+
         // Get account information.
-        $account = $this->getAccount($invoice->getCustomerAccountId());
-        $account->defaultPrice = $this->getAccountDefaultPrice($invoice->getCustomerAccountId());
+        if ($withAccount) {
+            try {
+                $account = $this->getAccount($invoice->getCustomerAccountId());
+                $account->defaultPrice = $this->getAccountDefaultPrice($invoice->getCustomerAccountId());
+            } catch (\Exception $exception) {
+                $account = null;
+            }
+        }
 
         $totalPrice = array_reduce($invoice->getInvoiceEntries()->toArray(), function ($carry, InvoiceEntry $entry) {
             return $carry + $entry->getAmount() * $entry->getPrice();
@@ -209,7 +219,7 @@ class BillingService extends JiraService
         $this->entityManager->persist($invoice);
         $this->entityManager->flush();
 
-        return $this->getInvoiceArray($invoice);
+        return $this->getInvoiceArray($invoice, true);
     }
 
     /**
@@ -251,7 +261,7 @@ class BillingService extends JiraService
 
         $this->entityManager->flush();
 
-        return $this->getInvoiceArray($invoice);
+        return $this->getInvoiceArray($invoice, true);
     }
 
     /**
