@@ -143,6 +143,7 @@ class BillingService extends JiraService
      * Get invoice as array.
      *
      * @param \Billing\Entity\Invoice $invoice
+     * @param bool                    $withAccount
      *
      * @return array
      */
@@ -156,8 +157,7 @@ class BillingService extends JiraService
             try {
                 $account = $this->getAccount($invoice->getCustomerAccountId());
                 $account->defaultPrice = $this->getAccountDefaultPrice($invoice->getCustomerAccountId());
-            }
-            catch (\Exception $exception) {
+            } catch (\Exception $exception) {
                 $account = null;
             }
         }
