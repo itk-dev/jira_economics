@@ -189,7 +189,7 @@ class HomePage extends Component {
                 keyEvent: 'posted',
                 items: invoices
                     .filter((item) => {
-                        return item.recorded === true && item.exportedDate === null;
+                        return item.recorded === true
                     }),
                 invoiceActions: (
                     <ButtonGroup
@@ -251,6 +251,9 @@ class HomePage extends Component {
                                         <th>{t('home_page.table.project')}</th>
                                         <th>{t('home_page.table.date')}</th>
                                         <th>{t('home_page.table.amount')}</th>
+                                        {tab.keyEvent === 'posted' &&
+                                            <th>{t('home_page.table.exported_date')}</th>
+                                        }
                                         <th className="text-right">{t('home_page.table.functions')}</th>
                                     </tr>
                                 </thead>
@@ -279,6 +282,13 @@ class HomePage extends Component {
                                             <td>
                                                 <strong>{item.totalPrice}</strong>
                                             </td>
+                                            {tab.keyEvent === 'posted' &&
+                                                <td>
+                                                    {item.exportedDate &&
+                                                        <Moment format="DD-MM-YYYY">{item.exportedDate}</Moment>
+                                                    }
+                                                </td>
+                                            }
                                             <td className="text-right">
                                                 {tab.actions(item)}
                                             </td>
