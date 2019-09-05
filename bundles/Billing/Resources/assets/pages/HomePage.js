@@ -189,7 +189,7 @@ class HomePage extends Component {
                 keyEvent: 'posted',
                 items: invoices
                     .filter((item) => {
-                        return item.recorded === true
+                        return item.recorded === true;
                     }),
                 invoiceActions: (
                     <ButtonGroup
