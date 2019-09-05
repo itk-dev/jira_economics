@@ -13,7 +13,6 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Table from 'react-bootstrap/Table';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Spinner from '../components/Spinner';
-import nl2br from 'react-nl2br';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import ConfirmModal from '../components/ConfirmModal';
@@ -36,12 +35,20 @@ class Invoice extends Component {
             invoice: null,
             invoiceEntries: {},
             entryIdToDelete: null,
-            toAccounts: {}
+            toAccounts: {},
+            accounts: {}
         };
     };
 
     componentDidMount () {
         const { dispatch } = this.props;
+
+        dispatch(rest.actions.getProjectAccounts({ id: `${this.props.match.params.projectId}` }))
+            .then((response) => {
+                this.setState({ accounts: response });
+            })
+            .catch((reason) => console.log('isCanceled', reason));
+
         dispatch(rest.actions.getProject({ id: `${this.props.match.params.projectId}` }))
             .then((response) => {
                 this.setState({ project: response });
