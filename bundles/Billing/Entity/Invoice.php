@@ -99,6 +99,11 @@ class Invoice
      */
     private $lockedSalesChannel;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $payedByAccount;
+
     public function __construct()
     {
         $this->invoiceEntries = new ArrayCollection();
@@ -292,6 +297,18 @@ class Invoice
     public function setLockedSalesChannel(?string $lockedSalesChannel): self
     {
         $this->lockedSalesChannel = $lockedSalesChannel;
+
+        return $this;
+    }
+
+    public function getPayedByAccount(): ?string
+    {
+        return $this->payedByAccount;
+    }
+
+    public function setPayedByAccount(?string $payedByAccount): self
+    {
+        $this->payedByAccount = $payedByAccount;
 
         return $this;
     }

@@ -175,6 +175,7 @@ class BillingService extends JiraService
             'recorded' => $invoice->getRecorded(),
             'accountId' => $invoice->getCustomerAccountId(),
             'description' => $invoice->getDescription(),
+            'payedByAccount' => $invoice->getPayedByAccount(),
             'account' => $account,
             'totalPrice' => $totalPrice,
             'exportedDate' => $invoice->getExportedDate() ? $invoice->getExportedDate()->format('c') : null,
@@ -252,6 +253,10 @@ class BillingService extends JiraService
 
         if (!empty($invoiceData['customerAccountId'])) {
             $invoice->setCustomerAccountId((int) $invoiceData['customerAccountId']);
+        }
+
+        if (!empty($invoiceData['payedByAccount'])) {
+            $invoice->setPayedByAccount($invoiceData['payedByAccount']);
         }
 
         if (isset($invoiceData['recorded'])) {
