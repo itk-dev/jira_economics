@@ -74,7 +74,7 @@ class PlanningService extends JiraService
             $result = $this->get('/rest/agile/1.0/board/'.$boardId.'/sprint', [
                 'startAt' => $startAt,
                 'maxResults' => 50,
-                'state' => 'future,active'
+                'state' => 'future,active',
             ]);
             $sprints = array_merge($sprints, $result->values);
 
@@ -114,7 +114,7 @@ class PlanningService extends JiraService
         while (true) {
             $result = $this->get('/rest/agile/1.0/board/'.$boardId.'/sprint/'.$sprintId.'/issue', [
                 'startAt' => $startAt,
-                'fields' =>  $fields,
+                'fields' => $fields,
             ]);
             $issues = array_merge($issues, $result->issues);
 
