@@ -269,7 +269,7 @@ class Invoice extends Component {
                             }
                         </div>
                         <div className="col-md-6">
-                            {!this.props.invoice.data.recorded &&
+                            {this.state.invoice && !this.state.invoice.recorded &&
                                 <div className="row mb-3">
                                     <div className="col-md-12 text-right">
                                         <ButtonGroup aria-label="Invoice actions">
