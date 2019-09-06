@@ -30,7 +30,7 @@ class Invoice extends Component {
             showDeleteEntryModal: false,
 
             formDescription: null,
-            formPayedByAccount: null,
+            formPaidByAccount: null,
             formAccount: null,
 
             invoice: null,
@@ -61,7 +61,7 @@ class Invoice extends Component {
                 this.setState({
                     invoice: response,
                     formDescription: response.description ? response.description : '',
-                    formPayedByAccount: response.payedByAccount ? response.payedByAccount : '',
+                    formPaidByAccount: response.paidByAccount ? response.paidByAccount : '',
                     formAccount: response.accountId ? response.accountId : ''
                 });
             })
@@ -153,7 +153,7 @@ class Invoice extends Component {
         let data = {
             id: this.state.invoice.id,
             description: this.state.formDescription,
-            payedByAccount: this.state.formPayedByAccount,
+            paidByAccount: this.state.formPaidByAccount,
             customerAccountId: this.state.formAccount
         };
 
@@ -231,7 +231,7 @@ class Invoice extends Component {
                             {this.props.invoice.loading &&
                                 <Spinner/>
                             }
-                            {this.state.formPayedByAccount !== null &&
+                            {this.state.formPaidByAccount !== null &&
                                 <Form onSubmit={this.handleSubmit.bind(this)}>
                                     <Form.Group>
                                         <Form.Label htmlFor={'formDescription'}>
@@ -274,14 +274,14 @@ class Invoice extends Component {
                                             {t('invoice.form.helptext.customer_account')}
                                         </small>
 
-                                        <Form.Label htmlFor={'formPayedByAccount'}>
-                                            {t('invoice.form.label.payed_by_account')}
+                                        <Form.Label htmlFor={'formPaidByAccount'}>
+                                            {t('invoice.form.label.paid_by_account')}
                                         </Form.Label>
                                         <Form.Control
                                             as="select"
-                                            name={'formPayedByAccount'}
+                                            name={'formPaidByAccount'}
                                             onChange={this.handleChange.bind(this)}
-                                            value={this.state.formPayedByAccount}
+                                            value={this.state.formPaidByAccount}
                                         >
                                             <option value=""> </option>
                                             {this.state.toAccounts && Object.keys(this.state.toAccounts)
@@ -295,7 +295,7 @@ class Invoice extends Component {
                                                 ))}
                                         </Form.Control>
                                         <small className="form-text text-muted mb-3">
-                                            {t('invoice.form.helptext.payed_by_account')}
+                                            {t('invoice.form.helptext.paid_by_account')}
                                         </small>
                                     </Form.Group>
                                     <input type="submit" value={t('invoice.submit_form')} className={'btn btn-primary'} />

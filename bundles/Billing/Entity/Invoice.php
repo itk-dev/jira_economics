@@ -102,7 +102,7 @@ class Invoice
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $payedByAccount;
+    private $paidByAccount;
 
     public function __construct()
     {
@@ -301,14 +301,14 @@ class Invoice
         return $this;
     }
 
-    public function getPayedByAccount(): ?string
+    public function getPaidByAccount(): ?string
     {
-        return $this->payedByAccount;
+        return $this->paidByAccount;
     }
 
-    public function setPayedByAccount(?string $payedByAccount): self
+    public function setPaidByAccount(?string $paidByAccount): self
     {
-        $this->payedByAccount = $payedByAccount;
+        $this->paidByAccount = $paidByAccount;
 
         return $this;
     }
