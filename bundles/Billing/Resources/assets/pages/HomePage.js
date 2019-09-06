@@ -123,10 +123,7 @@ class HomePage extends Component {
             {
                 title: t('home_page.tab.not_recorded'),
                 keyEvent: 'drafts',
-                items: invoices
-                    .filter((item) => {
-                        return item.recorded === false;
-                    }),
+                items: invoices.filter(item => !item.recorded),
                 actions: (item) => (
                     <ButtonGroup size="sm"
                         className="float-right"
@@ -187,10 +184,7 @@ class HomePage extends Component {
             {
                 title: t('home_page.tab.recorded'),
                 keyEvent: 'posted',
-                items: invoices
-                    .filter((item) => {
-                        return item.recorded === true;
-                    }),
+                items: invoices.filter(item => item.recorded),
                 invoiceActions: (
                     <ButtonGroup
                         className="btn-group-sm float-right"
