@@ -4,7 +4,7 @@
 
 {% set is_create = app.request.get('create')|default(false) %}
 
-{% block page_title (is_create ? 'resetting.create.title' : 'resetting.reset.submit')|trans %}
+{% block page_title %}{{ is_create ? 'resetting.create.title'|trans : 'resetting.reset.submit'|trans }}{% endblock %}
 
 {% block fos_user_content %}
 {% include '@FOSUser/Resetting/reset_content.html.twig' %}
