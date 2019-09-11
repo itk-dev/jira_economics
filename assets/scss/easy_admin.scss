@@ -1,0 +1,63 @@
+// Base colors
+$color-white: #FFF;
+$color-grey-light: #F5F5F5;
+$color-grey: #4A4A4A;
+$color-black: #000;
+
+/* Login page */
+.form-signin {
+	max-width: 420px;
+	padding: 5px 25px 25px 25px;
+	margin: 20px auto;
+	background: $color-white;
+	box-shadow: 0 0 6px rgba(0,0,0,.15);
+	border: none;
+	border-radius: 0;
+    .checkbox {
+        margin-bottom: 20px;
+    }
+     .panel-heading {
+        font-weight: 400;
+        font-size: 1.6em;
+    }
+    .control-label {
+        font-weight: 200;
+        font-size: 1em;
+    }
+    .checkbox {
+        font-weight: normal;
+    }
+    .form-control {
+        position: relative;
+        height: auto;
+        -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+                box-sizing: border-box;
+        padding: 15px;
+        font-size: 16px;
+        background-color: $color-grey-light;
+        border-color: #EAEAEA;
+        margin-bottom: 10px;
+        border-radius: 3px;
+    }
+    input[disabled].form-control {
+        color: #969696;
+    }
+}
+
+
+@media (max-width: 767px) {
+    #fos-user {
+        // remove unwanted space on mobile
+        #flash-messages, .form-signin {
+            padding-top: 0;
+            margin-top: 0;
+        }
+        // resize image
+        #header-image {
+            img {
+                max-height: 19px;
+            }
+        }
+    }
+}

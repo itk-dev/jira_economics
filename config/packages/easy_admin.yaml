@@ -1,5 +1,9 @@
 easy_admin:
     design:
+        assets:
+            css:
+                - 'build/easy_admin.css'
+
         menu:
             - entity: User
             - label: Jira
