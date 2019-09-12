@@ -159,3 +159,5 @@ parameters:
             #     icon: 'fa-braille'
             #     routeName: 'index'
             #     btnTxt: 'Se sprintrapporter'
+
+    user_created.email: ~

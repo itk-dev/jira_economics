@@ -1,5 +1,9 @@
 easy_admin:
     design:
+        assets:
+            css:
+                - 'build/easy_admin.css'
+
         menu:
             - entity: User
             - label: Jira
@@ -9,10 +13,14 @@ easy_admin:
 
     entities:
         User:
+            controller: App\Controller\UserController
+
             class: App\Entity\User
             label: portal.user
 
             list:
+                actions: ['notifyUserCreated', 'resetPassword']
+
                 fields:
                     - property: email
                       label: portal.user.email
@@ -20,12 +28,13 @@ easy_admin:
                       label: portal.user.roles
                     - property: enabled
                       label: portal.user.enabled
+                      type: boolean
                     - property: portalApps
                       label: portal.user.portalApps
                     - property: lastLogin
                       label: portal.user.lastLogin
 
-            form:
+            new:
                 fields:
                     - property: email
                       label: portal.user.email
@@ -41,5 +50,22 @@ easy_admin:
                       type_options:
                           multiple: true
                           expanded: true
+
+            edit:
+                fields:
+                    - property: email
+                      label: portal.user.email
                     - property: enabled
                       label: portal.user.enabled
+                    - property: roles
+                      label: portal.user.roles
+                      type: App\Form\UserRolesType
+                      type_options:
+                          multiple: true
+                          expanded: true
+                    - property: portalApps
+                      label: portal.user.portalApps
+                      type: App\Form\PortalAppsType
+                      type_options:
+                          multiple: true
+                          expanded: true

@@ -3,6 +3,7 @@ let Encore = require('@symfony/webpack-encore');
 Encore
     .setOutputPath('public/build/')
     .setPublicPath('/build')
+    .addEntry('easy_admin', './assets/js/easy_admin.js')
     .addEntry('app', './assets/js/app.js')
     .addEntry('billing', './bundles/Billing/Resources/assets/index.js')
     .addEntry('expense', './bundles/Expense/Resources/assets/index.js')
