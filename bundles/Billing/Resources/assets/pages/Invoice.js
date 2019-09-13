@@ -13,7 +13,6 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Table from 'react-bootstrap/Table';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Spinner from '../components/Spinner';
-import nl2br from 'react-nl2br';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import ConfirmModal from '../components/ConfirmModal';
@@ -29,16 +28,28 @@ class Invoice extends Component {
             showDeleteModal: false,
             showRecordModal: false,
             showDeleteEntryModal: false,
-            editDescription: false,
+
+            formDescription: null,
+            formPaidByAccount: null,
+            formAccount: null,
 
             invoice: null,
             invoiceEntries: {},
-            entryIdToDelete: null
+            entryIdToDelete: null,
+            toAccounts: {},
+            accounts: null
         };
     };
 
     componentDidMount () {
         const { dispatch } = this.props;
+
+        dispatch(rest.actions.getProjectAccounts({ id: `${this.props.match.params.projectId}` }))
+            .then((response) => {
+                this.setState({ accounts: response });
+            })
+            .catch((reason) => console.log('isCanceled', reason));
+
         dispatch(rest.actions.getProject({ id: `${this.props.match.params.projectId}` }))
             .then((response) => {
                 this.setState({ project: response });
@@ -47,13 +58,24 @@ class Invoice extends Component {
 
         dispatch(rest.actions.getInvoice({ id: `${this.props.match.params.invoiceId}` }))
             .then((response) => {
-                this.setState({ invoice: response });
+                this.setState({
+                    invoice: response,
+                    formDescription: response.description ? response.description : '',
+                    formPaidByAccount: response.paidByAccount ? response.paidByAccount : '',
+                    formAccount: response.accountId ? response.accountId : ''
+                });
             })
             .catch((reason) => console.log('isCanceled', reason));
 
         dispatch(rest.actions.getInvoiceEntries({ id: `${this.props.match.params.invoiceId}` }))
             .then((response) => {
                 this.setState({ invoiceEntries: response });
+            })
+            .catch((reason) => console.log('isCanceled', reason));
+
+        dispatch(rest.actions.getToAccounts())
+            .then((response) => {
+                this.setState({ toAccounts: response });
             })
             .catch((reason) => console.log('isCanceled', reason));
     };
@@ -121,39 +143,35 @@ class Invoice extends Component {
             .catch(reason => console.log(reason));
     };
 
-    handleSaveEditDescription = (event) => {
+    handleSubmit = (event) => {
         event.preventDefault();
 
         if (!this.state.invoice.id) {
             return;
         }
 
+        let data = {
+            id: this.state.invoice.id,
+            description: this.state.formDescription,
+            paidByAccount: this.state.formPaidByAccount,
+            customerAccountId: this.state.formAccount
+        };
+
+        const { dispatch } = this.props;
+        dispatch(rest.actions.updateInvoice({ id: this.state.invoice.id }, {
+            body: JSON.stringify(data)
+        }))
+            .catch((reason) => {
+                console.log(reason);
+            })
+        ;
+    };
+
+    handleChange (event) {
         let fieldName = event.target.name;
         let fieldVal = event.target.value;
-        if (fieldName === 'description' && fieldVal !== this.state.invoice.description) {
-            this.setState({
-                ...this.state,
-                invoice: {
-                    ...this.state.invoice,
-                    description: fieldVal
-                }
-            });
-
-            let data = {
-                id: this.state.invoice.id,
-                description: fieldVal
-            };
-
-            const { dispatch } = this.props;
-            dispatch(rest.actions.updateInvoice({ id: this.state.invoice.id }, {
-                body: JSON.stringify(data)
-            }));
-        }
-
-        this.setState({
-            editDescription: false
-        });
-    };
+        this.setState({ ...this.state, [fieldName]: fieldVal });
+    }
 
     handleInvoiceEntryDelete = (event) => {
         event.preventDefault();
@@ -213,36 +231,105 @@ class Invoice extends Component {
                             {this.props.invoice.loading &&
                                 <Spinner/>
                             }
-                            {!this.state.editDescription && !this.props.invoice.loading &&
-                                <div onClick={() => { this.setState({ editDescription: true }); }} className={'mb-3'}>
-                                    {!this.props.invoice.data.description &&
-                                        <div className={'text-muted'}>{t('invoice.click_to_edit_description')}</div>
-                                    }
-                                    {this.props.invoice.data.description &&
-                                        nl2br(this.props.invoice.data.description)
-                                    }
-                                </div>
-                            }
-                            {this.state.editDescription && !this.props.invoice.loading &&
-                                <Form onBlur={this.handleSaveEditDescription.bind(this)}>
+                            {this.state.formPaidByAccount !== null &&
+                                <Form onSubmit={this.handleSubmit.bind(this)}>
                                     <Form.Group>
+                                        <Form.Label htmlFor={'formDescription'}>
+                                            {t('invoice.form.label.description')}
+                                        </Form.Label>
                                         <Form.Control
-                                            id="invoice-description"
-                                            name={'description'}
-                                            className={'mb-3 border-0'}
-                                            as="textarea" rows="5"
-                                            defaultValue={this.props.invoice.data.description}
+                                            name={'formDescription'}
+                                            maxLength="450"
+                                            as="textarea"
+                                            rows={10}
+                                            onChange={this.handleChange.bind(this)}
+                                            value={this.state.formDescription}
                                             placeholder={t('invoice.click_to_edit_description')}>
                                         </Form.Control>
+                                        <small className="form-text text-muted mb-3">
+                                            {t('invoice.form.helptext.description')}
+                                        </small>
+
+                                        <Form.Label htmlFor={'formAccount'}>
+                                            {t('invoice.form.label.customer_account')}
+                                        </Form.Label>
+                                        <Form.Control
+                                            as="select"
+                                            name={'formAccount'}
+                                            onChange={this.handleChange.bind(this)}
+                                            value={this.state.formAccount}
+                                        >
+                                            <option value=""> </option>
+                                            {this.state.accounts && Object.keys(this.state.accounts)
+                                                .map((keyName) => (
+                                                    this.state.accounts.hasOwnProperty(keyName) &&
+                                                    <option
+                                                        key={keyName + '-' + this.state.accounts[keyName].name}
+                                                        value={keyName}>
+                                                        {keyName}: {this.state.accounts[keyName].name}
+                                                    </option>
+                                                ))}
+                                        </Form.Control>
+                                        <small className="form-text text-muted mb-3">
+                                            {t('invoice.form.helptext.customer_account')}
+                                        </small>
+
+                                        <Form.Label htmlFor={'formPaidByAccount'}>
+                                            {t('invoice.form.label.paid_by_account')}
+                                        </Form.Label>
+                                        <Form.Control
+                                            as="select"
+                                            name={'formPaidByAccount'}
+                                            onChange={this.handleChange.bind(this)}
+                                            value={this.state.formPaidByAccount}
+                                        >
+                                            <option value=""> </option>
+                                            {this.state.toAccounts && Object.keys(this.state.toAccounts)
+                                                .map((keyName) => (
+                                                    this.state.toAccounts.hasOwnProperty(keyName) &&
+                                                    <option
+                                                        key={keyName + '-' + this.state.toAccounts[keyName].name}
+                                                        value={keyName}>
+                                                        {keyName}: {this.state.toAccounts[keyName].name}
+                                                    </option>
+                                                ))}
+                                        </Form.Control>
+                                        <small className="form-text text-muted mb-3">
+                                            {t('invoice.form.helptext.paid_by_account')}
+                                        </small>
                                     </Form.Group>
+                                    <input type="submit" value={t('invoice.submit_form')} className={'btn btn-primary'} />
                                 </Form>
                             }
                         </div>
                         <div className="col-md-6">
-                            <h4>{t('invoice.client_information')}</h4>
+                            {this.state.invoice && !this.state.invoice.recorded &&
+                                <div className="row mb-3">
+                                    <div className="col-md-12 text-right">
+                                        <ButtonGroup aria-label="Invoice actions">
+                                            <Button variant="primary" type="submit"
+                                                id="record-invoice" onClick={() => { this.setState({ showRecordModal: true }); }}>
+                                                {t('invoice.record_invoice')}
+                                            </Button>
+                                            <Button
+                                                variant={'secondary'}
+                                                href={'/jira/billing/show_export_invoice/' + this.state.invoice.id}>
+                                                {t('invoice.show_export_invoice')}
+                                            </Button>
+                                            <Button variant="danger" type="submit"
+                                                id="delete" onClick={() => { this.setState({ showDeleteModal: true }); }}>
+                                                {t('invoice.delete_invoice')}
+                                            </Button>
+                                        </ButtonGroup>
+                                    </div>
+                                </div>
+                            }
                             {
                                 this.props.invoice.data.account &&
                                 <ListGroup>
+                                    <ListGroup.Item>
+                                        <strong>{t('invoice.client_information')}</strong>
+                                    </ListGroup.Item>
                                     <ListGroup.Item>
                                         <span className="text-muted d-inline-block w-25">
                                             {t('invoice.client_name')}
@@ -269,28 +356,26 @@ class Invoice extends Component {
                                             {t('invoice.client_account')}
                                         </span>{this.props.invoice.data.account.customer.key}
                                     </ListGroup.Item>
+                                    {this.props.invoice.data.account.category.name === 'INTERN' &&
+                                        <ListGroup.Item>
+                                            <span
+                                                className="text-muted d-inline-block w-25">
+                                                {t('invoice.client_psp')}
+                                            </span>{this.props.invoice.data.account.key}
+                                        </ListGroup.Item>
+                                    }
+                                    {this.props.invoice.data.account.category.name === 'EKSTERN' &&
+                                        <ListGroup.Item>
+                                            <span
+                                                className="text-muted d-inline-block w-25">
+                                                {t('invoice.client_ean')}
+                                            </span>{this.props.invoice.data.account.key}
+                                        </ListGroup.Item>
+                                    }
                                 </ListGroup>
                             }
                         </div>
                     </div>
-                    {!this.props.invoice.data.recorded &&
-                        <div className="row mb-3">
-                            <div className="col-md-12 text-right">
-                                <ButtonGroup aria-label="Invoice actions">
-                                    <Button variant="primary" type="submit"
-                                        id="record-invoice"
-                                        onClick={() => { this.setState({ showRecordModal: true }); }}>
-                                        {t('invoice.record_invoice')}
-                                    </Button>
-                                    <Button variant="danger" type="submit"
-                                        id="delete" className="mr-3"
-                                        onClick={() => { this.setState({ showDeleteModal: true }); }}>
-                                        {t('invoice.delete_invoice')}
-                                    </Button>
-                                </ButtonGroup>
-                            </div>
-                        </div>
-                    }
                     <div className="row">
                         <div className="col-md-12">
                             <h2>{t('invoice.invoice_entries_list_title')}</h2>
@@ -314,14 +399,14 @@ class Invoice extends Component {
                                 <Table responsive hover className="table-borderless bg-light">
                                     <thead>
                                         <tr>
-                                            <th>{t('invoice.form.account')}</th>
-                                            <th>{t('invoice.form.material_number')}</th>
-                                            <th>{t('invoice.form.product')}</th>
-                                            <th>{t('invoice.form.description')}</th>
-                                            <th>{t('invoice.form.amount')}</th>
-                                            <th>{t('invoice.form.price')}</th>
-                                            <th>{t('invoice.form.total_price')}</th>
-                                            <th>{t('invoice.form.type')}</th>
+                                            <th>{t('invoice.table.account')}</th>
+                                            <th>{t('invoice.table.material_number')}</th>
+                                            <th>{t('invoice.table.product')}</th>
+                                            <th>{t('invoice.table.description')}</th>
+                                            <th>{t('invoice.table.amount')}</th>
+                                            <th>{t('invoice.table.price')}</th>
+                                            <th>{t('invoice.table.total_price')}</th>
+                                            <th>{t('invoice.table.type')}</th>
                                             <th> </th>
                                         </tr>
                                     </thead>

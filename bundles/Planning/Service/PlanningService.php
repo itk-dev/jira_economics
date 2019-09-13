@@ -40,16 +40,19 @@ class PlanningService extends JiraService
     {
         $boards = [];
 
-        $start = 0;
+        $startAt = 0;
         while (true) {
-            $result = $this->get('/rest/agile/1.0/board?maxResults=50&startAt='.$start);
+            $result = $this->get('/rest/agile/1.0/board', [
+                'maxResults' => 50,
+                'startAt' => $startAt,
+            ]);
             $boards = array_merge($boards, $result->values);
 
             if ($result->isLast) {
                 break;
             }
 
-            $start = $start + 50;
+            $startAt = $startAt + 50;
         }
 
         return $boards;
@@ -66,16 +69,20 @@ class PlanningService extends JiraService
     {
         $sprints = [];
 
-        $start = 0;
+        $startAt = 0;
         while (true) {
-            $result = $this->get('/rest/agile/1.0/board/'.$boardId.'/sprint?startAt='.$start.'&maxResults=50&state=future,active');
+            $result = $this->get('/rest/agile/1.0/board/'.$boardId.'/sprint', [
+                'startAt' => $startAt,
+                'maxResults' => 50,
+                'state' => 'future,active',
+            ]);
             $sprints = array_merge($sprints, $result->values);
 
             if ($result->isLast) {
                 break;
             }
 
-            $start = $start + 50;
+            $startAt = $startAt + 50;
         }
 
         return $sprints;
@@ -103,14 +110,17 @@ class PlanningService extends JiraService
             ]
         );
 
-        $start = 0;
+        $startAt = 0;
         while (true) {
-            $result = $this->get('/rest/agile/1.0/board/'.$boardId.'/sprint/'.$sprintId.'/issue?startAt='.$start.'&fields='.$fields);
+            $result = $this->get('/rest/agile/1.0/board/'.$boardId.'/sprint/'.$sprintId.'/issue', [
+                'startAt' => $startAt,
+                'fields' => $fields,
+            ]);
             $issues = array_merge($issues, $result->issues);
 
-            $start = $start + 50;
+            $startAt = $startAt + 50;
 
-            if ($start > $result->total) {
+            if ($startAt > $result->total) {
                 break;
             }
         }
