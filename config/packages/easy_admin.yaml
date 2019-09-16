@@ -33,6 +33,18 @@ easy_admin:
                       label: portal.user.portalApps
                     - property: lastLogin
                       label: portal.user.lastLogin
+                    - property: UserFullName
+                      label: portal.user.UserFullName
+                    - property: UserDepartment
+                      label: portal.user.UserDepartment
+                    - property: UserAddress
+                      label: portal.user.UserAddress
+                    - property: UserPostalCode
+                      label: portal.user.UserPostalCode
+                    - property: UserCity
+                      label: portal.user.UserCity
+                    - property: UserAccount
+                      label: portal.user.UserAccount
 
             new:
                 fields:
@@ -50,6 +62,22 @@ easy_admin:
                       type_options:
                           multiple: true
                           expanded: true
+                    - property: UserFullName
+                      label: portal.user.UserFullName
+                    - property: UserDepartment
+                      label: portal.user.UserDepartment
+                    - property: UserAddress
+                      label: portal.user.UserAddress
+                    - property: UserPostalCode
+                      label: portal.user.UserPostalCode
+                    - property: UserCity
+                      label: portal.user.UserCity
+                    - property: UserAccount
+                      label: portal.user.UserAccount
+                      type: App\Form\PortalAccountType
+                      type_options:
+                        multiple: false
+                        expanded: false
 
             edit:
                 fields:
@@ -69,3 +97,19 @@ easy_admin:
                       type_options:
                           multiple: true
                           expanded: true
+                    - property: UserFullName
+                      label: portal.user.UserFullName
+                    - property: UserDepartment
+                      label: portal.user.UserDepartment
+                    - property: UserAddress
+                      label: portal.user.UserAddress
+                    - property: UserPostalCode
+                      label: portal.user.UserPostalCode
+                    - property: UserCity
+                      label: portal.user.UserCity
+                    - property: UserAccount
+                      label: portal.user.UserAccount
+                      type: App\Form\PortalAccountType
+                      type_options:
+                        multiple: false
+                        expanded: false
