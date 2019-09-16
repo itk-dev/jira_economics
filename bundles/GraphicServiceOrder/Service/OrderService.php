@@ -199,7 +199,7 @@ class OrderService
         // @TODO: Fix path parameters.
         $ownCloudPath = $_ENV['OWNCLOUD_USER_SHARED_DIR'].$order_id.'/_Materiale/';
         $ocFilename = $order_id.'-'.$fileName;
-        $file = file_get_contents('/app/private/files/gs/'.$fileName);
+        $file = file_get_contents($this->appKernel->getProjectDir().'/private/files/gs/'.$fileName);
         $response = $this->ownCloudService->sendFile(
             'owncloud/remote.php/dav/files/'.$ownCloudPath.$ocFilename,
             $file
