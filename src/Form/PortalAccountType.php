@@ -31,19 +31,19 @@ class PortalAccountType extends ChoiceType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-      $options['choice_loader'] = new CallbackChoiceLoader(function () {
-        // Note: We assume that all roles are reachable from ROLE_ADMIN.
-        $accounts = $this->hammerService->getAllAccounts();
+        $options['choice_loader'] = new CallbackChoiceLoader(function () {
+            // Note: We assume that all roles are reachable from ROLE_ADMIN.
+            $accounts = $this->hammerService->getAllAccounts();
 
-        $optionalAccounts = [];
-        foreach ($accounts as $account) {
-          $optionalAccounts[$account->name.' ('.$account->key.')'] = $account->key;
-        }
-        $optionalAccounts = ['-- None --' => null] + $optionalAccounts;
+            $optionalAccounts = [];
+            foreach ($accounts as $account) {
+                $optionalAccounts[$account->name.' ('.$account->key.')'] = $account->key;
+            }
+            $optionalAccounts = ['-- None --' => null] + $optionalAccounts;
 
-        return $optionalAccounts;
-      });
+            return $optionalAccounts;
+        });
 
-      parent::buildForm($builder, $options);
+        parent::buildForm($builder, $options);
     }
 }
