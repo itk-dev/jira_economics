@@ -50,18 +50,18 @@ easy_admin:
                       type_options:
                           multiple: true
                           expanded: true
-                    - property: FullName
-                      label: portal.user.FullName
-                    - property: Department
-                      label: portal.user.Department
-                    - property: Address
-                      label: portal.user.Address
-                    - property: PostalCode
-                      label: portal.user.PostalCode
-                    - property: City
-                      label: portal.user.City
-                    - property: Account
-                      label: portal.user.Account
+                    - property: fullName
+                      label: portal.user.fullName
+                    - property: department
+                      label: portal.user.department
+                    - property: address
+                      label: portal.user.address
+                    - property: postalCode
+                      label: portal.user.postalCode
+                    - property: city
+                      label: portal.user.city
+                    - property: account
+                      label: portal.user.account
                       type: App\Form\PortalAccountType
                       type_options:
                         multiple: false
