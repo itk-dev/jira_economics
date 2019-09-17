@@ -36,32 +36,32 @@ class User extends BaseUser
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $UserFullName;
+    private $fullName;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $UserDepartment;
+    private $department;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $UserAddress;
+    private $address;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $UserPostalCode;
+    private $postalCode;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $UserCity;
+    private $city;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
-    private $UserAccount;
+    private $account;
 
     public function setEmail($email)
     {
@@ -82,74 +82,74 @@ class User extends BaseUser
         return $this;
     }
 
-    public function getUserFullName(): ?string
+    public function getFullName(): ?string
     {
-        return $this->UserFullName;
+        return $this->fullName;
     }
 
-    public function setUserFullName(?string $UserFullName): self
+    public function setFullName(?string $fullName): self
     {
-        $this->UserFullName = $UserFullName;
+        $this->fullName = $fullName;
 
         return $this;
     }
 
-    public function getUserDepartment(): ?string
+    public function getDepartment(): ?string
     {
-        return $this->UserDepartment;
+        return $this->department;
     }
 
-    public function setUserDepartment(?string $UserDepartment): self
+    public function setDepartment(?string $department): self
     {
-        $this->UserDepartment = $UserDepartment;
+        $this->department = $department;
 
         return $this;
     }
 
-    public function getUserAddress(): ?string
+    public function getAddress(): ?string
     {
-        return $this->UserAddress;
+        return $this->address;
     }
 
-    public function setUserAddress(?string $UserAddress): self
+    public function setAddress(?string $address): self
     {
-        $this->UserAddress = $UserAddress;
+        $this->address = $address;
 
         return $this;
     }
 
-    public function getUserPostalCode(): ?int
+    public function getPostalCode(): ?int
     {
-        return $this->UserPostalCode;
+        return $this->postalCode;
     }
 
-    public function setUserPostalCode(?int $UserPostalCode): self
+    public function setPostalCode(?int $postalCode): self
     {
-        $this->UserPostalCode = $UserPostalCode;
+        $this->postalCode = $postalCode;
 
         return $this;
     }
 
-    public function getUserCity(): ?string
+    public function getCity(): ?string
     {
-        return $this->UserCity;
+        return $this->city;
     }
 
-    public function setUserCity(?string $UserCity): self
+    public function setCity(?string $city): self
     {
-        $this->UserCity = $UserCity;
+        $this->city = $city;
 
         return $this;
     }
 
-    public function getUserAccount(): ?string
+    public function getAccount(): ?string
     {
-        return $this->UserAccount;
+        return $this->account;
     }
 
-    public function setUserAccount(?string $UserAccount): self
+    public function setAccount(?string $account): self
     {
-        $this->UserAccount = $UserAccount;
+        $this->account = $account;
 
         return $this;
     }
