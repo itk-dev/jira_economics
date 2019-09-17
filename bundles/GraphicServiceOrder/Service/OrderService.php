@@ -18,6 +18,7 @@ use GraphicServiceOrder\Message\OwnCloudShareMessage;
 use GraphicServiceOrder\Repository\GsOrderRepository;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class OrderService
 {
@@ -28,10 +29,10 @@ class OrderService
     private $entityManager;
     private $messageBus;
     private $ownCloudFilesFolder;
+    private $tokenStorage;
 
     /**
      * OrderService constructor.
-     *
      * @param \Doctrine\ORM\EntityManagerInterface              $entityManager
      * @param \App\Service\HammerService                        $hammerService
      * @param \App\Service\OwnCloudService                      $ownCloudService
@@ -39,6 +40,7 @@ class OrderService
      * @param \Symfony\Component\HttpKernel\KernelInterface     $appKernel
      * @param \Symfony\Component\Messenger\MessageBusInterface  $messageBus
      * @param string                                            $ownCloudFilesFolder
+     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -47,7 +49,8 @@ class OrderService
         GsOrderRepository $gsOrderRepository,
         KernelInterface $appKernel,
         MessageBusInterface $messageBus,
-        string $ownCloudFilesFolder
+        string $ownCloudFilesFolder,
+        TokenStorageInterface $tokenStorage
     ) {
         $this->entityManager = $entityManager;
         $this->gsOrderRepository = $gsOrderRepository;
@@ -57,6 +60,7 @@ class OrderService
         $this->appKernel = $appKernel;
         $this->messageBus = $messageBus;
         $this->ownCloudFilesFolder = $ownCloudFilesFolder;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
