@@ -32,7 +32,6 @@ class PortalAccountType extends ChoiceType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $options['choice_loader'] = new CallbackChoiceLoader(function () {
-            // Note: We assume that all roles are reachable from ROLE_ADMIN.
             $accounts = $this->hammerService->getAllAccounts();
 
             $optionalAccounts = [];
