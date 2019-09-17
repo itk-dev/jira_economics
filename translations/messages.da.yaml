@@ -20,7 +20,13 @@ portal.user.email: E-mailadresse
 portal.user.enabled: Aktiv
 portal.user.lastLogin: Seneste login
 portal.user.portalApps: Apps
-portal.user.roles: Roler
+portal.user.roles: Roller
+portal.user.fullName: Bruger navn
+portal.user.department: Afdeling
+portal.user.address: Adresse
+portal.user.postalCode: Postnummer
+portal.user.city: By
+portal.user.account: Jira konto
 
 ROLE_ADMIN: Administrator
 ROLE_JIRA: Jira

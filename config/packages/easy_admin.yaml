@@ -50,6 +50,22 @@ easy_admin:
                       type_options:
                           multiple: true
                           expanded: true
+                    - property: fullName
+                      label: portal.user.fullName
+                    - property: department
+                      label: portal.user.department
+                    - property: address
+                      label: portal.user.address
+                    - property: postalCode
+                      label: portal.user.postalCode
+                    - property: city
+                      label: portal.user.city
+                    - property: account
+                      label: portal.user.account
+                      type: App\Form\PortalAccountType
+                      type_options:
+                        multiple: false
+                        expanded: false
 
             edit:
                 fields:
@@ -69,3 +85,19 @@ easy_admin:
                       type_options:
                           multiple: true
                           expanded: true
+                    - property: fullName
+                      label: portal.user.fullName
+                    - property: department
+                      label: portal.user.department
+                    - property: address
+                      label: portal.user.address
+                    - property: postalCode
+                      label: portal.user.postalCode
+                    - property: city
+                      label: portal.user.city
+                    - property: account
+                      label: portal.user.account
+                      type: App\Form\PortalAccountType
+                      type_options:
+                        multiple: false
+                        expanded: false
