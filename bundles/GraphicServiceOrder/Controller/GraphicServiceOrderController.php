@@ -36,7 +36,7 @@ class GraphicServiceOrderController extends AbstractController
      */
     public function createOrder(Request $request, OrderService $orderService)
     {
-        $gsOrder = new GsOrder();
+        $gsOrder = $orderService->prepareOrder();
         $form = $this->createForm(GraphicServiceOrderForm::class, $gsOrder);
 
         $form->handleRequest($request);
@@ -46,12 +46,13 @@ class GraphicServiceOrderController extends AbstractController
             $orderService->createOrder($gsOrder, $uploadedFiles);
 
             // Go to form submitted page.
-            return $this->redirectToRoute('graphic_service_order_submitted');
+            return $this->redirectToRoute('graphic_service_order_submitted', [$gsOrder->getId()]);
         }
 
         // The initial form build.
         return $this->render('@GraphicServiceOrderBundle/createOrderForm.html.twig', [
             'form' => $form->createView(),
+            'user_email' => $orderService->getUserEmail(),
         ]);
     }
 
@@ -62,6 +63,10 @@ class GraphicServiceOrderController extends AbstractController
      */
     public function createOrderSubmitted()
     {
-        return $this->render('@GraphicServiceOrderBundle/createOrderSubmitted.html.twig');
+        $order = $this->getDoctrine()->getRepository(GsOrder::class)->find($_REQUEST[0]);
+
+        return $this->render('@GraphicServiceOrderBundle/createOrderSubmitted.html.twig', [
+            'order' => $order,
+        ]);
     }
 }

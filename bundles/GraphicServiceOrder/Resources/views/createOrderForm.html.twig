@@ -12,13 +12,14 @@
     </div>
     <h4 class="mt-4">{{ 'service_order_form.profile.header'|trans }}</h4>
     <div>
-      <div class="mb-2">
-        <span class="label"><strong>{{ 'service_order_form.profile.name'|trans }}:</strong></span>
-        <span class="value">Martin Yde Granath</span>
+      <div class="form-group no-gutters">
+        <label>{{ 'service_order_form.profile.email'|trans }}:</label>
+        <span class="value">{{ user_email }}</span>
       </div>
-      <div class="mb-2">
-        <span class="label"><strong>{{ 'service_order_form.profile.email'|trans }}:</strong></span>
-        <span class="value">my@aarhus.dk</span>
+      <div class="form-group">
+        <label>{{ form_label(form.full_name) }}:</label>
+          {{ form_widget(form.full_name) }}
+          {{ form_help(form.full_name) }}
       </div>
     </div>
     <h4 class="mt-4">{{ 'service_order_form.job_description.header'|trans }}</h4>

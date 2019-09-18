@@ -5,6 +5,9 @@ service_order_form:
     header: Profil
     name: Navn
     email: E-mail
+  full_name:
+    label: Navn
+    help: Angiv dit fulde navn
   job_description:
     header: Opgavebeskrivelse
     title:
@@ -53,4 +56,5 @@ service_order_form:
   receipt:
     title: Bestilling oprettet
     sub_text: Bestillingen er oprettet. Du vil høre nærmere.
+
 

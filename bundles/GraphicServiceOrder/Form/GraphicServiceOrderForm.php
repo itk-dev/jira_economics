@@ -67,8 +67,19 @@ class GraphicServiceOrderForm extends AbstractType
         $helper = $this->container->get('oneup_uploader.templating.uploader_helper');
         $endpoint = $helper->endpoint('gsorder');
         $token = $this->tokenStorage->getToken();
-        $user = null !== $token ? $token->getUser() : NULL;
+        $user = null !== $token ? $token->getUser() : null;
         $builder
+            ->add('full_name', TextType::class, [
+                'label' => 'service_order_form.full_name.label',
+                'constraints' => [
+                    new NotNull(['groups' => 'base']),
+                ],
+                'attr' => ['class' => 'form-control'],
+                'help_attr' => ['class' => 'form-text text-muted'],
+                'help' => 'service_order_form.full_name.help',
+                'required' => false,
+            ])
+
             ->add('job_title', TextType::class, [
                 'label' => 'service_order_form.job_description.title.label',
                 'constraints' => [
@@ -158,7 +169,7 @@ class GraphicServiceOrderForm extends AbstractType
                 'attr' => ['class' => 'form-control'],
                 'required' => false,
             ])
-            ->add('postal_code', TextType::class, [
+            ->add('postal_code', NumberType::class, [
                 'label' => 'service_order_form.job_delivery.postal_code.label',
                 'constraints' => [
                     new NotNull(['groups' => 'base']),

@@ -33,13 +33,14 @@ class OrderService
 
     /**
      * OrderService constructor.
-     * @param \Doctrine\ORM\EntityManagerInterface              $entityManager
-     * @param \App\Service\HammerService                        $hammerService
-     * @param \App\Service\OwnCloudService                      $ownCloudService
-     * @param \GraphicServiceOrder\Repository\GsOrderRepository $gsOrderRepository
-     * @param \Symfony\Component\HttpKernel\KernelInterface     $appKernel
-     * @param \Symfony\Component\Messenger\MessageBusInterface  $messageBus
-     * @param string                                            $ownCloudFilesFolder
+     *
+     * @param \Doctrine\ORM\EntityManagerInterface                                                $entityManager
+     * @param \App\Service\HammerService                                                          $hammerService
+     * @param \App\Service\OwnCloudService                                                        $ownCloudService
+     * @param \GraphicServiceOrder\Repository\GsOrderRepository                                   $gsOrderRepository
+     * @param \Symfony\Component\HttpKernel\KernelInterface                                       $appKernel
+     * @param \Symfony\Component\Messenger\MessageBusInterface                                    $messageBus
+     * @param string                                                                              $ownCloudFilesFolder
      * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
      */
     public function __construct(
@@ -53,7 +54,6 @@ class OrderService
         TokenStorageInterface $tokenStorage
     ) {
         $this->entityManager = $entityManager;
-        $this->gsOrderRepository = $gsOrderRepository;
         $this->hammerService = $hammerService;
         $this->ownCloudService = $ownCloudService;
         $this->gsOrderRepository = $gsOrderRepository;
@@ -61,6 +61,65 @@ class OrderService
         $this->messageBus = $messageBus;
         $this->ownCloudFilesFolder = $ownCloudFilesFolder;
         $this->tokenStorage = $tokenStorage;
+    }
+
+    /**
+     * Preset some values from user entity.
+     *
+     * @return \GraphicServiceOrder\Entity\GsOrder
+     */
+    public function prepareOrder()
+    {
+        $gsOrder = new GsOrder();
+        $token = $this->tokenStorage->getToken();
+        if (null !== $token) {
+            $user = $token->getUser();
+            $gsOrder->setFullName($user->getFullName());
+            $gsOrder->setAddress($user->getAddress());
+            $gsOrder->setDepartment($user->getDepartment());
+            $gsOrder->setPostalcode($user->getPostalCode());
+            $gsOrder->setCity($user->getCity());
+        }
+
+        return $gsOrder;
+    }
+
+    /**
+     * Fetch user mail from active user.
+     *
+     * @return string
+     */
+    public function getUserEmail()
+    {
+        $token = $this->tokenStorage->getToken();
+        if (null !== $token) {
+            $user = $token->getUser();
+
+            return $user->getEmail();
+        }
+
+        return '';
+    }
+
+    /**
+     * Update active user with submitted values.
+     *
+     * @param $gsOrder
+     */
+    private function updateUser($gsOrder)
+    {
+        $token = $this->tokenStorage->getToken();
+        if (null !== $token) {
+            $user = $token->getUser();
+            $user->setFullName($gsOrder->getFullName());
+            $user->setDepartment($gsOrder->getDepartment());
+            $user->setAddress($gsOrder->getAddress());
+            $user->setPostalCode($gsOrder->getPostalcode());
+            $user->setCity($gsOrder->getCity());
+
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        }
     }
 
     /**
@@ -88,6 +147,7 @@ class OrderService
         // Notify messenger of new job.
         $this->messageBus->dispatch(new OwnCloudShareMessage($gsOrder->getId()));
 
+        $this->updateUser($gsOrder);
         // @TODO: Send notification mail.
     }
 
