@@ -30,7 +30,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class GraphicServiceOrderForm extends AbstractType
 {
@@ -38,13 +37,12 @@ class GraphicServiceOrderForm extends AbstractType
     private $container;
     private $tokenStorage;
 
-    public function __construct(HammerService $hammerService, ContainerInterface $container, array $options = [], TokenStorageInterface $tokenStorage)
+    public function __construct(HammerService $hammerService, ContainerInterface $container, array $options = [])
     {
         $this->hammerService = $hammerService;
         $this->container = $container;
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
-        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -66,8 +64,6 @@ class GraphicServiceOrderForm extends AbstractType
         // Add file upload endpoint.
         $helper = $this->container->get('oneup_uploader.templating.uploader_helper');
         $endpoint = $helper->endpoint('gsorder');
-        $token = $this->tokenStorage->getToken();
-        $user = null !== $token ? $token->getUser() : null;
         $builder
             ->add('full_name', TextType::class, [
                 'label' => 'service_order_form.full_name.label',
