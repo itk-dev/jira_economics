@@ -19,7 +19,6 @@ use GraphicServiceOrder\Repository\GsOrderRepository;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use GraphicServiceOrder\Service\FileUploader;
 
 class OrderService
 {
@@ -32,19 +31,19 @@ class OrderService
     private $ownCloudFilesFolder;
     private $tokenStorage;
 
-  /**
-   * OrderService constructor.
-   *
-   * @param \Doctrine\ORM\EntityManagerInterface $entityManager
-   * @param \App\Service\HammerService $hammerService
-   * @param \App\Service\OwnCloudService $ownCloudService
-   * @param \GraphicServiceOrder\Repository\GsOrderRepository $gsOrderRepository
-   * @param \Symfony\Component\HttpKernel\KernelInterface $appKernel
-   * @param \Symfony\Component\Messenger\MessageBusInterface $messageBus
-   * @param string $ownCloudFilesFolder
-   * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-   * @param \GraphicServiceOrder\Service\FileUploader $fileUploader
-   */
+    /**
+     * OrderService constructor.
+     *
+     * @param \Doctrine\ORM\EntityManagerInterface                                                $entityManager
+     * @param \App\Service\HammerService                                                          $hammerService
+     * @param \App\Service\OwnCloudService                                                        $ownCloudService
+     * @param \GraphicServiceOrder\Repository\GsOrderRepository                                   $gsOrderRepository
+     * @param \Symfony\Component\HttpKernel\KernelInterface                                       $appKernel
+     * @param \Symfony\Component\Messenger\MessageBusInterface                                    $messageBus
+     * @param string                                                                              $ownCloudFilesFolder
+     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
+     * @param \GraphicServiceOrder\Service\FileUploader                                           $fileUploader
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
         HammerService $hammerService,
@@ -328,10 +327,10 @@ class OrderService
         $uploadedFiles = [];
         $upload_files = $form['multi_upload']->getData();
         if ($upload_files) {
-          foreach ($upload_files as $file) {
-            $uploadedFileName = $this->fileUploader->upload($file);
-            $uploadedFiles[] = $uploadedFileName;
-          }
+            foreach ($upload_files as $file) {
+                $uploadedFileName = $this->fileUploader->upload($file);
+                $uploadedFiles[] = $uploadedFileName;
+            }
         }
         $gsOrder->setFiles($uploadedFiles);
 

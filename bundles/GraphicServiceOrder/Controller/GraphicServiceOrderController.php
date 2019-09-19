@@ -24,17 +24,16 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class GraphicServiceOrderController extends AbstractController
 {
-
-  /**
-   * Create a service order.
-   *
-   * @Route("/", name="form")
-   *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   * @param \GraphicServiceOrder\Service\OrderService $orderService
-   *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-   */
+    /**
+     * Create a service order.
+     *
+     * @Route("/", name="form")
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \GraphicServiceOrder\Service\OrderService $orderService
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
     public function createOrder(Request $request, OrderService $orderService)
     {
         $gsOrder = $orderService->prepareOrder();

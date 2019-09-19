@@ -20,15 +20,12 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class GraphicServiceOrderForm extends AbstractType
@@ -90,18 +87,18 @@ class GraphicServiceOrderForm extends AbstractType
                 'entry_options' => ['label' => false],
             ])
             ->add('multi_upload', CollectionType::class, [
-              'label' => 'service_order_form.job_description.files.label',
-              'entry_type' => FileType::class,
-              'allow_add' => true,
-              'allow_delete' => true,
-              'mapped' => false,
-              'entry_options' => [
-                'label' => false,
+                'label' => 'service_order_form.job_description.files.label',
+                'entry_type' => FileType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'mapped' => false,
+                'entry_options' => [
+                    'label' => false,
+                    'required' => false,
+                ],
+                'help_attr' => ['class' => 'form-text text-muted'],
+                'help' => 'service_order_form.job_description.files.help',
                 'required' => false,
-              ],
-              'help_attr' => ['class' => 'form-text text-muted'],
-              'help' => 'service_order_form.job_description.files.help',
-              'required' => false,
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'service_order_form.job_description.description.label',
