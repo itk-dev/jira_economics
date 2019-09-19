@@ -16,7 +16,8 @@
 }
 
 #graphic-service-order {
-    .order-lines {
+    .order-lines,
+    .multi-upload-lines {
         ul {
             list-style-type: none;
             padding: 0;
@@ -59,6 +60,29 @@
         }
     }
 
+    .multi-upload-lines {
+        .custom-file {
+            flex: 0 0 75%;
+        }
+
+        li {
+            margin-bottom: 1rem;
+        }
+        .remove-line-file {
+            display: block;
+            margin: 10px;
+            cursor: pointer;
+            flex: 0;
+        }
+        
+        .custom-file-label {
+            overflow: hidden;
+            padding-right: 6em;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    }
+
     .icon-jfi-trash {
         background: url("../images/trash-alt-solid.svg") no-repeat 0;
         background-size: 16px;
@@ -80,36 +104,5 @@
         height: 100%;
         border: 1px solid #ced4da;
         border-radius: .25rem;
-    }
-
-    #fileList {
-        list-style-type: none;
-        padding-left: 0;
-
-        li {
-            display: flex;
-            flex-wrap: nowrap;
-            justify-content: flex-start;
-            padding: 0 0 .5em 0;
-            border-bottom: 1px solid #ced4da;
-            margin: 0 0 .5em 0;
-
-            > div, p {
-                flex: 0 1 auto;
-                margin: 0 1em 0 0;
-                line-height: 35px;
-            }
-
-            i {
-                padding-left: 1em;
-            }
-
-            .remove-line {
-                @extend %remove-line;
-                text-align: right;
-                flex: 1 1 auto;
-                top: 0;
-            }
-        }
     }
 }

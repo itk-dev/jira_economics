@@ -8,4 +8,4 @@ service_order_form:
   delivery:
     postal_code:
       constraint:
-        not_null: Angiv et validt postnummer
+        not_null: Angiv et gyldigt postnummer
