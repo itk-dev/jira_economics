@@ -42,8 +42,7 @@ class GraphicServiceOrderController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $uploadedFiles = $form->get('files_uploaded')->getData();
-            $orderService->createOrder($gsOrder, $uploadedFiles);
+            $orderService->createOrder($gsOrder, $form);
 
             // Go to form submitted page.
             return $this->redirectToRoute('graphic_service_order_submitted', [$gsOrder->getId()]);

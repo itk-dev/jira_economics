@@ -20,15 +20,13 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class GraphicServiceOrderForm extends AbstractType
@@ -54,16 +52,13 @@ class GraphicServiceOrderForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $allowed_file_types = [
-            'application/pdf',
-            'application/zip',
-            'image/jpeg',
-            'image/png',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'pdf' => 'application/pdf',
+            'zip' => 'application/zip',
+            'jpg' => 'image/jpeg',
+            'png' => 'image/png',
+            'doc' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         ];
 
-        // Add file upload endpoint.
-        $helper = $this->container->get('oneup_uploader.templating.uploader_helper');
-        $endpoint = $helper->endpoint('gsorder');
         $builder
             ->add('full_name', TextType::class, [
                 'label' => 'service_order_form.full_name.label',
@@ -92,34 +87,33 @@ class GraphicServiceOrderForm extends AbstractType
                 'allow_delete' => true,
                 'entry_options' => ['label' => false],
             ])
+            ->add('multi_upload', CollectionType::class, [
+                'label' => 'service_order_form.job_description.files.label',
+                'entry_type' => FileType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'mapped' => false,
+                'entry_options' => [
+                    'label' => false,
+                    'required' => false,
+                    'constraints' => [
+                        new File([
+                            'maxSize' => $_ENV['FORM_FILE_GS_UPLOAD_SIZE'],
+                            'mimeTypes' => $allowed_file_types,
+                            'mimeTypesMessage' => 'Please upload a valid file: '.implode(', ', array_keys($allowed_file_types)),
+                        ]),
+                    ],
+                ],
+                'help_attr' => ['class' => 'form-text text-muted'],
+                'help' => 'service_order_form.job_description.files.help',
+                'required' => false,
+            ])
             ->add('description', TextareaType::class, [
                 'label' => 'service_order_form.job_description.description.label',
                 'attr' => ['class' => 'form-control', 'required'],
                 'help_attr' => ['class' => 'form-text text-muted'],
                 'help' => 'service_order_form.job_description.description.help',
                 'required' => false,
-            ])
-      // Using OneupUploaderBundle and ajax for uploading the files, see GsUploadListener and jquery-fileupload-config.js
-            ->add('files', FileType::class, [
-                'label' => 'service_order_form.job_description.files.label',
-                'constraints' => [
-                    new All([
-                        new File([
-                            'maxSize' => getenv('FORM_FILE_GS_UPLOAD_SIZE'),
-                            'mimeTypes' => $allowed_file_types,
-                        ]),
-                    ]),
-                ],
-                'attr' => ['class' => 'form-control', 'data-url' => $endpoint],
-                'help_attr' => ['class' => 'form-text text-muted'],
-                'help' => 'service_order_form.job_description.files.help',
-                'required' => 0,
-                'multiple' => true,
-            ])
-      // Using OneupUploaderBundle and ajax for uploading the files, causes the 'files' field to be empty on submit.
-      // We add the uploaded files to a hidden field, to store them until form submit.
-            ->add('files_uploaded', HiddenType::class, [
-                'mapped' => false,
             ])
             ->add('debitor', NumberType::class, [
                 'label' => 'service_order_form.job_payment.debitor.label',

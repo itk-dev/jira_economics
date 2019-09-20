@@ -42,6 +42,7 @@ class OrderService
      * @param \Symfony\Component\Messenger\MessageBusInterface                                    $messageBus
      * @param string                                                                              $ownCloudFilesFolder
      * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
+     * @param \GraphicServiceOrder\Service\FileUploader                                           $fileUploader
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -51,7 +52,8 @@ class OrderService
         KernelInterface $appKernel,
         MessageBusInterface $messageBus,
         string $ownCloudFilesFolder,
-        TokenStorageInterface $tokenStorage
+        TokenStorageInterface $tokenStorage,
+        FileUploader $fileUploader
     ) {
         $this->entityManager = $entityManager;
         $this->hammerService = $hammerService;
@@ -61,6 +63,7 @@ class OrderService
         $this->messageBus = $messageBus;
         $this->ownCloudFilesFolder = $ownCloudFilesFolder;
         $this->tokenStorage = $tokenStorage;
+        $this->fileUploader = $fileUploader;
     }
 
     /**
@@ -128,7 +131,7 @@ class OrderService
      * @param \GraphicServiceOrder\Entity\GsOrder $gsOrder
      * @param $uploadedFiles
      */
-    public function createOrder(GsOrder $gsOrder, $uploadedFiles)
+    public function createOrder(GsOrder $gsOrder, $form)
     {
         // Create a task on a jira project.
         $taskCreated = $this->createOrderTask($gsOrder);
@@ -138,7 +141,7 @@ class OrderService
         $gsOrder->setIssueKey($taskCreated->key);
 
         // Store file locally.
-        $gsOrder = $this->storeFile($gsOrder, $uploadedFiles);
+        $gsOrder = $this->storeFile($gsOrder, $form);
         $gsOrder->setOrderStatus('new');
 
         $this->entityManager->persist($gsOrder);
@@ -319,12 +322,14 @@ class OrderService
      *
      * @return mixed
      */
-    private function storeFile(GsOrder $gsOrder, $uploadedFiles)
+    private function storeFile(GsOrder $gsOrder, $form)
     {
-        $uploadedFiles = explode(';', $uploadedFiles);
-        foreach ($uploadedFiles as $key => $file) {
-            if (empty($file)) {
-                unset($uploadedFiles[$key]);
+        $uploadedFiles = [];
+        $upload_files = $form['multi_upload']->getData();
+        if ($upload_files) {
+            foreach ($upload_files as $file) {
+                $uploadedFileName = $this->fileUploader->upload($file);
+                $uploadedFiles[] = $uploadedFileName;
             }
         }
         $gsOrder->setFiles($uploadedFiles);
