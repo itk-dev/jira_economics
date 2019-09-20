@@ -24,6 +24,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -51,11 +52,11 @@ class GraphicServiceOrderForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $allowed_file_types = [
-            'application/pdf',
-            'application/zip',
-            'image/jpeg',
-            'image/png',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'pdf' => 'application/pdf',
+            'zip' => 'application/zip',
+            'jpg' => 'image/jpeg',
+            'png' => 'image/png',
+            'doc' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         ];
 
         $builder
@@ -95,6 +96,14 @@ class GraphicServiceOrderForm extends AbstractType
                 'entry_options' => [
                     'label' => false,
                     'required' => false,
+                    'constraints' => [
+                      new File([
+                        'maxSize' => $_ENV['FORM_FILE_GS_UPLOAD_SIZE'],
+                        'mimeTypes' => $allowed_file_types,
+                        'mimeTypesMessage' =>
+                          'Please upload a valid file: ' . implode(', ', array_keys($allowed_file_types)),
+                      ])
+                    ],
                 ],
                 'help_attr' => ['class' => 'form-text text-muted'],
                 'help' => 'service_order_form.job_description.files.help',

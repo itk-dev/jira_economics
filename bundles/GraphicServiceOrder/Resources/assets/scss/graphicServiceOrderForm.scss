@@ -67,6 +67,17 @@
 
         li {
             margin-bottom: 1rem;
+            position: relative;
+
+            > div {
+                justify-content: left;
+                position: relative;
+            }
+
+            .invalid-feedback {
+                position: absolute;
+                top: 40px;
+            }
         }
         .remove-line-file {
             display: block;

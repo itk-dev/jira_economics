@@ -20,7 +20,6 @@ jQuery(document).ready(function () {
     $collectionHolder.data('index', $collectionHolder.find(':input').length);
 
     addTagForm($collectionHolder, $newLinkLi, 1);
-
     // Look for changes in file upload.
     $('.multi-upload-lines').change(function(e){
         var fileLine = $(e.target).attr('id');
@@ -29,6 +28,17 @@ jQuery(document).ready(function () {
 
         addEmptyLine($collectionHolder, $newLinkLi);
     });
+    // Handle invalid form errors.
+    // All files must be uploaded again.
+    if($('.file-lines > li').length > 1) {
+        $('.file-lines > li').each(function(index) {
+            if ($(this).find('.custom-file-label').text() == '') {
+                if($(this).find('.invalid-feedback').length === 0 && index !== 0){
+                    $(this).remove();
+                }
+            }
+        });
+    }
 });
 
 /**
