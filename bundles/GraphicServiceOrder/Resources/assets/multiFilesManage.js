@@ -21,7 +21,7 @@ jQuery(document).ready(function () {
 
     addTagForm($collectionHolder, $newLinkLi, 1);
     // Look for changes in file upload.
-    $('.multi-upload-lines').change(function(e){
+    $('.multi-upload-lines').change(function (e) {
         var fileLine = $(e.target).attr('id');
         var fileName = e.target.files[0].name;
         $('label[for="' + fileLine + '"]').html(fileName);
@@ -30,10 +30,10 @@ jQuery(document).ready(function () {
     });
     // Handle invalid form errors.
     // All files must be uploaded again.
-    if($('.file-lines > li').length > 1) {
-        $('.file-lines > li').each(function(index) {
-            if ($(this).find('.custom-file-label').text() == '') {
-                if($(this).find('.invalid-feedback').length === 0 && index !== 0){
+    if ($('.file-lines > li').length > 1) {
+        $('.file-lines > li').each(function (index) {
+            if ($(this).find('.custom-file-label').text() === '') {
+                if ($(this).find('.invalid-feedback').length === 0 && index !== 0) {
                     $(this).remove();
                 }
             }
@@ -70,7 +70,7 @@ function addTagForm ($collectionHolder, $newLinkLi, initial) {
     $('.content-end').before($newFormLi);
 
     // add a delete link to the new form
-    if(initial === 0) {
+    if (initial === 0) {
         addTagFormDeleteLink($newFormLi, $collectionHolder, $newLinkLi);
     }
 }
@@ -89,7 +89,7 @@ function addTagFormDeleteLink ($lineFormLi, $collectionHolder, $newLinkLi) {
     $removeFormButton.on('click', function (e) {
         // remove the li for the line form
         $lineFormLi.remove();
-        addEmptyLine($collectionHolder, $newLinkLi)
+        addEmptyLine($collectionHolder, $newLinkLi);
     });
 }
 
@@ -99,11 +99,11 @@ function addTagFormDeleteLink ($lineFormLi, $collectionHolder, $newLinkLi) {
  * @param $collectionHolder
  * @param $newLinkLi
  */
-function addEmptyLine($collectionHolder, $newLinkLi) {
+function addEmptyLine ($collectionHolder, $newLinkLi) {
     // Make sure a new empty file field is always available.
     var emptyFieldExists = 1;
-    $('.multi-upload-lines input').each(function() {
-        if($(this).val() == '') {
+    $('.multi-upload-lines input').each(function () {
+        if ($(this).val() === '') {
             emptyFieldExists = 0;
         }
     });

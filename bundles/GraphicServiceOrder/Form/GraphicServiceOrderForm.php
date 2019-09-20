@@ -97,12 +97,11 @@ class GraphicServiceOrderForm extends AbstractType
                     'label' => false,
                     'required' => false,
                     'constraints' => [
-                      new File([
-                        'maxSize' => $_ENV['FORM_FILE_GS_UPLOAD_SIZE'],
-                        'mimeTypes' => $allowed_file_types,
-                        'mimeTypesMessage' =>
-                          'Please upload a valid file: ' . implode(', ', array_keys($allowed_file_types)),
-                      ])
+                        new File([
+                            'maxSize' => $_ENV['FORM_FILE_GS_UPLOAD_SIZE'],
+                            'mimeTypes' => $allowed_file_types,
+                            'mimeTypesMessage' => 'Please upload a valid file: '.implode(', ', array_keys($allowed_file_types)),
+                        ]),
                     ],
                 ],
                 'help_attr' => ['class' => 'form-text text-muted'],
