@@ -32,20 +32,20 @@ class OrderService
     private $ownCloudFilesFolder;
     private $tokenStorage;
 
-  /**
-   * OrderService constructor.
-   *
-   * @param \Doctrine\ORM\EntityManagerInterface $entityManager
-   * @param \App\Service\HammerService $hammerService
-   * @param \App\Service\OwnCloudService $ownCloudService
-   * @param \GraphicServiceOrder\Repository\GsOrderRepository $gsOrderRepository
-   * @param \Symfony\Component\HttpKernel\KernelInterface $appKernel
-   * @param \Symfony\Component\Messenger\MessageBusInterface $messageBus
-   * @param string $ownCloudFilesFolder
-   * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-   * @param \GraphicServiceOrder\Service\FileUploader $fileUploader
-   * @param \App\Service\UserManager $userManager
-   */
+    /**
+     * OrderService constructor.
+     *
+     * @param \Doctrine\ORM\EntityManagerInterface                                                $entityManager
+     * @param \App\Service\HammerService                                                          $hammerService
+     * @param \App\Service\OwnCloudService                                                        $ownCloudService
+     * @param \GraphicServiceOrder\Repository\GsOrderRepository                                   $gsOrderRepository
+     * @param \Symfony\Component\HttpKernel\KernelInterface                                       $appKernel
+     * @param \Symfony\Component\Messenger\MessageBusInterface                                    $messageBus
+     * @param string                                                                              $ownCloudFilesFolder
+     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
+     * @param \GraphicServiceOrder\Service\FileUploader                                           $fileUploader
+     * @param \App\Service\UserManager                                                            $userManager
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
         HammerService $hammerService,
@@ -82,11 +82,11 @@ class OrderService
         if (null !== $token) {
             $user = $token->getUser();
             $gsOrder
-              ->setFullName($user->getFullName())
-              ->setAddress($user->getAddress())
-              ->setDepartment($user->getDepartment())
-              ->setPostalcode($user->getPostalCode())
-              ->setCity($user->getCity());
+                ->setFullName($user->getFullName())
+                ->setAddress($user->getAddress())
+                ->setDepartment($user->getDepartment())
+                ->setPostalcode($user->getPostalCode())
+                ->setCity($user->getCity());
         }
 
         return $gsOrder;
@@ -101,14 +101,14 @@ class OrderService
     {
         $token = $this->tokenStorage->getToken();
         if (null !== $token) {
-            /** @var  \App\Entity\User $user */
+            /** @var \App\Entity\User $user */
             $user = $token->getUser();
             $user
-              ->setFullName($gsOrder->getFullName())
-              ->setDepartment($gsOrder->getDepartment())
-              ->setAddress($gsOrder->getAddress())
-              ->setPostalCode($gsOrder->getPostalcode())
-              ->setCity($gsOrder->getCity());
+                ->setFullName($gsOrder->getFullName())
+                ->setDepartment($gsOrder->getDepartment())
+                ->setAddress($gsOrder->getAddress())
+                ->setPostalCode($gsOrder->getPostalcode())
+                ->setCity($gsOrder->getCity());
 
             $this->userManager->updateUser($user);
         }

@@ -25,19 +25,17 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class GraphicServiceOrderController extends AbstractController
 {
-
-  /**
-   *
-   * Create a service order.
-   *
-   * @Route("/", name="form")
-   *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   * @param \GraphicServiceOrder\Service\OrderService $orderService
-   * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-   *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-   */
+    /**
+     * Create a service order.
+     *
+     * @Route("/", name="form")
+     *
+     * @param \Symfony\Component\HttpFoundation\Request                                           $request
+     * @param \GraphicServiceOrder\Service\OrderService                                           $orderService
+     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
     public function newOrder(Request $request, OrderService $orderService, TokenStorageInterface $tokenStorage)
     {
         $gsOrder = $orderService->prepareOrder();
@@ -55,7 +53,7 @@ class GraphicServiceOrderController extends AbstractController
         // The initial form build.
         return $this->render('@GraphicServiceOrderBundle/createOrderForm.html.twig', [
             'form' => $form->createView(),
-            'user_email' => $tokenStorage->getToken()->getUser()->getEmail()
+            'user_email' => $tokenStorage->getToken()->getUser()->getEmail(),
         ]);
     }
 
