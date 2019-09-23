@@ -88,16 +88,16 @@ pipeline {
                 }
                 steps {
                     // Update git repos.
-                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; git clean -d --force'"
-                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; git checkout ${BRANCH_NAME}'"
-                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; git fetch'"
-                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; git reset origin/${BRANCH_NAME} --hard'"
+                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/portal_itkdev_dk/htdocs; git clean -d --force'"
+                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/portal_itkdev_dk/htdocs; git checkout ${BRANCH_NAME}'"
+                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/portal_itkdev_dk/htdocs; git fetch'"
+                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/portal_itkdev_dk/htdocs; git reset origin/${BRANCH_NAME} --hard'"
 
                     // Run composer.
-                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; composer install --no-dev -o'"
+                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/portal_itkdev_dk/htdocs; composer install --no-dev -o'"
 
                     // Copy encore assets.
-                    sh "ansible srvitkeconomics -m synchronize -a 'src=${WORKSPACE}/public/build/ dest=/data/www/economics_itkdev_dk/htdocs/public/build'"
+                    sh "ansible srvitkeconomics -m synchronize -a 'src=${WORKSPACE}/public/build/ dest=/data/www/portal_itkdev_dk/htdocs/public/build'"
                 }
             }
         }
