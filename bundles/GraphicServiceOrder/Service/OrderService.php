@@ -19,6 +19,7 @@ use GraphicServiceOrder\Repository\GsOrderRepository;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use App\Service\UserManager;
 
 class OrderService
 {
@@ -31,19 +32,20 @@ class OrderService
     private $ownCloudFilesFolder;
     private $tokenStorage;
 
-    /**
-     * OrderService constructor.
-     *
-     * @param \Doctrine\ORM\EntityManagerInterface                                                $entityManager
-     * @param \App\Service\HammerService                                                          $hammerService
-     * @param \App\Service\OwnCloudService                                                        $ownCloudService
-     * @param \GraphicServiceOrder\Repository\GsOrderRepository                                   $gsOrderRepository
-     * @param \Symfony\Component\HttpKernel\KernelInterface                                       $appKernel
-     * @param \Symfony\Component\Messenger\MessageBusInterface                                    $messageBus
-     * @param string                                                                              $ownCloudFilesFolder
-     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-     * @param \GraphicServiceOrder\Service\FileUploader                                           $fileUploader
-     */
+  /**
+   * OrderService constructor.
+   *
+   * @param \Doctrine\ORM\EntityManagerInterface $entityManager
+   * @param \App\Service\HammerService $hammerService
+   * @param \App\Service\OwnCloudService $ownCloudService
+   * @param \GraphicServiceOrder\Repository\GsOrderRepository $gsOrderRepository
+   * @param \Symfony\Component\HttpKernel\KernelInterface $appKernel
+   * @param \Symfony\Component\Messenger\MessageBusInterface $messageBus
+   * @param string $ownCloudFilesFolder
+   * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
+   * @param \GraphicServiceOrder\Service\FileUploader $fileUploader
+   * @param \App\Service\UserManager $userManager
+   */
     public function __construct(
         EntityManagerInterface $entityManager,
         HammerService $hammerService,
@@ -53,7 +55,8 @@ class OrderService
         MessageBusInterface $messageBus,
         string $ownCloudFilesFolder,
         TokenStorageInterface $tokenStorage,
-        FileUploader $fileUploader
+        FileUploader $fileUploader,
+        UserManager $userManager
     ) {
         $this->entityManager = $entityManager;
         $this->hammerService = $hammerService;
@@ -64,6 +67,7 @@ class OrderService
         $this->ownCloudFilesFolder = $ownCloudFilesFolder;
         $this->tokenStorage = $tokenStorage;
         $this->fileUploader = $fileUploader;
+        $this->userManager = $userManager;
     }
 
     /**
@@ -77,31 +81,15 @@ class OrderService
         $token = $this->tokenStorage->getToken();
         if (null !== $token) {
             $user = $token->getUser();
-            $gsOrder->setFullName($user->getFullName());
-            $gsOrder->setAddress($user->getAddress());
-            $gsOrder->setDepartment($user->getDepartment());
-            $gsOrder->setPostalcode($user->getPostalCode());
-            $gsOrder->setCity($user->getCity());
+            $gsOrder
+              ->setFullName($user->getFullName())
+              ->setAddress($user->getAddress())
+              ->setDepartment($user->getDepartment())
+              ->setPostalcode($user->getPostalCode())
+              ->setCity($user->getCity());
         }
 
         return $gsOrder;
-    }
-
-    /**
-     * Fetch user mail from active user.
-     *
-     * @return string
-     */
-    public function getUserEmail()
-    {
-        $token = $this->tokenStorage->getToken();
-        if (null !== $token) {
-            $user = $token->getUser();
-
-            return $user->getEmail();
-        }
-
-        return '';
     }
 
     /**
@@ -113,15 +101,16 @@ class OrderService
     {
         $token = $this->tokenStorage->getToken();
         if (null !== $token) {
+            /** @var  \App\Entity\User $user */
             $user = $token->getUser();
-            $user->setFullName($gsOrder->getFullName());
-            $user->setDepartment($gsOrder->getDepartment());
-            $user->setAddress($gsOrder->getAddress());
-            $user->setPostalCode($gsOrder->getPostalcode());
-            $user->setCity($gsOrder->getCity());
+            $user
+              ->setFullName($gsOrder->getFullName())
+              ->setDepartment($gsOrder->getDepartment())
+              ->setAddress($gsOrder->getAddress())
+              ->setPostalCode($gsOrder->getPostalcode())
+              ->setCity($gsOrder->getCity());
 
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
+            $this->userManager->updateUser($user);
         }
     }
 

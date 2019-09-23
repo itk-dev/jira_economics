@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use GraphicServiceOrder\Form\GraphicServiceOrderForm;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Class GraphicServiceOrderController.
@@ -24,17 +25,20 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class GraphicServiceOrderController extends AbstractController
 {
-    /**
-     * Create a service order.
-     *
-     * @Route("/", name="form")
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \GraphicServiceOrder\Service\OrderService $orderService
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function createOrder(Request $request, OrderService $orderService)
+
+  /**
+   *
+   * Create a service order.
+   *
+   * @Route("/", name="form")
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param \GraphicServiceOrder\Service\OrderService $orderService
+   * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+   */
+    public function newOrder(Request $request, OrderService $orderService, TokenStorageInterface $tokenStorage)
     {
         $gsOrder = $orderService->prepareOrder();
         $form = $this->createForm(GraphicServiceOrderForm::class, $gsOrder);
@@ -45,26 +49,24 @@ class GraphicServiceOrderController extends AbstractController
             $orderService->createOrder($gsOrder, $form);
 
             // Go to form submitted page.
-            return $this->redirectToRoute('graphic_service_order_submitted', [$gsOrder->getId()]);
+            return $this->redirectToRoute('graphic_service_order_submitted', ['id' => $gsOrder->getId()]);
         }
 
         // The initial form build.
         return $this->render('@GraphicServiceOrderBundle/createOrderForm.html.twig', [
             'form' => $form->createView(),
-            'user_email' => $orderService->getUserEmail(),
+            'user_email' => $tokenStorage->getToken()->getUser()->getEmail()
         ]);
     }
 
     /**
      * Receipt page displayed when an order was created.
      *
-     * @Route("/submitted", name="submitted")
+     * @Route("/submitted/{id}", name="submitted")
      */
-    public function createOrderSubmitted()
+    public function showOrderSubmitted(GsOrder $order)
     {
-        $order = $this->getDoctrine()->getRepository(GsOrder::class)->find($_REQUEST[0]);
-
-        return $this->render('@GraphicServiceOrderBundle/createOrderSubmitted.html.twig', [
+        return $this->render('@GraphicServiceOrderBundle/showOrderSubmitted.html.twig', [
             'order' => $order,
         ]);
     }
