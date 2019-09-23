@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'expense.category.new.title'|trans }}{% endblock %}
+
+{% block content %}
+    <h1>{{ 'expense.category.new.title'|trans }}</h1>
+
+    {{ include('@ExpenseBundle/admin/expense/category/_form.html.twig') }}
+
+    <a class="btn btn-link" href="{{ path('expense_admin_category_index') }}">{{ 'expense.category.back_to_list'|trans }}</a>
+{% endblock %}

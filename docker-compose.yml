@@ -13,7 +13,6 @@ services:
 
   phpfpm:
     image: itkdev/php7.2-fpm:latest
-    restart: always
     environment:
       - PHP_XDEBUG=${PHP_XDEBUG:-0}
       - PHP_XDEBUG_REMOTE_AUTOSTART=${PHP_XDEBUG_REMOTE_AUTOSTART:-0}
@@ -44,12 +43,21 @@ services:
     environment:
       - MEMCACHED_CACHE_SIZE=64
 
+  redis:
+    image: redis:latest
+    ports:
+      - '6379'
+
   mailhog:
     image: mailhog/mailhog
-    restart: always
     ports:
       - "1025"
       - "8025"
+
+  yarn:
+    image: itkdev/yarn:latest
+    volumes:
+      - .:/app:delegated
 
   reverse-proxy:
     image: traefik  # The official Traefik docker image

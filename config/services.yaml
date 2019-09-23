@@ -1,10 +1,32 @@
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
 
+imports:
+    - { resource: create_project_config.local.yaml, ignore_errors: true }
+    - { resource: jira_economics.yaml, ignore_errors: true }
+    - { resource: jira_economics.local.yaml, ignore_errors: true }
+
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    locale: 'en'
+    locale: 'da'
+    env(JIRA_OAUTH_CUSTOMER_KEY): null
+    env(JIRA_OAUTH_PEM_PATH): null
+    env(JIRA_URL): null
+    env(JIRA_DEFAULT_BOARD): null
+    env(JIRA_USER): null
+    env(JIRA_TOKEN): null
+
+    site_name: '%env(SITE_NAME)%'
+    site_url: '%env(SITE_URL)%'
+    site_logo_path: '%env(SITE_LOGO_PATH)%'
+    mailer_name: '%env(MAILER_NAME)%'
+    mailer_email: '%env(MAILER_EMAIL)%'
+    user_created_user_subject: ''
+    user_created_user_header: ''
+    user_created_user_body: ''
+    user_created_user_button_text: ''
+    user_created_user_footer: ''
 
 services:
     # default configuration for services in *this* file
@@ -26,3 +48,47 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Service\JiraService:
+        arguments:
+            $jiraUrl: '%env(JIRA_URL)%'
+            $tokenStorage: '@security.token_storage'
+            $customerKey: '%env(JIRA_OAUTH_CUSTOMER_KEY)%'
+            $pemPath: '%env(resolve:JIRA_OAUTH_PEM_PATH)%'
+
+    App\Service\HammerService:
+        arguments:
+            $jiraUrl: '%env(JIRA_URL)%'
+            $apiUser: '%env(JIRA_USER)%'
+            $apiPass: '%env(JIRA_PASS)%'
+
+    App\Service\OwnCloudService:
+        arguments:
+            $host: '%env(OWNCLOUD_HOST)%'
+            $username: '%env(OWNCLOUD_USERNAME)%'
+            $password: '%env(OWNCLOUD_PASSWORD)%'
+
+    App\Form\RegistrationFormType:
+        arguments:
+            $class: App\Entity\User
+
+    App\Form\ProfileFormType:
+        arguments:
+            $class: App\Entity\User
+
+    App\Service\UserManager:
+        arguments:
+            - '@fos_user.util.password_updater'
+            - '@fos_user.util.canonical_fields_updater'
+            - '@fos_user.object_manager'
+            - '@fos_user.util.token_generator'
+            - '@twig'
+            - '@router'
+            - '@fos_user.mailer'
+            - '@mailer'
+            -
+                user_class: '%fos_user.model.user.class%'
+                user_created:
+                    sender:
+                        email: '%mailer_email%'
+                        name: '%mailer_name%'
+                    email: '%user_created.email%'

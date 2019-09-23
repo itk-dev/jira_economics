@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+  {{ 'service_order_form.title'|trans }}
+{% endblock %}
+{% block content %}
+  <h1>{{ 'service_order_form.title'|trans }}</h1>
+  <div class="form" id="graphic-service-order">
+    {{ form_start(form) }}
+    <div class="form-errors">
+      {{ form_errors(form) }}
+    </div>
+    <h4 class="mt-4">{{ 'service_order_form.profile.header'|trans }}</h4>
+    <div>
+      <div class="mb-2">
+        <span class="label"><strong>{{ 'service_order_form.profile.name'|trans }}:</strong></span>
+        <span class="value">Martin Yde Granath</span>
+      </div>
+      <div class="mb-2">
+        <span class="label"><strong>{{ 'service_order_form.profile.email'|trans }}:</strong></span>
+        <span class="value">my@aarhus.dk</span>
+      </div>
+    </div>
+    <h4 class="mt-4">{{ 'service_order_form.job_description.header'|trans }}</h4>
+    {{ form_row(form.job_title) }}
+    <div class="order-lines">
+      {# store the prototype on the data-prototype attribute #}
+      <ul class="lines" data-prototype="{{ form_widget(form.order_lines.vars.prototype)|e('html_attr') }}">
+        {# iterate over each existing tag and render its only field: name #}
+        {% for order_line in form.order_lines %}
+          <li>{{ form_row(order_line) }}</li>
+        {% endfor %}
+      </ul>
+      {# Hide order lines #}
+      {{ form_widget(form.order_lines) }}
+      {{ form_row(form.description) }}
+    </div>
+    <div>
+      {{ form_row(form.files) }}
+      <ul id="fileList">
+        <!-- The file list will be shown here -->
+      </ul>
+      {{ form_row(form.files_uploaded) }}
+    </div>
+    <h4 class="mt-4">{{ 'service_order_form.job_payment.header'|trans }}</h4>
+    <div class="row">
+      <div class="form-group col-md-6">
+        {{ form_row(form.debitor) }}
+      </div>
+      <div class="form-check col-md-6 marketing-account">
+        {{ form_row(form.marketing_account) }}
+      </div>
+    </div>
+    <h4 class="mt-4">{{ 'service_order_form.job_delivery.header'|trans }}</h4>
+    <div class="row">
+      <div class="form-group col-md-6">
+        {{ form_row(form.department) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-md-12">
+        {{ form_row(form.address) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-md-6">
+        {{ form_row(form.postal_code) }}
+      </div>
+      <div class="form-group col-md-6">
+        {{ form_row(form.city) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-md-6">
+        {{ form_row(form.date) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-group col-md-12">
+        {{ form_row(form.delivery_description) }}
+      </div>
+    </div>
+    {{ form_end(form) }}
+    <div id="graphic_service_order_form_save_text" style="display: none;">
+    <button class="btn btn-primary" type="button" disabled>
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      {{ 'service_order_form.save.progress_text'|trans }}
+    </button>
+    </div>
+  </div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+  {{ encore_entry_script_tags('app') }}
+  {{ encore_entry_script_tags('graphic_service_order') }}
+{% endblock %}

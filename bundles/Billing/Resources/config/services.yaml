@@ -1,0 +1,22 @@
+services:
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $boundReceiverAccount: '%billing_receiver_account%'
+            $boundMaterialNumbers: '%billing_material_numbers%'
+
+    Billing\:
+        resource: '../../*'
+        exclude: '../../{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    Billing\Controller\:
+        resource: '../../Controller'
+        tags: ['controller.service_arguments']
+
+    Billing\Service\BillingService:
+        arguments:
+            $jiraUrl: '%env(JIRA_URL)%'
+            $tokenStorage: '@security.token_storage'
+            $customerKey: '%env(JIRA_OAUTH_CUSTOMER_KEY)%'
+            $pemPath: '%env(JIRA_OAUTH_PEM_PATH)%'

@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'planning.board.title'|trans }}{% endblock %}
+
+{% block content %}
+    <div id="planningBoardApp">
+        <h1>{{ 'planning.board.headline'|trans }}</h1>
+
+        <div class="spinner-border" role="status" v-show="loading">
+            <span class="sr-only">{{ 'planning.board.loading'|trans }}</span>
+        </div>
+
+        <div class="col" v-if="!loading && boards.length > 0">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="{{ 'planning.board.filter_placeholder'|trans }}" aria-label="filter" aria-describedby="basic-addon1" v-model="filter">
+            </div>
+
+            <a v-for="board in filteredBoards" class="m-1 btn btn-light" v-bind:href="baseUrl + 'board/' + board.id" v-html="board.name"> </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script type="text/javascript">
+      var PLANNING_URL = '{{ planning_base_url }}';
+      var PLANNING_API_URL = '{{ planning_api_url }}';
+    </script>
+
+    {{ encore_entry_script_tags('planning_board') }}
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <div class="container-fluid" style="margin-top: 50px">
+        <div class="mb-4">
+            <h3>{{ 'sprint_report.selected'|trans }}</h3>
+            <div><strong>{{ 'sprint_report.selected_board'|trans }}:</strong> {{ board.name }}</div>
+            <div><strong>{{ 'sprint_report.selected_project'|trans }}:</strong> {{ project.name }}</div>
+        </div>
+
+        <div class="mb-4">
+            <h3>{{ 'sprint_report.select_version'|trans }}</h3>
+            {% for version in project.versions %}
+                <a class="m-1 btn btn-light" href="/jira/sprint_report/board/{{ boardId }}/version/{{ version.id }}">
+                    <div>{{ version.name }}</div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

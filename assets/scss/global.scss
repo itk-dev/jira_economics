@@ -1,0 +1,80 @@
+// customize Bootstrap variables
+$primary: #0747A6;
+$gray-200: #F4F5F7;
+
+@import "~bootstrap/scss/bootstrap";
+@import "~select2/src/scss/core";
+@import "../../bundles/CreateProject/Resources/assets/createProject";
+@import "../../bundles/GraphicServiceOrder/Resources/assets/graphicServiceOrder";
+
+html, body, .wrapper, .main {
+    height: 100%;
+}
+
+
+/* Global Nav */
+.global-nav {
+    @include media-breakpoint-up(md) {
+        .navbar {
+            height: 100%;
+        }
+    }
+
+    .navbar-brand img {
+        width: 2rem;
+    }
+
+    .nav-link {
+        @include media-breakpoint-up(md) {
+            text-align: center;
+            span {
+                font-size: .6rem;
+            }
+        }
+        color: $white;
+    }
+}
+
+/* Main */
+.main-sidebar {
+    background-color: $gray-200;
+}
+
+@include media-breakpoint-up(md) {
+    .main-sidebar {
+        height: 100%;
+    }
+    .main-content {
+        height: 100vh;
+        overflow: auto;
+    }
+}
+
+@include media-breakpoint-up(md) {
+    table.table tr td div.btn-group {
+        opacity: 0;
+        transition: opacity .2s ease-in;
+    }
+    table.table tr:hover td div.btn-group {
+        opacity: 1;
+        transition: opacity .4s ease-in-out;
+    }
+}
+
+// https://dusted.codes/making-font-awesome-awesome-using-icons-without-i-tags
+.icon::before {
+    display: inline-block;
+    margin-right: .5em;
+    font: normal normal normal 14px/1 FontAwesome; /* stylelint-disable-line font-family-no-missing-generic-family-keyword */
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+}
+
+th, td {
+    &.amount {
+        text-align: right;
+    }
+}

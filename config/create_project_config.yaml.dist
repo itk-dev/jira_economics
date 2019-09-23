@@ -1,0 +1,37 @@
+# Copy this file to create_project_config.local.yaml
+
+# Example config:
+#parameters:
+#    teamconfig:
+#      ITK Dev:
+#          team_lead: @string - Username
+#          price_table: @int - id
+#          project_category: @int - id
+#          issue_type_scheme: @int - id
+#          workflow_scheme: @int - id
+#          issue_type_screen_scheme: @int - id
+#          permission_scheme: @int - id
+#          board_template: (Optional)
+#            type: @string - scrum/kanban
+parameters:
+    teamconfig:
+      ITK Dev:
+          team_lead:
+          team_id:
+          price_table:
+          project_category:
+          issue_type_scheme:
+          workflow_scheme:
+          issue_type_screen_scheme:
+          permission_scheme:
+          board_template:
+            type:
+      ITK Lab:
+          team_lead:
+          team_id:
+          price_table:
+          project_category:
+          issue_type_scheme:
+          workflow_scheme:
+          issue_type_screen_scheme:
+          permission_scheme:

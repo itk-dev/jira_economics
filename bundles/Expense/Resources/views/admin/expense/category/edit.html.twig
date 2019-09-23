@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'expense.category.edit.title'|trans }}{% endblock %}
+
+{% block content %}
+    <h1>{{ 'expense.category.edit.title'|trans }}</h1>
+
+    {{ include('@ExpenseBundle/admin/expense/category/_form.html.twig', {'button_label': 'expense.category.action.update'|trans }) }}
+
+    <a class="btn btn-link" href="{{ path('expense_admin_category_index') }}">{{ 'expense.category.back_to_list'|trans }}</a>
+
+    {{ include('@ExpenseBundle/admin/expense/category/_delete_form.html.twig') }}
+{% endblock %}

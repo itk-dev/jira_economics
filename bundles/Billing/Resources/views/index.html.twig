@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}JIRA Economics{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    {{ encore_entry_link_tags('billing') }}
+{% endblock %}
+
+{% block sidebar %}
+    {% include "@Billing/_billing-sidebar.html.twig" %}
+{% endblock %}
+
+{% block content %}
+    <div id="app-root"></div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    {{ encore_entry_script_tags('billing') }}
+
+    <script type="text/javascript">
+      $(document).ready(function () {
+          $('[data-toggle="popover"]').popover();
+      });
+    </script>
+{% endblock %}

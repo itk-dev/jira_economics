@@ -1,0 +1,20 @@
+services:
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $ownCloudFilesFolder: '%env(OWNCLOUD_FILES_FOLDER)%'
+
+    GraphicServiceOrder\:
+        resource: '../../*'
+        exclude: '../../{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    GraphicServiceOrder\Controller\:
+        resource: '../../Controller'
+        tags: ['controller.service_arguments']
+
+    app.gs_upload_listener:
+        class: GraphicServiceOrder\EventListener\GsUploadListener
+        arguments: ["@doctrine.orm.entity_manager", "%kernel.project_dir%"]
+        tags:
+            - { name: kernel.event_listener, event: oneup_uploader.post_upload, method: onUpload }

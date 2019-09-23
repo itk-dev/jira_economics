@@ -1,0 +1,27 @@
+common:
+    title: ITK Jira
+main:
+    title: Vælg en opgave
+    bredcrumb: ITK Jira - Apps
+    sidebar:
+        shortcuts:
+            title: Genveje
+            desc: Praktiske genveje til værktøjer
+            projects: Jira projektoversigt
+            confluence: Confluence
+            teams: Teams
+dashboard:
+    title: Dashboard
+    headline: Vælg app
+
+# Admin user management
+portal.user: Bruger
+portal.user.email: E-mailadresse
+portal.user.enabled: Aktiv
+portal.user.lastLogin: Seneste login
+portal.user.portalApps: Apps
+portal.user.roles: Roler
+
+ROLE_ADMIN: Administrator
+ROLE_JIRA: Jira
+ROLE_USER: Bruger

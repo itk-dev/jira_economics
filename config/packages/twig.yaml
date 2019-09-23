@@ -2,3 +2,18 @@ twig:
     default_path: '%kernel.project_dir%/templates'
     debug: '%kernel.debug%'
     strict_variables: '%kernel.debug%'
+    form_themes: ['bootstrap_4_layout.html.twig']
+
+    # @TODO: Use locale for this!
+    number_format:
+        decimals: 2
+        decimal_point: ','
+        thousands_separator: '.'
+
+    globals:
+        site_name: '%site_name%'
+        site_url: '%site_url%'
+        site_logo_path: '%site_logo_path%'
+        sender:
+            email: '%mailer_email%'
+            name: '%mailer_name%'
