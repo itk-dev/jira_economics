@@ -33,7 +33,6 @@ class GraphicServiceOrderForm extends AbstractType
 {
     private $hammerService;
     private $container;
-    private $tokenStorage;
 
     public function __construct(HammerService $hammerService, ContainerInterface $container, array $options = [])
     {
@@ -65,8 +64,6 @@ class GraphicServiceOrderForm extends AbstractType
                 'constraints' => [
                     new NotNull(['groups' => 'base']),
                 ],
-                'attr' => ['class' => 'form-control'],
-                'help_attr' => ['class' => 'form-text text-muted'],
                 'help' => 'service_order_form.full_name.help',
                 'required' => false,
             ])
@@ -76,8 +73,6 @@ class GraphicServiceOrderForm extends AbstractType
                 'constraints' => [
                     new NotNull(['groups' => 'base']),
                 ],
-                'attr' => ['class' => 'form-control'],
-                'help_attr' => ['class' => 'form-text text-muted'],
                 'help' => 'service_order_form.job_description.title.help',
                 'required' => false,
             ])
@@ -104,14 +99,11 @@ class GraphicServiceOrderForm extends AbstractType
                         ]),
                     ],
                 ],
-                'help_attr' => ['class' => 'form-text text-muted'],
                 'help' => 'service_order_form.job_description.files.help',
                 'required' => false,
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'service_order_form.job_description.description.label',
-                'attr' => ['class' => 'form-control', 'required'],
-                'help_attr' => ['class' => 'form-text text-muted'],
                 'help' => 'service_order_form.job_description.description.help',
                 'required' => false,
             ])
@@ -130,7 +122,6 @@ class GraphicServiceOrderForm extends AbstractType
                         'maxMessage' => 'service_order_form.job_payment.debitor.constraint.max',
                     ]),
                 ],
-                'attr' => ['class' => 'form-control'],
                 'required' => false,
             ])
             ->add('marketing_account', CheckboxType::class, [
@@ -138,9 +129,7 @@ class GraphicServiceOrderForm extends AbstractType
                 'constraints' => [
                     new NotNull(['groups' => 'marketing_account']),
                 ],
-                'attr' => ['class' => 'form-check-input'],
                 'required' => false,
-                'help_attr' => ['class' => 'form-text text-muted'],
                 'help' => 'service_order_form.job_payment.marketing_account.help',
             ])
             ->add('department', TextType::class, [
@@ -148,7 +137,6 @@ class GraphicServiceOrderForm extends AbstractType
                 'constraints' => [
                     new NotNull(['groups' => 'base']),
                 ],
-                'attr' => ['class' => 'form-control'],
                 'required' => false,
             ])
             ->add('address', TextType::class, [
@@ -156,7 +144,6 @@ class GraphicServiceOrderForm extends AbstractType
                 'constraints' => [
                     new NotNull(['groups' => 'base']),
                 ],
-                'attr' => ['class' => 'form-control'],
                 'required' => false,
             ])
             ->add('postal_code', NumberType::class, [
@@ -164,7 +151,6 @@ class GraphicServiceOrderForm extends AbstractType
                 'constraints' => [
                     new NotNull(['groups' => 'base']),
                 ],
-                'attr' => ['class' => 'form-control'],
                 'required' => false,
             ])
             ->add('city', TextType::class, [
@@ -172,7 +158,6 @@ class GraphicServiceOrderForm extends AbstractType
                 'constraints' => [
                     new NotNull(['groups' => 'base']),
                 ],
-                'attr' => ['class' => 'form-control'],
                 'required' => false,
             ])
             ->add('date', DateType::class, [
@@ -182,19 +167,16 @@ class GraphicServiceOrderForm extends AbstractType
                 'constraints' => [
                     new NotNull(['groups' => 'base']),
                 ],
-                'attr' => ['class' => 'form-control js-datepicker'],
                 'required' => false,
             ])
             ->add('delivery_description', TextareaType::class, [
                 'label' => 'service_order_form.job_delivery.delivery_description.label',
-                'attr' => ['class' => 'form-control', 'required'],
-                'help_attr' => ['class' => 'form-text text-muted'],
                 'help' => 'service_order_form.job_delivery.delivery_description.help',
                 'required' => false,
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'service_order_form.save.label',
-                'attr' => ['class' => 'btn btn-primary'],
+                'attr' => ['class' => 'btn-primary'],
             ]);
     }
 

@@ -16,9 +16,7 @@
         <label>{{ 'service_order_form.profile.email'|trans }}:</label>
         <span class="value">{{ user_email }}</span>
       </div>
-      <div class="form-group">
-        {{ form_row(form.full_name) }}
-      </div>
+      {{ form_row(form.full_name) }}
     </div>
     <h4 class="mt-4">{{ 'service_order_form.job_description.header'|trans }}</h4>
     {{ form_row(form.job_title) }}
@@ -72,7 +70,7 @@
     </div>
     <div class="row">
       <div class="form-group col-md-6">
-        {{ form_row(form.date) }}
+        {{ form_row(form.date, {'attr': {'class': 'js-datepicker'}}) }}
       </div>
     </div>
     <div class="row">

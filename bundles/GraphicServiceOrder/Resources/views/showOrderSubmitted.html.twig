@@ -21,22 +21,24 @@
   </div>
   <div class="mb-2">
     <span class="label"><strong>{{ 'service_order_form.job_description.orders.label'|trans }}:</strong></span>
-    <ul>
-      {% for line in order.orderLines %}
-        <li>{{ line.amount }} {{ line.type }}</li>
-      {% endfor %}
-    </ul>
+    {% if order.orderLines is defined %}
+      <ul>
+        {% for line in order.orderLines %}
+          <li>{{ line.amount }} {{ line.type }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
   </div>
 
   <div class="mb-2">
     <span class="label"><strong>{{ 'service_order_form.job_description.files.label'|trans }}:</strong></span>
-    <ul>
-      {% if order.files is defined %}
+    {% if order.files is defined %}
+      <ul>
         {% for file in order.files %}
           <li>{{ file }}</li>
         {% endfor %}
-      {% endif %}
-    </ul>
+      </ul>
+    {% endif %}
   </div>
 
   <div class="mb-2">
