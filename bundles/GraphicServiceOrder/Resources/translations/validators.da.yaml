@@ -5,3 +5,7 @@ service_order_form:
         not_null: Angiv debitornummer eller anvend markedsføringskontoen hvis du kommer fra Borgerservice og biblioteker
         min: Debitornummer skal være præcis 4 cifre
         max: Debitornummer skal være præcis 4 cifre
+  delivery:
+    postal_code:
+      constraint:
+        not_null: Angiv et gyldigt postnummer
