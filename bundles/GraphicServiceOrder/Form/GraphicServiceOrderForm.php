@@ -50,14 +50,6 @@ class GraphicServiceOrderForm extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $allowed_file_types = [
-            'pdf' => 'application/pdf',
-            'zip' => 'application/zip',
-            'jpg' => 'image/jpeg',
-            'png' => 'image/png',
-            'doc' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        ];
-
         $builder
             ->add('full_name', TextType::class, [
                 'label' => 'service_order_form.full_name.label',
@@ -94,8 +86,6 @@ class GraphicServiceOrderForm extends AbstractType
                     'constraints' => [
                         new File([
                             'maxSize' => $_ENV['FORM_FILE_GS_UPLOAD_SIZE'],
-                            'mimeTypes' => $allowed_file_types,
-                            'mimeTypesMessage' => 'Please upload a valid file: '.implode(', ', array_keys($allowed_file_types)),
                         ]),
                     ],
                 ],

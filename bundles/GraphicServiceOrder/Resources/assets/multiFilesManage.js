@@ -33,11 +33,12 @@ jQuery(document).ready(function () {
     if ($('.file-lines > li').length > 1) {
         $('.file-lines > li').each(function (index) {
             if ($(this).find('.custom-file-label').text() === '') {
-                if ($(this).find('.invalid-feedback').length === 0 && index !== 0) {
-                    $(this).remove();
-                }
+                $(this).remove();
             }
         });
+        $('.multi-upload-lines #graphic_service_order_form_multi_upload_help').append('<div style="color:#dc3545">Bemærk: Eventuelle filer skal uploades igen!</div>')
+        addTagForm($collectionHolder, $newLinkLi, 1);
+        $('.multi-upload-lines .custom-file-input').addClass('is-invalid');
     }
 });
 

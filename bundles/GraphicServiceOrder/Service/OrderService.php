@@ -20,6 +20,9 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use App\Service\UserManager;
+use Swift_Mailer;
+use Twig\Environment;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OrderService
 {
@@ -31,21 +34,28 @@ class OrderService
     private $messageBus;
     private $ownCloudFilesFolder;
     private $tokenStorage;
+    private $fileUploader;
+    private $userManager;
+    private $swiftMailer;
+    private $twig;
 
-    /**
-     * OrderService constructor.
-     *
-     * @param \Doctrine\ORM\EntityManagerInterface                                                $entityManager
-     * @param \App\Service\HammerService                                                          $hammerService
-     * @param \App\Service\OwnCloudService                                                        $ownCloudService
-     * @param \GraphicServiceOrder\Repository\GsOrderRepository                                   $gsOrderRepository
-     * @param \Symfony\Component\HttpKernel\KernelInterface                                       $appKernel
-     * @param \Symfony\Component\Messenger\MessageBusInterface                                    $messageBus
-     * @param string                                                                              $ownCloudFilesFolder
-     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-     * @param \GraphicServiceOrder\Service\FileUploader                                           $fileUploader
-     * @param \App\Service\UserManager                                                            $userManager
-     */
+  /**
+   * OrderService constructor.
+   *
+   * @param \Doctrine\ORM\EntityManagerInterface $entityManager
+   * @param \App\Service\HammerService $hammerService
+   * @param \App\Service\OwnCloudService $ownCloudService
+   * @param \GraphicServiceOrder\Repository\GsOrderRepository $gsOrderRepository
+   * @param \Symfony\Component\HttpKernel\KernelInterface $appKernel
+   * @param \Symfony\Component\Messenger\MessageBusInterface $messageBus
+   * @param string $ownCloudFilesFolder
+   * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
+   * @param \GraphicServiceOrder\Service\FileUploader $fileUploader
+   * @param \App\Service\UserManager $userManager
+   * @param \Swift_Mailer $swiftMailer
+   * @param \Twig\Environment $twig
+   * @param \Symfony\Contracts\Translation\TranslatorInterface $translator
+   */
     public function __construct(
         EntityManagerInterface $entityManager,
         HammerService $hammerService,
@@ -56,7 +66,10 @@ class OrderService
         string $ownCloudFilesFolder,
         TokenStorageInterface $tokenStorage,
         FileUploader $fileUploader,
-        UserManager $userManager
+        UserManager $userManager,
+        Swift_Mailer $swiftMailer,
+        Environment $twig,
+        TranslatorInterface $translator
     ) {
         $this->entityManager = $entityManager;
         $this->hammerService = $hammerService;
@@ -68,6 +81,9 @@ class OrderService
         $this->tokenStorage = $tokenStorage;
         $this->fileUploader = $fileUploader;
         $this->userManager = $userManager;
+        $this->swiftMailer = $swiftMailer;
+        $this->twig = $twig;
+        $this->translator = $translator;
     }
 
     /**
@@ -114,12 +130,14 @@ class OrderService
         }
     }
 
-    /**
-     * Create a GsOrder.
-     *
-     * @param \GraphicServiceOrder\Entity\GsOrder $gsOrder
-     * @param $uploadedFiles
-     */
+  /**
+   * @param \GraphicServiceOrder\Entity\GsOrder $gsOrder
+   * @param $form
+   *
+   * @throws \Twig\Error\LoaderError
+   * @throws \Twig\Error\RuntimeError
+   * @throws \Twig\Error\SyntaxError
+   */
     public function createOrder(GsOrder $gsOrder, $form)
     {
         // Create a task on a jira project.
@@ -140,7 +158,7 @@ class OrderService
         $this->messageBus->dispatch(new OwnCloudShareMessage($gsOrder->getId()));
 
         $this->updateUser($gsOrder);
-        // @TODO: Send notification mail.
+        $this->sendReceiptMail($gsOrder);
     }
 
     /**
@@ -165,12 +183,12 @@ class OrderService
             $sharedFiles = $order->getOwnCloudSharedFiles();
             foreach ($files as $file) {
                 // if a file exists on the entity that has not yet been shared.
-                if (!\in_array($file, $sharedFiles)) {
+                if (!in_array($file, $sharedFiles)) {
                     // Attempt to share the file in owncloud.
                     $response = $this->shareFile($file, $order->getIssueKey());
                     $success = [201, 204];  // Successful responses;
                     // if file was shared successfully add to shared files array.
-                    if (\in_array($response, $success)) {
+                    if (in_array($response, $success)) {
                         $sharedFiles[] = $file;
                         $order->setOwnCloudSharedFiles($sharedFiles);
                     }
@@ -203,6 +221,23 @@ class OrderService
      */
     private function createOrderTask(GsOrder $gsOrder)
     {
+        // Define author of task.
+        $authorEmail = $this->tokenStorage->getToken()->getUser()->getEmail();
+        $userSearch = $this->hammerService->searchUser($authorEmail);
+        if (!empty($userSearch)) {
+          // We fairly assume only one existing user matches the email.
+          $author = $userSearch[0]->key;
+        }
+        // If no match we create a new user.
+        else {
+          $userFields = [
+            'name' => $authorEmail,
+            'emailAddress' => $authorEmail,
+            'displayName' => $authorEmail
+          ];
+          $this->hammerService->createUser($userFields);
+          $author = $userFields['name'];
+        }
         $description = $this->getDescription($gsOrder);
         $data = [
             'fields' => [
@@ -214,6 +249,10 @@ class OrderService
                 'issuetype' => [
                     'id' => $_ENV['GS_ORDER_ISSUETYPE_ID'],
                 ],
+                'reporter' => [
+                  'name' => $author
+                ],
+                'customfield_10309' => (string)$gsOrder->getDebitor()
             ],
         ];
         $response = $this->hammerService->post('/rest/api/2/issue', $data);
@@ -254,10 +293,9 @@ class OrderService
     {
         // @TODO: Fix path parameters.
         $ownCloudPath = $_ENV['OWNCLOUD_USER_SHARED_DIR'].$order_id.'/_Materiale/';
-        $ocFilename = $order_id.'-'.$fileName;
         $file = file_get_contents($this->appKernel->getProjectDir().'/private/files/gs/'.$fileName);
         $response = $this->ownCloudService->sendFile(
-            'owncloud/remote.php/dav/files/'.$ownCloudPath.$ocFilename,
+            'owncloud/remote.php/dav/files/'.$ownCloudPath.$fileName,
             $file
         );
 
@@ -288,7 +326,7 @@ class OrderService
         if ($orderData->getMarketingAccount()) {
             $description .= 'Borgerservice og bibliotekers markedsføringskonto. \\\\ ';
         } else {
-            $description .= 'Debitor: '.$orderData->getDebitor().'\\\\ ';
+            $description .= 'Debitor. \\\\ ';
         }
         $description .= ' \\\\ ';
 
@@ -297,7 +335,8 @@ class OrderService
         $description .= $orderData->getDepartment().' \\\\ ';
         $description .= $orderData->getAddress().'\\\\ ';
         $description .= $orderData->getPostalcode().' '.$orderData->getCity().'\\\\ ';
-        $description .= 'Dato: '.$orderData->getDate()->format('d-m-Y').'\\\\ ';
+        $description .= 'Leveringsdato: '.$orderData->getDate()->format('d-m-Y').'\\\\ ';
+        $description .= ' \\\\ ';
         $description .= $orderData->getDeliveryDescription();
 
         return $description;
@@ -317,12 +356,39 @@ class OrderService
         $upload_files = $form['multi_upload']->getData();
         if ($upload_files) {
             foreach ($upload_files as $file) {
-                $uploadedFileName = $this->fileUploader->upload($file);
+              if(isset($file)) {
+                $uploadedFileName = $this->fileUploader->upload($file, $gsOrder);
                 $uploadedFiles[] = $uploadedFileName;
+              }
             }
         }
         $gsOrder->setFiles($uploadedFiles);
 
         return $gsOrder;
+    }
+
+  /**
+   * @param $name
+   *
+   * Send receipt mail.
+   *
+   * @throws \Twig\Error\LoaderError
+   * @throws \Twig\Error\RuntimeError
+   * @throws \Twig\Error\SyntaxError
+   */
+    private function sendReceiptMail($gsOrder)
+    {
+      $message = (new \Swift_Message($this->translator->trans('service_order_email.subject')))
+        ->setFrom($_ENV['MAILER_EMAIL'])
+        ->setTo($this->tokenStorage->getToken()->getUser()->getEmail())
+        ->setBody(
+          $this->twig->render(
+            '@GraphicServiceOrderBundle/customerReceiptMail.twig',
+            ['order' => $gsOrder]
+          ),
+          'text/html'
+        );
+
+      $this->swiftMailer->send($message);
     }
 }
