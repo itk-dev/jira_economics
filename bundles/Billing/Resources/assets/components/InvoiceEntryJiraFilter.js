@@ -115,6 +115,26 @@ const InvoiceEntryJiraFilter = (props) => {
                 </select>
             </div>
             }
+
+            {props.accountKeys.length > 0 &&
+            <div>
+                <label htmlFor={'accountKeyFilter'}>{t('invoice_entry.filter.account_key')}</label>
+                <select
+                    name={'accountKeyFilter'}
+                    className={'form-control'}
+                    value={props.filterValues.accountKeyFilter}
+                    onChange={props.handleChange}>
+                    <option value={''}>
+                        {t('invoice_entry.filter.account_key_option.all')}
+                    </option>
+                    {props.accountKeys.map((accountKey) => (
+                        <option key={accountKey} value={accountKey}>
+                            {accountKey}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            }
         </Form.Group>
     );
 };
@@ -130,7 +150,8 @@ InvoiceEntryJiraFilter.propTypes = {
     categories: PropTypes.object,
     workers: PropTypes.array,
     expenseCategories: PropTypes.object,
-    billedFilterDisable: PropTypes.bool
+    billedFilterDisable: PropTypes.bool,
+    accountKeys: PropTypes.array
 };
 
 export default withTranslation()(InvoiceEntryJiraFilter);
