@@ -28,8 +28,7 @@ class FileUploader
         // We don't want to guess extension, since the file names of the uploads may be some obscure graphics file.
         $extension = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
         $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
-        $fileName = $gsOrder->getIssueKey() . '_' . $safeFilename . '-' . uniqid() . '.' . $extension;
-
+        $fileName = $gsOrder->getIssueKey().'_'.$safeFilename.'-'.uniqid().'.'.$extension;
 
         try {
             $file->move($this->getTargetDirectory(), $fileName);

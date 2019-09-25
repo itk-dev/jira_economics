@@ -384,9 +384,9 @@ abstract class AbstractJiraService
      */
     public function searchUser($username)
     {
-      $result = $this->get('/rest/api/2/user/search', ['username' => $username]);
+        $result = $this->get('/rest/api/2/user/search', ['username' => $username]);
 
-      return $result;
+        return $result;
     }
 
     /**
@@ -396,9 +396,9 @@ abstract class AbstractJiraService
      */
     public function createUser($user)
     {
-      $result = $this->post('/rest/api/2/user', $user);
+        $result = $this->post('/rest/api/2/user', $user);
 
-      return $result;
+        return $result;
     }
 
     public function search(array $query)
