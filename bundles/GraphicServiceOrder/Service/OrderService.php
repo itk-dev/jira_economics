@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use App\Service\UserManager;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class OrderService
 {
@@ -33,21 +34,23 @@ class OrderService
     private $tokenStorage;
     private $fileUploader;
     private $userManager;
+    private $params;
 
-    /**
-     * OrderService constructor.
-     *
-     * @param \Doctrine\ORM\EntityManagerInterface                                                $entityManager
-     * @param \App\Service\HammerService                                                          $hammerService
-     * @param \App\Service\OwnCloudService                                                        $ownCloudService
-     * @param \GraphicServiceOrder\Repository\GsOrderRepository                                   $gsOrderRepository
-     * @param \Symfony\Component\HttpKernel\KernelInterface                                       $appKernel
-     * @param \Symfony\Component\Messenger\MessageBusInterface                                    $messageBus
-     * @param string                                                                              $ownCloudFilesFolder
-     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-     * @param \GraphicServiceOrder\Service\FileUploader                                           $fileUploader
-     * @param \App\Service\UserManager                                                            $userManager
-     */
+  /**
+   * OrderService constructor.
+   *
+   * @param \Doctrine\ORM\EntityManagerInterface $entityManager
+   * @param \App\Service\HammerService $hammerService
+   * @param \App\Service\OwnCloudService $ownCloudService
+   * @param \GraphicServiceOrder\Repository\GsOrderRepository $gsOrderRepository
+   * @param \Symfony\Component\HttpKernel\KernelInterface $appKernel
+   * @param \Symfony\Component\Messenger\MessageBusInterface $messageBus
+   * @param string $ownCloudFilesFolder
+   * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
+   * @param \GraphicServiceOrder\Service\FileUploader $fileUploader
+   * @param \App\Service\UserManager $userManager
+   * @param \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface $params
+   */
     public function __construct(
         EntityManagerInterface $entityManager,
         HammerService $hammerService,
@@ -58,7 +61,8 @@ class OrderService
         string $ownCloudFilesFolder,
         TokenStorageInterface $tokenStorage,
         FileUploader $fileUploader,
-        UserManager $userManager
+        UserManager $userManager,
+        ParameterBagInterface $params
     ) {
         $this->entityManager = $entityManager;
         $this->hammerService = $hammerService;
@@ -70,6 +74,7 @@ class OrderService
         $this->tokenStorage = $tokenStorage;
         $this->fileUploader = $fileUploader;
         $this->userManager = $userManager;
+        $this->params = $params;
     }
 
     /**
@@ -90,7 +95,6 @@ class OrderService
                 ->setPostalcode($user->getPostalCode())
                 ->setCity($user->getCity());
         }
-
         return $gsOrder;
     }
 
@@ -186,9 +190,7 @@ class OrderService
             $order->setOrderStatus('received');
             // Remove local files.
             foreach ($order->getOwnCloudSharedFiles() as $file) {
-                // @TODO: Fix path parameters.
-                $files_dir = $this->appKernel->getProjectDir().'/private/files/gs/';
-                unlink($files_dir.$file);
+              unlink($this->params->get('gs_files_directory') . '/' . $file);
             }
         }
 
@@ -209,12 +211,12 @@ class OrderService
         $data = [
             'fields' => [
                 'project' => [
-                    'id' => $_ENV['GS_ORDER_PROJECT_ID'],
+                    'id' => $this->params->get('gs_order_project_id'),
                 ],
                 'summary' => $gsOrder->getJobTitle(),
                 'description' => $description,
                 'issuetype' => [
-                    'id' => $_ENV['GS_ORDER_ISSUETYPE_ID'],
+                    'id' => $this->params->get('gs_order_issuetype_id'),
                 ],
             ],
         ];
@@ -257,7 +259,7 @@ class OrderService
         // @TODO: Fix path parameters.
         $ownCloudPath = $_ENV['OWNCLOUD_USER_SHARED_DIR'].$order_id.'/_Materiale/';
         $ocFilename = $order_id.'-'.$fileName;
-        $file = file_get_contents($this->appKernel->getProjectDir().'/private/files/gs/'.$fileName);
+        $file = file_get_contents($this->params->get('gs_files_directory') . '/' . $fileName);
         $response = $this->ownCloudService->sendFile(
             'owncloud/remote.php/dav/files/'.$ownCloudPath.$ocFilename,
             $file
