@@ -230,9 +230,8 @@ class OrderService
         if (!empty($userSearch)) {
             // We fairly assume only one existing user matches the email.
             $author = $userSearch[0]->key;
-        }
-        // If no match we create a new user.
-        else {
+        } else {
+            // If no match we create a new user.
             $userFields = [
                 'name' => $authorEmail,
                 'emailAddress' => $authorEmail,
