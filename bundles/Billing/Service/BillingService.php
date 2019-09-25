@@ -922,12 +922,13 @@ class BillingService extends JiraService
             }
 
             $issueAccount = $expense->issue->fields->{$customFieldAccountKeyId};
-            if ($issueAccount != null) {
+            if (null !== $issueAccount) {
                 $expense->issue->accountKey = $issueAccount->key;
             }
 
             $expense->issue->versions = array_reduce($expense->issue->fields->fixVersions, function ($carry, $version) {
                 $carry->{$version->id} = $version->name;
+
                 return $carry;
             }, (object) []);
 
