@@ -36,21 +36,21 @@ class OrderService
     private $userManager;
     private $params;
 
-  /**
-   * OrderService constructor.
-   *
-   * @param \Doctrine\ORM\EntityManagerInterface $entityManager
-   * @param \App\Service\HammerService $hammerService
-   * @param \App\Service\OwnCloudService $ownCloudService
-   * @param \GraphicServiceOrder\Repository\GsOrderRepository $gsOrderRepository
-   * @param \Symfony\Component\HttpKernel\KernelInterface $appKernel
-   * @param \Symfony\Component\Messenger\MessageBusInterface $messageBus
-   * @param string $ownCloudFilesFolder
-   * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-   * @param \GraphicServiceOrder\Service\FileUploader $fileUploader
-   * @param \App\Service\UserManager $userManager
-   * @param \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface $params
-   */
+    /**
+     * OrderService constructor.
+     *
+     * @param \Doctrine\ORM\EntityManagerInterface                                                $entityManager
+     * @param \App\Service\HammerService                                                          $hammerService
+     * @param \App\Service\OwnCloudService                                                        $ownCloudService
+     * @param \GraphicServiceOrder\Repository\GsOrderRepository                                   $gsOrderRepository
+     * @param \Symfony\Component\HttpKernel\KernelInterface                                       $appKernel
+     * @param \Symfony\Component\Messenger\MessageBusInterface                                    $messageBus
+     * @param string                                                                              $ownCloudFilesFolder
+     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
+     * @param \GraphicServiceOrder\Service\FileUploader                                           $fileUploader
+     * @param \App\Service\UserManager                                                            $userManager
+     * @param \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface           $params
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
         HammerService $hammerService,
@@ -95,6 +95,7 @@ class OrderService
                 ->setPostalcode($user->getPostalCode())
                 ->setCity($user->getCity());
         }
+
         return $gsOrder;
     }
 
@@ -190,7 +191,7 @@ class OrderService
             $order->setOrderStatus('received');
             // Remove local files.
             foreach ($order->getOwnCloudSharedFiles() as $file) {
-              unlink($this->params->get('gs_files_directory') . '/' . $file);
+                unlink($this->params->get('gs_files_directory').'/'.$file);
             }
         }
 
@@ -259,7 +260,7 @@ class OrderService
         // @TODO: Fix path parameters.
         $ownCloudPath = $_ENV['OWNCLOUD_USER_SHARED_DIR'].$order_id.'/_Materiale/';
         $ocFilename = $order_id.'-'.$fileName;
-        $file = file_get_contents($this->params->get('gs_files_directory') . '/' . $fileName);
+        $file = file_get_contents($this->params->get('gs_files_directory').'/'.$fileName);
         $response = $this->ownCloudService->sendFile(
             'owncloud/remote.php/dav/files/'.$ownCloudPath.$ocFilename,
             $file
