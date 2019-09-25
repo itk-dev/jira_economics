@@ -86,19 +86,17 @@ pipeline {
                 timeout(time: 30, unit: 'MINUTES') {
                     input 'Should the site be deployed?'
                 }
-                steps {
-                    // Update git repos.
-                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; git clean -d --force'"
-                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; git checkout ${BRANCH_NAME}'"
-                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; git fetch'"
-                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; git reset origin/${BRANCH_NAME} --hard'"
+                // Update git repos.
+                sh "ansible srvitkeconomics -m shell -a 'cd /data/www/portal_itkdev_dk/htdocs; git clean -d --force'"
+                sh "ansible srvitkeconomics -m shell -a 'cd /data/www/portal_itkdev_dk/htdocs; git checkout ${BRANCH_NAME}'"
+                sh "ansible srvitkeconomics -m shell -a 'cd /data/www/portal_itkdev_dk/htdocs; git fetch'"
+                sh "ansible srvitkeconomics -m shell -a 'cd /data/www/portal_itkdev_dk/htdocs; git reset origin/${BRANCH_NAME} --hard'"
 
-                    // Run composer.
-                    sh "ansible srvitkeconomics -m shell -a 'cd /data/www/economics_itkdev_dk/htdocs; composer install --no-dev -o'"
+                // Run composer.
+                sh "ansible srvitkeconomics -m shell -a 'cd /data/www/portal_itkdev_dk/htdocs; composer install --no-dev -o'"
 
-                    // Copy encore assets.
-                    sh "ansible srvitkeconomics -m synchronize -a 'src=${WORKSPACE}/public/build/ dest=/data/www/economics_itkdev_dk/htdocs/public/build'"
-                }
+                // Copy encore assets.
+                sh "ansible srvitkeconomics -m synchronize -a 'src=${WORKSPACE}/public/build/ dest=/data/www/portal_itkdev_dk/htdocs/public/build'"
             }
         }
     }
