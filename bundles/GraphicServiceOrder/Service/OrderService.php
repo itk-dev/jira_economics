@@ -31,6 +31,8 @@ class OrderService
     private $messageBus;
     private $ownCloudFilesFolder;
     private $tokenStorage;
+    private $fileUploader;
+    private $userManager;
 
     /**
      * OrderService constructor.
@@ -97,7 +99,7 @@ class OrderService
      *
      * @param $gsOrder
      */
-    private function updateUser($gsOrder)
+    private function updateUserWithGSOrder($gsOrder)
     {
         $token = $this->tokenStorage->getToken();
         if (null !== $token) {
@@ -139,7 +141,7 @@ class OrderService
         // Notify messenger of new job.
         $this->messageBus->dispatch(new OwnCloudShareMessage($gsOrder->getId()));
 
-        $this->updateUser($gsOrder);
+        $this->updateUserWithGSOrder($gsOrder);
         // @TODO: Send notification mail.
     }
 
