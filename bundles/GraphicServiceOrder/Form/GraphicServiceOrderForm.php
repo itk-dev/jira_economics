@@ -28,18 +28,21 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class GraphicServiceOrderForm extends AbstractType
 {
     private $hammerService;
     private $container;
+    private $params;
 
-    public function __construct(HammerService $hammerService, ContainerInterface $container, array $options = [])
+    public function __construct(HammerService $hammerService, ContainerInterface $container, ParameterBagInterface $params, array $options = [])
     {
         $this->hammerService = $hammerService;
         $this->container = $container;
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
+        $this->params = $params;
     }
 
     /**
@@ -85,7 +88,9 @@ class GraphicServiceOrderForm extends AbstractType
                     'required' => false,
                     'constraints' => [
                         new File([
-                            'maxSize' => $_ENV['FORM_FILE_GS_UPLOAD_SIZE'],
+                            'maxSize' => $this->params->get('form_file_gs_upload_size'),
+                            'mimeTypes' => $allowed_file_types,
+                            'mimeTypesMessage' => 'Please upload a valid file: '.implode(', ', array_keys($allowed_file_types)),
                         ]),
                     ],
                 ],

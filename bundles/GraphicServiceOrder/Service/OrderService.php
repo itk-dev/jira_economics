@@ -23,6 +23,7 @@ use App\Service\UserManager;
 use Swift_Mailer;
 use Twig\Environment;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class OrderService
 {
@@ -38,6 +39,7 @@ class OrderService
     private $userManager;
     private $swiftMailer;
     private $twig;
+    private $params;
 
   /**
    * OrderService constructor.
@@ -55,7 +57,9 @@ class OrderService
    * @param \Swift_Mailer $swiftMailer
    * @param \Twig\Environment $twig
    * @param \Symfony\Contracts\Translation\TranslatorInterface $translator
+   * @param \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface $params
    */
+
     public function __construct(
         EntityManagerInterface $entityManager,
         HammerService $hammerService,
@@ -69,7 +73,8 @@ class OrderService
         UserManager $userManager,
         Swift_Mailer $swiftMailer,
         Environment $twig,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        ParameterBagInterface $params
     ) {
         $this->entityManager = $entityManager;
         $this->hammerService = $hammerService;
@@ -84,6 +89,7 @@ class OrderService
         $this->swiftMailer = $swiftMailer;
         $this->twig = $twig;
         $this->translator = $translator;
+        $this->params = $params;
     }
 
     /**
@@ -113,7 +119,7 @@ class OrderService
      *
      * @param $gsOrder
      */
-    private function updateUser($gsOrder)
+    private function updateUserWithGSOrder($gsOrder)
     {
         $token = $this->tokenStorage->getToken();
         if (null !== $token) {
@@ -157,8 +163,8 @@ class OrderService
         // Notify messenger of new job.
         $this->messageBus->dispatch(new OwnCloudShareMessage($gsOrder->getId()));
 
-        $this->updateUser($gsOrder);
         $this->sendReceiptMail($gsOrder);
+        $this->updateUserWithGSOrder($gsOrder);
     }
 
     /**
@@ -202,9 +208,7 @@ class OrderService
             $order->setOrderStatus('received');
             // Remove local files.
             foreach ($order->getOwnCloudSharedFiles() as $file) {
-                // @TODO: Fix path parameters.
-                $files_dir = $this->appKernel->getProjectDir().'/private/files/gs/';
-                unlink($files_dir.$file);
+                unlink($this->params->get('gs_files_directory').'/'.$file);
             }
         }
 
@@ -242,12 +246,12 @@ class OrderService
         $data = [
             'fields' => [
                 'project' => [
-                    'id' => $_ENV['GS_ORDER_PROJECT_ID'],
+                    'id' => $this->params->get('gs_order_project_id'),
                 ],
                 'summary' => $gsOrder->getJobTitle(),
                 'description' => $description,
                 'issuetype' => [
-                    'id' => $_ENV['GS_ORDER_ISSUETYPE_ID'],
+                    'id' => $this->params->get('gs_order_issuetype_id'),
                 ],
                 'reporter' => [
                   'name' => $author
@@ -293,7 +297,7 @@ class OrderService
     {
         // @TODO: Fix path parameters.
         $ownCloudPath = $_ENV['OWNCLOUD_USER_SHARED_DIR'].$order_id.'/_Materiale/';
-        $file = file_get_contents($this->appKernel->getProjectDir().'/private/files/gs/'.$fileName);
+        $file = file_get_contents($this->params->get('gs_files_directory').'/'.$fileName);
         $response = $this->ownCloudService->sendFile(
             'owncloud/remote.php/dav/files/'.$ownCloudPath.$fileName,
             $file

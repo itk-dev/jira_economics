@@ -19,7 +19,7 @@ jQuery(document).ready(function () {
     // index when inserting a new item (e.g. 2)
     $collectionHolder.data('index', $collectionHolder.find(':input').length);
 
-    addTagForm($collectionHolder, $newLinkLi, 1);
+    addFileForm($collectionHolder, $newLinkLi, 1);
     // Look for changes in file upload.
     $('.multi-upload-lines').change(function (e) {
         var fileLine = $(e.target).attr('id');
@@ -43,13 +43,13 @@ jQuery(document).ready(function () {
 });
 
 /**
- *  * Add a new form element.
+ * Add a new form element.
  *
  * @param $collectionHolder
  * @param $newLinkLi
  * @param initial
  */
-function addTagForm ($collectionHolder, $newLinkLi, initial) {
+function addFileForm ($collectionHolder, $newLinkLi, initial) {
     // Get the data-prototype explained earlier
     var prototype = $collectionHolder.data('prototype');
 
@@ -72,7 +72,7 @@ function addTagForm ($collectionHolder, $newLinkLi, initial) {
 
     // add a delete link to the new form
     if (initial === 0) {
-        addTagFormDeleteLink($newFormLi, $collectionHolder, $newLinkLi);
+        addFileFormDeleteLink($newFormLi, $collectionHolder, $newLinkLi);
     }
 }
 
@@ -83,7 +83,7 @@ function addTagForm ($collectionHolder, $newLinkLi, initial) {
  * @param $collectionHolder
  * @param $newLinkLi
  */
-function addTagFormDeleteLink ($lineFormLi, $collectionHolder, $newLinkLi) {
+function addFileFormDeleteLink ($lineFormLi, $collectionHolder, $newLinkLi) {
     var $removeFormButton = $('<div class="remove-line-file"><i class="remove-line-icon fa fa fa-trash-alt"></i></div>');
     $lineFormLi.append($removeFormButton);
 
@@ -109,6 +109,6 @@ function addEmptyLine ($collectionHolder, $newLinkLi) {
         }
     });
     if (emptyFieldExists > 0) {
-        addTagForm($collectionHolder, $newLinkLi, 0);
+        addFileForm($collectionHolder, $newLinkLi, 0);
     }
 }
