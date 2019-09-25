@@ -21,6 +21,7 @@ const InvoiceEntryJiraFilter = (props) => {
                     <select
                         name={'billedFilter'}
                         className={'form-control'}
+                        aria-label={t('invoice_entry.filter.billed')}
                         value={props.filterValues.billedFilter}
                         onChange={props.handleChange}>
                         <option value={''}>
@@ -42,6 +43,7 @@ const InvoiceEntryJiraFilter = (props) => {
                     <select
                         name={'workerFilter'}
                         className={'form-control'}
+                        aria-label={t('invoice_entry.filter.worker')}
                         value={props.filterValues.workerFilter}
                         onChange={props.handleChange}>
                         <option value={''}>
@@ -62,6 +64,7 @@ const InvoiceEntryJiraFilter = (props) => {
                     <select
                         name={'epicFilter'}
                         className={'form-control'}
+                        aria-label={t('invoice_entry.filter.epic')}
                         value={props.filterValues.epicFilter}
                         onChange={props.handleChange}>
                         <option value={''}>
@@ -82,6 +85,7 @@ const InvoiceEntryJiraFilter = (props) => {
                     <select
                         name={'versionFilter'}
                         className={'form-control'}
+                        aria-label={t('invoice_entry.filter.version')}
                         value={props.filterValues.versionFilter}
                         onChange={props.handleChange}>
                         <option value={''}>
@@ -102,6 +106,7 @@ const InvoiceEntryJiraFilter = (props) => {
                 <select
                     name={'categoryFilter'}
                     className={'form-control'}
+                    aria-label={t('invoice_entry.filter.category')}
                     value={props.filterValues.categoryFilter}
                     onChange={props.handleChange}>
                     <option value={''}>
@@ -122,6 +127,7 @@ const InvoiceEntryJiraFilter = (props) => {
                 <select
                     name={'accountKeyFilter'}
                     className={'form-control'}
+                    aria-label={t('invoice_entry.filter.account_key')}
                     value={props.filterValues.accountKeyFilter}
                     onChange={props.handleChange}>
                     <option value={''}>
