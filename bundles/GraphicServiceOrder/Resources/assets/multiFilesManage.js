@@ -36,8 +36,8 @@ jQuery(document).ready(function () {
                 $(this).remove();
             }
         });
-        $('.multi-upload-lines #graphic_service_order_form_multi_upload_help').append('<div style="color:#dc3545">Bemærk: Eventuelle filer skal uploades igen!</div>')
-        addTagForm($collectionHolder, $newLinkLi, 1);
+        $('.multi-upload-lines #graphic_service_order_form_multi_upload_help').append('<div style="color:#dc3545">Bemærk: Eventuelle filer skal uploades igen!</div>');
+        addFileForm($collectionHolder, $newLinkLi, 1);
         $('.multi-upload-lines .custom-file-input').addClass('is-invalid');
     }
 });

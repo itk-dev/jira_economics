@@ -89,8 +89,6 @@ class GraphicServiceOrderForm extends AbstractType
                     'constraints' => [
                         new File([
                             'maxSize' => $this->params->get('form_file_gs_upload_size'),
-                            'mimeTypes' => $allowed_file_types,
-                            'mimeTypesMessage' => 'Please upload a valid file: '.implode(', ', array_keys($allowed_file_types)),
                         ]),
                     ],
                 ],
