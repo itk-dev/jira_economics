@@ -342,13 +342,14 @@ export class InvoiceEntry extends Component {
                     <Form onSubmit={this.handleSubmit}>
                         <div>
                             <label htmlFor="selectedToAccount">
-                                {t('invoice_entry.form.toAccount')}
+                                {t('invoice_entry.form.to_account')}
                             </label>
                             <Select
                                 value={toAccountOptions.filter(item => this.state.selectedToAccount === item.value)}
                                 name={'selectedToAccount'}
                                 placeholder={t('invoice.form.select_account')}
                                 isSearchable={true}
+                                aria-label={t('invoice_entry.form.to_account')}
                                 onChange={
                                     selectedOption => {
                                         this.setState({ selectedToAccount: selectedOption.value });
@@ -364,6 +365,7 @@ export class InvoiceEntry extends Component {
                                 name={'materialNumber'}
                                 placeholder={t('invoice.form.select_account')}
                                 isSearchable={true}
+                                aria-label={t('invoice_entry.form.material_number')}
                                 onChange={
                                     selectedOption => {
                                         this.setState({ materialNumber: selectedOption.value });

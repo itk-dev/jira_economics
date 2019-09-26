@@ -272,6 +272,7 @@ class Invoice extends Component {
                                                 value={ accountOptions.filter(item => this.state.formAccount === item.value) }
                                                 name={'formAccount'}
                                                 placeholder={t('invoice.form.select_account')}
+                                                aria-label={t('invoice.form.label.customer_account')}
                                                 isSearchable={true}
                                                 onChange={
                                                     selectedOption => {
@@ -294,6 +295,7 @@ class Invoice extends Component {
                                             name={'formPaidByAccount'}
                                             isSearchable={true}
                                             placeholder={t('invoice.form.select_account')}
+                                            aria-label={t('invoice.form.label.paid_by_account')}
                                             onChange={
                                                 selectedOption => {
                                                     this.setState({ formPaidByAccount: selectedOption.value });
