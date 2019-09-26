@@ -17,6 +17,7 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import ConfirmModal from '../components/ConfirmModal';
 import { withTranslation, Trans } from 'react-i18next';
+import Select from 'react-select';
 
 class Invoice extends Component {
     constructor (props) {
@@ -199,6 +200,20 @@ class Invoice extends Component {
         const invoiceId = this.props.match.params.invoiceId;
         const invoiceRecorded = this.props.invoice.data.recorded ? t('invoice.recorded_true') : t('invoice.recorded_false');
 
+        const accountOptions = this.state.accounts ? Object.keys(this.state.accounts).map((keyName) => {
+            return {
+                'value': parseInt(keyName),
+                'label': keyName + ': ' + this.state.accounts[keyName].name
+            };
+        }) : [];
+
+        const paidByAccountOptions = this.state.toAccounts ? Object.keys(this.state.toAccounts).map((keyName) => {
+            return {
+                'value': keyName,
+                'label': keyName + ': ' + this.state.toAccounts[keyName].name
+            };
+        }) : [];
+
         if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId !== parseInt(this.props.match.params.projectId)) {
             return (
                 <ContentWrapper>
@@ -220,7 +235,6 @@ class Invoice extends Component {
                     <div className="row mb-3">
                         <div className="col-md-6">
                             <p>
-
                                 <Trans i18nKey="invoice.invoice_id">
                                     Invoice number: <strong className="pr-3">{{ invoiceId }}</strong>
                                 </Trans>
@@ -253,23 +267,21 @@ class Invoice extends Component {
                                         <Form.Label htmlFor={'formAccount'}>
                                             {t('invoice.form.label.customer_account')}
                                         </Form.Label>
-                                        <Form.Control
-                                            as="select"
-                                            name={'formAccount'}
-                                            onChange={this.handleChange.bind(this)}
-                                            value={this.state.formAccount}
-                                        >
-                                            <option value=""> </option>
-                                            {this.state.accounts && Object.keys(this.state.accounts)
-                                                .map((keyName) => (
-                                                    this.state.accounts.hasOwnProperty(keyName) &&
-                                                    <option
-                                                        key={keyName + '-' + this.state.accounts[keyName].name}
-                                                        value={keyName}>
-                                                        {keyName}: {this.state.accounts[keyName].name}
-                                                    </option>
-                                                ))}
-                                        </Form.Control>
+                                        { this.state.accounts &&
+                                            <Select
+                                                value={ accountOptions.filter(item => this.state.formAccount === item.value) }
+                                                name={'formAccount'}
+                                                placeholder={t('invoice.form.select_account')}
+                                                aria-label={t('invoice.form.label.customer_account')}
+                                                isSearchable={true}
+                                                onChange={
+                                                    selectedOption => {
+                                                        this.setState({ formAccount: selectedOption.value });
+                                                    }
+                                                }
+                                                options={accountOptions}
+                                            />
+                                        }
                                         <small className="form-text text-muted mb-3">
                                             {t('invoice.form.helptext.customer_account')}
                                         </small>
@@ -277,23 +289,21 @@ class Invoice extends Component {
                                         <Form.Label htmlFor={'formPaidByAccount'}>
                                             {t('invoice.form.label.paid_by_account')}
                                         </Form.Label>
-                                        <Form.Control
-                                            as="select"
+                                        { this.state.toAccounts &&
+                                        <Select
+                                            value={ paidByAccountOptions.filter(item => this.state.formPaidByAccount === item.value) }
                                             name={'formPaidByAccount'}
-                                            onChange={this.handleChange.bind(this)}
-                                            value={this.state.formPaidByAccount}
-                                        >
-                                            <option value=""> </option>
-                                            {this.state.toAccounts && Object.keys(this.state.toAccounts)
-                                                .map((keyName) => (
-                                                    this.state.toAccounts.hasOwnProperty(keyName) &&
-                                                    <option
-                                                        key={keyName + '-' + this.state.toAccounts[keyName].name}
-                                                        value={keyName}>
-                                                        {keyName}: {this.state.toAccounts[keyName].name}
-                                                    </option>
-                                                ))}
-                                        </Form.Control>
+                                            isSearchable={true}
+                                            placeholder={t('invoice.form.select_account')}
+                                            aria-label={t('invoice.form.label.paid_by_account')}
+                                            onChange={
+                                                selectedOption => {
+                                                    this.setState({ formPaidByAccount: selectedOption.value });
+                                                }
+                                            }
+                                            options={paidByAccountOptions}
+                                        />
+                                        }
                                         <small className="form-text text-muted mb-3">
                                             {t('invoice.form.helptext.paid_by_account')}
                                         </small>
