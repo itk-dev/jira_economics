@@ -334,7 +334,8 @@ abstract class AbstractJiraService
      *
      * @return mixed
      */
-    public function getCustomFields() {
+    public function getCustomFields()
+    {
         return $this->get('/rest/api/2/field');
     }
 
@@ -342,11 +343,13 @@ abstract class AbstractJiraService
      * Get custom field id by field name.
      *
      * @param string $fieldName
-     * @param array $customFields
+     * @param array  $customFields
+     *
      * @return string
      */
-    public function getCustomFieldId($fieldName, array $customFields = null) {
-        if ($customFields == null) {
+    public function getCustomFieldId($fieldName, array $customFields = null)
+    {
+        if (null === $customFields) {
             $customFields = $this->getCustomFields();
         }
 
