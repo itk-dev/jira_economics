@@ -40,7 +40,7 @@ parameters:
                 title: 'Dash'
                 desc: 'App oversigt'
                 icon: 'fa-th-large'
-                routeName: 'portal_index'
+                routeName: 'jira_index'
                 # active: '/' === $pathInfo
 
             planning:
@@ -74,31 +74,14 @@ parameters:
             sprint_report:
                 title: 'Sprintrapport'
                 desc: 'Generér sprintrapport'
-                icon: 'fa-braille'
+                icon: 'fa-file-alt'
                 routeName: 'sprint_report_index'
 
-            # @TODO: Add when ready.
-
-            # taskWizard:
-            #     title: 'Task wizard'
-            #     desc: 'Opret mange tasks på en gang.'
-            #     icon: 'fa-tasks'
-            #     routeName: 'index'
-            #     # active: false
-
-            # order:
-            #     title: 'Ordre'
-            #     desc: 'Opret ordrepakker ud fra tasks i Jira'
-            #     icon: 'fa-box-open'
-            #     routeName: 'index'
-            #     # active: false
-
-            # sprintplan:
-            #     title: 'Sprintrapport'
-            #     desc: 'Generér sprintrapport'
-            #     icon: 'fa-braille'
-            #     routeName: 'index'
-            #     # active: false
+            gs_billing:
+                title: 'Grafisk service fakturering'
+                desc: 'Lav udtræk af grafiske opgaver'
+                icon: 'fa-file-export'
+                routeName: 'graphic_service_billing_index'
 
             portal:
                 title: 'Portal'
@@ -136,28 +119,18 @@ parameters:
                 routeName: 'expense_new'
                 btnTxt: 'Opret en udgift'
 
+            sprint_report:
+                title: 'Sprintrapport'
+                desc: 'Generér sprintrapport'
+                icon: 'fa-file-alt'
+                routeName: 'sprint_report_index'
+                btnTxt: 'Lav sprintrapport'
 
-            # @TODO: Add when ready.
-
-            # taskWizard:
-            #     title: 'Task wizard'
-            #     desc: 'Opret mange tasks på en gang.'
-            #     icon: 'fa-tasks'
-            #     routeName: 'index'
-            #     btnTxt: 'Bliv Task wizard'
-
-            # order:
-            #     title: 'Ordre'
-            #     desc: 'Opret ordrepakker ud fra tasks i Jira'
-            #     icon: 'fa-box-open'
-            #     routeName: 'index'
-            #     btnTxt: 'Pak en Ordre'
-
-            # sprintplan:
-            #     title: 'Sprintrapport'
-            #     desc: 'Generér sprintrapport'
-            #     icon: 'fa-braille'
-            #     routeName: 'index'
-            #     btnTxt: 'Se sprintrapporter'
+            gs_billing:
+                title: 'Grafisk service fakturering'
+                desc: 'Lav udtræk af grafiske opgaver'
+                icon: 'fa-file-export'
+                routeName: 'graphic_service_billing_index'
+                btnTxt: 'Lav udtræk'
 
     user_created.email: ~
