@@ -55,6 +55,7 @@ const resources = {
             'invoice.table.price': 'Pris pr. stk (DKK)',
             'invoice.table.total_price': 'Total pris (DKK)',
             'invoice.table.type': 'Type',
+            'invoice.form.select_account': 'Vælg konto',
             'home_page.table.exported_date': 'Eksporteret',
             'invoice.show_export_invoice': 'Vis faktura',
             'invoice.form.label.description': 'Beskrivelse',
