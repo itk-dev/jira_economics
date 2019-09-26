@@ -884,18 +884,25 @@ class BillingService extends JiraService
         $customFields = $customFields = $this->get('/rest/api/2/field');
 
         // Get Epic link field id.
-        $customFieldEpicId = $customFieldEpicLink = array_search(
+        $customFieldEpicId = array_search(
             'Epic Link',
             array_column($customFields, 'name')
         );
         $epicNameCustomFieldIdId = $customFields[$customFieldEpicId]->{'id'};
 
         // Get Epic name field id.
-        $customFieldEpicName = $customFieldEpicLink = array_search(
+        $customFieldEpicName = array_search(
             'Epic Name',
             array_column($customFields, 'name')
         );
         $epicNameCustomFieldId = $customFields[$customFieldEpicName]->{'id'};
+
+        // Get Epic link field id.
+        $customFieldAccountKey = array_search(
+            'Account',
+            array_column($customFields, 'name')
+        );
+        $customFieldAccountKeyId = $customFields[$customFieldAccountKey]->{'id'};
 
         foreach ($expenses as $expense) {
             foreach ($epics as $epic) {
@@ -904,6 +911,11 @@ class BillingService extends JiraService
                     $expense->issue->epicName = $epic->fields->{$epicNameCustomFieldId};
                     break;
                 }
+            }
+
+            $issueAccount = $expense->issue->fields->{$customFieldAccountKeyId};
+            if (null !== $issueAccount) {
+                $expense->issue->accountKey = $issueAccount->key;
             }
 
             $expense->issue->versions = array_reduce($expense->issue->fields->fixVersions, function ($carry, $version) {

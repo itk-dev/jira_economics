@@ -12,6 +12,7 @@ import '../css/react-datepicker.scss';
 import { withTranslation } from 'react-i18next';
 import WorklogSelect from '../components/WorklogSelect';
 import ExpenseSelect from '../components/ExpenseSelect';
+import Select from 'react-select';
 
 export class InvoiceEntry extends Component {
     constructor (props) {
@@ -113,12 +114,20 @@ export class InvoiceEntry extends Component {
             this.setState({
                 amount: this.state.invoiceEntry.amount ? this.state.invoiceEntry.amount : 0,
                 description: this.state.invoiceEntry.description ? this.state.invoiceEntry.description : '',
-                price: this.state.invoiceEntry.price ? this.state.invoiceEntry.price : this.state.invoice.account.defaultPrice,
+                price: this.state.invoiceEntry.price
+                    ? this.state.invoiceEntry.price
+                    : (this.state.invoice.account ? this.state.invoice.account.defaultPrice : 0),
                 product: this.state.invoiceEntry.product ? this.state.invoiceEntry.product : '',
                 selectedToAccount: this.state.invoiceEntry.account ? this.state.invoiceEntry.account : '',
-                materialNumber: this.state.invoiceEntry.materialNumber ? this.state.invoiceEntry.materialNumber : '',
-                selectedWorklogs: this.state.invoiceEntry.worklogIds,
-                selectedExpenses: this.state.invoiceEntry.expenseIds,
+                materialNumber: this.state.invoiceEntry.materialNumber ? parseInt(this.state.invoiceEntry.materialNumber) : '',
+                selectedWorklogs: this.state.invoiceEntry.hasOwnProperty('worklogIds') ? Object.keys(this.state.invoiceEntry.worklogIds).reduce((carry, worklogId) => {
+                    carry[worklogId] = true;
+                    return carry;
+                }, {}) : {},
+                selectedExpenses: this.state.invoiceEntry.hasOwnProperty('expenseIds') ? Object.keys(this.state.invoiceEntry.expenseIds).reduce((carry, expenseId) => {
+                    carry[expenseId] = true;
+                    return carry;
+                }, {}) : {},
                 initialized: true
             });
         }
@@ -280,6 +289,20 @@ export class InvoiceEntry extends Component {
             return this.spinner();
         }
 
+        const toAccountOptions = Object.keys(this.state.toAccounts).map((keyName) => {
+            return {
+                'value': keyName,
+                'label': keyName + ': ' + this.state.toAccounts[keyName].name
+            };
+        });
+
+        const materialOptions = Object.keys(this.state.materialNumbers).map((keyName) => {
+            return {
+                'value': this.state.materialNumbers[keyName],
+                'label': keyName + ': ' + this.state.materialNumbers[keyName]
+            };
+        });
+
         // Test for whether invoice entry form or worklog/expenses selection
         // should be displayed.
         if (this.state.displaySelectionScreen) {
@@ -319,35 +342,37 @@ export class InvoiceEntry extends Component {
                     <Form onSubmit={this.handleSubmit}>
                         <div>
                             <label htmlFor="selectedToAccount">
-                                {t('invoice_entry.form.toAccount')}
+                                {t('invoice_entry.form.to_account')}
                             </label>
-                            <Form.Control as="select" name={'selectedToAccount'} onChange={this.handleChange} defaultValue={this.state.account ? this.state.account : this.state.invoiceEntry.account}>
-                                <option value=""> </option>
-                                {this.state.hasOwnProperty('toAccounts') && Object.keys(this.state.toAccounts)
-                                    .map((keyName) => (
-                                        this.state.toAccounts.hasOwnProperty(keyName) &&
-                                        <option
-                                            key={keyName + '-' + this.state.toAccounts[keyName].name}
-                                            value={keyName}>
-                                            {keyName}: {this.state.toAccounts[keyName].name}
-                                        </option>
-                                    ))}
-                            </Form.Control>
+                            <Select
+                                value={toAccountOptions.filter(item => this.state.selectedToAccount === item.value)}
+                                name={'selectedToAccount'}
+                                placeholder={t('invoice.form.select_account')}
+                                isSearchable={true}
+                                aria-label={t('invoice_entry.form.to_account')}
+                                onChange={
+                                    selectedOption => {
+                                        this.setState({ selectedToAccount: selectedOption.value });
+                                    }
+                                }
+                                options={toAccountOptions}
+                            />
                             <label htmlFor="materialNumber">
-                                {t('invoice_entry.form.materialNumber')}
+                                {t('invoice_entry.form.material_number')}
                             </label>
-                            <Form.Control as="select" name={'materialNumber'} onChange={this.handleChange} defaultValue={this.state.materialNumber ? this.state.materialNumber : this.state.invoiceEntry.materialNumber}>
-                                <option value=""> </option>
-                                {this.state.hasOwnProperty('materialNumbers') && Object.keys(this.state.materialNumbers)
-                                    .map((keyName) => (
-                                        this.state.materialNumbers.hasOwnProperty(keyName) &&
-                                        <option
-                                            key={keyName + '-' + this.state.materialNumbers[keyName]}
-                                            value={this.state.materialNumbers[keyName]}>
-                                            {keyName}: {this.state.materialNumbers[keyName]}
-                                        </option>
-                                    ))}
-                            </Form.Control>
+                            <Select
+                                value={ materialOptions.filter(item => this.state.materialNumber === item.value) }
+                                name={'materialNumber'}
+                                placeholder={t('invoice.form.select_account')}
+                                isSearchable={true}
+                                aria-label={t('invoice_entry.form.material_number')}
+                                onChange={
+                                    selectedOption => {
+                                        this.setState({ materialNumber: selectedOption.value });
+                                    }
+                                }
+                                options={materialOptions}
+                            />
                             <label htmlFor="product">
                                 {t('invoice_entry.form.product')}
                             </label>
