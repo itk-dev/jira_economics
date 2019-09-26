@@ -200,6 +200,20 @@ class Invoice extends Component {
         const invoiceId = this.props.match.params.invoiceId;
         const invoiceRecorded = this.props.invoice.data.recorded ? t('invoice.recorded_true') : t('invoice.recorded_false');
 
+        const accountOptions = this.state.accounts ? Object.keys(this.state.accounts).map((keyName) => {
+            return {
+                'value': parseInt(keyName),
+                'label': keyName + ': ' + this.state.accounts[keyName].name
+            };
+        }) : [];
+
+        const paidByAccountOptions = this.state.toAccounts ? Object.keys(this.state.toAccounts).map((keyName) => {
+            return {
+                'value': keyName,
+                'label': keyName + ': ' + this.state.toAccounts[keyName].name
+            };
+        }) : [];
+
         if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId !== parseInt(this.props.match.params.projectId)) {
             return (
                 <ContentWrapper>
@@ -255,23 +269,16 @@ class Invoice extends Component {
                                         </Form.Label>
                                         { this.state.accounts &&
                                             <Select
-                                                value={this.state.formAccount}
+                                                value={ accountOptions.filter(item => this.state.formAccount === item.value) }
                                                 name={'formAccount'}
                                                 placeholder={t('invoice.form.select_account')}
                                                 isSearchable={true}
                                                 onChange={
                                                     selectedOption => {
-                                                        this.setState({ formAccount: selectedOption });
+                                                        this.setState({ formAccount: selectedOption.value });
                                                     }
                                                 }
-                                                options={
-                                                    Object.keys(this.state.accounts).map((keyName) => {
-                                                        return {
-                                                            'value': keyName,
-                                                            'label': keyName + ': ' + this.state.accounts[keyName].name
-                                                        };
-                                                    })
-                                                }
+                                                options={accountOptions}
                                             />
                                         }
                                         <small className="form-text text-muted mb-3">
@@ -283,23 +290,16 @@ class Invoice extends Component {
                                         </Form.Label>
                                         { this.state.toAccounts &&
                                         <Select
-                                            value={this.state.formPaidByAccount}
+                                            value={ paidByAccountOptions.filter(item => this.state.formPaidByAccount === item.value) }
                                             name={'formPaidByAccount'}
                                             isSearchable={true}
                                             placeholder={t('invoice.form.select_account')}
                                             onChange={
                                                 selectedOption => {
-                                                    this.setState({ formPaidByAccount: selectedOption });
+                                                    this.setState({ formPaidByAccount: selectedOption.value });
                                                 }
                                             }
-                                            options={
-                                                Object.keys(this.state.toAccounts).map((keyName) => {
-                                                    return {
-                                                        'value': keyName,
-                                                        'label': keyName + ': ' + this.state.toAccounts[keyName].name
-                                                    };
-                                                })
-                                            }
+                                            options={paidByAccountOptions}
                                         />
                                         }
                                         <small className="form-text text-muted mb-3">
