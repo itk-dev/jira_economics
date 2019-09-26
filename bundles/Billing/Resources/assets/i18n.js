@@ -89,6 +89,8 @@ const resources = {
             'invoice_entry.filter.version_option.all': 'Alle',
             'invoice_entry.filter.category': 'Alle',
             'invoice_entry.filter.category_option.all': 'Alle',
+            'invoice_entry.filter.account_key': 'Konto',
+            'invoice_entry.filter.account_key_option.all': 'Alle',
             'invoice_entry.table.billed': 'Faktureret',
             'invoice_entry.table.epic': 'Epic',
             'invoice_entry.table.worklog': 'Worklog',
