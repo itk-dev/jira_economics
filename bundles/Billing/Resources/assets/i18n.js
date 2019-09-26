@@ -114,6 +114,8 @@ const resources = {
             'invoice_entry.form.cancel': 'Annullér',
             'invoice_entry.form.total_price': 'Samlet pris',
             'invoice_entry.select_jira_items': 'Vælg indgange',
+            'invoice_entry.table.select_all': 'Vælg alle',
+            'invoice_entry.table.deselect_all': 'Fravælg alle',
             'invoice.form.type': 'Type',
             'invoice.form.types.manual': '',
             'invoice.form.types.expense': 'Udgift',
