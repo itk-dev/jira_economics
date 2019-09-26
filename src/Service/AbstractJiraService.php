@@ -330,6 +330,36 @@ abstract class AbstractJiraService
     }
 
     /**
+     * Get all Jira custom fields.
+     *
+     * @return mixed
+     */
+    public function getCustomFields() {
+        return $this->get('/rest/api/2/field');
+    }
+
+    /**
+     * Get custom field id by field name.
+     *
+     * @param string $fieldName
+     * @param array $customFields
+     * @return string
+     */
+    public function getCustomFieldId($fieldName, array $customFields = null) {
+        if ($customFields == null) {
+            $customFields = $this->getCustomFields();
+        }
+
+        // Get Epic name field id.
+        $customField = array_search(
+            $fieldName,
+            array_column($customFields, 'name')
+        );
+
+        return $customFields[$customField]->{'id'};
+    }
+
+    /**
      * Get tempo custom fields.
      *
      * @return mixed

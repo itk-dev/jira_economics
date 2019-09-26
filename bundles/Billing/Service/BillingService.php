@@ -802,15 +802,7 @@ class BillingService extends JiraService
         $versions = $project->versions;
         $epics = $this->getProjectEpics($projectId);
 
-        // Get custom fields.
-        $customFields = $customFields = $this->get('/rest/api/2/field');
-
-        // Get Epic name field id.
-        $customFieldEpicName = $customFieldEpicLink = array_search(
-            'Epic Name',
-            array_column($customFields, 'name')
-        );
-        $epicNameCustomFieldId = $customFields[$customFieldEpicName]->{'id'};
+        $epicNameCustomFieldId = $this->getCustomFieldId('Epic Name');
 
         foreach ($worklogs as $worklog) {
             $issue = $worklog->issue;
