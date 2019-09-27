@@ -254,7 +254,7 @@ class OrderService
                 'reporter' => [
                     'name' => $author,
                 ],
-                'customfield_10309' => (string) $gsOrder->getDebitor(),
+                $this->params->get('jira_debitor_field') => (string) $gsOrder->getDebitor(),
             ],
         ];
         $response = $this->hammerService->post('/rest/api/2/issue', $data);
@@ -282,7 +282,7 @@ class OrderService
     }
 
     /**
-     * Share file in owncloud.
+     * Share file in Owncloud.
      *
      * @param $fileName
      * @param $order_id
@@ -348,7 +348,7 @@ class OrderService
      * Store files locally.
      *
      * @param $gsOrder
-     * @param $uploadedFiles
+     * @param $form
      *
      * @return mixed
      */
@@ -370,15 +370,15 @@ class OrderService
     }
 
     /**
-     * @param $name
-     *
      * Send receipt mail
+
+     * @param $gsOrder
      *
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    private function sendReceiptMail($gsOrder)
+    private function sendReceiptMail(GsOrder $gsOrder)
     {
         $message = (new \Swift_Message($this->translator->trans('service_order_email.subject')))
             ->setFrom($_ENV['MAILER_EMAIL'])
