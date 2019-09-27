@@ -370,8 +370,8 @@ class OrderService
     }
 
     /**
-     * Send receipt mail
-
+     * Send receipt mail.
+     *
      * @param $gsOrder
      *
      * @throws \Twig\Error\LoaderError
