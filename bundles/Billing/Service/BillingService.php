@@ -842,7 +842,7 @@ class BillingService extends JiraService
             // Enrich with account name.
             if (isset($issue->accountKey)) {
                 foreach ($accounts as $account) {
-                    if ($account->key == $issue->accountKey) {
+                    if ($account->key === $issue->accountKey) {
                         $issue->accountName = $account->name;
                         break;
                     }
