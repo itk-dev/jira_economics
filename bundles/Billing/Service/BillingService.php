@@ -816,6 +816,7 @@ class BillingService extends JiraService
         foreach ($worklogs as $worklog) {
             $issue = $worklog->issue;
 
+            // Enrich with epic name.
             if (!empty($issue->epicKey)) {
                 foreach ($epics as $epic) {
                     if ($epic->key === $issue->epicKey) {
@@ -838,6 +839,7 @@ class BillingService extends JiraService
 
             $issue->versions = $issueVersions;
 
+            // Enrich with account name.
             if (isset($issue->accountKey)) {
                 foreach ($accounts as $account) {
                     if ($account->key == $issue->accountKey) {

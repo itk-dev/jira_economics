@@ -71,7 +71,7 @@ const InvoiceEntryJiraFilter = (props) => {
                         placeholder={t('invoice_entry.filter.billed_option.all')}
                         isSearchable={true}
                         isClearable={true}
-                        ariaLabel={t('invoice_entry.filter.billed')}
+                        aria-label={t('invoice_entry.filter.billed')}
                         onChange={(selectedOption) => props.handleChange('billedFilter', selectedOption ? selectedOption.value : '')}
                         options={billedFilterOptions}
                     />
@@ -86,7 +86,7 @@ const InvoiceEntryJiraFilter = (props) => {
                         name={'workerFilter'}
                         isSearchable={true}
                         isClearable={true}
-                        ariaLabel={t('invoice_entry.filter.worker')}
+                        aria-label={t('invoice_entry.filter.worker')}
                         placeholder={t('invoice_entry.filter.worker_option.all')}
                         onChange={(selectedOption) => props.handleChange('workerFilter', selectedOption ? selectedOption.value : '')}
                         options={workerFilterOptions}
@@ -102,7 +102,7 @@ const InvoiceEntryJiraFilter = (props) => {
                         name={'epicFilter'}
                         isSearchable={true}
                         isClearable={true}
-                        ariaLabel={t('invoice_entry.filter.epic')}
+                        aria-label={t('invoice_entry.filter.epic')}
                         placeholder={t('invoice_entry.filter.epic_option.all')}
                         onChange={(selectedOption) => props.handleChange('epicFilter', selectedOption ? selectedOption.value : '')}
                         options={epicFilterOptions}
@@ -118,7 +118,7 @@ const InvoiceEntryJiraFilter = (props) => {
                         name={'versionFilter'}
                         isSearchable={true}
                         isClearable={true}
-                        ariaLabel={t('invoice_entry.filter.version')}
+                        aria-label={t('invoice_entry.filter.version')}
                         placeholder={t('invoice_entry.filter.version_option.all')}
                         onChange={(selectedOption) => props.handleChange('versionFilter', selectedOption ? selectedOption.value : '')}
                         options={versionFilterOptions}
@@ -134,7 +134,7 @@ const InvoiceEntryJiraFilter = (props) => {
                     name={'categoryFilter'}
                     isSearchable={true}
                     isClearable={true}
-                    ariaLabel={t('invoice_entry.filter.category')}
+                    aria-label={t('invoice_entry.filter.category')}
                     placeholder={t('invoice_entry.filter.category_option.all')}
                     onChange={(selectedOption) => props.handleChange('categoryFilter', selectedOption ? selectedOption.value : '')}
                     options={categoryFilterOptions}
@@ -150,7 +150,7 @@ const InvoiceEntryJiraFilter = (props) => {
                     name={'accountKeyFilter'}
                     isSearchable={true}
                     isClearable={true}
-                    ariaLabel={t('invoice_entry.filter.account_key')}
+                    aria-label={t('invoice_entry.filter.account_key')}
                     placeholder={t('invoice_entry.filter.account_key_option.all')}
                     onChange={(selectedOption) => props.handleChange('accountKeyFilter', selectedOption ? selectedOption.value : '')}
                     options={accountKeyFilterOptions}
