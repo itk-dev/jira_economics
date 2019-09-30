@@ -2,6 +2,8 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $boundProjectId: '%gs_billing_project_id%'
 
     GraphicServiceBilling\:
         resource: '../../*'
@@ -10,3 +12,10 @@ services:
     GraphicServiceBilling\Controller\:
         resource: '../../Controller'
         tags: ['controller.service_arguments']
+
+    GraphicServiceBilling\Service\GraphicServiceBillingService:
+        arguments:
+            $jiraUrl: '%env(JIRA_URL)%'
+            $tokenStorage: '@security.token_storage'
+            $customerKey: '%env(JIRA_OAUTH_CUSTOMER_KEY)%'
+            $pemPath: '%env(JIRA_OAUTH_PEM_PATH)%'

@@ -5,6 +5,8 @@ parameters:
 #        'Eksterne m/moms': 111111
 #        'Eksterne u/moms': 222222
 
+#    gs_billing_project_id: 1234
+
     user_created.email:
         subject: '{{ site_name }} – brugeroprettelse'
         header: 'Bruger oprettet på {{ site_name }}'

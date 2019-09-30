@@ -5,6 +5,8 @@ namespace GraphicServiceBilling\Controller;
 use App\Service\MenuService;
 use GraphicServiceBilling\Service\GraphicServiceBillingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -26,6 +28,9 @@ class MainController extends AbstractController
      */
     public function index(Request $request, MenuService $menuService, GraphicServiceBillingService $billingService) {
         $formBuilder = $this->createFormBuilder();
+        $formBuilder->add('from', DateTimeType::class, []);
+        $formBuilder->add('to', DateTimeType::class, []);
+        $formBuilder->add('marketing', CheckboxType::class, []);
         $formBuilder->add('submit', SubmitType::class, []);
 
         $form = $formBuilder->getForm();

@@ -1,6 +1,7 @@
 parameters:
     billing_receiver_account: ~
     billing_material_numbers: ~
+    gs_billing_project_id: ~
     portal:
         menu:
             grafisk_service:
