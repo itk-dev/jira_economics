@@ -801,6 +801,7 @@ class BillingService extends JiraService
         $project = $this->getProject($projectId);
         $versions = $project->versions;
         $epics = $this->getProjectEpics($projectId);
+        $accounts = $this->getAllAccounts();
 
         // Get custom fields.
         $customFields = $customFields = $this->get('/rest/api/2/field');
@@ -834,6 +835,15 @@ class BillingService extends JiraService
             }
 
             $issue->versions = $issueVersions;
+
+            if (isset($issue->accountKey)) {
+                foreach ($accounts as $account) {
+                    if ($account->key == $issue->accountKey) {
+                        $issue->accountName = $account->name;
+                        break;
+                    }
+                }
+            }
 
             $worklogEntity = $this->worklogRepository->findOneBy(['worklogId' => $worklog->tempoWorklogId]);
 
@@ -924,6 +934,7 @@ class BillingService extends JiraService
             $issueAccount = $expense->issue->fields->{$customFieldAccountKeyId};
             if (null !== $issueAccount) {
                 $expense->issue->accountKey = $issueAccount->key;
+                $expense->issue->accountName = $issueAccount->name;
             }
 
             $expense->issue->versions = array_reduce($expense->issue->fields->fixVersions, function ($carry, $version) {

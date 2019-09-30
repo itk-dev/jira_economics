@@ -121,7 +121,7 @@ const InvoiceEntryJiraFilter = (props) => {
             </div>
             }
 
-            {props.accountKeys.length > 0 &&
+            {Object.keys(props.accountKeys).length > 0 &&
             <div>
                 <label htmlFor={'accountKeyFilter'}>{t('invoice_entry.filter.account_key')}</label>
                 <select
@@ -133,9 +133,9 @@ const InvoiceEntryJiraFilter = (props) => {
                     <option value={''}>
                         {t('invoice_entry.filter.account_key_option.all')}
                     </option>
-                    {props.accountKeys.map((accountKey) => (
+                    {Object.keys(props.accountKeys).map((accountKey) => (
                         <option key={accountKey} value={accountKey}>
-                            {accountKey}
+                            {props.accountKeys[accountKey]}: {accountKey}
                         </option>
                     ))}
                 </select>
