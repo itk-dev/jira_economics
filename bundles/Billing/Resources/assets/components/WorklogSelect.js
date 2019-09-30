@@ -14,7 +14,8 @@ const WorklogSelect = (props) => {
         startDateFilter: '',
         endDateFilter: '',
         epicFilter: '',
-        versionFilter: ''
+        versionFilter: '',
+        accountKeyFilter: ''
     });
 
     const { t } = props;
@@ -42,6 +43,14 @@ const WorklogSelect = (props) => {
         .reduce((carry, worklog) => {
             if (carry.indexOf(worklog.worker) === -1) {
                 carry.push(worklog.worker);
+            }
+            return carry;
+        }, []);
+
+    const accountKeys = props.worklogs
+        .reduce((carry, worklog) => {
+            if (worklog.issue.accountKey && carry.indexOf(worklog.issue.accountKey) === -1) {
+                carry.push(worklog.issue.accountKey);
             }
             return carry;
         }, []);
@@ -107,6 +116,12 @@ const WorklogSelect = (props) => {
             }
         }
 
+        if (filterValues.accountKeyFilter !== '') {
+            if (item.issue.accountKey !== filterValues.accountKeyFilter) {
+                return false;
+            }
+        }
+
         return true;
     };
 
@@ -131,6 +146,7 @@ const WorklogSelect = (props) => {
                 categories={{}}
                 versions={versions}
                 workers={workers}
+                accountKeys={accountKeys}
             />
 
             <WorklogSelectTable
@@ -145,6 +161,7 @@ const WorklogSelect = (props) => {
                             issueSummary: worklog.issue.summary,
                             comment: worklog.comment,
                             issueId: worklog.issue.id,
+                            accountKey: worklog.issue.accountKey,
                             epicName: worklog.issue.epicName,
                             versions: worklog.issue.versions,
                             worker: worklog.worker,

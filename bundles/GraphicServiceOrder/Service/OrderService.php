@@ -18,6 +18,9 @@ use GraphicServiceOrder\Message\OwnCloudShareMessage;
 use GraphicServiceOrder\Repository\GsOrderRepository;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use App\Service\UserManager;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class OrderService
 {
@@ -28,17 +31,25 @@ class OrderService
     private $entityManager;
     private $messageBus;
     private $ownCloudFilesFolder;
+    private $tokenStorage;
+    private $fileUploader;
+    private $userManager;
+    private $params;
 
     /**
      * OrderService constructor.
      *
-     * @param \Doctrine\ORM\EntityManagerInterface              $entityManager
-     * @param \App\Service\HammerService                        $hammerService
-     * @param \App\Service\OwnCloudService                      $ownCloudService
-     * @param \GraphicServiceOrder\Repository\GsOrderRepository $gsOrderRepository
-     * @param \Symfony\Component\HttpKernel\KernelInterface     $appKernel
-     * @param \Symfony\Component\Messenger\MessageBusInterface  $messageBus
-     * @param string                                            $ownCloudFilesFolder
+     * @param \Doctrine\ORM\EntityManagerInterface                                                $entityManager
+     * @param \App\Service\HammerService                                                          $hammerService
+     * @param \App\Service\OwnCloudService                                                        $ownCloudService
+     * @param \GraphicServiceOrder\Repository\GsOrderRepository                                   $gsOrderRepository
+     * @param \Symfony\Component\HttpKernel\KernelInterface                                       $appKernel
+     * @param \Symfony\Component\Messenger\MessageBusInterface                                    $messageBus
+     * @param string                                                                              $ownCloudFilesFolder
+     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
+     * @param \GraphicServiceOrder\Service\FileUploader                                           $fileUploader
+     * @param \App\Service\UserManager                                                            $userManager
+     * @param \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface           $params
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -47,16 +58,67 @@ class OrderService
         GsOrderRepository $gsOrderRepository,
         KernelInterface $appKernel,
         MessageBusInterface $messageBus,
-        string $ownCloudFilesFolder
+        string $ownCloudFilesFolder,
+        TokenStorageInterface $tokenStorage,
+        FileUploader $fileUploader,
+        UserManager $userManager,
+        ParameterBagInterface $params
     ) {
         $this->entityManager = $entityManager;
-        $this->gsOrderRepository = $gsOrderRepository;
         $this->hammerService = $hammerService;
         $this->ownCloudService = $ownCloudService;
         $this->gsOrderRepository = $gsOrderRepository;
         $this->appKernel = $appKernel;
         $this->messageBus = $messageBus;
         $this->ownCloudFilesFolder = $ownCloudFilesFolder;
+        $this->tokenStorage = $tokenStorage;
+        $this->fileUploader = $fileUploader;
+        $this->userManager = $userManager;
+        $this->params = $params;
+    }
+
+    /**
+     * Preset some values from user entity.
+     *
+     * @return \GraphicServiceOrder\Entity\GsOrder
+     */
+    public function prepareOrder()
+    {
+        $gsOrder = new GsOrder();
+        $token = $this->tokenStorage->getToken();
+        if (null !== $token) {
+            $user = $token->getUser();
+            $gsOrder
+                ->setFullName($user->getFullName())
+                ->setAddress($user->getAddress())
+                ->setDepartment($user->getDepartment())
+                ->setPostalcode($user->getPostalCode())
+                ->setCity($user->getCity());
+        }
+
+        return $gsOrder;
+    }
+
+    /**
+     * Update active user with submitted values.
+     *
+     * @param $gsOrder
+     */
+    private function updateUserWithGSOrder($gsOrder)
+    {
+        $token = $this->tokenStorage->getToken();
+        if (null !== $token) {
+            /** @var \App\Entity\User $user */
+            $user = $token->getUser();
+            $user
+                ->setFullName($gsOrder->getFullName())
+                ->setDepartment($gsOrder->getDepartment())
+                ->setAddress($gsOrder->getAddress())
+                ->setPostalCode($gsOrder->getPostalcode())
+                ->setCity($gsOrder->getCity());
+
+            $this->userManager->updateUser($user);
+        }
     }
 
     /**
@@ -65,7 +127,7 @@ class OrderService
      * @param \GraphicServiceOrder\Entity\GsOrder $gsOrder
      * @param $uploadedFiles
      */
-    public function createOrder(GsOrder $gsOrder, $uploadedFiles)
+    public function createOrder(GsOrder $gsOrder, $form)
     {
         // Create a task on a jira project.
         $taskCreated = $this->createOrderTask($gsOrder);
@@ -75,7 +137,7 @@ class OrderService
         $gsOrder->setIssueKey($taskCreated->key);
 
         // Store file locally.
-        $gsOrder = $this->storeFile($gsOrder, $uploadedFiles);
+        $gsOrder = $this->storeFile($gsOrder, $form);
         $gsOrder->setOrderStatus('new');
 
         $this->entityManager->persist($gsOrder);
@@ -84,6 +146,7 @@ class OrderService
         // Notify messenger of new job.
         $this->messageBus->dispatch(new OwnCloudShareMessage($gsOrder->getId()));
 
+        $this->updateUserWithGSOrder($gsOrder);
         // @TODO: Send notification mail.
     }
 
@@ -128,9 +191,7 @@ class OrderService
             $order->setOrderStatus('received');
             // Remove local files.
             foreach ($order->getOwnCloudSharedFiles() as $file) {
-                // @TODO: Fix path parameters.
-                $files_dir = $this->appKernel->getProjectDir().'/private/files/gs/';
-                unlink($files_dir.$file);
+                unlink($this->params->get('gs_files_directory').'/'.$file);
             }
         }
 
@@ -151,12 +212,12 @@ class OrderService
         $data = [
             'fields' => [
                 'project' => [
-                    'id' => $_ENV['GS_ORDER_PROJECT_ID'],
+                    'id' => $this->params->get('gs_order_project_id'),
                 ],
                 'summary' => $gsOrder->getJobTitle(),
                 'description' => $description,
                 'issuetype' => [
-                    'id' => $_ENV['GS_ORDER_ISSUETYPE_ID'],
+                    'id' => $this->params->get('gs_order_issuetype_id'),
                 ],
             ],
         ];
@@ -199,7 +260,7 @@ class OrderService
         // @TODO: Fix path parameters.
         $ownCloudPath = $_ENV['OWNCLOUD_USER_SHARED_DIR'].$order_id.'/_Materiale/';
         $ocFilename = $order_id.'-'.$fileName;
-        $file = file_get_contents($this->appKernel->getProjectDir().'/private/files/gs/'.$fileName);
+        $file = file_get_contents($this->params->get('gs_files_directory').'/'.$fileName);
         $response = $this->ownCloudService->sendFile(
             'owncloud/remote.php/dav/files/'.$ownCloudPath.$ocFilename,
             $file
@@ -255,12 +316,14 @@ class OrderService
      *
      * @return mixed
      */
-    private function storeFile(GsOrder $gsOrder, $uploadedFiles)
+    private function storeFile(GsOrder $gsOrder, $form)
     {
-        $uploadedFiles = explode(';', $uploadedFiles);
-        foreach ($uploadedFiles as $key => $file) {
-            if (empty($file)) {
-                unset($uploadedFiles[$key]);
+        $uploadedFiles = [];
+        $upload_files = $form['multi_upload']->getData();
+        if ($upload_files) {
+            foreach ($upload_files as $file) {
+                $uploadedFileName = $this->fileUploader->upload($file);
+                $uploadedFiles[] = $uploadedFileName;
             }
         }
         $gsOrder->setFiles($uploadedFiles);
