@@ -36,7 +36,7 @@ const ExpenseSelectTable = (props) => {
                         <input
                             name={'selectAll'}
                             type="checkbox"
-                            aria-label={ getNumberOfSelectedExpenses() === props.expenses.length ? t('invoice_entry.table.deselect_all') : t('invoice_entry.table.select_all') }
+                            ariaLabel={ getNumberOfSelectedExpenses() === props.expenses.length ? t('invoice_entry.table.deselect_all') : t('invoice_entry.table.select_all') }
                             checked={ getNumberOfSelectedExpenses() === props.expenses.length }
                             onChange={ () => { toggleSelectAll(); } }/>
                     </th>

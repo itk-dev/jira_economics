@@ -36,7 +36,7 @@ const WorklogSelectTable = (props) => {
                         <input
                             name={'selectAll'}
                             type="checkbox"
-                            aria-label={ getNumberOfSelectedWorklogs() === props.worklogs.length ? t('invoice_entry.table.deselect_all') : t('invoice_entry.table.select_all') }
+                            ariaLabel={ getNumberOfSelectedWorklogs() === props.worklogs.length ? t('invoice_entry.table.deselect_all') : t('invoice_entry.table.select_all') }
                             checked={ getNumberOfSelectedWorklogs() === props.worklogs.length }
                             onChange={ () => { toggleSelectAll(); } }/>
                     </th>
