@@ -48,20 +48,17 @@ const ExpenseSelect = (props) => {
         }, {});
 
     const accountKeys = props.expenses
-        .reduce((carry, worklog) => {
-            if (worklog.issue.accountKey && carry.indexOf(worklog.issue.accountKey) === -1) {
-                carry.push(worklog.issue.accountKey);
+        .reduce((carry, expense) => {
+            if (expense.issue.accountKey && !carry.hasOwnProperty(expense.issue.accountKey)) {
+                carry[expense.issue.accountKey] = expense.issue.accountName;
             }
             return carry;
-        }, []);
+        }, {});
 
-    const handleFilterChange = (event) => {
-        const fieldName = event.target.name;
-        const fieldVal = event.target.value;
-
+    const handleFilterChange = (field, value) => {
         setFilterValues({
             ...filterValues,
-            [fieldName]: fieldVal
+            [field]: value
         });
     };
 
