@@ -57,15 +57,16 @@ const InvoiceEntryJiraFilter = (props) => {
     return (
         <Form.Group>
             <label htmlFor={'startDateFilter'}>{t('invoice_entry.filter.start_date')}</label>
-            <DatePicker name={'startDateFilter'} dateFormat={'dd/MM yyyy'} className={'form-control'} selected={props.filterValues.startDateFilter} isClearable onChange={props.handleStartDateChange} />
+            <DatePicker id={'startDateFilter'} name={'startDateFilter'} dateFormat={'dd/MM yyyy'} className={'form-control'} selected={props.filterValues.startDateFilter} isClearable onChange={props.handleStartDateChange} />
 
             <label htmlFor={'endDateFilter'}>{t('invoice_entry.filter.end_date')}</label>
-            <DatePicker name={'endDateFilter'} dateFormat={'dd/MM yyyy'} className={'form-control'} selected={props.filterValues.endDateFilter} isClearable onChange={props.handleEndDateChange} />
+            <DatePicker id={'endDateFilter'} name={'endDateFilter'} dateFormat={'dd/MM yyyy'} className={'form-control'} selected={props.filterValues.endDateFilter} isClearable onChange={props.handleEndDateChange} />
 
             {!props.billedFilterDisable &&
                 <div>
                     <label htmlFor={'billedFilter'}>{t('invoice_entry.filter.billed')}</label>
                     <Select
+                        id={'billedFilter'}
                         value={billedFilterOptions.filter(item => props.filterValues.billedFilter === item.value)}
                         name={'billedFilter'}
                         placeholder={t('invoice_entry.filter.billed_option.all')}
@@ -82,6 +83,7 @@ const InvoiceEntryJiraFilter = (props) => {
                 <div>
                     <label htmlFor={'workerFilter'}>{t('invoice_entry.filter.worker')}</label>
                     <Select
+                        id={'workerFilter'}
                         value={workerFilterOptions.filter(item => props.filterValues.workerFilter === item.value)}
                         name={'workerFilter'}
                         isSearchable={true}
@@ -98,6 +100,7 @@ const InvoiceEntryJiraFilter = (props) => {
                 <div>
                     <label htmlFor={'epicFilter'}>{t('invoice_entry.filter.epic')}</label>
                     <Select
+                        id={'epicFilter'}
                         value={epicFilterOptions.filter(item => props.filterValues.epicFilter === item.value)}
                         name={'epicFilter'}
                         isSearchable={true}
@@ -114,6 +117,7 @@ const InvoiceEntryJiraFilter = (props) => {
                 <div>
                     <label htmlFor={'versionFilter'}>{t('invoice_entry.filter.version')}</label>
                     <Select
+                        id={'versionFilter'}
                         value={versionFilterOptions.filter(item => props.filterValues.versionFilter === item.value)}
                         name={'versionFilter'}
                         isSearchable={true}
@@ -130,6 +134,7 @@ const InvoiceEntryJiraFilter = (props) => {
             <div>
                 <label htmlFor={'categoryFilter'}>{t('invoice_entry.filter.category')}</label>
                 <Select
+                    id={'categoryFilter'}
                     value={categoryFilterOptions.filter(item => props.filterValues.categoryFilter === item.value)}
                     name={'categoryFilter'}
                     isSearchable={true}
@@ -146,6 +151,7 @@ const InvoiceEntryJiraFilter = (props) => {
             <div>
                 <label htmlFor={'accountKeyFilter'}>{t('invoice_entry.filter.account_key')}</label>
                 <Select
+                    id={'accountKeyFilter'}
                     value={accountKeyFilterOptions.filter(item => props.filterValues.accountKeyFilter === item.value)}
                     name={'accountKeyFilter'}
                     isSearchable={true}
