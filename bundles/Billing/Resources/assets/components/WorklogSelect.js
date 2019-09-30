@@ -55,13 +55,10 @@ const WorklogSelect = (props) => {
             return carry;
         }, {});
 
-    const handleFilterChange = (event) => {
-        const fieldName = event.target.name;
-        const fieldVal = event.target.value;
-
+    const handleFilterChange = (field, value) => {
         setFilterValues({
             ...filterValues,
-            [fieldName]: fieldVal
+            [field]: value
         });
     };
 

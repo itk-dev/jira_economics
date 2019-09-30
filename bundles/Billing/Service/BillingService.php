@@ -816,10 +816,12 @@ class BillingService extends JiraService
         foreach ($worklogs as $worklog) {
             $issue = $worklog->issue;
 
-            foreach ($epics as $epic) {
-                if ($epic->key === $issue->epicKey) {
-                    $issue->epicName = $epic->fields->{$epicNameCustomFieldId};
-                    break;
+            if (!empty($issue->epicKey)) {
+                foreach ($epics as $epic) {
+                    if ($epic->key === $issue->epicKey) {
+                        $issue->epicName = $epic->fields->{$epicNameCustomFieldId};
+                        break;
+                    }
                 }
             }
 
