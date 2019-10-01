@@ -808,16 +808,20 @@ class BillingService extends JiraService
         $project = $this->getProject($projectId);
         $versions = $project->versions;
         $epics = $this->getProjectEpics($projectId);
+        $accounts = $this->getAllAccounts();
 
         $epicNameCustomFieldId = $this->getCustomFieldId('Epic Name');
 
         foreach ($worklogs as $worklog) {
             $issue = $worklog->issue;
 
-            foreach ($epics as $epic) {
-                if ($epic->key === $issue->epicKey) {
-                    $issue->epicName = $epic->fields->{$epicNameCustomFieldId};
-                    break;
+            // Enrich with epic name.
+            if (!empty($issue->epicKey)) {
+                foreach ($epics as $epic) {
+                    if ($epic->key === $issue->epicKey) {
+                        $issue->epicName = $epic->fields->{$epicNameCustomFieldId};
+                        break;
+                    }
                 }
             }
 
@@ -833,6 +837,16 @@ class BillingService extends JiraService
             }
 
             $issue->versions = $issueVersions;
+
+            // Enrich with account name.
+            if (isset($issue->accountKey)) {
+                foreach ($accounts as $account) {
+                    if ($account->key === $issue->accountKey) {
+                        $issue->accountName = $account->name;
+                        break;
+                    }
+                }
+            }
 
             $worklogEntity = $this->worklogRepository->findOneBy(['worklogId' => $worklog->tempoWorklogId]);
 
@@ -907,6 +921,7 @@ class BillingService extends JiraService
 
             if (isset($expense->issue->fields->{$customFieldAccountKeyId})) {
                 $expense->issue->accountKey = $expense->issue->fields->{$customFieldAccountKeyId}->key;
+                $expense->issue->accountName = $expense->issue->fields->{$customFieldAccountKeyId}->name;
             }
 
             $expense->issue->versions = array_reduce($expense->issue->fields->fixVersions, function ($carry, $version) {
