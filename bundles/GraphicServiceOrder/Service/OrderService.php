@@ -51,6 +51,8 @@ class OrderService
     private $swiftMailer;
     /** @var \Twig\Environment */
     private $twig;
+    /** @var \Symfony\Contracts\Translation\TranslatorInterface  */
+    private $translator;
     /** @var \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface */
     private $params;
 
