@@ -1,4 +1,5 @@
 parameters:
+    custom_fields: ~
     billing_receiver_account: ~
     billing_material_numbers: ~
     portal:

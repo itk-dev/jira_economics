@@ -130,3 +130,8 @@ OWNCLOUD_PASSWORD=""
 
 If you do not have a `config/jira_economics.local.yaml` file, copy from `config/jira_economics.local.yaml.dist`.
 Set `billing_to_accounts` to your accounts.
+
+# Custom Field Mappings
+
+Go to: `[JIRA URL]/secure/admin/ViewCustomFields.jspa` to find a list of all custom fields in your jira instance.
+Find the ids of the custom fields that are in `jira_economics.local.yaml.dist` and add to `jira_economics.local.yaml` under custom_fields.
