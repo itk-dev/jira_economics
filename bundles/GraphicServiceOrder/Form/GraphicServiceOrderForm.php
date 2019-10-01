@@ -32,11 +32,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class GraphicServiceOrderForm extends AbstractType
 {
-    /** @var \App\Service\HammerService  */
+    /* @var \App\Service\HammerService */
     private $hammerService;
-    /** @var \Symfony\Component\DependencyInjection\ContainerInterface  */
+    /* @var \Symfony\Component\DependencyInjection\ContainerInterface */
     private $container;
-    /** @var array */
+    /* @var array */
     private $params;
 
     public function __construct(HammerService $hammerService, ContainerInterface $container, array $gsOrderConfiguration)
