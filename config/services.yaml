@@ -54,6 +54,7 @@ services:
             $tokenStorage: '@security.token_storage'
             $customerKey: '%env(JIRA_OAUTH_CUSTOMER_KEY)%'
             $pemPath: '%env(resolve:JIRA_OAUTH_PEM_PATH)%'
+            $customFieldMappings: '%custom_fields%'
 
     App\Service\HammerService:
         arguments:

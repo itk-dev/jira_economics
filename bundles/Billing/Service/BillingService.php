@@ -43,6 +43,7 @@ class BillingService extends JiraService
      * @param \Billing\Repository\ExpenseRepository $expenseRepository
      * @param \Billing\Repository\InvoiceRepository $invoiceRepository
      * @param $boundReceiverAccount
+     * @param $boundCustomFieldMappings
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -53,9 +54,10 @@ class BillingService extends JiraService
         WorklogRepository $worklogRepository,
         ExpenseRepository $expenseRepository,
         InvoiceRepository $invoiceRepository,
-        $boundReceiverAccount
+        $boundReceiverAccount,
+        $boundCustomFieldMappings
     ) {
-        parent::__construct($jiraUrl, $tokenStorage, $customerKey, $pemPath);
+        parent::__construct($jiraUrl, $tokenStorage, $customerKey, $pemPath, $boundCustomFieldMappings);
 
         $this->entityManager = $entityManager;
         $this->worklogRepository = $worklogRepository;
@@ -798,6 +800,11 @@ class BillingService extends JiraService
     public function getProjectWorklogsWithMetadata($projectId)
     {
         $worklogs = $this->getProjectWorklogs($projectId);
+
+        if (count($worklogs) == 0) {
+            return $worklogs;
+        }
+
         $project = $this->getProject($projectId);
         $versions = $project->versions;
         $epics = $this->getProjectEpics($projectId);
@@ -878,31 +885,16 @@ class BillingService extends JiraService
     public function getProjectExpensesWithMetadata($projectId)
     {
         $expenses = $this->getProjectExpenses($projectId);
+
+        if (count($expenses) == 0) {
+            return $expenses;
+        }
+
         $epics = $this->getProjectEpics($projectId);
 
-        // Get custom fields.
-        $customFields = $customFields = $this->get('/rest/api/2/field');
-
-        // Get Epic link field id.
-        $customFieldEpicId = array_search(
-            'Epic Link',
-            array_column($customFields, 'name')
-        );
-        $epicNameCustomFieldIdId = $customFields[$customFieldEpicId]->{'id'};
-
-        // Get Epic name field id.
-        $customFieldEpicName = array_search(
-            'Epic Name',
-            array_column($customFields, 'name')
-        );
-        $epicNameCustomFieldId = $customFields[$customFieldEpicName]->{'id'};
-
-        // Get Epic link field id.
-        $customFieldAccountKey = array_search(
-            'Account',
-            array_column($customFields, 'name')
-        );
-        $customFieldAccountKeyId = $customFields[$customFieldAccountKey]->{'id'};
+        $epicNameCustomFieldIdId = $this->getCustomFieldId('Epic Link');
+        $epicNameCustomFieldId = $this->getCustomFieldId('Epic Name');
+        $customFieldAccountKeyId = $this->getCustomFieldId('Account');
 
         foreach ($expenses as $expense) {
             foreach ($epics as $epic) {
@@ -913,9 +905,8 @@ class BillingService extends JiraService
                 }
             }
 
-            $issueAccount = $expense->issue->fields->{$customFieldAccountKeyId};
-            if (null !== $issueAccount) {
-                $expense->issue->accountKey = $issueAccount->key;
+            if (isset($expense->issue->fields->{$customFieldAccountKeyId})) {
+                $expense->issue->accountKey = $expense->issue->fields->{$customFieldAccountKeyId}->key;
             }
 
             $expense->issue->versions = array_reduce($expense->issue->fields->fixVersions, function ($carry, $version) {

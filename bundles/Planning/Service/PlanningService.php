@@ -16,14 +16,20 @@ class PlanningService extends JiraService
 {
     /**
      * Constructor.
+     * @param $jiraUrl
+     * @param $tokenStorage
+     * @param $customerKey
+     * @param $pemPath
+     * @param $customFieldMappings
      */
     public function __construct(
         $jiraUrl,
         $tokenStorage,
         $customerKey,
-        $pemPath
+        $pemPath,
+        $customFieldMappings
     ) {
-        parent::__construct($jiraUrl, $tokenStorage, $customerKey, $pemPath);
+        parent::__construct($jiraUrl, $tokenStorage, $customerKey, $pemPath, $customFieldMappings);
     }
 
     public function getBoard($boardId)

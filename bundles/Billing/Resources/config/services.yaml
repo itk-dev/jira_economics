@@ -5,6 +5,7 @@ services:
         bind:
             $boundReceiverAccount: '%billing_receiver_account%'
             $boundMaterialNumbers: '%billing_material_numbers%'
+            $boundCustomFieldMappings: '%custom_fields%'
 
     Billing\:
         resource: '../../*'

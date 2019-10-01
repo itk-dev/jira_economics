@@ -21,18 +21,23 @@ class JiraService extends AbstractJiraService
     protected $tokenStorage;
     protected $customerKey;
     protected $pemPath;
-    private $entity_manager;
 
     /**
      * Constructor.
+     * @param $jiraUrl
+     * @param $tokenStorage
+     * @param $customerKey
+     * @param $pemPath
+     * @param $customFieldMappings
      */
     public function __construct(
         $jiraUrl,
         $tokenStorage,
         $customerKey,
-        $pemPath
+        $pemPath,
+        $customFieldMappings
     ) {
-        parent::__construct($jiraUrl);
+        parent::__construct($jiraUrl, $customFieldMappings);
         $this->tokenStorage = $tokenStorage;
         $this->customerKey = $customerKey;
         $this->pemPath = $pemPath;
