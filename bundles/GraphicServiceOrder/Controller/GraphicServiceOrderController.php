@@ -30,12 +30,12 @@ class GraphicServiceOrderController extends AbstractController
      *
      * @Route("/", name="form")
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \GraphicServiceOrder\Service\OrderService $orderService
+     * @param \Symfony\Component\HttpFoundation\Request                                           $request
+     * @param \GraphicServiceOrder\Service\OrderService                                           $orderService
      * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     * 
+     *
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
