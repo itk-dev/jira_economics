@@ -17,10 +17,12 @@ use GuzzleHttp\Exception\RequestException;
 abstract class AbstractJiraService
 {
     protected $jiraUrl;
+    protected $customFieldMappings;
 
-    public function __construct($jiraUrl)
+    public function __construct($jiraUrl, $customFieldMappings)
     {
         $this->jiraUrl = $jiraUrl;
+        $this->customFieldMappings = $customFieldMappings;
     }
 
     /**
@@ -327,6 +329,30 @@ abstract class AbstractJiraService
 
             return $carry;
         }, []);
+    }
+
+    /**
+     * Get all Jira custom fields.
+     *
+     * @return mixed
+     */
+    public function getCustomFields()
+    {
+        return $this->get('/rest/api/2/field');
+    }
+
+    /**
+     * Get custom field id by field name.
+     *
+     * These refer to mappings set in jira_economics.local.yaml.
+     *
+     * @param string $fieldName
+     *
+     * @return string
+     */
+    public function getCustomFieldId($fieldName)
+    {
+        return isset($this->customFieldMappings[$fieldName]) ? 'customfield_'.$this->customFieldMappings[$fieldName] : false;
     }
 
     /**

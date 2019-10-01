@@ -10,7 +10,6 @@
 
 namespace SprintReport\Service;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Service\JiraService;
 
 class SprintReportService extends JiraService
@@ -22,14 +21,16 @@ class SprintReportService extends JiraService
      * @param $customerKey
      * @param $pemPath
      * @param $jiraUrl
+     * @param $customFieldMappings
      */
     public function __construct(
         $tokenStorage,
         $customerKey,
         $pemPath,
-        $jiraUrl
+        $jiraUrl,
+        $customFieldMappings
     ) {
-        parent::__construct($jiraUrl, $tokenStorage, $customerKey, $pemPath);
+        parent::__construct($jiraUrl, $tokenStorage, $customerKey, $pemPath, $customFieldMappings);
     }
 
     /**
@@ -49,32 +50,9 @@ class SprintReportService extends JiraService
         // Get version, project, customFields from Jira.
         $version = $this->get('/rest/api/2/version/'.$vid);
         $project = $this->getProject($version->projectId);
-        $customFields = $this->get('/rest/api/2/field');
 
-        // Find customField definitions.
-        $customFieldEpicLink = array_search(
-            'Epic Link',
-            array_column($customFields, 'name')
-        );
-        if (false === $customFieldEpicLink) {
-            throw new HttpException(
-                500,
-                'Epic Link custom field does not exist'
-            );
-        }
-        $customFieldEpicLink = $customFields[$customFieldEpicLink];
-
-        $customFieldSprint = array_search(
-            'Sprint',
-            array_column($customFields, 'name')
-        );
-        if (false === $customFieldSprint) {
-            throw new HttpException(
-                500,
-                'Sprint custom field does not exist'
-            );
-        }
-        $customFieldSprint = $customFields[$customFieldSprint];
+        $customFieldEpicLinkId = $this->getCustomFieldId('Epic Link');
+        $customFieldSprintId = $this->getCustomFieldId('Sprint');
 
         // Get active sprint.
         $activeSprint = $this->get(
@@ -101,8 +79,8 @@ class SprintReportService extends JiraService
                 'assignee',
                 'status',
                 'resolutionDate',
-                $customFieldEpicLink->id,
-                $customFieldSprint->id,
+                $customFieldEpicLinkId,
+                $customFieldSprintId,
             ]
         );
 
@@ -145,40 +123,42 @@ class SprintReportService extends JiraService
             $issue->sprints = [];
 
             // Get sprints for issue.
-            foreach ($issue->fields->{$customFieldSprint->id} as $sprintString) {
-                $replace = preg_replace(
-                    ['/.*\[/', '/].*/'],
-                    '',
-                    $sprintString
-                );
-                $fields = explode(',', $replace);
+            if (isset($issue->fields->{$customFieldSprintId})) {
+                foreach ($issue->fields->{$customFieldSprintId} as $sprintString) {
+                    $replace = preg_replace(
+                        ['/.*\[/', '/].*/'],
+                        '',
+                        $sprintString
+                    );
+                    $fields = explode(',', $replace);
 
-                $sprint = [];
-                foreach ($fields as $field) {
-                    $split = explode('=', $field);
+                    $sprint = [];
+                    foreach ($fields as $field) {
+                        $split = explode('=', $field);
 
-                    $sprint[$split[0]] = $split[1];
-                }
+                        $sprint[$split[0]] = $split[1];
+                    }
 
-                // Set shortName
-                $sprint['shortName'] = str_replace('Sprint ', '', $sprint['name']);
+                    // Set shortName
+                    $sprint['shortName'] = str_replace('Sprint ', '', $sprint['name']);
 
-                $issue->sprints[] = (object) $sprint;
+                    $issue->sprints[] = (object) $sprint;
 
-                if (!isset($sprints[$sprint['id']])) {
-                    $sprints[$sprint['id']] = (object) $sprint;
-                }
+                    if (!isset($sprints[$sprint['id']])) {
+                        $sprints[$sprint['id']] = (object) $sprint;
+                    }
 
-                if ('ACTIVE' === $sprint['state'] || 'FUTURE' === $sprint['state']) {
-                    $issue->assignedToSprint = (object) $sprint;
+                    if ('ACTIVE' === $sprint['state'] || 'FUTURE' === $sprint['state']) {
+                        $issue->assignedToSprint = (object) $sprint;
+                    }
                 }
             }
 
             // Get issue epic.
-            if (isset($issue->fields->{$customFieldEpicLink->id})) {
-                if (!isset($epics[$issue->fields->{$customFieldEpicLink->id}])) {
-                    $epic = $epics[$issue->fields->{$customFieldEpicLink->id}] = $this->get(
-                        'rest/agile/1.0/epic/'.$issue->fields->{$customFieldEpicLink->id}
+            if (isset($issue->fields->{$customFieldEpicLinkId})) {
+                if (!isset($epics[$issue->fields->{$customFieldEpicLinkId}])) {
+                    $epic = $epics[$issue->fields->{$customFieldEpicLinkId}] = $this->get(
+                        'rest/agile/1.0/epic/'.$issue->fields->{$customFieldEpicLinkId}
                     );
 
                     $epic->spentSum = 0;
@@ -186,7 +166,7 @@ class SprintReportService extends JiraService
                     $epic->originalEstimateSum = 0;
                     $epic->plannedWorkSum = 0;
                 }
-                $issue->epic = $epics[$issue->fields->{$customFieldEpicLink->id}];
+                $issue->epic = $epics[$issue->fields->{$customFieldEpicLinkId}];
             } else {
                 $issue->epic = $epics['NoEpic'];
             }
