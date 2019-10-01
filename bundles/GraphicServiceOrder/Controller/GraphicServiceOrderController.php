@@ -25,7 +25,6 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class GraphicServiceOrderController extends AbstractController
 {
-
   /**
    * Create a service order.
    *
