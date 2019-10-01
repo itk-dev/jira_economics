@@ -25,17 +25,22 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class GraphicServiceOrderController extends AbstractController
 {
-    /**
-     * Create a service order.
-     *
-     * @Route("/", name="form")
-     *
-     * @param \Symfony\Component\HttpFoundation\Request                                           $request
-     * @param \GraphicServiceOrder\Service\OrderService                                           $orderService
-     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
+
+  /**
+   *
+   * Create a service order.
+   *
+   * @Route("/", name="form")
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param \GraphicServiceOrder\Service\OrderService $orderService
+   * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+   * @throws \Twig\Error\LoaderError
+   * @throws \Twig\Error\RuntimeError
+   * @throws \Twig\Error\SyntaxError
+   */
     public function newOrder(Request $request, OrderService $orderService, TokenStorageInterface $tokenStorage)
     {
         $gsOrder = $orderService->prepareOrder();
@@ -57,11 +62,15 @@ class GraphicServiceOrderController extends AbstractController
         ]);
     }
 
-    /**
-     * Receipt page displayed when an order was created.
-     *
-     * @Route("/submitted/{id}", name="submitted")
-     */
+  /**
+   * Receipt page displayed when an order was created.
+   *
+   * @Route("/submitted/{id}", name="submitted")
+   *
+   * @param \GraphicServiceOrder\Entity\GsOrder $order
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   */
     public function showOrderSubmitted(GsOrder $order)
     {
         return $this->render('@GraphicServiceOrderBundle/showOrderSubmitted.html.twig', [
