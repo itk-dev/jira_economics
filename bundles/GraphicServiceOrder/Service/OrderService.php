@@ -27,33 +27,33 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OrderService
 {
-    /** @var \App\Service\HammerService */
+    /* @var \App\Service\HammerService */
     private $hammerService;
-    /** @var \App\Service\OwnCloudService */
+    /* @var \App\Service\OwnCloudService */
     private $ownCloudService;
-    /** @var \GraphicServiceOrder\Repository\GsOrderRepository */
+    /* @var \GraphicServiceOrder\Repository\GsOrderRepository */
     private $gsOrderRepository;
-    /** @var \Symfony\Component\HttpKernel\KernelInterface */
+    /* @var \Symfony\Component\HttpKernel\KernelInterface */
     private $appKernel;
-    /** @var \Doctrine\ORM\EntityManagerInterface */
+    /* @var \Doctrine\ORM\EntityManagerInterface */
     private $entityManager;
-    /** @var \Symfony\Component\Messenger\MessageBusInterface */
+    /* @var \Symfony\Component\Messenger\MessageBusInterface */
     private $messageBus;
-    /** @var string */
+    /* @var string */
     private $ownCloudFilesFolder;
-    /** @var \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface */
+    /* @var \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface */
     private $tokenStorage;
-    /** @var \GraphicServiceOrder\Service\FileUploader */
+    /* @var \GraphicServiceOrder\Service\FileUploader */
     private $fileUploader;
-    /** @var \App\Service\UserManager */
+    /* @var \App\Service\UserManager */
     private $userManager;
-    /** @var \Swift_Mailer */
+    /* @var \Swift_Mailer */
     private $swiftMailer;
-    /** @var \Twig\Environment */
+    /* @var \Twig\Environment */
     private $twig;
-    /** @var \Symfony\Contracts\Translation\TranslatorInterface  */
+    /* @var \Symfony\Contracts\Translation\TranslatorInterface */
     private $translator;
-    /** @var \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface */
+    /* @var \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface */
     private $params;
 
     /**

@@ -27,7 +27,6 @@ class GraphicServiceOrderController extends AbstractController
 {
 
   /**
-   *
    * Create a service order.
    *
    * @Route("/", name="form")
