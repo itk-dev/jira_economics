@@ -162,7 +162,7 @@ parameters:
 
     user_created.email: ~
 
-    gsorder_bundle:
+    gsorder_bundles:
         field_debitor: ~
         gs_files_directory: '%env(resolve:GS_FILES_DIRECTORY)%'
         form_file_gs_upload_size: '%env(resolve:FORM_FILE_GS_UPLOAD_SIZE)%'
