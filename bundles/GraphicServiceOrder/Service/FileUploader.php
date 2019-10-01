@@ -17,6 +17,11 @@ class FileUploader
 {
     private $targetDirectory;
 
+    /**
+     * FileUploader constructor.
+     *
+     * @param $targetDirectory
+     */
     public function __construct($targetDirectory)
     {
         $this->targetDirectory = $targetDirectory;

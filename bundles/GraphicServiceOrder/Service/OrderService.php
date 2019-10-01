@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use GraphicServiceOrder\Entity\GsOrder;
 use GraphicServiceOrder\Message\OwnCloudShareMessage;
 use GraphicServiceOrder\Repository\GsOrderRepository;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -23,22 +24,34 @@ use App\Service\UserManager;
 use Swift_Mailer;
 use Twig\Environment;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class OrderService
 {
+    /** @var \App\Service\HammerService */
     private $hammerService;
+    /** @var \App\Service\OwnCloudService */
     private $ownCloudService;
+    /** @var \GraphicServiceOrder\Repository\GsOrderRepository */
     private $gsOrderRepository;
+    /** @var \Symfony\Component\HttpKernel\KernelInterface */
     private $appKernel;
+    /** @var \Doctrine\ORM\EntityManagerInterface */
     private $entityManager;
+    /** @var \Symfony\Component\Messenger\MessageBusInterface */
     private $messageBus;
+    /** @var string */
     private $ownCloudFilesFolder;
+    /** @var \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface */
     private $tokenStorage;
+    /** @var \GraphicServiceOrder\Service\FileUploader */
     private $fileUploader;
+    /** @var \App\Service\UserManager */
     private $userManager;
+    /** @var \Swift_Mailer */
     private $swiftMailer;
+    /** @var \Twig\Environment */
     private $twig;
+    /** @var \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface */
     private $params;
 
     /**
@@ -57,7 +70,7 @@ class OrderService
      * @param \Swift_Mailer                                                                       $swiftMailer
      * @param \Twig\Environment                                                                   $twig
      * @param \Symfony\Contracts\Translation\TranslatorInterface                                  $translator
-     * @param \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface           $params
+     * @param array                                                                               $gsOrderConfiguration
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -73,7 +86,7 @@ class OrderService
         Swift_Mailer $swiftMailer,
         Environment $twig,
         TranslatorInterface $translator,
-        ParameterBagInterface $params
+        array $gsOrderConfiguration
     ) {
         $this->entityManager = $entityManager;
         $this->hammerService = $hammerService;
@@ -88,7 +101,7 @@ class OrderService
         $this->swiftMailer = $swiftMailer;
         $this->twig = $twig;
         $this->translator = $translator;
-        $this->params = $params;
+        $this->params = new ParameterBag($gsOrderConfiguration);
     }
 
     /**
@@ -254,7 +267,7 @@ class OrderService
                 'reporter' => [
                     'name' => $author,
                 ],
-                $this->params->get('jira_debitor_field') => (string) $gsOrder->getDebitor(),
+                $this->params->get('field_debitor') => (string) $gsOrder->getDebitor(),
             ],
         ];
         $response = $this->hammerService->post('/rest/api/2/issue', $data);
@@ -282,7 +295,7 @@ class OrderService
     }
 
     /**
-     * Share file in Owncloud.
+     * Share file in ownCloud.
      *
      * @param $fileName
      * @param $order_id
