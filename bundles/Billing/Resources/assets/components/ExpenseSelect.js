@@ -14,7 +14,8 @@ const ExpenseSelect = (props) => {
         endDateFilter: '',
         epicFilter: '',
         versionFilter: '',
-        categoryFilter: ''
+        categoryFilter: '',
+        accountKeyFilter: ''
     });
 
     const { t } = props;
@@ -46,13 +47,18 @@ const ExpenseSelect = (props) => {
             return carry;
         }, {});
 
-    const handleFilterChange = (event) => {
-        const fieldName = event.target.name;
-        const fieldVal = event.target.value;
+    const accountKeys = props.expenses
+        .reduce((carry, expense) => {
+            if (expense.issue.accountKey && !carry.hasOwnProperty(expense.issue.accountKey)) {
+                carry[expense.issue.accountKey] = expense.issue.accountName;
+            }
+            return carry;
+        }, {});
 
+    const handleFilterChange = (field, value) => {
         setFilterValues({
             ...filterValues,
-            [fieldName]: fieldVal
+            [field]: value
         });
     };
 
@@ -107,6 +113,12 @@ const ExpenseSelect = (props) => {
             }
         }
 
+        if (filterValues.accountKeyFilter !== '') {
+            if (item.issue.accountKey !== filterValues.accountKeyFilter) {
+                return false;
+            }
+        }
+
         return true;
     };
 
@@ -131,6 +143,7 @@ const ExpenseSelect = (props) => {
                 categories={categories}
                 versions={versions}
                 workers={[]}
+                accountKeys={accountKeys}
             />
 
             <ExpenseSelectTable
@@ -148,6 +161,7 @@ const ExpenseSelect = (props) => {
                             epicName: expense.issue.epicName,
                             category: expense.expenseCategory.name,
                             versions: expense.issue.versions,
+                            accountKey: expense.issue.accountKey,
                             billed: expense.billed ? t('invoice_entry.billed_text') : '',
                             amount: expense.amount,
                             date: expense.date
