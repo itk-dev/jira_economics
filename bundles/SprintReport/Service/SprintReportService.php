@@ -10,7 +10,6 @@
 
 namespace SprintReport\Service;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use App\Service\JiraService;
 
 class SprintReportService extends JiraService

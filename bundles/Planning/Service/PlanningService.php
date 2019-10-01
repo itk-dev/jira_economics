@@ -16,6 +16,7 @@ class PlanningService extends JiraService
 {
     /**
      * Constructor.
+     *
      * @param $jiraUrl
      * @param $tokenStorage
      * @param $customerKey

@@ -801,7 +801,7 @@ class BillingService extends JiraService
     {
         $worklogs = $this->getProjectWorklogs($projectId);
 
-        if (count($worklogs) == 0) {
+        if (0 === \count($worklogs)) {
             return $worklogs;
         }
 
@@ -886,7 +886,7 @@ class BillingService extends JiraService
     {
         $expenses = $this->getProjectExpenses($projectId);
 
-        if (count($expenses) == 0) {
+        if (0 === \count($expenses)) {
             return $expenses;
         }
 

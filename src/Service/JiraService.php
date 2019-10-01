@@ -24,6 +24,7 @@ class JiraService extends AbstractJiraService
 
     /**
      * Constructor.
+     *
      * @param $jiraUrl
      * @param $tokenStorage
      * @param $customerKey

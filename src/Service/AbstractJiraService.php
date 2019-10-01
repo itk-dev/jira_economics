@@ -352,7 +352,7 @@ abstract class AbstractJiraService
      */
     public function getCustomFieldId($fieldName)
     {
-        return isset($this->customFieldMappings[$fieldName]) ? 'customfield_' . $this->customFieldMappings[$fieldName] : false;
+        return isset($this->customFieldMappings[$fieldName]) ? 'customfield_'.$this->customFieldMappings[$fieldName] : false;
     }
 
     /**
