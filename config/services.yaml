@@ -62,6 +62,7 @@ services:
             $jiraUrl: '%env(JIRA_URL)%'
             $apiUser: '%env(JIRA_USER)%'
             $apiPass: '%env(JIRA_PASS)%'
+            $customFieldMappings: '%custom_fields%'
 
     App\Service\OwnCloudService:
         arguments:
