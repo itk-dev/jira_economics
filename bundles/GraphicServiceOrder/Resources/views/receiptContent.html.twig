@@ -1,0 +1,69 @@
+<h3 class="mt-4">{{ 'service_order_form.job_description.header'|trans }}</h3>
+<div class="mb-2">
+    <span class="label"><strong>ID:</strong></span>
+    <span class="value">{{ order.issueKey }}</span>
+</div>
+<div class="mb-2">
+    <span class="label"><strong>{{ 'service_order_form.job_description.title.label'|trans }}:</strong></span>
+    <span class="value">{{ order.jobTitle }}</span>
+</div>
+<div class="mb-2">
+    <span class="label"><strong>{{ 'service_order_form.job_description.orders.label'|trans }}:</strong></span>
+    {% if order.orderLines is defined %}
+        <ul>
+            {% for line in order.orderLines %}
+                <li>{{ line.amount }} {{ line.type }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
+<div class="mb-2">
+    <span class="label"><strong>{{ 'service_order_form.job_description.files.label'|trans }}:</strong></span>
+    {% if order.files is defined %}
+        <ul>
+            {% for file in order.files %}
+                <li>{{ file }} <small class="text-muted">({{ 'service_order_form.job_description.files.comment'|trans }})</small></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
+<div class="mb-2">
+    <span class="label"><strong>{{ 'service_order_form.job_description.description.label'|trans }}:</strong></span>
+    <span class="value">{{ order.description }}</span>
+</div>
+
+<h3 class="mt-4">{{ 'service_order_form.job_payment.header'|trans }}</h3>
+<div class="mb-2">
+    {% if order.marketingAccount %}
+        <span class="label"><strong>{{ 'service_order_form.job_payment.marketing_account.label'|trans }}:</strong></span>
+    {% else %}
+        <span class="label"><strong>{{ 'service_order_form.job_payment.debitor.label'|trans }}:</strong></span>
+        <span class="value">{{ order.debitor }}</span>
+    {% endif %}
+</div>
+
+<h3 class="mt-4">{{ 'service_order_form.job_delivery.header'|trans }}</h3>
+<div class="mb-2">
+    <span class="label"><strong>{{ 'service_order_form.job_delivery.department.label'|trans }}:</strong></span>
+    <span class="value">{{ order.department }}</span>
+</div>
+
+<div class="mb-2">
+    <span class="label"><strong>{{ 'service_order_form.job_delivery.address.label'|trans }}:</strong></span>
+    <div>
+        <div class="value">{{ order.address }}</div>
+        <div class="value"><span>{{ order.postalcode }}</span> <span>{{ order.city }}</span></div>
+    </div>
+</div>
+
+<div class="mb-2">
+    <span class="label"><strong>{{ 'service_order_form.job_delivery.date.label'|trans }}:</strong></span>
+    <span class="value">{{ order.date|date('d-m-Y') }}</span>
+</div>
+
+<div class="mb-2">
+    <span class="label"><strong>{{ 'service_order_form.job_delivery.delivery_description.label'|trans }}:</strong></span>
+    <span class="value">{{ order.deliveryDescription }}</span>
+</div>
