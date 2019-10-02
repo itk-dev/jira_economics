@@ -17,14 +17,14 @@ class HammerService extends AbstractJiraService
     protected $apiUser;
     protected $apiPass;
 
-  /**
-   * HammerService constructor.
-   *
-   * @param $jiraUrl
-   * @param $apiUser
-   * @param $apiPass
-   * @param $customFieldMappings
-   */
+    /**
+     * HammerService constructor.
+     *
+     * @param $jiraUrl
+     * @param $apiUser
+     * @param $apiPass
+     * @param $customFieldMappings
+     */
     public function __construct(
         $jiraUrl,
         $apiUser,
