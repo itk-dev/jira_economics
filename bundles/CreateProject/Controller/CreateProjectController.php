@@ -10,7 +10,6 @@
 
 namespace CreateProject\Controller;
 
-use App\Service\JiraService;
 use App\Service\HammerService;
 use App\Service\MenuService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
