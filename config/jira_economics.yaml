@@ -162,3 +162,10 @@ parameters:
             #     btnTxt: 'Se sprintrapporter'
 
     user_created.email: ~
+
+    gsorder_bundle:
+        field_debitor: ~
+        gs_files_directory: '%env(resolve:GS_FILES_DIRECTORY)%'
+        form_file_gs_upload_size: '%env(resolve:FORM_FILE_GS_UPLOAD_SIZE)%'
+        gs_order_project_id: '%env(resolve:GS_ORDER_PROJECT_ID)%'
+        gs_order_issuetype_id: '%env(resolve:GS_ORDER_ISSUETYPE_ID)%'
