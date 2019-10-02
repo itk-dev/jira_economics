@@ -28,6 +28,9 @@
             justify-content: space-between;
             padding: 1em 0 0;
             border-top: 1px solid $gray-300;
+            margin-bottom: 1rem;
+            position: relative;
+
             &:first-child,
             &:last-child {
                 border: 0;
@@ -36,6 +39,11 @@
 
             > fieldset {
                 width: 100%;
+            }
+
+            > div {
+                justify-content: left;
+                position: relative;
             }
 
             > div,
@@ -54,31 +62,23 @@
                 }
             }
 
-            .remove-line {
-                @extend %remove-line;
-            }
-        }
-    }
-
-    .multi-upload-lines {
-        .custom-file {
-            flex: 0 0 75%;
-        }
-
-        li {
-            margin-bottom: 1rem;
-            position: relative;
-
-            > div {
-                justify-content: left;
-                position: relative;
-            }
-
             .invalid-feedback {
                 position: absolute;
                 top: 40px;
             }
+
+            .remove-line {
+                @extend %remove-line;
+            }
         }
+
+        .custom-file {
+            flex: 0 0 75%;
+            height: 100%;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+        }
+
         .remove-line-file {
             display: block;
             margin: 10px;
@@ -109,11 +109,5 @@
         @include media-breakpoint-up(md) {
             margin-top: 37px;
         }
-    }
-
-    .custom-file {
-        height: 100%;
-        border: 1px solid #ced4da;
-        border-radius: .25rem;
     }
 }

@@ -12,6 +12,7 @@ namespace GraphicServiceOrder\Form;
 
 use App\Service\HammerService;
 use GraphicServiceOrder\Entity\GsOrder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormInterface;
@@ -28,21 +29,23 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class GraphicServiceOrderForm extends AbstractType
 {
+    /* @var \App\Service\HammerService */
     private $hammerService;
+    /* @var \Symfony\Component\DependencyInjection\ContainerInterface */
     private $container;
+    /* @var array */
     private $params;
 
-    public function __construct(HammerService $hammerService, ContainerInterface $container, ParameterBagInterface $params, array $options = [])
+    public function __construct(HammerService $hammerService, ContainerInterface $container, array $gsOrderConfiguration)
     {
         $this->hammerService = $hammerService;
         $this->container = $container;
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
-        $this->params = $params;
+        $this->params = new ParameterBag($gsOrderConfiguration);
     }
 
     /**
@@ -53,14 +56,6 @@ class GraphicServiceOrderForm extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $allowed_file_types = [
-            'pdf' => 'application/pdf',
-            'zip' => 'application/zip',
-            'jpg' => 'image/jpeg',
-            'png' => 'image/png',
-            'doc' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        ];
-
         $builder
             ->add('full_name', TextType::class, [
                 'label' => 'service_order_form.full_name.label',
@@ -97,8 +92,6 @@ class GraphicServiceOrderForm extends AbstractType
                     'constraints' => [
                         new File([
                             'maxSize' => $this->params->get('form_file_gs_upload_size'),
-                            'mimeTypes' => $allowed_file_types,
-                            'mimeTypesMessage' => 'Please upload a valid file: '.implode(', ', array_keys($allowed_file_types)),
                         ]),
                     ],
                 ],

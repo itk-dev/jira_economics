@@ -10,7 +10,7 @@
 
 namespace CreateProject\Controller;
 
-use App\Service\JiraService;
+use App\Service\HammerService;
 use App\Service\MenuService;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,12 +22,12 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CreateProjectController extends Controller
 {
-    private $jiraService;
+    private $hammerService;
     private $formData;
 
-    public function __construct(JiraService $jiraService)
+    public function __construct(HammerService $hammerService)
     {
-        $this->jiraService = $jiraService;
+        $this->hammerService = $hammerService;
     }
 
     /**
@@ -42,11 +42,11 @@ class CreateProjectController extends Controller
 
         $this->formData = [
             'form' => $form->getData(),
-            'projects' => $this->jiraService->getAllProjects(),
-            'accounts' => $this->jiraService->getAllAccounts(),
-            'projectCategories' => $this->jiraService->getAllProjectCategories(),
+            'projects' => $this->hammerService->getAllProjects(),
+            'accounts' => $this->hammerService->getAllAccounts(),
+            'projectCategories' => $this->hammerService->getAllProjectCategories(),
             'allTeamsConfig' => $this->getParameter('teamconfig'),
-            'user' => $this->jiraService->getCurrentUser(),
+            'user' => $this->hammerService->getCurrentUser(),
             'jira_url' => $_ENV['JIRA_URL'],
         ];
 
@@ -65,7 +65,7 @@ class CreateProjectController extends Controller
             if (!$newProjectKey) {
                 exit('Error: No project was created.');
             } else {
-                $project = $this->jiraService->getProject($newProjectKey);
+                $project = $this->hammerService->getProject($newProjectKey);
             }
 
             // Check for new account.
@@ -101,7 +101,7 @@ class CreateProjectController extends Controller
                 $account = $this->createJiraAccount();
             } else {
                 // Set account key from selected account in form.
-                $account = $this->jiraService->get('rest/tempo-accounts/1/account/key/'.$this->formData['form']['account']);
+                $account = $this->hammerService->get('rest/tempo-accounts/1/account/key/'.$this->formData['form']['account']);
             }
 
             // Add project to tempo account
@@ -138,7 +138,7 @@ class CreateProjectController extends Controller
      */
     public function createProjectSubmitted(
         MenuService $menuService,
-        JiraService $jiraService,
+        HammerService $hammerService,
         Request $request
     ) {
         return $this->render(
@@ -165,7 +165,7 @@ class CreateProjectController extends Controller
             'name' => $this->formData['form']['new_customer_name'],
             'key' => $this->formData['form']['new_customer_key'],
         ];
-        $response = $this->jiraService->post(
+        $response = $this->hammerService->post(
             'rest/tempo-accounts/1/customer/',
             $customer
         );
@@ -202,7 +202,7 @@ class CreateProjectController extends Controller
                 'username' => $_ENV['CPB_ACCOUNT_MANAGER'],
             ],
         ];
-        $response = $this->jiraService->post(
+        $response = $this->hammerService->post(
             'rest/tempo-accounts/1/account/',
             $account
         );
@@ -239,7 +239,7 @@ class CreateProjectController extends Controller
             'permissionScheme' => $this->formData['selectedTeamConfig']['permission_scheme'],
         ];
 
-        $response = $this->jiraService->post(
+        $response = $this->hammerService->post(
             'rest/extender/1.0/project/createProject',
             $project
         );
@@ -267,7 +267,7 @@ class CreateProjectController extends Controller
             'accountId' => $account->id,
             'scope' => $project->id,
         ];
-        $response = $this->jiraService->post(
+        $response = $this->hammerService->post(
             'rest/tempo-accounts/1/link/',
             $link
         );
@@ -297,7 +297,7 @@ class CreateProjectController extends Controller
             'editable' => false,
         ];
 
-        $filterResponse = $this->jiraService->post(
+        $filterResponse = $this->hammerService->post(
             '/rest/api/2/filter',
             $filter
         );
@@ -310,7 +310,7 @@ class CreateProjectController extends Controller
             'edit' => false,
         ];
 
-        $projectShareResponse = $this->jiraService->post(
+        $projectShareResponse = $this->hammerService->post(
             '/rest/api/2/filter/'.$filterResponse->id.'/permission',
             $projectShare
         );
@@ -322,7 +322,7 @@ class CreateProjectController extends Controller
             'filterId' => $filterResponse->id,
         ];
 
-        $boardResponse = $this->jiraService->post(
+        $boardResponse = $this->hammerService->post(
             '/rest/agile/1.0/board',
             $board
         );
@@ -339,7 +339,7 @@ class CreateProjectController extends Controller
     private function allProjectsByKey()
     {
         $projects = [];
-        $allProjects = $this->jiraService->getAllProjects();
+        $allProjects = $this->hammerService->getAllProjects();
         foreach ($allProjects as $project) {
             $projects[$project->key] = [
                 'key' => $project->key,

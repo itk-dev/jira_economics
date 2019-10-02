@@ -15,18 +15,23 @@ use GuzzleHttp\Client;
 class HammerService extends AbstractJiraService
 {
     protected $apiUser;
-
     protected $apiPass;
 
     /**
-     * Constructor.
+     * HammerService constructor.
+     *
+     * @param $jiraUrl
+     * @param $apiUser
+     * @param $apiPass
+     * @param $customFieldMappings
      */
     public function __construct(
         $jiraUrl,
         $apiUser,
-        $apiPass
+        $apiPass,
+        $customFieldMappings
     ) {
-        parent::__construct($jiraUrl);
+        parent::__construct($jiraUrl, $customFieldMappings);
         $this->apiUser = $apiUser;
         $this->apiPass = $apiPass;
     }

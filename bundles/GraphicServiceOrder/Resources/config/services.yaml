@@ -1,15 +1,10 @@
-parameters:
-    gs_files_directory: '%env(resolve:GS_FILES_DIRECTORY)%'
-    form_file_gs_upload_size: '%env(resolve:FORM_FILE_GS_UPLOAD_SIZE)%'
-    gs_order_project_id: '%env(resolve:GS_ORDER_PROJECT_ID)%'
-    gs_order_issuetype_id: '%env(resolve:GS_ORDER_ISSUETYPE_ID)%'
-
 services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
             $ownCloudFilesFolder: '%env(OWNCLOUD_FILES_FOLDER)%'
+            $gsOrderConfiguration: '%gsorder_bundle%'
 
     GraphicServiceOrder\:
         resource: '../../*'
