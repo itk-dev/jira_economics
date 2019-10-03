@@ -403,6 +403,30 @@ abstract class AbstractJiraService
         return $result;
     }
 
+    /**
+     * Get users from search.
+     *
+     * @return mixed
+     */
+    public function searchUser($username)
+    {
+        $result = $this->get('/rest/api/2/user/search', ['username' => $username]);
+
+        return $result;
+    }
+
+    /**
+     * Create a new jira user.
+     *
+     * @return mixed
+     */
+    public function createUser($user)
+    {
+        $result = $this->post('/rest/api/2/user', $user);
+
+        return $result;
+    }
+
     public function search(array $query)
     {
         $result = $this->get('/rest/api/2/search', $query);

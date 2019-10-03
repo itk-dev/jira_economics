@@ -35,12 +35,12 @@ class GsOrder
     private $issueKey;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $fullName;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $jobTitle;
 
@@ -143,7 +143,7 @@ class GsOrder
         return $this->fullName;
     }
 
-    public function setFullName(string $fullName): self
+    public function setFullName(?string $fullName): self
     {
         $this->fullName = $fullName;
 
@@ -155,7 +155,7 @@ class GsOrder
         return $this->jobTitle;
     }
 
-    public function setJobTitle(string $jobTitle): self
+    public function setJobTitle(?string $jobTitle): self
     {
         $this->jobTitle = $jobTitle;
 

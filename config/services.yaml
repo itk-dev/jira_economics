@@ -22,6 +22,7 @@ parameters:
     site_logo_path: '%env(SITE_LOGO_PATH)%'
     mailer_name: '%env(MAILER_NAME)%'
     mailer_email: '%env(MAILER_EMAIL)%'
+    jira_debitor_field: '%env(resolve:JIRA_DEBITOR_FIELD)%'
     user_created_user_subject: ''
     user_created_user_header: ''
     user_created_user_body: ''
@@ -61,6 +62,7 @@ services:
             $jiraUrl: '%env(JIRA_URL)%'
             $apiUser: '%env(JIRA_USER)%'
             $apiPass: '%env(JIRA_PASS)%'
+            $customFieldMappings: '%custom_fields%'
 
     App\Service\OwnCloudService:
         arguments:
