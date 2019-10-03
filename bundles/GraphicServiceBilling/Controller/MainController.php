@@ -15,7 +15,7 @@ use GraphicServiceBilling\Service\GraphicServiceBillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -39,29 +39,35 @@ class MainController extends AbstractController
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     * @throws \Exception
      */
     public function index(Request $request, MenuService $menuService, GraphicServiceBillingService $graphicServiceBillingService)
     {
-        $startOfWeek = (new \DateTime(date('c', strtotime('this week', time()))))->setTime(0, 0);
-        $endOfWeek = (new \DateTime($startOfWeek->format('c')))->add(new \DateInterval('P6D'))->setTime(23, 59);
+        $startDayOfWeek = (new \DateTime('this week'))->setTime(0, 0);
+        $endDayOfWeek = (new \DateTime($startDayOfWeek->format('c')))->add(new \DateInterval('P6D'));
 
         $formBuilder = $this->createFormBuilder();
-        $formBuilder->add('from', DateTimeType::class, [
+        $formBuilder->add('from', DateType::class, [
             'label' => 'gs_billing_form.from',
-            'data' => $startOfWeek,
-            'date_widget' => 'single_text',
+            'data' => $startDayOfWeek,
+            'widget' => 'single_text',
         ]);
-        $formBuilder->add('to', DateTimeType::class, [
+        $formBuilder->add('to', DateType::class, [
             'label' => 'gs_billing_form.to',
-            'data' => $endOfWeek,
-            'date_widget' => 'single_text',
+            'data' => $endDayOfWeek,
+            'widget' => 'single_text',
         ]);
         $formBuilder->add('marketing', CheckboxType::class, [
             'label' => 'gs_billing_form.marketing_account',
             'required' => false,
         ]);
+        $formBuilder->add('markAsBilled', CheckboxType::class, [
+            'label' => 'gs_billing_form.mark_as_billed',
+            'help' => 'gs_billing_form.mark_as_billed_help',
+            'required' => false,
+        ]);
         $formBuilder->add('submit', SubmitType::class, [
-            'label' => 'gs_billing_form.preview',
+            'label' => 'gs_billing_form.show_preview',
         ]);
         $formBuilder->add('download', SubmitType::class, [
             'label' => 'gs_billing_form.download',
@@ -80,7 +86,9 @@ class MainController extends AbstractController
             $download = $form->get('download')->isClicked();
 
             $from = $form->get('from')->getData();
-            $to = $form->get('to')->getData();
+            // Add one day, since all of $to day should be included.
+            $to = $form->get('to')->getData()->add(new \DateInterval('P1D'));
+
             $marketing = $form->get('marketing')->getData();
 
             $entries = $graphicServiceBillingService->createExportData($from, $to, $marketing);
@@ -104,6 +112,8 @@ class MainController extends AbstractController
                 $response->headers->set('Content-Type', $contentType);
                 $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
                 $response->headers->set('Cache-Control', 'max-age=0');
+
+                // @TODO: If markAsBilled is selected in the form, update the custom field for the issues in Jira.
 
                 return $response;
             } else {

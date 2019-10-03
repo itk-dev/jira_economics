@@ -20,8 +20,16 @@
     <div class="row">
         <div class="col m-2">
             {{form_row(form.submit)}}
+
+            {% if preview is defined and preview != null %}
+                <h2>{{ 'gs_billing_form.preview'|trans }}</h2>
+                {{ preview|raw }}
+            {% endif %}
         </div>
+    </div>
+    <div class="row">
         <div class="col m-2">
+            {{form_row(form.markAsBilled)}}
             {{form_row(form.download)}}
         </div>
     </div>
@@ -31,9 +39,4 @@
         </div>
     </div>
     {{ form_end(form) }}
-
-    {% if preview is defined and preview != null %}
-        <h2>Preview:</h2>
-        {{ preview|raw }}
-    {% endif %}
 {% endblock %}
