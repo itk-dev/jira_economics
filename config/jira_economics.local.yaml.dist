@@ -1,11 +1,12 @@
 parameters:
     # Locate ids in the Jira instance and enter them here.
     custom_fields:
-        'Epic Name': 10103
-        'Epic Link': 10101
-        'Account': 10107
-        'Debitor': 10309
-        'Sprint': 10105
+        'Epic Name': 10000
+        'Epic Link': 10001
+        'Account': 10002
+        'Debitor': 10003
+        'Sprint': 10004
+        'Faktureret': 10005
 
 #    billing_receiver_account: 1234
 #    billing_material_numbers:
@@ -13,7 +14,11 @@ parameters:
 #        'Eksterne m/moms': 111111
 #        'Eksterne u/moms': 222222
 
+#    gs_billing_material_id: 123456
 #    gs_billing_project_id: 1234
+#    gs_billing_receiver_psp: 1234
+#    gs_billing_receiver_account: 1234
+#    gs_billing_worklog_hour_price: 123
 
     user_created.email:
         subject: '{{ site_name }} – brugeroprettelse'

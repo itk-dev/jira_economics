@@ -511,7 +511,7 @@ abstract class AbstractJiraService
      */
     public function getExpenses(array $query = [])
     {
-        $result = $this->get('/rest/tempo-core/1/expense/', $query);
+        $result = $this->get('/rest/tempo-core/1/expense', $query);
 
         return $result;
     }

@@ -4,4 +4,8 @@
 
 {% block content %}
     {{form(form)}}
+
+    {% if export is defined %}
+        {{ export|raw }}
+    {% endif %}
 {% endblock %}
