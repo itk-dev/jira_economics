@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * This file is part of aakb/jira_economics.
+ *
+ * (c) 2019 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace GraphicServiceBilling\Service;
 
 use Billing\Service\BillingService;
@@ -16,6 +24,7 @@ class GraphicServiceBillingService
 
     /**
      * GraphicServiceBillingService constructor.
+     *
      * @param $boundProjectId
      * @param \Billing\Service\BillingService $billingService
      * @param $boundReceiverAccount
@@ -42,10 +51,12 @@ class GraphicServiceBillingService
     /**
      * Create export data for the given interval.
      *
-     * @param \DateTime $from Start of interval.
-     * @param \DateTime $to End of interval.
-     * @param bool $marketing Marketing account or not.
+     * @param \DateTime $from      start of interval
+     * @param \DateTime $to        end of interval
+     * @param bool      $marketing marketing account or not
+     *
      * @return array
+     *
      * @throws \Exception
      */
     public function createExportData(\DateTime $from, \DateTime $to, bool $marketing)
@@ -60,15 +71,15 @@ class GraphicServiceBillingService
         $entries = [];
 
         foreach ($tasks as $task) {
-            // Strip file link and \\ from description.
+            // Strip file link and \\ from description.
             $description = $task->fields->description;
             $description = preg_replace('/\\\\ \[Åbn filer i OwnCloud.*]\\ /i', '', $description);
             $description = preg_replace('/\\\\/', '', $description);
 
             // Add summary and task key to start of description.
-            $description = implode([
+            $description = implode('', [
                 $task->fields->summary,
-                ' (' .  $task->key . '): ',
+                ' ('.$task->key.'): ',
                 $description,
             ]);
 
@@ -89,19 +100,18 @@ class GraphicServiceBillingService
                 'scopeType' => 'ISSUE',
             ]);
 
-            // Bail out if there are nothing to bill for task.
-            if (count($worklogs) == 0 && count($expenses) == 0) {
-                // @TODO: Should task be marked as billed?
-
+            // Bail out if there is nothing to bill for task.
+            if (0 === \count($worklogs) && 0 === \count($expenses)) {
                 continue;
             }
 
             $lines = [];
 
             // Create line data for worklogs.
-            if (count($worklogs) > 0) {
+            if (\count($worklogs) > 0) {
                 $worklogsSum = array_reduce($worklogs, function ($carry, $item) {
                     $carry = $carry + $item->timeSpentSeconds;
+
                     return $carry;
                 }, 0);
 
@@ -110,7 +120,7 @@ class GraphicServiceBillingService
 
                 $lines[] = (object) [
                     'materialNumber' => $this->boundMaterialId,
-                    'product' => 'Design: ' . $task->fields->summary,
+                    'product' => 'Design: '.$task->fields->summary,
                     'amount' => 1,
                     'price' => $worklogsSum * $this->boundWorklogPricePerHour,
                     'psp' => $this->boundReceiverPSP,
@@ -118,15 +128,16 @@ class GraphicServiceBillingService
             }
 
             // Create line data for expenses.
-            if (count($expenses) > 0) {
+            if (\count($expenses) > 0) {
                 $expensesSum = array_reduce($expenses, function ($carry, $item) {
                     $carry = $carry + $item->amount;
+
                     return $carry;
                 }, 0);
 
                 $lines[] = (object) [
                     'materialNumber' => $this->boundMaterialId,
-                    'product' => 'Tryk: ' . $task->fields->summary,
+                    'product' => 'Tryk: '.$task->fields->summary,
                     'amount' => 1,
                     'price' => $expensesSum,
                     'psp' => $this->boundReceiverPSP,
@@ -149,8 +160,10 @@ class GraphicServiceBillingService
      * @param $projectId
      * @param \DateTime|null $from
      * @param \DateTime|null $to
-     * @param bool $marketing
+     * @param bool           $marketing
+     *
      * @return array
+     *
      * @throws \Exception
      */
     private function getAllNonBilledFinishedTasks($projectId, \DateTime $from = null, \DateTime $to = null, bool $marketing = false)
@@ -164,26 +177,26 @@ class GraphicServiceBillingService
 
         foreach ($issues as $issue) {
             // Ignore issues that are not Done.
-            if ($issue->fields->status->statusCategory->key != 'done') {
+            if ('done' !== $issue->fields->status->statusCategory->key) {
                 continue;
             }
 
             // Ignore already billed issues.
-            if (isset($issue->fields->{$billedCustomFieldId}) && $issue->fields->{$billedCustomFieldId}->value == 'Faktureret') {
+            if (isset($issue->fields->{$billedCustomFieldId}) && 'Faktureret' === $issue->fields->{$billedCustomFieldId}->value) {
                 continue;
             }
 
             // Ignore issues that are not resolved within the selected period.
             $resolutionDate = new \DateTime($issue->fields->resolutiondate);
-            if ($from != null) {
+            if (null !== $from) {
                 $diffFrom = $resolutionDate->diff($from)->format('%R');
-                if ($diffFrom == '+') {
+                if ('+' === $diffFrom) {
                     continue;
                 }
             }
-            if ($to != null) {
+            if (null !== $to) {
                 $diffTo = $resolutionDate->diff($to)->format('%R');
-                if ($diffTo == '-') {
+                if ('-' === $diffTo) {
                     continue;
                 }
             }
@@ -191,11 +204,10 @@ class GraphicServiceBillingService
             // Select issues that are from the marketing account or not (not both).
             if (isset($issue->fields->{$marketingAccountCustomFieldId})) {
                 $marketingField = $issue->fields->{$marketingAccountCustomFieldId}[0];
-                if (!$marketing && $marketingField->value == 'Markedsføringskonto') {
+                if (!$marketing && 'Markedsføringskonto' === $marketingField->value) {
                     continue;
                 }
-            }
-            else {
+            } else {
                 if ($marketing) {
                     continue;
                 }

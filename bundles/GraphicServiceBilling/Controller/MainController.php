@@ -1,9 +1,16 @@
 <?php
 
+/*
+ * This file is part of aakb/jira_economics.
+ *
+ * (c) 2019 ITK Development
+ *
+ * This source file is subject to the MIT license.
+ */
+
 namespace GraphicServiceBilling\Controller;
 
 use App\Service\MenuService;
-use Billing\Service\BillingService;
 use GraphicServiceBilling\Service\GraphicServiceBillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,8 +22,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Class MainController
- * @package GraphicServiceBilling\Controller
+ * Class MainController.
  *
  * @Route("", name="graphic_service_billing_")
  */
@@ -26,13 +32,16 @@ class MainController extends AbstractController
      * @Route("", name="index")
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \App\Service\MenuService $menuService
+     * @param \App\Service\MenuService                  $menuService
+     *
      * @return \Symfony\Component\HttpFoundation\Response
+     *
      * @throws \Exception
      */
-    public function index(Request $request, MenuService $menuService, GraphicServiceBillingService $billingService) {
-        $startOfWeek = (new \DateTime(date("c", strtotime('this week', time()))))->setTime(0, 0);
-        $endOfWeek = (new \DateTime($startOfWeek->format('c')))->add(new \DateInterval('P6D'))->setTime(23,59);
+    public function index(Request $request, MenuService $menuService, GraphicServiceBillingService $billingService)
+    {
+        $startOfWeek = (new \DateTime(date('c', strtotime('this week', time()))))->setTime(0, 0);
+        $endOfWeek = (new \DateTime($startOfWeek->format('c')))->add(new \DateInterval('P6D'))->setTime(23, 59);
 
         $formBuilder = $this->createFormBuilder();
         $formBuilder->add('from', DateTimeType::class, [
@@ -50,7 +59,7 @@ class MainController extends AbstractController
             'required' => false,
         ]);
         $formBuilder->add('submit', SubmitType::class, [
-            'label' => 'gs_billing_form.preview'
+            'label' => 'gs_billing_form.preview',
         ]);
         $formBuilder->add('download', SubmitType::class, [
             'label' => 'gs_billing_form.download',
