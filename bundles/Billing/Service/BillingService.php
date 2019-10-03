@@ -964,7 +964,7 @@ class BillingService extends JiraService
      */
     public function getProjectIssues($projectId, $issueType = null)
     {
-        $epics = [];
+        $issues = [];
 
         $jql = 'project='.$projectId;
 
@@ -979,7 +979,7 @@ class BillingService extends JiraService
                 'maxResults' => 50,
                 'startAt' => $startAt,
             ]);
-            $epics = array_merge($epics, $result->issues);
+            $issues = array_merge($issues, $result->issues);
 
             $startAt = $startAt + 50;
 
@@ -988,6 +988,6 @@ class BillingService extends JiraService
             }
         }
 
-        return $epics;
+        return $issues;
     }
 }
