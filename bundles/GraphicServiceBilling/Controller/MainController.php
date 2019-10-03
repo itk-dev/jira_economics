@@ -31,14 +31,16 @@ class MainController extends AbstractController
     /**
      * @Route("", name="index")
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \App\Service\MenuService                  $menuService
+     * @param \Symfony\Component\HttpFoundation\Request                   $request
+     * @param \App\Service\MenuService                                    $menuService
+     * @param \GraphicServiceBilling\Service\GraphicServiceBillingService $graphicServiceBillingService
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @throws \Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function index(Request $request, MenuService $menuService, GraphicServiceBillingService $billingService)
+    public function index(Request $request, MenuService $menuService, GraphicServiceBillingService $graphicServiceBillingService)
     {
         $startOfWeek = (new \DateTime(date('c', strtotime('this week', time()))))->setTime(0, 0);
         $endOfWeek = (new \DateTime($startOfWeek->format('c')))->add(new \DateInterval('P6D'))->setTime(23, 59);
@@ -81,8 +83,8 @@ class MainController extends AbstractController
             $to = $form->get('to')->getData();
             $marketing = $form->get('marketing')->getData();
 
-            $entries = $billingService->createExportData($from, $to, $marketing);
-            $spreadsheet = $billingService->exportInvoicesToSpreadsheet($entries);
+            $entries = $graphicServiceBillingService->createExportData($from, $to, $marketing);
+            $spreadsheet = $graphicServiceBillingService->exportTasksToSpreadsheet($entries);
 
             if ($download) {
                 $writer = IOFactory::createWriter($spreadsheet, 'Csv');

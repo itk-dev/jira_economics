@@ -155,7 +155,7 @@ class GraphicServiceBillingService
 
     /**
      * Get all tasks in the interval from the project that have not been
-     * billed and that have the status "Order completed and sent".
+     * billed and that have the status "Done".
      *
      * @param $projectId
      * @param \DateTime|null $from
@@ -171,7 +171,7 @@ class GraphicServiceBillingService
         $billedCustomFieldId = $this->billingService->getCustomFieldId('Faktureret');
         $marketingAccountCustomFieldId = $this->billingService->getCustomFieldId('Marketing Account');
 
-        $unbilledIssues = [];
+        $notBilledIssues = [];
 
         $issues = $this->billingService->getProjectIssues($projectId);
 
@@ -213,28 +213,28 @@ class GraphicServiceBillingService
                 }
             }
 
-            $unbilledIssues[$issue->id] = $issue;
+            $notBilledIssues[$issue->id] = $issue;
         }
 
-        return $unbilledIssues;
+        return $notBilledIssues;
     }
 
     /**
-     * Export the selected invoices (by id) to csv.
+     * Export the selected tasks to a spreadsheet.
      *
-     * @param array $entries
+     * @param array $tasks
      *
      * @return \PhpOffice\PhpSpreadsheet\Spreadsheet
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
-    public function exportInvoicesToSpreadsheet(array $entries)
+    public function exportTasksToSpreadsheet(array $tasks)
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $row = 1;
 
-        foreach ($entries as $entry) {
+        foreach ($tasks as $entry) {
             $header = $entry->header;
 
             // Generate header line (H).
