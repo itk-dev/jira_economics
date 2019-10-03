@@ -31,29 +31,43 @@ class MainController extends AbstractController
      * @throws \Exception
      */
     public function index(Request $request, MenuService $menuService, GraphicServiceBillingService $billingService) {
-        $now = new \DateTime();
+        $startOfWeek = (new \DateTime(date("c", strtotime('this week', time()))))->setTime(0, 0);
+        $endOfWeek = (new \DateTime($startOfWeek->format('c')))->add(new \DateInterval('P6D'))->setTime(23,59);
 
         $formBuilder = $this->createFormBuilder();
         $formBuilder->add('from', DateTimeType::class, [
-            'data' => $now,
+            'label' => 'gs_billing_form.from',
+            'data' => $startOfWeek,
             'date_widget' => 'single_text',
         ]);
         $formBuilder->add('to', DateTimeType::class, [
-            'data' => $now,
+            'label' => 'gs_billing_form.to',
+            'data' => $endOfWeek,
             'date_widget' => 'single_text',
         ]);
         $formBuilder->add('marketing', CheckboxType::class, [
+            'label' => 'gs_billing_form.marketing_account',
             'required' => false,
         ]);
-        $formBuilder->add('submit', SubmitType::class, []);
+        $formBuilder->add('submit', SubmitType::class, [
+            'label' => 'gs_billing_form.preview'
+        ]);
+        $formBuilder->add('download', SubmitType::class, [
+            'label' => 'gs_billing_form.download',
+            'attr' => [
+                'class' => 'btn-secondary',
+            ],
+        ]);
 
         $form = $formBuilder->getForm();
 
         $form->handleRequest($request);
 
-        $mock = null;
+        $preview = null;
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $download = $form->get('download')->isClicked();
+
             $from = $form->get('from')->getData();
             $to = $form->get('to')->getData();
             $marketing = $form->get('marketing')->getData();
@@ -61,31 +75,54 @@ class MainController extends AbstractController
             $entries = $billingService->createExportData($from, $to, $marketing);
             $spreadsheet = $billingService->exportInvoicesToSpreadsheet($entries);
 
-            $writer = IOFactory::createWriter($spreadsheet, 'Html');
-            ob_start();
-            $writer->save('php://output');
-            $html = ob_get_clean();
+            if ($download) {
+                $writer = IOFactory::createWriter($spreadsheet, 'Csv');
+                $writer->setDelimiter(';');
+                $writer->setEnclosure('');
+                $writer->setLineEnding("\r\n");
+                $writer->setSheetIndex(0);
+                $filename = 'faktura'.date('d-m-Y').($marketing ? '-marketing' : '-not_marketing').'-from'.$from->format('d-m-Y').'-to'.$to->format('d-m-Y').'.csv';
 
-            // Extract body content.
-            $d = new \DOMDocument();
-            $mock = new \DOMDocument();
-            $d->loadHTML($html);
-            $body = $d->getElementsByTagName('body')->item(0);
-            foreach ($body->childNodes as $child) {
-                if ('style' === $child->tagName) {
-                    continue;
+                $contentType = 'text/csv';
+
+                $response = new StreamedResponse(
+                    function () use ($writer) {
+                        $writer->save('php://output');
+                    }
+                );
+                $response->headers->set('Content-Type', $contentType);
+                $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+                $response->headers->set('Cache-Control', 'max-age=0');
+
+                return $response;
+            } else {
+                // Show preview.
+                $writer = IOFactory::createWriter($spreadsheet, 'Html');
+                ob_start();
+                $writer->save('php://output');
+                $html = ob_get_clean();
+
+                // Extract body content.
+                $d = new \DOMDocument();
+                $preview = new \DOMDocument();
+                $d->loadHTML($html);
+                $body = $d->getElementsByTagName('body')->item(0);
+                foreach ($body->childNodes as $child) {
+                    if ('style' === $child->tagName) {
+                        continue;
+                    }
+                    if ('table' === $child->tagName) {
+                        $child->setAttribute('class', 'table table-bordered');
+                    }
+                    $preview->appendChild($preview->importNode($child, true));
                 }
-                if ('table' === $child->tagName) {
-                    $child->setAttribute('class', 'table table-bordered');
-                }
-                $mock->appendChild($mock->importNode($child, true));
             }
         }
 
         return $this->render('@GraphicServiceBilling/index.html.twig', [
             'form' => $form->createView(),
             'global_menu_items' => $menuService->getGlobalMenuItems(),
-            'export' => $mock ? $mock->saveHTML() : '',
+            'preview' => $preview ? $preview->saveHTML() : null,
         ]);
     }
 }

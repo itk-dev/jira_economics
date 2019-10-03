@@ -3,9 +3,37 @@
 {% block title %}Grafisk service - Fakturering{% endblock %}
 
 {% block content %}
-    {{form(form)}}
+    {{ form_start(form) }}
+    <div class="row">
+        <div class="col m-2">
+            {{form_row(form.from)}}
+        </div>
+        <div class="col m-2">
+            {{form_row(form.to)}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col m-2">
+            {{form_row(form.marketing)}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col m-2">
+            {{form_row(form.submit)}}
+        </div>
+        <div class="col m-2">
+            {{form_row(form.download)}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col m-2">
+            {{form_rest(form)}}
+        </div>
+    </div>
+    {{ form_end(form) }}
 
-    {% if export is defined %}
-        {{ export|raw }}
+    {% if preview is defined and preview != null %}
+        <h2>Preview:</h2>
+        {{ preview|raw }}
     {% endif %}
 {% endblock %}

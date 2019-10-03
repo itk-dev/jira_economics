@@ -1,0 +1,6 @@
+gs_billing_form:
+    download: Hent CSV
+    preview: Vis Preview
+    from: Fra
+    to: Til
+    marketing_account: Marketingskonto

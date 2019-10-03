@@ -12,6 +12,7 @@ class GraphicServiceBillingService
     private $boundReceiverAccount;
     private $boundReceiverPSP;
     private $boundMaterialId;
+    private $boundWorklogPricePerHour;
 
     /**
      * GraphicServiceBillingService constructor.
@@ -20,19 +21,22 @@ class GraphicServiceBillingService
      * @param $boundReceiverAccount
      * @param $boundReceiverPSP
      * @param $boundMaterialId
+     * @param $boundWorklogPricePerHour
      */
     public function __construct(
         $boundProjectId,
         BillingService $billingService,
         $boundReceiverAccount,
         $boundReceiverPSP,
-        $boundMaterialId
+        $boundMaterialId,
+        $boundWorklogPricePerHour
     ) {
         $this->boundProjectId = $boundProjectId;
         $this->billingService = $billingService;
         $this->boundReceiverAccount = $boundReceiverAccount;
         $this->boundReceiverPSP = $boundReceiverPSP;
         $this->boundMaterialId = $boundMaterialId;
+        $this->boundWorklogPricePerHour = $boundWorklogPricePerHour;
     }
 
     /**
@@ -42,6 +46,7 @@ class GraphicServiceBillingService
      * @param \DateTime $to End of interval.
      * @param bool $marketing Marketing account or not.
      * @return array
+     * @throws \Exception
      */
     public function createExportData(\DateTime $from, \DateTime $to, bool $marketing)
     {
@@ -55,11 +60,12 @@ class GraphicServiceBillingService
         $entries = [];
 
         foreach ($tasks as $task) {
-            $description1 = $task->fields->description;
-
-            $description = preg_replace('/\\\\ \[Åbn filer i OwnCloud.*]\\ /i', '', $description1);
+            // Strip file link and \\ from description.
+            $description = $task->fields->description;
+            $description = preg_replace('/\\\\ \[Åbn filer i OwnCloud.*]\\ /i', '', $description);
             $description = preg_replace('/\\\\/', '', $description);
 
+            // Add summary and task key to start of description.
             $description = implode([
                 $task->fields->summary,
                 ' (' .  $task->key . '): ',
@@ -99,12 +105,14 @@ class GraphicServiceBillingService
                     return $carry;
                 }, 0);
 
+                // From seconds to hours.
+                $worklogsSum = $worklogsSum / 60.0 / 60.0;
+
                 $lines[] = (object) [
                     'materialNumber' => $this->boundMaterialId,
-                    'product' => 'Design ' . $task->fields->summary,
+                    'product' => 'Design: ' . $task->fields->summary,
                     'amount' => 1,
-                    // @TODO: What is the price per hour?
-                    'price' => $worklogsSum,
+                    'price' => $worklogsSum * $this->boundWorklogPricePerHour,
                     'psp' => $this->boundReceiverPSP,
                 ];
             }
@@ -118,7 +126,7 @@ class GraphicServiceBillingService
 
                 $lines[] = (object) [
                     'materialNumber' => $this->boundMaterialId,
-                    'product' => 'Tryk ' . $task->fields->summary,
+                    'product' => 'Tryk: ' . $task->fields->summary,
                     'amount' => 1,
                     'price' => $expensesSum,
                     'psp' => $this->boundReceiverPSP,
@@ -143,16 +151,19 @@ class GraphicServiceBillingService
      * @param \DateTime|null $to
      * @param bool $marketing
      * @return array
+     * @throws \Exception
      */
     private function getAllNonBilledFinishedTasks($projectId, \DateTime $from = null, \DateTime $to = null, bool $marketing = false)
     {
         $billedCustomFieldId = $this->billingService->getCustomFieldId('Faktureret');
+        $marketingAccountCustomFieldId = $this->billingService->getCustomFieldId('Marketing Account');
 
         $unbilledIssues = [];
 
         $issues = $this->billingService->getProjectIssues($projectId);
 
         foreach ($issues as $issue) {
+            // Ignore issues that are not Done.
             if ($issue->fields->status->statusCategory->key != 'done') {
                 continue;
             }
@@ -162,9 +173,33 @@ class GraphicServiceBillingService
                 continue;
             }
 
-            // @TODO: Resolution date between $from and $to.
+            // Ignore issues that are not resolved within the selected period.
+            $resolutionDate = new \DateTime($issue->fields->resolutiondate);
+            if ($from != null) {
+                $diffFrom = $resolutionDate->diff($from)->format('%R');
+                if ($diffFrom == '+') {
+                    continue;
+                }
+            }
+            if ($to != null) {
+                $diffTo = $resolutionDate->diff($to)->format('%R');
+                if ($diffTo == '-') {
+                    continue;
+                }
+            }
 
-            // @TODO: Only from/not_from marketing account.
+            // Select issues that are from the marketing account or not (not both).
+            if (isset($issue->fields->{$marketingAccountCustomFieldId})) {
+                $marketingField = $issue->fields->{$marketingAccountCustomFieldId}[0];
+                if (!$marketing && $marketingField->value == 'Markedsføringskonto') {
+                    continue;
+                }
+            }
+            else {
+                if ($marketing) {
+                    continue;
+                }
+            }
 
             $unbilledIssues[$issue->id] = $issue;
         }

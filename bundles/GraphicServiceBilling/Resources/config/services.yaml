@@ -7,6 +7,7 @@ services:
             $boundReceiverPSP: '%gs_billing_receiver_psp%'
             $boundProjectId: '%gs_billing_project_id%'
             $boundMaterialId: '%gs_billing_material_id%'
+            $boundWorklogPricePerHour: '%gs_billing_worklog_hour_price%'
 
     GraphicServiceBilling\:
         resource: '../../*'
