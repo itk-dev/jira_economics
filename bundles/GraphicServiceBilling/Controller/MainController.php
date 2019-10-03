@@ -34,14 +34,14 @@ class MainController extends AbstractController
      * @param \Symfony\Component\HttpFoundation\Request                   $request
      * @param \App\Service\MenuService                                    $menuService
      * @param \GraphicServiceBilling\Service\GraphicServiceBillingService $graphicServiceBillingService
+     * @param $boundProjectId
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
-     * @throws \Exception
      */
-    public function index(Request $request, MenuService $menuService, GraphicServiceBillingService $graphicServiceBillingService)
+    public function index(Request $request, MenuService $menuService, GraphicServiceBillingService $graphicServiceBillingService, $boundProjectId)
     {
         $startDayOfWeek = (new \DateTime('this week'))->setTime(0, 0);
         $endDayOfWeek = (new \DateTime($startDayOfWeek->format('c')))->add(new \DateInterval('P6D'));
@@ -91,7 +91,8 @@ class MainController extends AbstractController
 
             $marketing = $form->get('marketing')->getData();
 
-            $entries = $graphicServiceBillingService->createExportData($from, $to, $marketing);
+            $tasks = $graphicServiceBillingService->getAllNonBilledFinishedTasks($boundProjectId, $from, $to, $marketing);
+            $entries = $graphicServiceBillingService->createExportData($tasks);
             $spreadsheet = $graphicServiceBillingService->exportTasksToSpreadsheet($entries);
 
             if ($download) {
@@ -113,7 +114,11 @@ class MainController extends AbstractController
                 $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
                 $response->headers->set('Cache-Control', 'max-age=0');
 
-                // @TODO: If markAsBilled is selected in the form, update the custom field for the issues in Jira.
+                $markAsBilled = $form->get('markAsBilled')->getData();
+
+                if ($markAsBilled) {
+                    $graphicServiceBillingService->markIssuesAsBilled($tasks);
+                }
 
                 return $response;
             } else {

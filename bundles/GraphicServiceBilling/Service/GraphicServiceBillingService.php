@@ -49,22 +49,14 @@ class GraphicServiceBillingService
     }
 
     /**
-     * Create export data for the given interval.
+     * Create export data for the given tasks.
      *
-     * @param \DateTime $from      start of interval
-     * @param \DateTime $to        end of interval
-     * @param bool      $marketing marketing account or not
+     * @param $tasks
      *
      * @return array
-     *
-     * @throws \Exception
      */
-    public function createExportData(\DateTime $from, \DateTime $to, bool $marketing)
+    public function createExportData($tasks)
     {
-        // Get all tasks in the interval from the project that have not been
-        // billed and that have the status "Order completed and sent".
-        $tasks = $this->getAllNonBilledFinishedTasks($this->boundProjectId, $from, $to, $marketing);
-
         // Get debtor custom field.
         $debtorCustomFieldId = $this->billingService->getCustomFieldId('Debitor');
 
@@ -154,6 +146,28 @@ class GraphicServiceBillingService
     }
 
     /**
+     * Mark the chosen issues a billed in Jira.
+     *
+     * @param $issues
+     */
+    public function markIssuesAsBilled($issues)
+    {
+        $billedCustomFieldId = $this->billingService->getCustomFieldId('Faktureret');
+
+        foreach ($issues as $issue) {
+            $this->billingService->put('/rest/api/2/issue/'.$issue->id, (object) [
+                'fields' => [
+                    $billedCustomFieldId => [
+                        [
+                            'value' => 'Faktureret',
+                        ],
+                    ],
+                ],
+            ]);
+        }
+    }
+
+    /**
      * Get all tasks in the interval from the project that have not been
      * billed and that have the status "Done".
      *
@@ -166,7 +180,7 @@ class GraphicServiceBillingService
      *
      * @throws \Exception
      */
-    private function getAllNonBilledFinishedTasks($projectId, \DateTime $from = null, \DateTime $to = null, bool $marketing = false)
+    public function getAllNonBilledFinishedTasks($projectId, \DateTime $from = null, \DateTime $to = null, bool $marketing = false)
     {
         $billedCustomFieldId = $this->billingService->getCustomFieldId('Faktureret');
         $marketingAccountCustomFieldId = $this->billingService->getCustomFieldId('Marketing Account');
