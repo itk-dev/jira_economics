@@ -14,6 +14,8 @@ dashboard:
     title: Dashboard
     headline: Vælg app
 
+portal.title: ITK portal
+
 # Admin user management
 portal.user: Bruger
 portal.user.email: E-mailadresse
@@ -31,3 +33,5 @@ portal.user.account: Jira konto
 ROLE_ADMIN: Administrator
 ROLE_JIRA: Jira
 ROLE_USER: Bruger
+
+jira.title: Jira Apps

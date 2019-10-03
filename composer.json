@@ -67,6 +67,7 @@
             "Billing\\": "bundles/Billing/",
             "CreateProject\\": "bundles/CreateProject/",
             "Expense\\":"bundles/Expense",
+            "GraphicServiceBilling\\": "bundles/GraphicServiceBilling/",
             "GraphicServiceOrder\\": "bundles/GraphicServiceOrder/",
             "Planning\\": "bundles/Planning/",
             "SprintReport\\": "bundles/SprintReport/"

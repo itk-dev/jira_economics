@@ -1,0 +1,4 @@
+controllers:
+    resource: "@GraphicServiceBillingBundle/Controller"
+    type: annotation
+    prefix: /gs-billing
