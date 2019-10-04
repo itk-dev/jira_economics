@@ -16,11 +16,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use GraphicServiceOrder\Entity\GsOrder;
 use GraphicServiceOrder\Message\OwnCloudShareMessage;
 use GraphicServiceOrder\Repository\GsOrderRepository;
+use ItkDev\UserManagementBundle\Doctrine\UserManager;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use App\Service\UserManager;
 use Swift_Mailer;
 use Twig\Environment;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -45,7 +45,7 @@ class OrderService
     private $tokenStorage;
     /* @var \GraphicServiceOrder\Service\FileUploader */
     private $fileUploader;
-    /* @var \App\Service\UserManager */
+    /** @var \ItkDev\UserManagementBundle\Doctrine\UserManager */
     private $userManager;
     /* @var \Swift_Mailer */
     private $swiftMailer;
@@ -68,7 +68,7 @@ class OrderService
      * @param string                                                                              $ownCloudFilesFolder
      * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
      * @param \GraphicServiceOrder\Service\FileUploader                                           $fileUploader
-     * @param \App\Service\UserManager                                                            $userManager
+     * @param \ItkDev\UserManagementBundle\Doctrine\UserManager                                   $userManager
      * @param \Swift_Mailer                                                                       $swiftMailer
      * @param \Twig\Environment                                                                   $twig
      * @param \Symfony\Contracts\Translation\TranslatorInterface                                  $translator
