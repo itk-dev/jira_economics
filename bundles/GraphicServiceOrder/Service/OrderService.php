@@ -115,7 +115,6 @@ class OrderService
     public function prepareOrder()
     {
         $gsOrder = new GsOrder();
-
         $token = $this->tokenStorage->getToken();
         if (null !== $token) {
             $user = $token->getUser();
@@ -129,7 +128,7 @@ class OrderService
                     ->setCity($user->getCity());
             }
         }
-        //$response = $this->hammerService->get('/rest/api/2/issue/GSORDER-119');
+
         return $gsOrder;
     }
 
@@ -323,10 +322,11 @@ class OrderService
                 'reporter' => [
                     'name' => $author,
                 ],
-                $this->params->get('field_debitor') => (string) $gsOrder->getDebitor(),
-                $this->params->get('field_marketing_account') => $gsOrder->getMarketingAccount() ? [0 => ['value' => 'Markedsføringskonto']] : null,
+                $this->hammerService->getCustomFieldId('Debitor') => (string) $gsOrder->getDebitor(),
+                $this->hammerService->getCustomFieldId('Marketing Account') => $gsOrder->getMarketingAccount() ? [0 => ['value' => 'Markedsføringskonto']] : null,
             ],
         ];
+
         $response = $this->hammerService->post('/rest/api/2/issue', $data);
 
         return $response;

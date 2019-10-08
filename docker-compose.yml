@@ -67,6 +67,8 @@ services:
 
   redis:
     image: redis:latest
+    networks:
+      - app
     ports:
       - '6379'
 
@@ -80,14 +82,7 @@ services:
 
   yarn:
     image: itkdev/yarn:latest
+    networks:
+      - app
     volumes:
       - .:/app:delegated
-
-  reverse-proxy:
-    image: traefik:2.0  # The official Traefik docker image
-    command: --api.insecure=true --providers.docker # Enables the web UI and tells Traefik to listen to docker
-    ports:
-      - "80"
-      - "8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock  # So that Traefik can listen to the Docker events
