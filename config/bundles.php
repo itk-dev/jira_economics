@@ -29,4 +29,5 @@ return [
     Expense\ExpenseBundle::class => ['all' => true],
     FOS\UserBundle\FOSUserBundle::class => ['all' => true],
     EasyCorp\Bundle\EasyAdminBundle\EasyAdminBundle::class => ['all' => true],
+    ItkDev\UserManagementBundle\ItkDevUserManagementBundle::class => ['all' => true],
 ];

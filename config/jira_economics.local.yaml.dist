@@ -21,17 +21,6 @@ parameters:
     gs_billing_receiver_account: ~
     gs_billing_worklog_hour_price: ~
 
-    user_created.email:
-        subject: '{{ site_name }} – brugeroprettelse'
-        header: 'Bruger oprettet på {{ site_name }}'
-        body: |-
-            <p style='margin: 0;'>Du er blevet oprettet som bruger på {{ site_name }} med e-mailadressen {{ user.email }}.</p>
-            <p style='margin: 0;'>For at komme i gang skal du <a href="{{ reset_password_url }}">angive en adgangskode</a>.</p>
-            <p style='margin: 0;'>Du kan efterfølgende logge ind med din e-mailadresse ({{ user.email }}) og den valgte adgangskode.</p>
-        button:
-            text: 'Angiv adgangskode'
-        footer: '<p style="margin: 0;">Venlig hilsen<br/> {{ sender.name }}</p>'
-
     gsorder_bundle:
         field_debitor: 'customfield_10309'
         field_marketing_account: 'customfield_10400'

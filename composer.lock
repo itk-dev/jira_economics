@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2c6c4860edfb6aa1dd98396b8745d17f",
+    "content-hash": "a22e8367265d7dfeb9e960154c83be22",
     "packages": [
         {
             "name": "api-platform/api-pack",
@@ -2227,6 +2227,69 @@
                 "youtube"
             ],
             "time": "2018-07-31T10:19:28+00:00"
+        },
+        {
+            "name": "itk-dev/user-management-bundle",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/itk-dev/user-management-bundle.git",
+                "reference": "92c30128ad01e821c5d9a3170ee1030ce41dfc22"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/itk-dev/user-management-bundle/zipball/92c30128ad01e821c5d9a3170ee1030ce41dfc22",
+                "reference": "92c30128ad01e821c5d9a3170ee1030ce41dfc22",
+                "shasum": ""
+            },
+            "require": {
+                "friendsofsymfony/user-bundle": "^2.1",
+                "symfony/framework-bundle": "^4.0",
+                "twig/twig": "^2.11"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.15",
+                "friendsoftwig/twigcs": "^3.1"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "ItkDev\\UserManagementBundle\\": "src/"
+                }
+            },
+            "scripts": {
+                "check-coding-standards/php-cs-fixer": [
+                    "php-cs-fixer --config=.php_cs.dist fix --dry-run"
+                ],
+                "check-coding-standards/twigcs": [
+                    "twigcs lint src/Resources/views/"
+                ],
+                "check-coding-standards": [
+                    "@check-coding-standards/php-cs-fixer",
+                    "@check-coding-standards/twigcs"
+                ],
+                "apply-coding-standards/php-cs-fixer": [
+                    "php-cs-fixer --config=.php_cs.dist fix"
+                ],
+                "apply-coding-standards": [
+                    "@apply-coding-standards/php-cs-fixer"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mikkel Ricky",
+                    "email": "rimi@aarhus.dk"
+                }
+            ],
+            "description": "User management made easier",
+            "support": {
+                "source": "https://github.com/itk-dev/user-management-bundle/tree/master",
+                "issues": "https://github.com/itk-dev/user-management-bundle/issues"
+            },
+            "time": "2019-10-04T13:55:40+00:00"
         },
         {
             "name": "jdorn/sql-formatter",
@@ -9671,15 +9734,17 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "itk-dev/user-management-bundle": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": "^7.1.3",
         "ext-ctype": "*",
+        "ext-dom": "*",
         "ext-iconv": "*",
-        "ext-json": "*",
-        "ext-dom": "*"
+        "ext-json": "*"
     },
     "platform-dev": []
 }
