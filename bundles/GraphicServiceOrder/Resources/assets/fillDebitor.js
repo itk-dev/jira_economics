@@ -1,24 +1,24 @@
 /**
  * Apply autofiller for debitor number.
  */
+/* global allDebtors */
 $(document).ready(function () {
     let target = $('.js-debtor-exists');
     let inputField = $('#graphic_service_order_form_debitor');
-    inputField.on('input', function() {
-        validateInput($(this))
+    inputField.on('input', function () {
+        validateInput($(this));
     });
 
-    $('.js-fill-debtor').click(function() {
+    $('.js-fill-debtor').click(function () {
         let number = $(this).text().split(':');
         inputField.val(number[0]);
         validateInput(inputField);
     });
 
-    function validateInput(input){
-        if(allDebtors.hasOwnProperty(input.val())) {
+    function validateInput (input) {
+        if (allDebtors.hasOwnProperty(input.val())) {
             target.text(allDebtors[input.val()]);
-        }
-        else {
+        } else {
             target.text('Ukendt');
         }
     }
