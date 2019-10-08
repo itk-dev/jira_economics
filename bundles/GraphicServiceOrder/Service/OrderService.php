@@ -324,7 +324,7 @@ class OrderService
                     'name' => $author,
                 ],
                 $this->params->get('field_debitor') => (string) $gsOrder->getDebitor(),
-                $this->params->get('field_marketing_account') => $gsOrder->getMarketingAccount() ? array(0 => array('value' => 'Markedsføringskonto')) : null,
+                $this->params->get('field_marketing_account') => $gsOrder->getMarketingAccount() ? [0 => ['value' => 'Markedsføringskonto']] : null,
             ],
         ];
         $response = $this->hammerService->post('/rest/api/2/issue', $data);
