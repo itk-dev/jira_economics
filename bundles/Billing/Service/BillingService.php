@@ -486,6 +486,10 @@ class BillingService extends JiraService
         // If worklogIds has been changed.
         if (isset($invoiceEntryData['worklogIds'])) {
             $worklogs = $invoiceEntry->getWorklogs();
+            $worklogIdsAlreadyAdded = array_reduce($worklogs->toArray(), function ($carry, Worklog $worklog) {
+                $carry[] = $worklog->getWorklogId();
+                return $carry;
+            }, []);
 
             // Remove de-selected worklogs.
             foreach ($worklogs as $worklog) {
@@ -496,19 +500,21 @@ class BillingService extends JiraService
 
             // Add not-added worklogs.
             foreach ($invoiceEntryData['worklogIds'] as $worklogId) {
-                $worklog = $this->worklogRepository->findOneBy(['worklogId' => $worklogId]);
+                if (!in_array($worklogId, $worklogIdsAlreadyAdded)) {
+                    $worklog = $this->worklogRepository->findOneBy(['worklogId' => $worklogId]);
 
-                if (null === $worklog) {
-                    $worklog = new Worklog();
-                    $worklog->setWorklogId($worklogId);
-                    $worklog->setInvoiceEntry($invoiceEntry);
+                    if (null === $worklog) {
+                        $worklog = new Worklog();
+                        $worklog->setWorklogId($worklogId);
+                        $worklog->setInvoiceEntry($invoiceEntry);
 
-                    $this->entityManager->persist($worklog);
-                } else {
-                    if ($worklog->getInvoiceEntry()->getId() === $invoiceEntry->getId()) {
-                        throw new HttpException(
-                            'Used by other invoice entry.'
-                        );
+                        $this->entityManager->persist($worklog);
+                    } else {
+                        if ($worklog->getInvoiceEntry()->getId() === $invoiceEntry->getId()) {
+                            throw new HttpException(
+                                'Used by other invoice entry.'
+                            );
+                        }
                     }
                 }
             }
