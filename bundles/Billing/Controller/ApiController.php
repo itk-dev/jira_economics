@@ -350,13 +350,6 @@ class ApiController extends Controller
         BillingService $billingService,
         $projectId
     ) {
-        $accountIds = $billingService->getAccountIdsByProject($projectId);
-        $accounts = [];
-        foreach ($accountIds as $accountId) {
-            $accounts[$accountId] = $billingService->getAccount($accountId);
-            $accounts[$accountId]->defaultPrice = $billingService->getAccountDefaultPrice($accountId);
-        }
-
-        return new JsonResponse($accounts);
+        return new JsonResponse($billingService->getProjectAccounts($projectId));
     }
 }

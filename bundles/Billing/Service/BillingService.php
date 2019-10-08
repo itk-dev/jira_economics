@@ -19,6 +19,7 @@ use Billing\Entity\Expense;
 use Billing\Repository\ExpenseRepository;
 use Billing\Repository\InvoiceRepository;
 use Billing\Repository\WorklogRepository;
+use Doctrine\Common\Cache\CacheProvider;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,6 +31,7 @@ class BillingService extends JiraService
     private $expenseRepository;
     private $invoiceRepository;
     private $boundReceiverAccount;
+    private $cache;
 
     /**
      * Constructor.
@@ -39,6 +41,7 @@ class BillingService extends JiraService
      * @param $tokenStorage
      * @param $customerKey
      * @param $pemPath
+     * @param CacheProvider $cache
      * @param \Billing\Repository\WorklogRepository $worklogRepository
      * @param \Billing\Repository\ExpenseRepository $expenseRepository
      * @param \Billing\Repository\InvoiceRepository $invoiceRepository
@@ -51,6 +54,7 @@ class BillingService extends JiraService
         $tokenStorage,
         $customerKey,
         $pemPath,
+        CacheProvider $cache,
         WorklogRepository $worklogRepository,
         ExpenseRepository $expenseRepository,
         InvoiceRepository $invoiceRepository,
@@ -64,6 +68,7 @@ class BillingService extends JiraService
         $this->expenseRepository = $expenseRepository;
         $this->invoiceRepository = $invoiceRepository;
         $this->boundReceiverAccount = $boundReceiverAccount;
+        $this->cache = $cache;
     }
 
     /**
@@ -989,5 +994,31 @@ class BillingService extends JiraService
         }
 
         return $issues;
+    }
+
+    /**
+     * Get accounts for a given project id.
+     *
+     * @param $projectId
+     * @return array|false|mixed
+     */
+    public function getProjectAccounts($projectId)
+    {
+        $cacheKey = 'project_accounts_'.$projectId;
+        if ($this->cache->contains($cacheKey)) {
+            return $this->cache->fetch($cacheKey);
+        }
+
+        $accountIds = $this->getAccountIdsByProject($projectId);
+        $accounts = [];
+        foreach ($accountIds as $accountId) {
+            $accounts[$accountId] = $this->getAccount($accountId);
+            $accounts[$accountId]->defaultPrice = $this->getAccountDefaultPrice($accountId);
+        }
+
+        // Cache result for one day.
+        $this->cache->save($cacheKey, $accounts, 60 * 60 * 24);
+
+        return $accounts;
     }
 }
