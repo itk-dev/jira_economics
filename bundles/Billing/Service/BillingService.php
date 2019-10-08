@@ -523,6 +523,10 @@ class BillingService extends JiraService
         // If expenseIds has been changed.
         if (isset($invoiceEntryData['expenseIds'])) {
             $expenses = $invoiceEntry->getExpenses();
+            $expenseIdsAlreadyAdded = array_reduce($expenses->toArray(), function ($carry, Expense $expense) {
+                $carry[] = $expense->getExpenseId();
+                return $carry;
+            }, []);
 
             // Remove de-selected expenses.
             foreach ($expenses as $expense) {
@@ -533,19 +537,22 @@ class BillingService extends JiraService
 
             // Add not-added expenses.
             foreach ($invoiceEntryData['expenseIds'] as $expenseId) {
-                $expense = $this->expenseRepository->findOneBy(['expenseId' => $expenseId]);
+                if (!in_array($expenseId, $expenseIdsAlreadyAdded)) {
+                    $expense = $this->expenseRepository->findOneBy(['expenseId' => $expenseId]);
 
-                if (null === $expense) {
-                    $expense = new Expense();
-                    $expense->setExpenseId($expenseId);
-                    $expense->setInvoiceEntry($invoiceEntry);
+                    if (null === $expense) {
+                        $expense = new Expense();
+                        $expense->setExpenseId($expenseId);
+                        $expense->setInvoiceEntry($invoiceEntry);
 
-                    $this->entityManager->persist($expense);
-                } else {
-                    if ($expense->getInvoiceEntry()->getId() === $invoiceEntry->getId()) {
-                        throw new HttpException(
-                            'Used by other invoice entry.'
-                        );
+                        $this->entityManager->persist($expense);
+                    } else {
+                        if ($expense->getInvoiceEntry()
+                                ->getId() === $invoiceEntry->getId()) {
+                            throw new HttpException(
+                                'Used by other invoice entry.'
+                            );
+                        }
                     }
                 }
             }
