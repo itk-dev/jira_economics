@@ -479,6 +479,15 @@ class Invoice extends Component {
                                                 </td>
                                             </tr>
                                         )}
+                                        <tr key={'sum'} className={'table-light'}>
+                                            <td colSpan={6}> </td>
+                                            <td>
+                                                {this.state.invoiceEntries.data && this.state.invoiceEntries.data.reduce((carry, item) => {
+                                                    return carry + item.amount * item.price;
+                                                }, 0)}
+                                            </td>
+                                            <td colSpan={2}> </td>
+                                        </tr>
                                     </tbody>
                                 </Table>
                             }

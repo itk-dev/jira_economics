@@ -383,7 +383,7 @@ export class InvoiceEntry extends Component {
                                 id="invoice-entry-product"
                                 aria-describedby="enterVarenr"
                                 onChange={this.handleChange}
-                                defaultValue={ this.state.product }
+                                value={ this.state.product }
                                 placeholder={t('invoice_entry.form.product_placeholder')}>
                             </input>
                             <label htmlFor="description">
@@ -396,7 +396,7 @@ export class InvoiceEntry extends Component {
                                 id="invoice-entry-description"
                                 aria-describedby="enterBeskrivelse"
                                 onChange={this.handleChange}
-                                defaultValue={ this.state.description }
+                                value={ this.state.description }
                                 placeholder={t('invoice_entry.form.description_placeholder')}>
                             </input>
                             <label htmlFor="amount">
@@ -409,7 +409,7 @@ export class InvoiceEntry extends Component {
                                 id="invoice-entry-hours-spent"
                                 aria-describedby="enterHoursSpent"
                                 onChange={this.handleChange}
-                                defaultValue={this.state.amount}
+                                value={this.state.amount}
                                 readOnly={['worklog', 'expense'].indexOf(this.state.invoiceEntry.entryType) !== -1}>
                             </input>
                             <label htmlFor="price">
@@ -422,7 +422,7 @@ export class InvoiceEntry extends Component {
                                 id="invoice-entry-unit-price"
                                 aria-describedby="enterUnitPrice"
                                 onChange={this.handleChange}
-                                defaultValue={this.state.price}
+                                value={this.state.price}
                                 readOnly={['expense'].indexOf(this.state.invoiceEntry.entryType) !== -1}>
                             </input>
                             <label htmlFor="totalPrice">
@@ -432,10 +432,10 @@ export class InvoiceEntry extends Component {
                                 type="text"
                                 name={'totalPrice'}
                                 className="form-control"
-                                id="invoice-entry-unit-price"
+                                id="invoice-entry-total-price"
                                 aria-describedby="enterUnitPrice"
                                 disabled={true}
-                                defaultValue={ this.state.price * this.state.amount }>
+                                value={ this.state.price * this.state.amount }>
                             </input>
                         </div>
                         <button
