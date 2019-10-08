@@ -43,7 +43,11 @@ class GraphicServiceOrderController extends AbstractController
     public function newOrder(Request $request, OrderService $orderService, TokenStorageInterface $tokenStorage)
     {
         $gsOrder = $orderService->prepareOrder();
-        $form = $this->createForm(GraphicServiceOrderForm::class, $gsOrder);
+        $options = [
+            'used_debtors' => $orderService->getUsedDebtors(),
+            'all_debtors' => json_encode($orderService->getAllDebtors()),
+        ];
+        $form = $this->createForm(GraphicServiceOrderForm::class, $gsOrder, $options);
 
         $form->handleRequest($request);
 
@@ -58,6 +62,7 @@ class GraphicServiceOrderController extends AbstractController
         return $this->render('@GraphicServiceOrderBundle/createOrderForm.html.twig', [
             'form' => $form->createView(),
             'user_email' => $tokenStorage->getToken()->getUser()->getEmail(),
+            'options' => $options,
         ]);
     }
 

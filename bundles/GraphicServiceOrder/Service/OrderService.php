@@ -13,6 +13,7 @@ namespace GraphicServiceOrder\Service;
 use App\Service\HammerService;
 use App\Service\OwnCloudService;
 use Doctrine\ORM\EntityManagerInterface;
+use GraphicServiceOrder\Entity\Debtor;
 use GraphicServiceOrder\Entity\GsOrder;
 use GraphicServiceOrder\Message\OwnCloudShareMessage;
 use GraphicServiceOrder\Repository\GsOrderRepository;
@@ -117,15 +118,59 @@ class OrderService
         $token = $this->tokenStorage->getToken();
         if (null !== $token) {
             $user = $token->getUser();
-            $gsOrder
-                ->setFullName($user->getFullName())
-                ->setAddress($user->getAddress())
-                ->setDepartment($user->getDepartment())
-                ->setPostalcode($user->getPostalCode())
-                ->setCity($user->getCity());
+            $useDefaults = $user->getNoDefaultSettings();
+            if ($useDefaults) {
+                $gsOrder
+                    ->setFullName($user->getFullName())
+                    ->setAddress($user->getAddress())
+                    ->setDepartment($user->getDepartment())
+                    ->setPostalcode($user->getPostalCode())
+                    ->setCity($user->getCity());
+            }
         }
 
         return $gsOrder;
+    }
+
+    /**
+     * Get used debtors for GS form.
+     *
+     * @return array
+     */
+    public function getUsedDebtors($asString = true)
+    {
+        $usedDebtors = [];
+        $token = $this->tokenStorage->getToken();
+        if (null !== $token) {
+            $user = $token->getUser();
+            $debtors = $user->getUsedDebtors();
+            foreach ($debtors as $debtor) {
+                if ($asString) {
+                    $usedDebtors[] = (string) $debtor;
+                } else {
+                    $usedDebtors[] = $debtor->getId();
+                }
+            }
+        }
+
+        return $usedDebtors;
+    }
+
+    /**
+     * Get all debtors from DB.
+     *
+     * @return array
+     */
+    public function getAllDebtors()
+    {
+        $debtors = [];
+        $debtorEntities = $this->entityManager->getRepository(Debtor::class)
+            ->findAll();
+        foreach ($debtorEntities as $debtorEntity) {
+            $debtors[$debtorEntity->getNumber()] = $debtorEntity->getLabel();
+        }
+
+        return $debtors;
     }
 
     /**
@@ -133,7 +178,7 @@ class OrderService
      *
      * @param $gsOrder
      */
-    private function updateUserWithGSOrder($gsOrder)
+    private function updateUserWithGSOrder(GsOrder $gsOrder)
     {
         $token = $this->tokenStorage->getToken();
         if (null !== $token) {
@@ -145,6 +190,14 @@ class OrderService
                 ->setAddress($gsOrder->getAddress())
                 ->setPostalCode($gsOrder->getPostalcode())
                 ->setCity($gsOrder->getCity());
+
+            /** @var \GraphicServiceOrder\Entity\Debtor $debtorOrder */
+            $debtorOrder = $this
+                ->entityManager->getRepository(Debtor::class)
+                ->findOneBy(['number' => $gsOrder->getDebitor()]);
+            if (isset($debtorOrder)) {
+                $user->addUsedDebtor($debtorOrder);
+            }
 
             $this->userManager->updateUser($user);
         }

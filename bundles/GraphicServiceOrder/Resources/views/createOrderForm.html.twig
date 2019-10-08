@@ -44,6 +44,13 @@
     <div class="row">
       <div class="form-group col-md-6">
         {{ form_row(form.debitor) }}
+        <small class="form-text text-muted">
+          <div class="debitor-validator">Debitor: <span class="js-debtor-exists">Ukendt</span></div>
+          {{ 'service_order_form.job_payment.debitor.help_header'|trans }}
+            {% for debtor in options.used_debtors %}
+              <span class="badge badge-secondary js-fill-debtor">{{ debtor }}</span>
+            {% endfor %}
+        </small>
       </div>
       <div class="form-check col-md-6 marketing-account">
         {{ form_row(form.marketing_account) }}
@@ -86,8 +93,9 @@
     </button>
     </div>
   </div>
-
-
+  <script type="text/javascript">
+    let allDebtors = {{ options.all_debtors | raw }};
+  </script>
 {% endblock %}
 
 {% block javascripts %}
