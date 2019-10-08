@@ -22,7 +22,8 @@ parameters:
     gs_billing_worklog_hour_price: ~
 
     gsorder_bundle:
-        field_debitor: customfield_10309
+        field_debitor: 'customfield_10309'
+        field_marketing_account: 'customfield_10400'
         gs_files_directory: '%env(resolve:GS_FILES_DIRECTORY)%'
         form_file_gs_upload_size: '%env(resolve:FORM_FILE_GS_UPLOAD_SIZE)%'
         gs_order_project_id: '%env(resolve:GS_ORDER_PROJECT_ID)%'
