@@ -60,12 +60,15 @@ easy_admin:
                       label: portal.user.postalCode
                     - property: city
                       label: portal.user.city
-                    - property: account
-                      label: portal.user.account
-                      type: App\Form\PortalAccountType
+                    - property: usedDebtors
+                      label: portal.user.debtors
+                      type: 'easyadmin_autocomplete'
                       type_options:
-                        multiple: false
-                        expanded: false
+                          by_reference: false
+                          class: 'GraphicServiceOrder\Entity\Debtor'
+                          multiple: true
+                    - property: noDefaultSettings
+                      label: portal.user.noDefault
 
             edit:
                 fields:
@@ -95,9 +98,14 @@ easy_admin:
                       label: portal.user.postalCode
                     - property: city
                       label: portal.user.city
-                    - property: account
-                      label: portal.user.account
-                      type: App\Form\PortalAccountType
+                    - property: usedDebtors
+                      label: portal.user.debtors
+                      type: 'easyadmin_autocomplete'
                       type_options:
-                        multiple: false
-                        expanded: false
+                        by_reference: false
+                        class: 'GraphicServiceOrder\Entity\Debtor'
+                        multiple: true
+                    - property: noDefaultSettings
+                      label: portal.user.noDefault
+        Debtor:
+          class: GraphicServiceOrder\Entity\Debtor

@@ -10,8 +10,11 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
+use GraphicServiceOrder\Entity\Debtor;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
@@ -59,9 +62,20 @@ class User extends BaseUser
     private $city;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\ManyToMany(targetEntity="GraphicServiceOrder\Entity\Debtor", mappedBy="User")
      */
-    private $account;
+    private $usedDebtors;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $noDefaultSettings;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->usedDebtors = new ArrayCollection();
+    }
 
     public function setEmail($email)
     {
@@ -142,14 +156,42 @@ class User extends BaseUser
         return $this;
     }
 
-    public function getAccount(): ?string
+    /**
+     * @return Collection|Debtor[]
+     */
+    public function getUsedDebtors(): Collection
     {
-        return $this->account;
+        return $this->usedDebtors;
     }
 
-    public function setAccount(?string $account): self
+    public function addUsedDebtor(Debtor $usedDebtor): self
     {
-        $this->account = $account;
+        if (!$this->usedDebtors->contains($usedDebtor)) {
+            $this->usedDebtors[] = $usedDebtor;
+            $usedDebtor->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUsedDebtor(Debtor $usedDebtor): self
+    {
+        if ($this->usedDebtors->contains($usedDebtor)) {
+            $this->usedDebtors->removeElement($usedDebtor);
+            $usedDebtor->removeUser($this);
+        }
+
+        return $this;
+    }
+
+    public function getNoDefaultSettings(): ?bool
+    {
+        return $this->noDefaultSettings;
+    }
+
+    public function setNoDefaultSettings(?bool $noDefaultSettings): self
+    {
+        $this->noDefaultSettings = $noDefaultSettings;
 
         return $this;
     }
