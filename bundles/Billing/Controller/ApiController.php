@@ -291,18 +291,7 @@ class ApiController extends Controller
      */
     public function toAccounts(BillingService $billingService)
     {
-        $toAccounts = [];
-        $allAccounts = $billingService->getAllAccounts();
-
-        foreach ($allAccounts as $account) {
-            if ('INTERN' === $account->category->name) {
-                if ('XG' === substr($account->key, 0, 2) || 'XD' === substr($account->key, 0, 2)) {
-                    $toAccounts[$account->key] = $account;
-                }
-            }
-        }
-
-        return new JsonResponse($toAccounts);
+        return new JsonResponse($billingService->getToAccounts());
     }
 
     /**
@@ -351,5 +340,15 @@ class ApiController extends Controller
         $projectId
     ) {
         return new JsonResponse($billingService->getProjectAccounts($projectId));
+    }
+
+    /**
+     * @Route("/clear_cache", name="clear_cache")
+     */
+    public function clearCache(BillingService $billingService)
+    {
+        $billingService->clearCache();
+
+        return new JsonResponse(['cache_clear' => true]);
     }
 }

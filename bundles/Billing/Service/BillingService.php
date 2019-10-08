@@ -1021,4 +1021,41 @@ class BillingService extends JiraService
 
         return $accounts;
     }
+
+    /**
+     * Get to accounts.
+     *
+     * @return array|false|mixed
+     */
+    public function getToAccounts()
+    {
+        $cacheKey = 'to_accounts';
+        if ($this->cache->contains($cacheKey)) {
+            return $this->cache->fetch($cacheKey);
+        }
+
+        $toAccounts = [];
+        $allAccounts = $this->getAllAccounts();
+
+        foreach ($allAccounts as $account) {
+            if ('INTERN' === $account->category->name) {
+                if ('XG' === substr($account->key, 0, 2) || 'XD' === substr($account->key, 0, 2)) {
+                    $toAccounts[$account->key] = $account;
+                }
+            }
+        }
+
+        // Cache result for one day.
+        $this->cache->save($cacheKey, $toAccounts, 60 * 60 * 24);
+
+        return $toAccounts;
+    }
+
+    /**
+     * Clear cache entries.
+     */
+    public function clearCache()
+    {
+        $this->cache->flushAll();
+    }
 }
