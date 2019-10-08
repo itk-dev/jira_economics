@@ -11,8 +11,8 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Service\UserManager;
 use EasyCorp\Bundle\EasyAdminBundle\Event\EasyAdminEvents;
+use ItkDev\UserManagementBundle\Doctrine\UserManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -20,7 +20,7 @@ use Twig\Environment;
 
 class UserController extends AdminController implements EventSubscriberInterface
 {
-    /** @var \App\Service\UserManager */
+    /** @var \ItkDev\UserManagementBundle\Doctrine\UserManager */
     private $userManager;
 
     public function __construct(

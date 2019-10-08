@@ -1,0 +1,24 @@
+itk_dev_user_management:
+    site_name: '%env(SITE_NAME)%'
+    site_url: '%env(SITE_URL)%'
+
+    sender:
+        email: '%env(MAILER_EMAIL)%'
+        name: '%env(MAILER_NAME)%'
+
+    # Template for mails sent to new users
+    user_created:
+        subject: '{{ site_name }} – brugeroprettelse'
+        header: 'Bruger oprettet på {{ site_name }}'
+        body: |-
+            <p style='margin: 0;'>Du er blevet oprettet som bruger på {{ site_name }} med e-mailadressen {{ user.email }}.</p>
+            <p style='margin: 0;'>For at komme i gang skal du <a href="{{ reset_password_url }}">angive en adgangskode</a>.</p>
+            <p style='margin: 0;'>Du kan efterfølgende logge ind med din e-mailadresse ({{ user.email }}) og den valgte adgangskode.</p>
+        button:
+            text: 'Angiv adgangskode'
+        footer: '<p style="margin: 0;">Venlig hilsen<br/> {{ site_name }}</p>'
+
+    # Set to true to automatically notify users on creation.
+    # Otherwise, use the `itk-dev:user-management:notify-users-created` console
+    # command or call `UserManager::notifyUserCreated` to notify new users.
+    notify_user_on_create: true
