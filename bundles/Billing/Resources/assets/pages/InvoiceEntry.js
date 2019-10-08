@@ -403,7 +403,8 @@ export class InvoiceEntry extends Component {
                                 {t('invoice_entry.form.amount')}
                             </label>
                             <input
-                                type="text"
+                                type="number"
+                                step="0.25"
                                 name={'amount'}
                                 className="form-control"
                                 id="invoice-entry-hours-spent"
@@ -416,7 +417,8 @@ export class InvoiceEntry extends Component {
                                 {t('invoice_entry.form.price')}
                             </label>
                             <input
-                                type="text"
+                                type="number"
+                                step="0.25"
                                 name={'price'}
                                 className="form-control"
                                 id="invoice-entry-unit-price"
