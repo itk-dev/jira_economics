@@ -10,20 +10,14 @@
 
 namespace Billing\Entity;
 
+use App\Entity\AbstractEntity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="Billing\Repository\ExpenseRepository")
  */
-class Expense
+class Expense extends AbstractEntity
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
-
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
@@ -39,11 +33,6 @@ class Expense
      * @ORM\Column(type="integer")
      */
     private $expenseId;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getIsBilled(): ?bool
     {

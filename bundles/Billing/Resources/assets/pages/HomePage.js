@@ -219,6 +219,8 @@ class HomePage extends Component {
             }
         ];
 
+        console.log(this.state);
+
         return (
             <ContentWrapper>
                 <PageTitle breadcrumb="">{t('home_page.invoices')}</PageTitle>

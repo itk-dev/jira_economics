@@ -186,7 +186,8 @@ class BillingService extends JiraService
             'account' => $account,
             'totalPrice' => $totalPrice,
             'exportedDate' => $invoice->getExportedDate() ? $invoice->getExportedDate()->format('c') : null,
-            'created' => $invoice->getCreated()->format('c'),
+            'created' => $invoice->getCreatedAt()->format('c'),
+            'created_by' => $invoice->getCreatedBy(),
         ];
     }
 
