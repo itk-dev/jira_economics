@@ -29,6 +29,7 @@ portal.user.address: Adresse
 portal.user.postalCode: Postnummer
 portal.user.city: By
 portal.user.account: Jira konto
+portal.user.noDefault: Brug ikke brugerens indstillinger ved oprettelse af bestilling
 
 ROLE_ADMIN: Administrator
 ROLE_JIRA: Jira

@@ -85,7 +85,7 @@
             cursor: pointer;
             flex: 0;
         }
-        
+
         .custom-file-label {
             overflow: hidden;
             padding-right: 6em;
@@ -101,6 +101,10 @@
         &:before {
             content: "";
         }
+    }
+
+    .js-fill-debtor {
+        cursor: pointer;
     }
 
     .marketing-account {

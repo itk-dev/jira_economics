@@ -33,6 +33,7 @@ service_order_form:
     header: Hvem skal betale?
     debitor:
       label: Debitornummer
+      help_header: Tidligere anvendte debitorer:
     marketing_account:
       label: Borgerservice og bibliotekers markedsføringskonto?
       help: Markedsføringskontoen er en pulje i Borgerservice og Biblioteker til borgerrettet information om arrangementer og kurser i bibliotekerne samt generelle borgerservicekampagner.
