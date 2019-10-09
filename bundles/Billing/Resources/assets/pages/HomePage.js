@@ -17,18 +17,24 @@ import Tooltip from 'react-bootstrap/Tooltip';
 import Spinner from '../components/Spinner';
 import { withTranslation } from 'react-i18next';
 import ConfirmModal from '../components/ConfirmModal';
+import Select from 'react-select';
 
 class HomePage extends Component {
     constructor (props) {
         super(props);
 
         this.state = {
+            filterValues: {
+                creationDateSorting: 'asc',
+                creatorFilter: ''
+            },
             allInvoices: {},
             showModal: false,
             invoiceIdToDelete: null,
-            sortOrder: 'asc',
             selectedItems: {}
         };
+
+        this.handleFilterChange.bind(this);
     };
 
     componentDidMount () {
@@ -67,12 +73,6 @@ class HomePage extends Component {
         this.setState({ allInvoices: remainingInvoices });
     };
 
-    toggleSort () {
-        this.setState((prevState) => ({
-            sortOrder: prevState.sortOrder === 'asc' ? 'desc' : 'asc'
-        }));
-    };
-
     exportInvoices = () => {
         const items = Object.keys(this.state.selectedItems).reduce((carry, key) => {
             if (
@@ -98,6 +98,15 @@ class HomePage extends Component {
         }));
     };
 
+    handleFilterChange = (field, value) => {
+        this.setState((prevState) => ({
+            filterValues: {
+                ...prevState.filterValues,
+                [field]: value
+            }
+        }));
+    };
+
     render () {
         const { t } = this.props;
 
@@ -109,15 +118,44 @@ class HomePage extends Component {
             );
         }
 
-        let sortOrder = this.state.sortOrder;
+        let sortOrder = this.state.filterValues.creationDateSorting;
         let invoices = [].concat(this.state.allInvoices.data)
             .sort((i1, i2) => {
                 if (sortOrder === 'asc') {
-                    return i1.created.date > i2.created.date ? 1 : -1;
+                    return i1.created > i2.created ? 1 : -1;
                 } else {
-                    return i1.created.date < i2.created.date ? 1 : -1;
+                    return i1.created < i2.created ? 1 : -1;
                 }
             });
+
+        if (this.state.filterValues.creatorFilter !== '') {
+            invoices = invoices.filter(item => item.created_by === this.state.filterValues.creatorFilter);
+        }
+
+        let creators = invoices.reduce((carry, item) => {
+            if (item.created_by !== null && carry.indexOf(item.created_by) === -1) {
+                carry.push(item.created_by);
+            }
+            return carry;
+        }, []);
+
+        const creatorFilterOptions = creators.map((creator) => {
+            return {
+                value: creator,
+                label: creator
+            };
+        });
+
+        const creationDateSortingOptions = [
+            {
+                value: 'desc',
+                label: t('home_page.sorting.newest')
+            },
+            {
+                value: 'asc',
+                label: t('home_page.sorting.oldest')
+            }
+        ];
 
         const tabs = [
             {
@@ -219,8 +257,6 @@ class HomePage extends Component {
             }
         ];
 
-        console.log(this.state);
-
         return (
             <ContentWrapper>
                 <PageTitle breadcrumb="">{t('home_page.invoices')}</PageTitle>
@@ -230,11 +266,27 @@ class HomePage extends Component {
                         <Tab key={index} eventKey={tab.keyEvent} title={tab.title}>
                             <Form className="mt-3 mb-1 w-25">
                                 <Form.Group className="mb-0">
-                                    <Form.Label className="sr-only">{t('home_page.sort')}</Form.Label>
-                                    <Form.Control size="sm" as="select" value={this.state.sortOrder} onChange={this.toggleSort.bind(this) }>
-                                        <option value={'desc'}>{t('home_page.sorting.newest')}</option>
-                                        <option value={'asc'}>{t('home_page.sorting.oldest')}</option>
-                                    </Form.Control>
+                                    <label htmlFor={'creationDateSorting'}>{t('home_page.sort.created_at')}</label>
+                                    <Select
+                                        id={'creationDateSorting'}
+                                        value={creationDateSortingOptions.filter(item => this.state.filterValues.creationDateSorting === item.value)}
+                                        name={'creationDateSorting'}
+                                        aria-label={t('home_page.filter.creator')}
+                                        onChange={(selectedOption) => this.handleFilterChange('creationDateSorting', selectedOption ? selectedOption.value : '')}
+                                        options={creationDateSortingOptions}
+                                    />
+                                    <label htmlFor={'creatorFilter'}>{t('home_page.filter.creator')}</label>
+                                    <Select
+                                        id={'creatorFilter'}
+                                        value={creatorFilterOptions.filter(item => this.state.filterValues.creatorFilter === item.value)}
+                                        name={'creatorFilter'}
+                                        isSearchable={true}
+                                        isClearable={true}
+                                        aria-label={t('home_page.filter.creator')}
+                                        placeholder={t('home_page.filter.creator_option.all')}
+                                        onChange={(selectedOption) => this.handleFilterChange('creatorFilter', selectedOption ? selectedOption.value : '')}
+                                        options={creatorFilterOptions}
+                                    />
                                 </Form.Group>
                             </Form>
                             <Table responsive striped hover borderless>
@@ -245,6 +297,7 @@ class HomePage extends Component {
                                         }
                                         <th>{t('home_page.table.invoice')}</th>
                                         <th>{t('home_page.table.project')}</th>
+                                        <th>{t('home_page.table.creator')}</th>
                                         <th>{t('home_page.table.date')}</th>
                                         <th>{t('home_page.table.amount')}</th>
                                         {tab.keyEvent === 'posted' &&
@@ -272,8 +325,9 @@ class HomePage extends Component {
                                                 </a>
                                             </td>
                                             <td>{item.projectName}</td>
+                                            <td>{item.created_by}</td>
                                             <td>
-                                                <Moment format="DD-MM-YYYY">{item.created.date}</Moment>
+                                                <Moment format="DD-MM-YYYY">{item.created}</Moment>
                                             </td>
                                             <td>
                                                 <strong>{item.totalPrice}</strong>
