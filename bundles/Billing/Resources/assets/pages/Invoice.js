@@ -140,7 +140,9 @@ class Invoice extends Component {
 
         const { dispatch } = this.props;
         dispatch(rest.actions.recordInvoice({ id: `${this.props.match.params.invoiceId}` }))
-            .then(response => console.log(response))
+            .then(response => this.setState({
+                'invoice': response
+            }))
             .catch(reason => console.log(reason));
     };
 
@@ -256,6 +258,7 @@ class Invoice extends Component {
                                             maxLength="450"
                                             as="textarea"
                                             rows={10}
+                                            disabled={this.state.invoice && this.state.invoice.recorded}
                                             onChange={this.handleChange.bind(this)}
                                             value={this.state.formDescription}
                                             placeholder={t('invoice.click_to_edit_description')}>
@@ -279,6 +282,7 @@ class Invoice extends Component {
                                                         this.setState({ formAccount: selectedOption.value });
                                                     }
                                                 }
+                                                isDisabled={this.state.invoice && this.state.invoice.recorded}
                                                 options={accountOptions}
                                             />
                                         }
@@ -301,6 +305,7 @@ class Invoice extends Component {
                                                     this.setState({ formPaidByAccount: selectedOption.value });
                                                 }
                                             }
+                                            isDisabled={this.state.invoice && this.state.invoice.recorded}
                                             options={paidByAccountOptions}
                                         />
                                         }
@@ -308,7 +313,9 @@ class Invoice extends Component {
                                             {t('invoice.form.helptext.paid_by_account')}
                                         </small>
                                     </Form.Group>
-                                    <input type="submit" value={t('invoice.submit_form')} className={'btn btn-primary'} />
+                                    {this.state.invoice && !this.state.invoice.recorded &&
+                                        <input type="submit" value={t('invoice.submit_form')} className={'btn btn-primary'}/>
+                                    }
                                 </Form>
                             }
                         </div>
@@ -348,7 +355,7 @@ class Invoice extends Component {
                                     <ListGroup.Item>
                                         <span className="text-muted d-inline-block w-25">
                                             {t('invoice.client_contact')}
-                                        </span>{this.props.invoice.data.account.contact.name}
+                                        </span>{this.props.invoice.data.account.contact ? this.props.invoice.data.account.contact.name : ''}
                                     </ListGroup.Item>
                                     <ListGroup.Item>
                                         <span className="text-muted d-inline-block w-25">
@@ -364,7 +371,7 @@ class Invoice extends Component {
                                         <span
                                             className="text-muted d-inline-block w-25">
                                             {t('invoice.client_account')}
-                                        </span>{this.props.invoice.data.account.customer.key}
+                                        </span>{this.props.invoice.data.account.customer ? this.props.invoice.data.account.customer.key : ''}
                                     </ListGroup.Item>
                                     {this.props.invoice.data.account.category.name === 'INTERN' &&
                                         <ListGroup.Item>
@@ -389,19 +396,21 @@ class Invoice extends Component {
                     <div className="row">
                         <div className="col-md-12">
                             <h2>{t('invoice.invoice_entries_list_title')}</h2>
-                            <div className="row mb-3">
-                                <div className="col-md-12">
-                                    <Button variant="outline-success"
-                                        type="submit" className="mr-3"
-                                        onClick={this.handleAddFromWorklog}>{t('invoice.add_from_worklog')}</Button>
-                                    <Button variant="outline-success"
-                                        type="submit" className="mr-3"
-                                        onClick={this.handleAddFromExpense}>{t('invoice.add_from_expense')}</Button>
-                                    <Button variant="outline-success"
-                                        type="submit"
-                                        onClick={this.handleAddManually}>{t('invoice.add_new_manual_entry')}</Button>
+                            {this.state.invoice && !this.state.invoice.recorded &&
+                                <div className="row mb-3">
+                                    <div className="col-md-12">
+                                        <Button variant="outline-success"
+                                            type="submit" className="mr-3"
+                                            onClick={this.handleAddFromWorklog}>{t('invoice.add_from_worklog')}</Button>
+                                        <Button variant="outline-success"
+                                            type="submit" className="mr-3"
+                                            onClick={this.handleAddFromExpense}>{t('invoice.add_from_expense')}</Button>
+                                        <Button variant="outline-success"
+                                            type="submit"
+                                            onClick={this.handleAddManually}>{t('invoice.add_new_manual_entry')}</Button>
+                                    </div>
                                 </div>
-                            </div>
+                            }
                             {this.props.invoiceEntries.loading &&
                                 <Spinner/>
                             }
@@ -436,46 +445,51 @@ class Invoice extends Component {
                                                     {item.entryType === 'manual' && t('invoice.form.types.manual')}
                                                 </td>
                                                 <td className="text-right">
-                                                    <ButtonGroup size="sm" className="float-right" aria-label="Invoice entry functions">
-                                                        <OverlayTrigger key="edit" placement="top"
-                                                            overlay={
-                                                                <Tooltip
-                                                                    id="tooltip-edit">
-                                                                    {t('invoice.edit_entry')}
-                                                                </Tooltip>
-                                                            }
-                                                        >
-                                                            <Button
-                                                                className="btn-primary"
-                                                                href={'/jira/billing/project/' + this.props.match.params.projectId + '/' + this.props.match.params.invoiceId + '/' + item.id}>
-                                                                <i className="fas fa-edit mx-2"></i>
-                                                                <span className="sr-only">{t('common.edit')}</span>
-                                                            </Button>
-                                                        </OverlayTrigger>
-                                                        <OverlayTrigger
-                                                            key="delete"
-                                                            placement="top"
-                                                            overlay={
-                                                                <Tooltip
-                                                                    id="tooltip-delete">
-                                                                    {t('invoice.delete_entry')}
-                                                                </Tooltip>
-                                                            }
-                                                        >
-                                                            <Button
-                                                                className="btn-danger"
-                                                                onClick={() => {
-                                                                    this.setState({
-                                                                        showDeleteEntryModal: true,
-                                                                        entryIdToDelete: item.id
-                                                                    });
-                                                                }}>
-                                                                <i className="fas fa-trash-alt mx-2"></i>
-                                                                <span
-                                                                    className="sr-only">{t('common.delete')}</span>
-                                                            </Button>
-                                                        </OverlayTrigger>
-                                                    </ButtonGroup>
+                                                    {this.state.invoice && !this.state.invoice.recorded &&
+                                                        <ButtonGroup size="sm" className="float-right" aria-label="Invoice entry functions">
+                                                            <OverlayTrigger
+                                                                key="edit"
+                                                                placement="top"
+                                                                overlay={
+                                                                    <Tooltip
+                                                                        id="tooltip-edit">
+                                                                        {t('invoice.edit_entry')}
+                                                                    </Tooltip>
+                                                                }
+                                                            >
+                                                                <Button
+                                                                    className="btn-primary"
+                                                                    href={'/jira/billing/project/' + this.props.match.params.projectId + '/' + this.props.match.params.invoiceId + '/' + item.id}>
+                                                                    <i className="fas fa-edit mx-2"></i>
+                                                                    <span
+                                                                        className="sr-only">{t('common.edit')}</span>
+                                                                </Button>
+                                                            </OverlayTrigger>
+                                                            <OverlayTrigger
+                                                                key="delete"
+                                                                placement="top"
+                                                                overlay={
+                                                                    <Tooltip
+                                                                        id="tooltip-delete">
+                                                                        {t('invoice.delete_entry')}
+                                                                    </Tooltip>
+                                                                }
+                                                            >
+                                                                <Button
+                                                                    className="btn-danger"
+                                                                    onClick={() => {
+                                                                        this.setState({
+                                                                            showDeleteEntryModal: true,
+                                                                            entryIdToDelete: item.id
+                                                                        });
+                                                                    }}>
+                                                                    <i className="fas fa-trash-alt mx-2"></i>
+                                                                    <span
+                                                                        className="sr-only">{t('common.delete')}</span>
+                                                                </Button>
+                                                            </OverlayTrigger>
+                                                        </ButtonGroup>
+                                                    }
                                                 </td>
                                             </tr>
                                         )}

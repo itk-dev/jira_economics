@@ -222,7 +222,6 @@ class BillingService extends JiraService
         $invoice->setName($invoiceData['name']);
         $invoice->setProject($project);
         $invoice->setRecorded(false);
-        $invoice->setCreated(new \DateTime('now'));
         $invoice->setCustomerAccountId((int) $invoiceData['customerAccountId']);
 
         $this->entityManager->persist($invoice);
@@ -249,6 +248,10 @@ class BillingService extends JiraService
 
         if (!$invoice) {
             throw new HttpException(404, 'Unable to update invoice with id '.$invoiceData['id'].' as it does not already exist');
+        }
+
+        if ($invoice->getRecorded()) {
+            throw new HttpException(400, 'Unable to update invoice with id '.$invoiceData['id'].' since it has been recorded.');
         }
 
         if (!empty($invoiceData['name'])) {
@@ -293,6 +296,10 @@ class BillingService extends JiraService
 
         if (!$invoice) {
             throw new HttpException(404, 'Invoice with id '.$invoiceId.' did not exist');
+        }
+
+        if ($invoice->getRecorded()) {
+            throw new HttpException(400, 'Unable to delete invoice with id '.$invoiceId.' since it has been recorded.');
         }
 
         $this->entityManager->remove($invoice);
@@ -431,7 +438,11 @@ class BillingService extends JiraService
         $invoice = $invoiceRepository->findOneBy(['id' => $invoiceEntryData['invoiceId']]);
 
         if (!$invoice) {
-            throw new HttpException(400, 'Invoice with id '.$invoiceEntryData['invoiceId'].' not found');
+            throw new HttpException(404, 'Invoice with id '.$invoiceEntryData['invoiceId'].' not found');
+        }
+
+        if ($invoice->getRecorded()) {
+            throw new HttpException(400, 'Invoice with id '.$invoiceEntryData['invoiceId'].' has been recorded');
         }
 
         $invoiceEntry = new InvoiceEntry();
@@ -581,6 +592,10 @@ class BillingService extends JiraService
             throw new HttpException(404, 'Unable to update invoiceEntry with id '.$invoiceEntryData['id'].' as it does not already exist');
         }
 
+        if ($invoiceEntry->getInvoice()->getRecorded()) {
+            throw new HttpException(400, 'Unable to update invoiceEntry with id '.$invoiceEntryData['id'].' since the invoice it belongs to has been recorded.');
+        }
+
         $invoiceEntry = $this->setInvoiceEntryValuesFromData($invoiceEntry, $invoiceEntryData);
 
         $this->entityManager->persist($invoiceEntry);
@@ -607,6 +622,10 @@ class BillingService extends JiraService
             throw new HttpException(404, 'InvoiceEntry with id '.$invoiceEntryId.' did not exist');
         }
 
+        if ($invoiceEntry->getInvoice()->getRecorded()) {
+            throw new HttpException(400, 'Unable to delete invoiceEntry with id '.$invoiceEntryId.' since the invoice it belongs to has been recorded.');
+        }
+
         $this->entityManager->remove($invoiceEntry);
         $this->entityManager->flush();
     }
@@ -629,11 +648,20 @@ class BillingService extends JiraService
 
         $customerAccount = $this->getAccount($invoice->getCustomerAccountId());
 
-        $invoice->setLockedType($customerAccount->category->name);
-        $invoice->setLockedCustomerKey($customerAccount->customer->key);
+        if (isset($customerAccount->category)) {
+            $invoice->setLockedType($customerAccount->category->name);
+            $invoice->setLockedSalesChannel($customerAccount->category->key);
+        }
+
+        if (isset($customerAccount->customer)) {
+            $invoice->setLockedCustomerKey($customerAccount->customer->key);
+        }
+
+        if (isset($customerAccount->contact)) {
+            $invoice->setLockedContactName($customerAccount->contact->name);
+        }
+
         $invoice->setLockedAccountKey($customerAccount->key);
-        $invoice->setLockedSalesChannel($customerAccount->category->key);
-        $invoice->setLockedContactName($customerAccount->contact->name);
 
         // Set billed field in Jira for each worklog.
         foreach ($invoice->getInvoiceEntries() as $invoiceEntry) {
