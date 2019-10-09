@@ -358,6 +358,7 @@ export class InvoiceEntry extends Component {
                             </label>
                             <Select
                                 value={toAccountOptions.filter(item => this.state.selectedToAccount === item.value)}
+                                id={'selectedToAccount'}
                                 name={'selectedToAccount'}
                                 placeholder={t('invoice.form.select_account')}
                                 isSearchable={true}
@@ -374,6 +375,7 @@ export class InvoiceEntry extends Component {
                             </label>
                             <Select
                                 value={ materialOptions.filter(item => this.state.materialNumber === item.value) }
+                                id={'materialNumber'}
                                 name={'materialNumber'}
                                 placeholder={t('invoice.form.select_account')}
                                 isSearchable={true}
@@ -390,9 +392,9 @@ export class InvoiceEntry extends Component {
                             </label>
                             <input
                                 type="text"
+                                id={'product'}
                                 name={'product'}
                                 className="form-control"
-                                id="invoice-entry-product"
                                 aria-describedby="enterVarenr"
                                 onChange={this.handleChange}
                                 value={ this.state.product }
@@ -403,9 +405,9 @@ export class InvoiceEntry extends Component {
                             </label>
                             <input
                                 type="text"
+                                id={'description'}
                                 name={'description'}
                                 className="form-control"
-                                id="invoice-entry-description"
                                 aria-describedby="enterBeskrivelse"
                                 onChange={this.handleChange}
                                 value={ this.state.description }
@@ -417,9 +419,9 @@ export class InvoiceEntry extends Component {
                             <input
                                 type="number"
                                 step="0.25"
+                                id={'amount'}
                                 name={'amount'}
                                 className="form-control"
-                                id="invoice-entry-hours-spent"
                                 aria-describedby="enterHoursSpent"
                                 onChange={this.handleChange}
                                 value={this.state.amount}
@@ -431,9 +433,9 @@ export class InvoiceEntry extends Component {
                             <input
                                 type="number"
                                 step="0.25"
+                                id={'price'}
                                 name={'price'}
                                 className="form-control"
-                                id="invoice-entry-unit-price"
                                 aria-describedby="enterUnitPrice"
                                 onChange={this.handleChange}
                                 value={this.state.price}
@@ -444,9 +446,9 @@ export class InvoiceEntry extends Component {
                             </label>
                             <input
                                 type="text"
+                                id={'totalPrice'}
                                 name={'totalPrice'}
                                 className="form-control"
-                                id="invoice-entry-total-price"
                                 aria-describedby="enterUnitPrice"
                                 disabled={true}
                                 value={ this.state.price * this.state.amount }>
