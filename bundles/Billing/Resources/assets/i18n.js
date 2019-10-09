@@ -18,6 +18,8 @@ const resources = {
             'home_page.sr_only.delete_invoice': 'Slet faktura',
             'home_page.tooltip.download_csv': 'Download csv',
             'home_page.sr_only.download_csv': 'Download csv',
+            'home_page.tooltip.show_export_invoice': 'Vis eksport',
+            'home_page.sr_only.show_export_invoice': 'Vis eksport',
             'home_page.sort': 'Sorter',
             'home_page.sorting.newest': 'Nyeste først',
             'home_page.sorting.oldest': 'Ældste først',
