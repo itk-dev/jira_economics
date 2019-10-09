@@ -327,7 +327,7 @@ class Invoice extends Component {
                                         </small>
                                     </Form.Group>
                                     {this.state.invoice && !this.state.invoice.recorded &&
-                                        <input type="submit" value={t('invoice.submit_form')} className={'btn btn-primary'}/>
+                                        <button type="submit" className={'btn btn-primary'}>{t('invoice.submit_form')}</button>
                                     }
                                 </Form>
                             }
