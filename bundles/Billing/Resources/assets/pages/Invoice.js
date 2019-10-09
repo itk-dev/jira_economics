@@ -18,6 +18,7 @@ import Tooltip from 'react-bootstrap/Tooltip';
 import ConfirmModal from '../components/ConfirmModal';
 import { withTranslation, Trans } from 'react-i18next';
 import Select from 'react-select';
+import Bus from '../modules/Bus';
 
 class Invoice extends Component {
     constructor (props) {
@@ -49,13 +50,17 @@ class Invoice extends Component {
             .then((response) => {
                 this.setState({ accounts: response });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
 
         dispatch(rest.actions.getProject({ id: `${this.props.match.params.projectId}` }))
             .then((response) => {
                 this.setState({ project: response });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
 
         dispatch(rest.actions.getInvoice({ id: `${this.props.match.params.invoiceId}` }))
             .then((response) => {
@@ -66,19 +71,25 @@ class Invoice extends Component {
                     formAccount: response.accountId ? response.accountId : ''
                 });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
 
         dispatch(rest.actions.getInvoiceEntries({ id: `${this.props.match.params.invoiceId}` }))
             .then((response) => {
                 this.setState({ invoiceEntries: response });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
 
         dispatch(rest.actions.getToAccounts())
             .then((response) => {
                 this.setState({ toAccounts: response });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
     };
 
     createEntry = (entryType) => {
@@ -98,8 +109,7 @@ class Invoice extends Component {
                 this.props.history.push(`/project/${this.props.match.params.projectId}/${response.invoiceId}/${response.id}`);
             })
             .catch((reason) => {
-                // @TODO: Warn about error.
-                console.log('isCanceled', reason);
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
             });
     };
 
@@ -129,7 +139,7 @@ class Invoice extends Component {
                 this.props.history.push(`/`);
             })
             .catch((reason) => {
-                console.log(reason);
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
             });
     };
 
@@ -143,7 +153,9 @@ class Invoice extends Component {
             .then(response => this.setState({
                 'invoice': response
             }))
-            .catch(reason => console.log(reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
     };
 
     handleSubmit = (event) => {
@@ -165,9 +177,8 @@ class Invoice extends Component {
             body: JSON.stringify(data)
         }))
             .catch((reason) => {
-                console.log(reason);
-            })
-        ;
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
     };
 
     handleChange (event) {
@@ -190,10 +201,12 @@ class Invoice extends Component {
                     .then((response) => {
                         this.setState({ invoiceEntries: response });
                     })
-                    .catch((reason) => console.log('isCanceled', reason));
+                    .catch((reason) => {
+                        Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+                    });
             })
             .catch((reason) => {
-                console.log(reason);
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
             });
     };
 

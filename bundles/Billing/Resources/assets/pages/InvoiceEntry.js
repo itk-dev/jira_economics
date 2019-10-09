@@ -13,6 +13,7 @@ import { withTranslation } from 'react-i18next';
 import WorklogSelect from '../components/WorklogSelect';
 import ExpenseSelect from '../components/ExpenseSelect';
 import Select from 'react-select';
+import Bus from '../modules/Bus';
 
 export class InvoiceEntry extends Component {
     constructor (props) {
@@ -71,7 +72,9 @@ export class InvoiceEntry extends Component {
                                 projectWorklogs: response
                             });
                         })
-                        .catch((reason) => console.log('isCancelled', reason));
+                        .catch((reason) => {
+                            Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+                        });
                 } else if (response.entryType === 'expense') {
                     dispatch(rest.actions.getProjectExpenses({ id: this.props.match.params.projectId }))
                         .then((response) => {
@@ -79,14 +82,18 @@ export class InvoiceEntry extends Component {
                                 projectExpenses: response
                             });
                         })
-                        .catch((reason) => console.log('isCancelled', reason));
+                        .catch((reason) => {
+                            Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+                        });
                 }
 
                 this.setState({ invoiceEntry: response }, () => {
                     this.setDefaultValues();
                 });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
 
         dispatch(rest.actions.getInvoice({ id: this.props.match.params.invoiceId }))
             .then((response) => {
@@ -94,19 +101,25 @@ export class InvoiceEntry extends Component {
                     this.setDefaultValues();
                 });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
 
         dispatch(rest.actions.getToAccounts())
             .then((response) => {
                 this.setState({ toAccounts: response });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
 
         dispatch(rest.actions.getMaterialNumbers())
             .then((response) => {
                 this.setState({ materialNumbers: response });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
     }
 
     setDefaultValues = () => {
@@ -197,8 +210,7 @@ export class InvoiceEntry extends Component {
                 this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
             })
             .catch((reason) => {
-                // @TODO: Warn about error.
-                console.log('isCanceled', reason);
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
             });
     };
 

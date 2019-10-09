@@ -18,6 +18,7 @@ import Spinner from '../components/Spinner';
 import { withTranslation } from 'react-i18next';
 import ConfirmModal from '../components/ConfirmModal';
 import Select from 'react-select';
+import Bus from '../modules/Bus';
 
 class HomePage extends Component {
     constructor (props) {
@@ -44,7 +45,9 @@ class HomePage extends Component {
             .then((response) => {
                 this.setState({ allInvoices: response });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
     };
 
     handleInvoiceDeleteConfirm = (event) => {
@@ -56,7 +59,9 @@ class HomePage extends Component {
             .then(() => {
                 this.removeInvoiceFromState(invoiceId);
             })
-            .catch((reason) => console.log('isCanceled', reason.isCanceled));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
 
         this.setState({ showModal: false, invoiceIdToDelete: null });
     };

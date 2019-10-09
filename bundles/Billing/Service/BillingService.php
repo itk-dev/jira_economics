@@ -36,12 +36,12 @@ class BillingService extends JiraService
     /**
      * Constructor.
      *
-     * @param \Doctrine\ORM\EntityManagerInterface $entityManager
      * @param $jiraUrl
      * @param $tokenStorage
      * @param $customerKey
      * @param $pemPath
      * @param CacheProvider $cache
+     * @param \Doctrine\ORM\EntityManagerInterface $entityManager
      * @param \Billing\Repository\WorklogRepository $worklogRepository
      * @param \Billing\Repository\ExpenseRepository $expenseRepository
      * @param \Billing\Repository\InvoiceRepository $invoiceRepository
@@ -49,12 +49,12 @@ class BillingService extends JiraService
      * @param $boundCustomFieldMappings
      */
     public function __construct(
-        EntityManagerInterface $entityManager,
         $jiraUrl,
         $tokenStorage,
         $customerKey,
         $pemPath,
         CacheProvider $cache,
+        EntityManagerInterface $entityManager,
         WorklogRepository $worklogRepository,
         ExpenseRepository $expenseRepository,
         InvoiceRepository $invoiceRepository,
