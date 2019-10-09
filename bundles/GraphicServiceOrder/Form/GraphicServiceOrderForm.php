@@ -106,10 +106,6 @@ class GraphicServiceOrderForm extends AbstractType
             ->add('debitor', NumberType::class, [
                 'label' => 'service_order_form.job_payment.debitor.label',
                 'constraints' => [
-                    new NotNull([
-                        'groups' => 'debitor',
-                        'message' => 'service_order_form.job_payment.debitor.constraint.not_null',
-                    ]),
                     new Length([
                         'groups' => 'debitor',
                         'min' => 4,
@@ -184,6 +180,8 @@ class GraphicServiceOrderForm extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
+            'used_debtors' => null,
+            'all_debtors' => null,
             'data_class' => GsOrder::class,
             'validation_groups' => function (FormInterface $form) {
                 $data = $form->getData();

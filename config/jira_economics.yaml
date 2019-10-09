@@ -139,8 +139,6 @@ parameters:
                 routeName: 'graphic_service_billing_index'
                 btnTxt: 'Lav udtræk'
 
-    user_created.email: ~
-
     gsorder_bundle:
         field_debitor: ~
         gs_files_directory: '%env(resolve:GS_FILES_DIRECTORY)%'

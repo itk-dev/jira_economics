@@ -13,14 +13,15 @@ namespace GraphicServiceOrder\Service;
 use App\Service\HammerService;
 use App\Service\OwnCloudService;
 use Doctrine\ORM\EntityManagerInterface;
+use GraphicServiceOrder\Entity\Debtor;
 use GraphicServiceOrder\Entity\GsOrder;
 use GraphicServiceOrder\Message\OwnCloudShareMessage;
 use GraphicServiceOrder\Repository\GsOrderRepository;
+use ItkDev\UserManagementBundle\Doctrine\UserManager;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use App\Service\UserManager;
 use Swift_Mailer;
 use Twig\Environment;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -45,7 +46,7 @@ class OrderService
     private $tokenStorage;
     /* @var \GraphicServiceOrder\Service\FileUploader */
     private $fileUploader;
-    /* @var \App\Service\UserManager */
+    /** @var \ItkDev\UserManagementBundle\Doctrine\UserManager */
     private $userManager;
     /* @var \Swift_Mailer */
     private $swiftMailer;
@@ -68,7 +69,7 @@ class OrderService
      * @param string                                                                              $ownCloudFilesFolder
      * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
      * @param \GraphicServiceOrder\Service\FileUploader                                           $fileUploader
-     * @param \App\Service\UserManager                                                            $userManager
+     * @param \ItkDev\UserManagementBundle\Doctrine\UserManager                                   $userManager
      * @param \Swift_Mailer                                                                       $swiftMailer
      * @param \Twig\Environment                                                                   $twig
      * @param \Symfony\Contracts\Translation\TranslatorInterface                                  $translator
@@ -117,15 +118,59 @@ class OrderService
         $token = $this->tokenStorage->getToken();
         if (null !== $token) {
             $user = $token->getUser();
-            $gsOrder
-                ->setFullName($user->getFullName())
-                ->setAddress($user->getAddress())
-                ->setDepartment($user->getDepartment())
-                ->setPostalcode($user->getPostalCode())
-                ->setCity($user->getCity());
+            $dontUseDefaults = $user->getNoDefaultSettings();
+            if (false === $dontUseDefaults) {
+                $gsOrder
+                    ->setFullName($user->getFullName())
+                    ->setAddress($user->getAddress())
+                    ->setDepartment($user->getDepartment())
+                    ->setPostalcode($user->getPostalCode())
+                    ->setCity($user->getCity());
+            }
         }
 
         return $gsOrder;
+    }
+
+    /**
+     * Get used debtors for GS form.
+     *
+     * @return array
+     */
+    public function getUsedDebtors($asString = true)
+    {
+        $usedDebtors = [];
+        $token = $this->tokenStorage->getToken();
+        if (null !== $token) {
+            $user = $token->getUser();
+            $debtors = $user->getUsedDebtors();
+            foreach ($debtors as $debtor) {
+                if ($asString) {
+                    $usedDebtors[] = (string) $debtor;
+                } else {
+                    $usedDebtors[] = $debtor->getId();
+                }
+            }
+        }
+
+        return $usedDebtors;
+    }
+
+    /**
+     * Get all debtors from DB.
+     *
+     * @return array
+     */
+    public function getAllDebtors()
+    {
+        $debtors = [];
+        $debtorEntities = $this->entityManager->getRepository(Debtor::class)
+            ->findAll();
+        foreach ($debtorEntities as $debtorEntity) {
+            $debtors[$debtorEntity->getNumber()] = $debtorEntity->getLabel();
+        }
+
+        return $debtors;
     }
 
     /**
@@ -133,7 +178,7 @@ class OrderService
      *
      * @param $gsOrder
      */
-    private function updateUserWithGSOrder($gsOrder)
+    private function updateUserWithGSOrder(GsOrder $gsOrder)
     {
         $token = $this->tokenStorage->getToken();
         if (null !== $token) {
@@ -145,6 +190,14 @@ class OrderService
                 ->setAddress($gsOrder->getAddress())
                 ->setPostalCode($gsOrder->getPostalcode())
                 ->setCity($gsOrder->getCity());
+
+            /** @var \GraphicServiceOrder\Entity\Debtor $debtorOrder */
+            $debtorOrder = $this
+                ->entityManager->getRepository(Debtor::class)
+                ->findOneBy(['number' => $gsOrder->getDebitor()]);
+            if (isset($debtorOrder)) {
+                $user->addUsedDebtor($debtorOrder);
+            }
 
             $this->userManager->updateUser($user);
         }
@@ -269,9 +322,11 @@ class OrderService
                 'reporter' => [
                     'name' => $author,
                 ],
-                $this->params->get('field_debitor') => (string) $gsOrder->getDebitor(),
+                $this->hammerService->getCustomFieldId('Debitor') => (string) $gsOrder->getDebitor(),
+                $this->hammerService->getCustomFieldId('Marketing Account') => $gsOrder->getMarketingAccount() ? [0 => ['value' => 'Markedsføringskonto']] : null,
             ],
         ];
+
         $response = $this->hammerService->post('/rest/api/2/issue', $data);
 
         return $response;

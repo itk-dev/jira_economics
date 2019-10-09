@@ -13,6 +13,7 @@
         "guzzlehttp/oauth-subscriber": "^0.3.0",
         "guzzlehttp/psr7": "^1.5",
         "hwi/oauth-bundle": "^0.6.3",
+        "itk-dev/user-management-bundle": "dev-master",
         "php-http/guzzle6-adapter": " ^1.0",
         "php-http/httplug": "^1.0",
         "php-http/httplug-bundle": "^1.15",
@@ -138,6 +139,12 @@
         "symfony": {
             "allow-contrib": false,
             "require": "4.3.*"
+        }
+    },
+    "repositories": {
+        "itk-dev/user-management-bundle": {
+            "type": "vcs",
+            "url": "https://github.com/itk-dev/user-management-bundle"
         }
     }
 }
