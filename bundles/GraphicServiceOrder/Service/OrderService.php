@@ -118,8 +118,8 @@ class OrderService
         $token = $this->tokenStorage->getToken();
         if (null !== $token) {
             $user = $token->getUser();
-            $useDefaults = $user->getNoDefaultSettings();
-            if ($useDefaults) {
+            $dontUseDefaults = $user->getNoDefaultSettings();
+            if (false === $dontUseDefaults) {
                 $gsOrder
                     ->setFullName($user->getFullName())
                     ->setAddress($user->getAddress())
