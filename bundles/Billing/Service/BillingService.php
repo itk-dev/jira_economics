@@ -40,8 +40,8 @@ class BillingService extends JiraService
      * @param $tokenStorage
      * @param $customerKey
      * @param $pemPath
-     * @param CacheProvider $cache
-     * @param \Doctrine\ORM\EntityManagerInterface $entityManager
+     * @param CacheProvider                         $cache
+     * @param \Doctrine\ORM\EntityManagerInterface  $entityManager
      * @param \Billing\Repository\WorklogRepository $worklogRepository
      * @param \Billing\Repository\ExpenseRepository $expenseRepository
      * @param \Billing\Repository\InvoiceRepository $invoiceRepository
@@ -499,6 +499,7 @@ class BillingService extends JiraService
             $worklogs = $invoiceEntry->getWorklogs();
             $worklogIdsAlreadyAdded = array_reduce($worklogs->toArray(), function ($carry, Worklog $worklog) {
                 $carry[] = $worklog->getWorklogId();
+
                 return $carry;
             }, []);
 
@@ -511,7 +512,7 @@ class BillingService extends JiraService
 
             // Add not-added worklogs.
             foreach ($invoiceEntryData['worklogIds'] as $worklogId) {
-                if (!in_array($worklogId, $worklogIdsAlreadyAdded)) {
+                if (!\in_array($worklogId, $worklogIdsAlreadyAdded)) {
                     $worklog = $this->worklogRepository->findOneBy(['worklogId' => $worklogId]);
 
                     if (null === $worklog) {
@@ -536,6 +537,7 @@ class BillingService extends JiraService
             $expenses = $invoiceEntry->getExpenses();
             $expenseIdsAlreadyAdded = array_reduce($expenses->toArray(), function ($carry, Expense $expense) {
                 $carry[] = $expense->getExpenseId();
+
                 return $carry;
             }, []);
 
@@ -548,7 +550,7 @@ class BillingService extends JiraService
 
             // Add not-added expenses.
             foreach ($invoiceEntryData['expenseIds'] as $expenseId) {
-                if (!in_array($expenseId, $expenseIdsAlreadyAdded)) {
+                if (!\in_array($expenseId, $expenseIdsAlreadyAdded)) {
                     $expense = $this->expenseRepository->findOneBy(['expenseId' => $expenseId]);
 
                     if (null === $expense) {
@@ -559,7 +561,7 @@ class BillingService extends JiraService
                         $this->entityManager->persist($expense);
                     } else {
                         if ($expense->getInvoiceEntry()
-                                ->getId() === $invoiceEntry->getId()) {
+                            ->getId() === $invoiceEntry->getId()) {
                             throw new HttpException(
                                 'Used by other invoice entry.'
                             );
@@ -1042,6 +1044,7 @@ class BillingService extends JiraService
      * Get accounts for a given project id.
      *
      * @param $projectId
+     *
      * @return array|false|mixed
      */
     public function getProjectAccounts($projectId)

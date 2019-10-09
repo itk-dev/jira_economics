@@ -10,7 +10,6 @@
 
 namespace Billing\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
 use App\Entity\AbstractEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
