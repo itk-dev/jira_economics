@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a22e8367265d7dfeb9e960154c83be22",
+    "content-hash": "7375453a260e678968e06fdc80137835",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -2056,16 +2056,16 @@
         },
         {
             "name": "itk-dev/user-management-bundle",
-            "version": "dev-master",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/itk-dev/user-management-bundle.git",
-                "reference": "92c30128ad01e821c5d9a3170ee1030ce41dfc22"
+                "reference": "5848c02342558e7b138816bbc7c89f7e8cb3bec7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/itk-dev/user-management-bundle/zipball/92c30128ad01e821c5d9a3170ee1030ce41dfc22",
-                "reference": "92c30128ad01e821c5d9a3170ee1030ce41dfc22",
+                "url": "https://api.github.com/repos/itk-dev/user-management-bundle/zipball/5848c02342558e7b138816bbc7c89f7e8cb3bec7",
+                "reference": "5848c02342558e7b138816bbc7c89f7e8cb3bec7",
                 "shasum": ""
             },
             "require": {
@@ -2083,24 +2083,7 @@
                     "ItkDev\\UserManagementBundle\\": "src/"
                 }
             },
-            "scripts": {
-                "check-coding-standards/php-cs-fixer": [
-                    "php-cs-fixer --config=.php_cs.dist fix --dry-run"
-                ],
-                "check-coding-standards/twigcs": [
-                    "twigcs lint src/Resources/views/"
-                ],
-                "check-coding-standards": [
-                    "@check-coding-standards/php-cs-fixer",
-                    "@check-coding-standards/twigcs"
-                ],
-                "apply-coding-standards/php-cs-fixer": [
-                    "php-cs-fixer --config=.php_cs.dist fix"
-                ],
-                "apply-coding-standards": [
-                    "@apply-coding-standards/php-cs-fixer"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2111,11 +2094,7 @@
                 }
             ],
             "description": "User management made easier",
-            "support": {
-                "source": "https://github.com/itk-dev/user-management-bundle/tree/master",
-                "issues": "https://github.com/itk-dev/user-management-bundle/issues"
-            },
-            "time": "2019-10-04T13:55:40+00:00"
+            "time": "2019-10-09T19:34:32+00:00"
         },
         {
             "name": "jdorn/sql-formatter",
@@ -9666,9 +9645,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "itk-dev/user-management-bundle": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
