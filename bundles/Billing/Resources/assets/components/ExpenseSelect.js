@@ -164,7 +164,8 @@ const ExpenseSelect = (props) => {
                             accountKey: expense.issue.accountKey,
                             billed: expense.billed ? t('invoice_entry.billed_text') : '',
                             amount: expense.amount,
-                            date: expense.date
+                            date: expense.date,
+                            addedToOtherInvoice: expense.hasOwnProperty('addedToInvoiceEntryId') && expense.addedToInvoiceEntryId !== props.invoiceEntryId
                         };
                     })}
                 handleSelectOnChange={props.handleSelectOnChange}

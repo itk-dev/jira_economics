@@ -8,7 +8,7 @@ const ExpenseSelectTable = (props) => {
 
     const getNumberOfSelectedExpenses = () => {
         return props.expenses.reduce((carry, value) => {
-            return carry + (value.selected ? 1 : 0);
+            return carry + (value.selected || value.addedToOtherInvoice ? 1 : 0);
         }, 0);
     };
 
@@ -21,7 +21,7 @@ const ExpenseSelectTable = (props) => {
             });
         } else {
             props.expenses.map((expense) => {
-                if (!expense.selected) {
+                if (!expense.selected && !expense.addedToOtherInvoice) {
                     props.handleSelectOnChange(expense);
                 }
             });
