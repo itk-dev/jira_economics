@@ -8,7 +8,7 @@ const WorklogSelectTable = (props) => {
 
     const getNumberOfSelectedWorklogs = () => {
         return props.worklogs.reduce((carry, value) => {
-            return carry + (value.selected ? 1 : 0);
+            return carry + (value.selected || value.addedToOtherInvoice ? 1 : 0);
         }, 0);
     };
 
@@ -21,7 +21,7 @@ const WorklogSelectTable = (props) => {
             });
         } else {
             props.worklogs.map((worklog) => {
-                if (!worklog.selected) {
+                if (!worklog.selected && !worklog.addedToOtherInvoice) {
                     props.handleSelectOnChange(worklog);
                 }
             });

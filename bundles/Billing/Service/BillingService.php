@@ -19,6 +19,7 @@ use Billing\Entity\Expense;
 use Billing\Repository\ExpenseRepository;
 use Billing\Repository\InvoiceRepository;
 use Billing\Repository\WorklogRepository;
+use Doctrine\Common\Cache\CacheProvider;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,15 +31,17 @@ class BillingService extends JiraService
     private $expenseRepository;
     private $invoiceRepository;
     private $boundReceiverAccount;
+    private $cache;
 
     /**
      * Constructor.
      *
-     * @param \Doctrine\ORM\EntityManagerInterface $entityManager
      * @param $jiraUrl
      * @param $tokenStorage
      * @param $customerKey
      * @param $pemPath
+     * @param CacheProvider                         $cache
+     * @param \Doctrine\ORM\EntityManagerInterface  $entityManager
      * @param \Billing\Repository\WorklogRepository $worklogRepository
      * @param \Billing\Repository\ExpenseRepository $expenseRepository
      * @param \Billing\Repository\InvoiceRepository $invoiceRepository
@@ -46,11 +49,12 @@ class BillingService extends JiraService
      * @param $boundCustomFieldMappings
      */
     public function __construct(
-        EntityManagerInterface $entityManager,
         $jiraUrl,
         $tokenStorage,
         $customerKey,
         $pemPath,
+        CacheProvider $cache,
+        EntityManagerInterface $entityManager,
         WorklogRepository $worklogRepository,
         ExpenseRepository $expenseRepository,
         InvoiceRepository $invoiceRepository,
@@ -64,6 +68,7 @@ class BillingService extends JiraService
         $this->expenseRepository = $expenseRepository;
         $this->invoiceRepository = $invoiceRepository;
         $this->boundReceiverAccount = $boundReceiverAccount;
+        $this->cache = $cache;
     }
 
     /**
@@ -181,7 +186,8 @@ class BillingService extends JiraService
             'account' => $account,
             'totalPrice' => $totalPrice,
             'exportedDate' => $invoice->getExportedDate() ? $invoice->getExportedDate()->format('c') : null,
-            'created' => $invoice->getCreated()->format('c'),
+            'created' => $invoice->getCreatedAt()->format('c'),
+            'created_by' => $invoice->getCreatedBy(),
         ];
     }
 
@@ -216,7 +222,6 @@ class BillingService extends JiraService
         $invoice->setName($invoiceData['name']);
         $invoice->setProject($project);
         $invoice->setRecorded(false);
-        $invoice->setCreated(new \DateTime('now'));
         $invoice->setCustomerAccountId((int) $invoiceData['customerAccountId']);
 
         $this->entityManager->persist($invoice);
@@ -243,6 +248,10 @@ class BillingService extends JiraService
 
         if (!$invoice) {
             throw new HttpException(404, 'Unable to update invoice with id '.$invoiceData['id'].' as it does not already exist');
+        }
+
+        if ($invoice->getRecorded()) {
+            throw new HttpException(400, 'Unable to update invoice with id '.$invoiceData['id'].' since it has been recorded.');
         }
 
         if (!empty($invoiceData['name'])) {
@@ -287,6 +296,10 @@ class BillingService extends JiraService
 
         if (!$invoice) {
             throw new HttpException(404, 'Invoice with id '.$invoiceId.' did not exist');
+        }
+
+        if ($invoice->getRecorded()) {
+            throw new HttpException(400, 'Unable to delete invoice with id '.$invoiceId.' since it has been recorded.');
         }
 
         $this->entityManager->remove($invoice);
@@ -425,7 +438,11 @@ class BillingService extends JiraService
         $invoice = $invoiceRepository->findOneBy(['id' => $invoiceEntryData['invoiceId']]);
 
         if (!$invoice) {
-            throw new HttpException(400, 'Invoice with id '.$invoiceEntryData['invoiceId'].' not found');
+            throw new HttpException(404, 'Invoice with id '.$invoiceEntryData['invoiceId'].' not found');
+        }
+
+        if ($invoice->getRecorded()) {
+            throw new HttpException(400, 'Invoice with id '.$invoiceEntryData['invoiceId'].' has been recorded');
         }
 
         $invoiceEntry = new InvoiceEntry();
@@ -480,6 +497,11 @@ class BillingService extends JiraService
         // If worklogIds has been changed.
         if (isset($invoiceEntryData['worklogIds'])) {
             $worklogs = $invoiceEntry->getWorklogs();
+            $worklogIdsAlreadyAdded = array_reduce($worklogs->toArray(), function ($carry, Worklog $worklog) {
+                $carry[] = $worklog->getWorklogId();
+
+                return $carry;
+            }, []);
 
             // Remove de-selected worklogs.
             foreach ($worklogs as $worklog) {
@@ -490,19 +512,21 @@ class BillingService extends JiraService
 
             // Add not-added worklogs.
             foreach ($invoiceEntryData['worklogIds'] as $worklogId) {
-                $worklog = $this->worklogRepository->findOneBy(['worklogId' => $worklogId]);
+                if (!\in_array($worklogId, $worklogIdsAlreadyAdded)) {
+                    $worklog = $this->worklogRepository->findOneBy(['worklogId' => $worklogId]);
 
-                if (null === $worklog) {
-                    $worklog = new Worklog();
-                    $worklog->setWorklogId($worklogId);
-                    $worklog->setInvoiceEntry($invoiceEntry);
+                    if (null === $worklog) {
+                        $worklog = new Worklog();
+                        $worklog->setWorklogId($worklogId);
+                        $worklog->setInvoiceEntry($invoiceEntry);
 
-                    $this->entityManager->persist($worklog);
-                } else {
-                    if ($worklog->getInvoiceEntry()->getId() === $invoiceEntry->getId()) {
-                        throw new HttpException(
-                            'Used by other invoice entry.'
-                        );
+                        $this->entityManager->persist($worklog);
+                    } else {
+                        if ($worklog->getInvoiceEntry()->getId() === $invoiceEntry->getId()) {
+                            throw new HttpException(
+                                'Used by other invoice entry.'
+                            );
+                        }
                     }
                 }
             }
@@ -511,6 +535,11 @@ class BillingService extends JiraService
         // If expenseIds has been changed.
         if (isset($invoiceEntryData['expenseIds'])) {
             $expenses = $invoiceEntry->getExpenses();
+            $expenseIdsAlreadyAdded = array_reduce($expenses->toArray(), function ($carry, Expense $expense) {
+                $carry[] = $expense->getExpenseId();
+
+                return $carry;
+            }, []);
 
             // Remove de-selected expenses.
             foreach ($expenses as $expense) {
@@ -521,19 +550,22 @@ class BillingService extends JiraService
 
             // Add not-added expenses.
             foreach ($invoiceEntryData['expenseIds'] as $expenseId) {
-                $expense = $this->expenseRepository->findOneBy(['expenseId' => $expenseId]);
+                if (!\in_array($expenseId, $expenseIdsAlreadyAdded)) {
+                    $expense = $this->expenseRepository->findOneBy(['expenseId' => $expenseId]);
 
-                if (null === $expense) {
-                    $expense = new Expense();
-                    $expense->setExpenseId($expenseId);
-                    $expense->setInvoiceEntry($invoiceEntry);
+                    if (null === $expense) {
+                        $expense = new Expense();
+                        $expense->setExpenseId($expenseId);
+                        $expense->setInvoiceEntry($invoiceEntry);
 
-                    $this->entityManager->persist($expense);
-                } else {
-                    if ($expense->getInvoiceEntry()->getId() === $invoiceEntry->getId()) {
-                        throw new HttpException(
-                            'Used by other invoice entry.'
-                        );
+                        $this->entityManager->persist($expense);
+                    } else {
+                        if ($expense->getInvoiceEntry()
+                            ->getId() === $invoiceEntry->getId()) {
+                            throw new HttpException(
+                                'Used by other invoice entry.'
+                            );
+                        }
                     }
                 }
             }
@@ -562,6 +594,10 @@ class BillingService extends JiraService
             throw new HttpException(404, 'Unable to update invoiceEntry with id '.$invoiceEntryData['id'].' as it does not already exist');
         }
 
+        if ($invoiceEntry->getInvoice()->getRecorded()) {
+            throw new HttpException(400, 'Unable to update invoiceEntry with id '.$invoiceEntryData['id'].' since the invoice it belongs to has been recorded.');
+        }
+
         $invoiceEntry = $this->setInvoiceEntryValuesFromData($invoiceEntry, $invoiceEntryData);
 
         $this->entityManager->persist($invoiceEntry);
@@ -588,6 +624,10 @@ class BillingService extends JiraService
             throw new HttpException(404, 'InvoiceEntry with id '.$invoiceEntryId.' did not exist');
         }
 
+        if ($invoiceEntry->getInvoice()->getRecorded()) {
+            throw new HttpException(400, 'Unable to delete invoiceEntry with id '.$invoiceEntryId.' since the invoice it belongs to has been recorded.');
+        }
+
         $this->entityManager->remove($invoiceEntry);
         $this->entityManager->flush();
     }
@@ -610,11 +650,20 @@ class BillingService extends JiraService
 
         $customerAccount = $this->getAccount($invoice->getCustomerAccountId());
 
-        $invoice->setLockedType($customerAccount->category->name);
-        $invoice->setLockedCustomerKey($customerAccount->customer->key);
+        if (isset($customerAccount->category)) {
+            $invoice->setLockedType($customerAccount->category->name);
+            $invoice->setLockedSalesChannel($customerAccount->category->key);
+        }
+
+        if (isset($customerAccount->customer)) {
+            $invoice->setLockedCustomerKey($customerAccount->customer->key);
+        }
+
+        if (isset($customerAccount->contact)) {
+            $invoice->setLockedContactName($customerAccount->contact->name);
+        }
+
         $invoice->setLockedAccountKey($customerAccount->key);
-        $invoice->setLockedSalesChannel($customerAccount->category->key);
-        $invoice->setLockedContactName($customerAccount->contact->name);
 
         // Set billed field in Jira for each worklog.
         foreach ($invoice->getInvoiceEntries() as $invoiceEntry) {
@@ -989,5 +1038,69 @@ class BillingService extends JiraService
         }
 
         return $issues;
+    }
+
+    /**
+     * Get accounts for a given project id.
+     *
+     * @param $projectId
+     *
+     * @return array|false|mixed
+     */
+    public function getProjectAccounts($projectId)
+    {
+        $cacheKey = 'project_accounts_'.$projectId;
+        if ($this->cache->contains($cacheKey)) {
+            return $this->cache->fetch($cacheKey);
+        }
+
+        $accountIds = $this->getAccountIdsByProject($projectId);
+        $accounts = [];
+        foreach ($accountIds as $accountId) {
+            $accounts[$accountId] = $this->getAccount($accountId);
+            $accounts[$accountId]->defaultPrice = $this->getAccountDefaultPrice($accountId);
+        }
+
+        // Cache result for one day.
+        $this->cache->save($cacheKey, $accounts, 60 * 60 * 24);
+
+        return $accounts;
+    }
+
+    /**
+     * Get to accounts.
+     *
+     * @return array|false|mixed
+     */
+    public function getToAccounts()
+    {
+        $cacheKey = 'to_accounts';
+        if ($this->cache->contains($cacheKey)) {
+            return $this->cache->fetch($cacheKey);
+        }
+
+        $toAccounts = [];
+        $allAccounts = $this->getAllAccounts();
+
+        foreach ($allAccounts as $account) {
+            if ('INTERN' === $account->category->name) {
+                if ('XG' === substr($account->key, 0, 2) || 'XD' === substr($account->key, 0, 2)) {
+                    $toAccounts[$account->key] = $account;
+                }
+            }
+        }
+
+        // Cache result for one day.
+        $this->cache->save($cacheKey, $toAccounts, 60 * 60 * 24);
+
+        return $toAccounts;
+    }
+
+    /**
+     * Clear cache entries.
+     */
+    public function clearCache()
+    {
+        $this->cache->flushAll();
     }
 }

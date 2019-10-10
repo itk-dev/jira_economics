@@ -12,6 +12,7 @@ import Spinner from '../components/Spinner';
 import { withTranslation } from 'react-i18next';
 import PageTitle from '../components/PageTitle';
 import Select from 'react-select';
+import Bus from '../modules/Bus';
 
 const createRows = (projects) => {
     if (projects.data.data === undefined) {
@@ -102,7 +103,7 @@ class NewInvoice extends Component {
             })
             .catch((reason) => {
                 this.setState({ showModal: false });
-                console.log('isCanceled', reason);
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
             });
     }
 
@@ -186,8 +187,8 @@ class NewInvoice extends Component {
                                             return {
                                                 'value': this.props.accounts.data[keyName].id,
                                                 'label': this.props.accounts.data[keyName].category.name === 'INTERN'
-                                                    ? this.props.accounts.data[keyName].name + ': ' + this.props.accounts.data[keyName].customer.key + ' - PSP: ' + this.props.accounts.data[keyName].key
-                                                    : this.props.accounts.data[keyName].name + ': ' + this.props.accounts.data[keyName].customer.key + ' - EAN: ' + this.props.accounts.data[keyName].key
+                                                    ? this.props.accounts.data[keyName].name + ': ' + (this.props.accounts.data[keyName].customer ? this.props.accounts.data[keyName].customer.key : '') + ' - PSP: ' + this.props.accounts.data[keyName].key
+                                                    : this.props.accounts.data[keyName].name + ': ' + (this.props.accounts.data[keyName].customer ? this.props.accounts.data[keyName].customer.key : '') + ' - EAN: ' + this.props.accounts.data[keyName].key
                                             };
                                         })
                                     }
