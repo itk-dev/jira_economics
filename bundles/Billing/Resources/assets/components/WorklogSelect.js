@@ -164,7 +164,8 @@ const WorklogSelect = (props) => {
                             worker: worklog.worker,
                             billed: worklog.billed ? t('invoice_entry.billed_text') : '',
                             timeSpent: worklog.timeSpent,
-                            dateUpdated: worklog.dateUpdated
+                            dateUpdated: worklog.dateUpdated,
+                            addedToOtherInvoice: worklog.hasOwnProperty('addedToInvoiceEntryId') && worklog.addedToInvoiceEntryId !== props.invoiceEntryId
                         };
                     })}
                 handleSelectOnChange={props.handleSelectOnChange}

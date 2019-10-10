@@ -13,6 +13,7 @@ import { withTranslation } from 'react-i18next';
 import WorklogSelect from '../components/WorklogSelect';
 import ExpenseSelect from '../components/ExpenseSelect';
 import Select from 'react-select';
+import Bus from '../modules/Bus';
 
 export class InvoiceEntry extends Component {
     constructor (props) {
@@ -71,7 +72,9 @@ export class InvoiceEntry extends Component {
                                 projectWorklogs: response
                             });
                         })
-                        .catch((reason) => console.log('isCancelled', reason));
+                        .catch((reason) => {
+                            Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+                        });
                 } else if (response.entryType === 'expense') {
                     dispatch(rest.actions.getProjectExpenses({ id: this.props.match.params.projectId }))
                         .then((response) => {
@@ -79,14 +82,18 @@ export class InvoiceEntry extends Component {
                                 projectExpenses: response
                             });
                         })
-                        .catch((reason) => console.log('isCancelled', reason));
+                        .catch((reason) => {
+                            Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+                        });
                 }
 
                 this.setState({ invoiceEntry: response }, () => {
                     this.setDefaultValues();
                 });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
 
         dispatch(rest.actions.getInvoice({ id: this.props.match.params.invoiceId }))
             .then((response) => {
@@ -94,19 +101,25 @@ export class InvoiceEntry extends Component {
                     this.setDefaultValues();
                 });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
 
         dispatch(rest.actions.getToAccounts())
             .then((response) => {
                 this.setState({ toAccounts: response });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
 
         dispatch(rest.actions.getMaterialNumbers())
             .then((response) => {
                 this.setState({ materialNumbers: response });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
     }
 
     setDefaultValues = () => {
@@ -197,8 +210,7 @@ export class InvoiceEntry extends Component {
                 this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
             })
             .catch((reason) => {
-                // @TODO: Warn about error.
-                console.log('isCanceled', reason);
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
             });
     };
 
@@ -346,6 +358,7 @@ export class InvoiceEntry extends Component {
                             </label>
                             <Select
                                 value={toAccountOptions.filter(item => this.state.selectedToAccount === item.value)}
+                                id={'selectedToAccount'}
                                 name={'selectedToAccount'}
                                 placeholder={t('invoice.form.select_account')}
                                 isSearchable={true}
@@ -362,6 +375,7 @@ export class InvoiceEntry extends Component {
                             </label>
                             <Select
                                 value={ materialOptions.filter(item => this.state.materialNumber === item.value) }
+                                id={'materialNumber'}
                                 name={'materialNumber'}
                                 placeholder={t('invoice.form.select_account')}
                                 isSearchable={true}
@@ -378,12 +392,12 @@ export class InvoiceEntry extends Component {
                             </label>
                             <input
                                 type="text"
+                                id={'product'}
                                 name={'product'}
                                 className="form-control"
-                                id="invoice-entry-product"
                                 aria-describedby="enterVarenr"
                                 onChange={this.handleChange}
-                                defaultValue={ this.state.product }
+                                value={ this.state.product }
                                 placeholder={t('invoice_entry.form.product_placeholder')}>
                             </input>
                             <label htmlFor="description">
@@ -391,38 +405,40 @@ export class InvoiceEntry extends Component {
                             </label>
                             <input
                                 type="text"
+                                id={'description'}
                                 name={'description'}
                                 className="form-control"
-                                id="invoice-entry-description"
                                 aria-describedby="enterBeskrivelse"
                                 onChange={this.handleChange}
-                                defaultValue={ this.state.description }
+                                value={ this.state.description }
                                 placeholder={t('invoice_entry.form.description_placeholder')}>
                             </input>
                             <label htmlFor="amount">
                                 {t('invoice_entry.form.amount')}
                             </label>
                             <input
-                                type="text"
+                                type="number"
+                                step="0.25"
+                                id={'amount'}
                                 name={'amount'}
                                 className="form-control"
-                                id="invoice-entry-hours-spent"
                                 aria-describedby="enterHoursSpent"
                                 onChange={this.handleChange}
-                                defaultValue={this.state.amount}
+                                value={this.state.amount}
                                 readOnly={['worklog', 'expense'].indexOf(this.state.invoiceEntry.entryType) !== -1}>
                             </input>
                             <label htmlFor="price">
                                 {t('invoice_entry.form.price')}
                             </label>
                             <input
-                                type="text"
+                                type="number"
+                                step="0.25"
+                                id={'price'}
                                 name={'price'}
                                 className="form-control"
-                                id="invoice-entry-unit-price"
                                 aria-describedby="enterUnitPrice"
                                 onChange={this.handleChange}
-                                defaultValue={this.state.price}
+                                value={this.state.price}
                                 readOnly={['expense'].indexOf(this.state.invoiceEntry.entryType) !== -1}>
                             </input>
                             <label htmlFor="totalPrice">
@@ -430,12 +446,12 @@ export class InvoiceEntry extends Component {
                             </label>
                             <input
                                 type="text"
+                                id={'totalPrice'}
                                 name={'totalPrice'}
                                 className="form-control"
-                                id="invoice-entry-unit-price"
                                 aria-describedby="enterUnitPrice"
                                 disabled={true}
-                                defaultValue={ this.state.price * this.state.amount }>
+                                value={ this.state.price * this.state.amount }>
                             </input>
                         </div>
                         <button

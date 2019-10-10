@@ -1,6 +1,10 @@
 sidebar:
-  title: Faktura
-  btn:
-    new: Ny faktura
-    invoices: Fakturaer
-    statistics: Statistik
+    title: Faktura
+    btn:
+        new: Ny faktura
+        invoices: Fakturaer
+        statistics: Statistik
+        clear_cache: Ryd cachen
+        clear_cache_confirm: Ryd cachen
+        cancel: Annullér
+    clear_cache_confirm_text: Er du sikker på at du vil rydde cachen?
