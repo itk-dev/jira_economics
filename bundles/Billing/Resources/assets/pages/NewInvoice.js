@@ -184,11 +184,14 @@ class NewInvoice extends Component {
                                     }
                                     options={
                                         Object.keys(this.props.accounts.data).map((keyName) => {
+                                            let label = !this.props.accounts.data[keyName].category ? this.props.accounts.data[keyName].name + ' (No category)'
+                                                : this.props.accounts.data[keyName].category.name === 'INTERN'
+                                                    ? this.props.accounts.data[keyName].name + ': ' + (this.props.accounts.data[keyName].customer ? this.props.accounts.data[keyName].customer.key : '') + ' - PSP: ' + this.props.accounts.data[keyName].key
+                                                    : this.props.accounts.data[keyName].name + ': ' + (this.props.accounts.data[keyName].customer ? this.props.accounts.data[keyName].customer.key : '') + ' - EAN: ' + this.props.accounts.data[keyName].key;
+
                                             return {
                                                 'value': this.props.accounts.data[keyName].id,
-                                                'label': this.props.accounts.data[keyName].category.name === 'INTERN'
-                                                    ? this.props.accounts.data[keyName].name + ': ' + (this.props.accounts.data[keyName].customer ? this.props.accounts.data[keyName].customer.key : '') + ' - PSP: ' + this.props.accounts.data[keyName].key
-                                                    : this.props.accounts.data[keyName].name + ': ' + (this.props.accounts.data[keyName].customer ? this.props.accounts.data[keyName].customer.key : '') + ' - EAN: ' + this.props.accounts.data[keyName].key
+                                                'label': label
                                             };
                                         })
                                     }
