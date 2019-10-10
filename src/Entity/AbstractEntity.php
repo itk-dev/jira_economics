@@ -33,12 +33,4 @@ abstract class AbstractEntity
     {
         return $this->id;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString()
-    {
-        return (string) $this->id;
-    }
 }
