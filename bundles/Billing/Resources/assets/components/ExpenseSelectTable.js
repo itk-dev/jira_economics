@@ -6,11 +6,40 @@ import Moment from 'react-moment';
 const ExpenseSelectTable = (props) => {
     const { t } = props;
 
+    const getNumberOfSelectedExpenses = () => {
+        return props.expenses.reduce((carry, value) => {
+            return carry + (value.selected || value.addedToOtherInvoice ? 1 : 0);
+        }, 0);
+    };
+
+    const toggleSelectAll = () => {
+        if (getNumberOfSelectedExpenses() === props.expenses.length) {
+            props.expenses.map((expense) => {
+                if (expense.selected) {
+                    props.handleSelectOnChange(expense);
+                }
+            });
+        } else {
+            props.expenses.map((expense) => {
+                if (!expense.selected && !expense.addedToOtherInvoice) {
+                    props.handleSelectOnChange(expense);
+                }
+            });
+        }
+    };
+
     return (
         <table className={'table'}>
             <thead>
                 <tr>
-                    <th> </th>
+                    <th>
+                        <input
+                            name={'selectAll'}
+                            type="checkbox"
+                            aria-label={ getNumberOfSelectedExpenses() === props.expenses.length ? t('invoice_entry.table.deselect_all') : t('invoice_entry.table.select_all') }
+                            checked={ getNumberOfSelectedExpenses() === props.expenses.length }
+                            onChange={ () => { toggleSelectAll(); } }/>
+                    </th>
                     <th>{t('invoice_entry.table.expense')}</th>
                     <th>{t('invoice_entry.table.category')}</th>
                     <th>{t('invoice_entry.table.billed')}</th>

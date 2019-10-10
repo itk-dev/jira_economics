@@ -10,24 +10,16 @@
 
 namespace Billing\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use App\Entity\AbstractEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ApiResource()
  * @ORM\Entity(repositoryClass="Billing\Repository\InvoiceRepository")
  */
-class Invoice
+class Invoice extends AbstractEntity
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
-
     /**
      * @ORM\Column(type="string", length=255)
      */
@@ -53,11 +45,6 @@ class Invoice
      * @ORM\Column(type="boolean")
      */
     private $recorded;
-
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $created;
 
     /**
      * @ORM\Column(type="integer")
@@ -107,11 +94,6 @@ class Invoice
     public function __construct()
     {
         $this->invoiceEntries = new ArrayCollection();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getName(): ?string
@@ -189,18 +171,6 @@ class Invoice
     public function setRecorded(bool $recorded): self
     {
         $this->recorded = $recorded;
-
-        return $this;
-    }
-
-    public function getCreated(): ?\DateTimeInterface
-    {
-        return $this->created;
-    }
-
-    public function setCreated(\DateTimeInterface $created): self
-    {
-        $this->created = $created;
 
         return $this;
     }

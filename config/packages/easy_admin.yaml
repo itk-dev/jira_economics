@@ -50,6 +50,25 @@ easy_admin:
                       type_options:
                           multiple: true
                           expanded: true
+                    - property: fullName
+                      label: portal.user.fullName
+                    - property: department
+                      label: portal.user.department
+                    - property: address
+                      label: portal.user.address
+                    - property: postalCode
+                      label: portal.user.postalCode
+                    - property: city
+                      label: portal.user.city
+                    - property: usedDebtors
+                      label: portal.user.debtors
+                      type: 'easyadmin_autocomplete'
+                      type_options:
+                          by_reference: false
+                          class: 'GraphicServiceOrder\Entity\Debtor'
+                          multiple: true
+                    - property: noDefaultSettings
+                      label: portal.user.noDefault
 
             edit:
                 fields:
@@ -69,3 +88,24 @@ easy_admin:
                       type_options:
                           multiple: true
                           expanded: true
+                    - property: fullName
+                      label: portal.user.fullName
+                    - property: department
+                      label: portal.user.department
+                    - property: address
+                      label: portal.user.address
+                    - property: postalCode
+                      label: portal.user.postalCode
+                    - property: city
+                      label: portal.user.city
+                    - property: usedDebtors
+                      label: portal.user.debtors
+                      type: 'easyadmin_autocomplete'
+                      type_options:
+                        by_reference: false
+                        class: 'GraphicServiceOrder\Entity\Debtor'
+                        multiple: true
+                    - property: noDefaultSettings
+                      label: portal.user.noDefault
+        Debtor:
+          class: GraphicServiceOrder\Entity\Debtor

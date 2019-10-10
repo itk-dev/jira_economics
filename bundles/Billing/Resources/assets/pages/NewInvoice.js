@@ -11,6 +11,8 @@ import ContentWrapper from '../components/ContentWrapper';
 import Spinner from '../components/Spinner';
 import { withTranslation } from 'react-i18next';
 import PageTitle from '../components/PageTitle';
+import Select from 'react-select';
+import Bus from '../modules/Bus';
 
 const createRows = (projects) => {
     if (projects.data.data === undefined) {
@@ -38,7 +40,7 @@ class NewInvoice extends Component {
             inputFilter: '',
             showModal: false,
             selectedProject: null,
-            selectedCustomerAccount: ''
+            selectedCustomerAccount: null
         };
 
         this.onFilterChange = this.onFilterChange.bind(this);
@@ -83,7 +85,8 @@ class NewInvoice extends Component {
         const { dispatch } = this.props;
         const name = this.textInput.current.value;
         const projectId = this.state.selectedProject;
-        const customerAccountId = this.state.selectedCustomerAccount;
+        const customerAccountId = this.state.selectedCustomerAccount ? this.state.selectedCustomerAccount.value : '';
+
         const invoiceData = {
             name: name,
             projectId: projectId,
@@ -100,7 +103,7 @@ class NewInvoice extends Component {
             })
             .catch((reason) => {
                 this.setState({ showModal: false });
-                console.log('isCanceled', reason);
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
             });
     }
 
@@ -119,26 +122,6 @@ class NewInvoice extends Component {
             );
         }
     }
-
-    handleChange (event) {
-        let fieldName = event.target.name;
-        let fieldVal = event.target.value;
-        this.setState({ ...this.state, [fieldName]: fieldVal });
-    }
-
-    accountOptions = () => {
-        return Object.keys(this.props.accounts.data)
-            .map((keyName) => (
-                this.props.accounts.data.hasOwnProperty(keyName) &&
-                <option
-                    key={this.props.accounts.data[keyName].id}
-                    value={this.props.accounts.data[keyName].id}>
-                    {this.props.accounts.data[keyName].category.name === 'INTERN'
-                        ? this.props.accounts.data[keyName].name + ': ' + this.props.accounts.data[keyName].customer.key + ' - PSP: ' + this.props.accounts.data[keyName].key
-                        : this.props.accounts.data[keyName].name + ': ' + this.props.accounts.data[keyName].customer.key + ' - EAN: ' + this.props.accounts.data[keyName].key}
-                </option>
-            ));
-    };
 
     render () {
         const { t } = this.props;
@@ -188,10 +171,28 @@ class NewInvoice extends Component {
                                 <Form.Control ref={this.textInput} type="text" placeholder={t('new_invoice.form.name_placeholder')}>
                                 </Form.Control>
                                 <Form.Label>{t('new_invoice.select_customer_account')}</Form.Label>
-                                <Form.Control as="select" onChange={this.handleChange.bind(this)} name={'selectedCustomerAccount'}>
-                                    <option value=''> </option>
-                                    {this.accountOptions()}
-                                </Form.Control>
+                                <Select
+                                    value={this.state.selectedCustomerAccount}
+                                    name={'selectedCustomerAccount'}
+                                    placeholder={t('invoice.form.select_account')}
+                                    isSearchable={true}
+                                    aria-label={t('new_invoice.select_customer_account')}
+                                    onChange={
+                                        selectedOption => {
+                                            this.setState({ selectedCustomerAccount: selectedOption });
+                                        }
+                                    }
+                                    options={
+                                        Object.keys(this.props.accounts.data).map((keyName) => {
+                                            return {
+                                                'value': this.props.accounts.data[keyName].id,
+                                                'label': this.props.accounts.data[keyName].category.name === 'INTERN'
+                                                    ? this.props.accounts.data[keyName].name + ': ' + (this.props.accounts.data[keyName].customer ? this.props.accounts.data[keyName].customer.key : '') + ' - PSP: ' + this.props.accounts.data[keyName].key
+                                                    : this.props.accounts.data[keyName].name + ': ' + (this.props.accounts.data[keyName].customer ? this.props.accounts.data[keyName].customer.key : '') + ' - EAN: ' + this.props.accounts.data[keyName].key
+                                            };
+                                        })
+                                    }
+                                />
                             </Form.Group>
                         }
                         {(this.props.accounts.loading || !this.props.accounts.hasOwnProperty('data')) &&

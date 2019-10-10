@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+  {{ 'service_order_form.receipt.title'|trans }}
+{% endblock %}
+
+{% block content %}
+  <div class="alert alert-success" role="alert">
+    <h4 class="alert-heading">{{ 'service_order_form.receipt.title'|trans }}</h4>
+    <p class="card-text">{{ 'service_order_form.receipt.sub_text'|trans }}<br>
+  </div>
+
+  {% include '@GraphicServiceOrderBundle/receiptContent.html.twig' %}
+{% endblock %}

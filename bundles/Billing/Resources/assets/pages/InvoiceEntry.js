@@ -12,6 +12,8 @@ import '../css/react-datepicker.scss';
 import { withTranslation } from 'react-i18next';
 import WorklogSelect from '../components/WorklogSelect';
 import ExpenseSelect from '../components/ExpenseSelect';
+import Select from 'react-select';
+import Bus from '../modules/Bus';
 
 export class InvoiceEntry extends Component {
     constructor (props) {
@@ -70,7 +72,9 @@ export class InvoiceEntry extends Component {
                                 projectWorklogs: response
                             });
                         })
-                        .catch((reason) => console.log('isCancelled', reason));
+                        .catch((reason) => {
+                            Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+                        });
                 } else if (response.entryType === 'expense') {
                     dispatch(rest.actions.getProjectExpenses({ id: this.props.match.params.projectId }))
                         .then((response) => {
@@ -78,14 +82,18 @@ export class InvoiceEntry extends Component {
                                 projectExpenses: response
                             });
                         })
-                        .catch((reason) => console.log('isCancelled', reason));
+                        .catch((reason) => {
+                            Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+                        });
                 }
 
                 this.setState({ invoiceEntry: response }, () => {
                     this.setDefaultValues();
                 });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
 
         dispatch(rest.actions.getInvoice({ id: this.props.match.params.invoiceId }))
             .then((response) => {
@@ -93,19 +101,25 @@ export class InvoiceEntry extends Component {
                     this.setDefaultValues();
                 });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
 
         dispatch(rest.actions.getToAccounts())
             .then((response) => {
                 this.setState({ toAccounts: response });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
 
         dispatch(rest.actions.getMaterialNumbers())
             .then((response) => {
                 this.setState({ materialNumbers: response });
             })
-            .catch((reason) => console.log('isCanceled', reason));
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
     }
 
     setDefaultValues = () => {
@@ -113,12 +127,20 @@ export class InvoiceEntry extends Component {
             this.setState({
                 amount: this.state.invoiceEntry.amount ? this.state.invoiceEntry.amount : 0,
                 description: this.state.invoiceEntry.description ? this.state.invoiceEntry.description : '',
-                price: this.state.invoiceEntry.price ? this.state.invoiceEntry.price : this.state.invoice.account.defaultPrice,
+                price: this.state.invoiceEntry.price
+                    ? this.state.invoiceEntry.price
+                    : (this.state.invoice.account ? this.state.invoice.account.defaultPrice : 0),
                 product: this.state.invoiceEntry.product ? this.state.invoiceEntry.product : '',
                 selectedToAccount: this.state.invoiceEntry.account ? this.state.invoiceEntry.account : '',
-                materialNumber: this.state.invoiceEntry.materialNumber ? this.state.invoiceEntry.materialNumber : '',
-                selectedWorklogs: this.state.invoiceEntry.worklogIds,
-                selectedExpenses: this.state.invoiceEntry.expenseIds,
+                materialNumber: this.state.invoiceEntry.materialNumber ? parseInt(this.state.invoiceEntry.materialNumber) : '',
+                selectedWorklogs: this.state.invoiceEntry.hasOwnProperty('worklogIds') ? Object.keys(this.state.invoiceEntry.worklogIds).reduce((carry, worklogId) => {
+                    carry[worklogId] = true;
+                    return carry;
+                }, {}) : {},
+                selectedExpenses: this.state.invoiceEntry.hasOwnProperty('expenseIds') ? Object.keys(this.state.invoiceEntry.expenseIds).reduce((carry, expenseId) => {
+                    carry[expenseId] = true;
+                    return carry;
+                }, {}) : {},
                 initialized: true
             });
         }
@@ -188,8 +210,7 @@ export class InvoiceEntry extends Component {
                 this.props.history.push(`/project/${this.props.match.params.projectId}/${this.props.match.params.invoiceId}`);
             })
             .catch((reason) => {
-                // @TODO: Warn about error.
-                console.log('isCanceled', reason);
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
             });
     };
 
@@ -280,6 +301,20 @@ export class InvoiceEntry extends Component {
             return this.spinner();
         }
 
+        const toAccountOptions = Object.keys(this.state.toAccounts).map((keyName) => {
+            return {
+                'value': keyName,
+                'label': keyName + ': ' + this.state.toAccounts[keyName].name
+            };
+        });
+
+        const materialOptions = Object.keys(this.state.materialNumbers).map((keyName) => {
+            return {
+                'value': this.state.materialNumbers[keyName],
+                'label': keyName + ': ' + this.state.materialNumbers[keyName]
+            };
+        });
+
         // Test for whether invoice entry form or worklog/expenses selection
         // should be displayed.
         if (this.state.displaySelectionScreen) {
@@ -319,46 +354,50 @@ export class InvoiceEntry extends Component {
                     <Form onSubmit={this.handleSubmit}>
                         <div>
                             <label htmlFor="selectedToAccount">
-                                {t('invoice_entry.form.toAccount')}
+                                {t('invoice_entry.form.to_account')}
                             </label>
-                            <Form.Control as="select" name={'selectedToAccount'} onChange={this.handleChange} defaultValue={this.state.account ? this.state.account : this.state.invoiceEntry.account}>
-                                <option value=""> </option>
-                                {this.state.hasOwnProperty('toAccounts') && Object.keys(this.state.toAccounts)
-                                    .map((keyName) => (
-                                        this.state.toAccounts.hasOwnProperty(keyName) &&
-                                        <option
-                                            key={keyName + '-' + this.state.toAccounts[keyName].name}
-                                            value={keyName}>
-                                            {keyName}: {this.state.toAccounts[keyName].name}
-                                        </option>
-                                    ))}
-                            </Form.Control>
+                            <Select
+                                value={toAccountOptions.filter(item => this.state.selectedToAccount === item.value)}
+                                id={'selectedToAccount'}
+                                name={'selectedToAccount'}
+                                placeholder={t('invoice.form.select_account')}
+                                isSearchable={true}
+                                aria-label={t('invoice_entry.form.to_account')}
+                                onChange={
+                                    selectedOption => {
+                                        this.setState({ selectedToAccount: selectedOption.value });
+                                    }
+                                }
+                                options={toAccountOptions}
+                            />
                             <label htmlFor="materialNumber">
-                                {t('invoice_entry.form.materialNumber')}
+                                {t('invoice_entry.form.material_number')}
                             </label>
-                            <Form.Control as="select" name={'materialNumber'} onChange={this.handleChange} defaultValue={this.state.materialNumber ? this.state.materialNumber : this.state.invoiceEntry.materialNumber}>
-                                <option value=""> </option>
-                                {this.state.hasOwnProperty('materialNumbers') && Object.keys(this.state.materialNumbers)
-                                    .map((keyName) => (
-                                        this.state.materialNumbers.hasOwnProperty(keyName) &&
-                                        <option
-                                            key={keyName + '-' + this.state.materialNumbers[keyName]}
-                                            value={this.state.materialNumbers[keyName]}>
-                                            {keyName}: {this.state.materialNumbers[keyName]}
-                                        </option>
-                                    ))}
-                            </Form.Control>
+                            <Select
+                                value={ materialOptions.filter(item => this.state.materialNumber === item.value) }
+                                id={'materialNumber'}
+                                name={'materialNumber'}
+                                placeholder={t('invoice.form.select_account')}
+                                isSearchable={true}
+                                aria-label={t('invoice_entry.form.material_number')}
+                                onChange={
+                                    selectedOption => {
+                                        this.setState({ materialNumber: selectedOption.value });
+                                    }
+                                }
+                                options={materialOptions}
+                            />
                             <label htmlFor="product">
                                 {t('invoice_entry.form.product')}
                             </label>
                             <input
                                 type="text"
+                                id={'product'}
                                 name={'product'}
                                 className="form-control"
-                                id="invoice-entry-product"
                                 aria-describedby="enterVarenr"
                                 onChange={this.handleChange}
-                                defaultValue={ this.state.product }
+                                value={ this.state.product }
                                 placeholder={t('invoice_entry.form.product_placeholder')}>
                             </input>
                             <label htmlFor="description">
@@ -366,38 +405,40 @@ export class InvoiceEntry extends Component {
                             </label>
                             <input
                                 type="text"
+                                id={'description'}
                                 name={'description'}
                                 className="form-control"
-                                id="invoice-entry-description"
                                 aria-describedby="enterBeskrivelse"
                                 onChange={this.handleChange}
-                                defaultValue={ this.state.description }
+                                value={ this.state.description }
                                 placeholder={t('invoice_entry.form.description_placeholder')}>
                             </input>
                             <label htmlFor="amount">
                                 {t('invoice_entry.form.amount')}
                             </label>
                             <input
-                                type="text"
+                                type="number"
+                                step="0.25"
+                                id={'amount'}
                                 name={'amount'}
                                 className="form-control"
-                                id="invoice-entry-hours-spent"
                                 aria-describedby="enterHoursSpent"
                                 onChange={this.handleChange}
-                                defaultValue={this.state.amount}
+                                value={this.state.amount}
                                 readOnly={['worklog', 'expense'].indexOf(this.state.invoiceEntry.entryType) !== -1}>
                             </input>
                             <label htmlFor="price">
                                 {t('invoice_entry.form.price')}
                             </label>
                             <input
-                                type="text"
+                                type="number"
+                                step="0.25"
+                                id={'price'}
                                 name={'price'}
                                 className="form-control"
-                                id="invoice-entry-unit-price"
                                 aria-describedby="enterUnitPrice"
                                 onChange={this.handleChange}
-                                defaultValue={this.state.price}
+                                value={this.state.price}
                                 readOnly={['expense'].indexOf(this.state.invoiceEntry.entryType) !== -1}>
                             </input>
                             <label htmlFor="totalPrice">
@@ -405,12 +446,12 @@ export class InvoiceEntry extends Component {
                             </label>
                             <input
                                 type="text"
+                                id={'totalPrice'}
                                 name={'totalPrice'}
                                 className="form-control"
-                                id="invoice-entry-unit-price"
                                 aria-describedby="enterUnitPrice"
                                 disabled={true}
-                                defaultValue={ this.state.price * this.state.amount }>
+                                value={ this.state.price * this.state.amount }>
                             </input>
                         </div>
                         <button

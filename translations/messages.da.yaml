@@ -14,14 +14,25 @@ dashboard:
     title: Dashboard
     headline: Vælg app
 
+portal.title: ITK portal
+
 # Admin user management
 portal.user: Bruger
 portal.user.email: E-mailadresse
 portal.user.enabled: Aktiv
 portal.user.lastLogin: Seneste login
 portal.user.portalApps: Apps
-portal.user.roles: Roler
+portal.user.roles: Roller
+portal.user.fullName: Bruger navn
+portal.user.department: Afdeling
+portal.user.address: Adresse
+portal.user.postalCode: Postnummer
+portal.user.city: By
+portal.user.account: Jira konto
+portal.user.noDefault: Brug ikke brugerens indstillinger ved oprettelse af bestilling
 
 ROLE_ADMIN: Administrator
 ROLE_JIRA: Jira
 ROLE_USER: Bruger
+
+jira.title: Jira Apps

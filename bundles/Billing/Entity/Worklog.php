@@ -10,20 +10,14 @@
 
 namespace Billing\Entity;
 
+use App\Entity\AbstractEntity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="Billing\Repository\WorklogRepository")
  */
-class Worklog
+class Worklog extends AbstractEntity
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
-
     /**
      * @ORM\Column(type="integer")
      */
@@ -39,11 +33,6 @@ class Worklog
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $isBilled;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getWorklogId(): ?int
     {

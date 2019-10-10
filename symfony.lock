@@ -1,21 +1,4 @@
 {
-    "api-platform/api-pack": {
-        "version": "v1.2.0"
-    },
-    "api-platform/core": {
-        "version": "2.1",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "2.1",
-            "ref": "18727d8f229306860b46955f438e1897421da689"
-        },
-        "files": [
-            "config/packages/api_platform.yaml",
-            "config/routes/api_platform.yaml",
-            "src/Entity/.gitignore"
-        ]
-    },
     "behat/transliterator": {
         "version": "v1.2.0"
     },
@@ -186,6 +169,9 @@
             "ref": "20cacc9b2da49d96ea55c8a8dd31324c5be88bc9"
         }
     },
+    "itk-dev/user-management-bundle": {
+        "version": "dev-master"
+    },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },
@@ -204,18 +190,6 @@
     "monolog/monolog": {
         "version": "1.24.0"
     },
-    "nelmio/cors-bundle": {
-        "version": "1.5",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "1.5",
-            "ref": "f0436fc35fca88eada758311f8de43bfb61f1980"
-        },
-        "files": [
-            "config/packages/nelmio_cors.yaml"
-        ]
-    },
     "netresearch/jsonmapper": {
         "version": "v1.4.0"
     },
@@ -227,19 +201,6 @@
     },
     "ocramius/proxy-manager": {
         "version": "2.2.2"
-    },
-    "oneup/uploader-bundle": {
-        "version": "2.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "master",
-            "version": "2.0",
-            "ref": "b19678d1535b9fe7cdf4647fd3483455e4fca458"
-        },
-        "files": [
-            "config/packages/oneup_uploader.yaml",
-            "config/routes/oneup_uploader.yaml"
-        ]
     },
     "pagerfanta/pagerfanta": {
         "version": "v2.1.3"
@@ -358,6 +319,18 @@
             "phpcs.xml.dist"
         ]
     },
+    "stof/doctrine-extensions-bundle": {
+        "version": "1.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "master",
+            "version": "1.2",
+            "ref": "6c1ceb662f8997085f739cd089bfbef67f245983"
+        },
+        "files": [
+            "config/packages/stof_doctrine_extensions.yaml"
+        ]
+    },
     "swiftmailer/swiftmailer": {
         "version": "v6.2.0"
     },
@@ -382,6 +355,9 @@
     "symfony/cache": {
         "version": "v4.2.4"
     },
+    "symfony/cache-contracts": {
+        "version": "v1.1.7"
+    },
     "symfony/config": {
         "version": "v4.2.4"
     },
@@ -397,9 +373,6 @@
             "bin/console",
             "config/bootstrap.php"
         ]
-    },
-    "symfony/contracts": {
-        "version": "v1.0.2"
     },
     "symfony/css-selector": {
         "version": "v4.2.4"
@@ -436,6 +409,9 @@
     },
     "symfony/event-dispatcher": {
         "version": "v4.2.4"
+    },
+    "symfony/event-dispatcher-contracts": {
+        "version": "v1.1.7"
     },
     "symfony/expression-language": {
         "version": "v4.2.4"
@@ -627,6 +603,9 @@
     "symfony/serializer-pack": {
         "version": "v1.0.2"
     },
+    "symfony/service-contracts": {
+        "version": "v1.1.7"
+    },
     "symfony/stopwatch": {
         "version": "v4.2.4"
     },
@@ -662,6 +641,9 @@
             "config/packages/translation.yaml",
             "translations/.gitignore"
         ]
+    },
+    "symfony/translation-contracts": {
+        "version": "v1.1.7"
     },
     "symfony/twig-bridge": {
         "version": "v4.2.4"
@@ -774,9 +756,6 @@
     },
     "webmozart/assert": {
         "version": "1.4.0"
-    },
-    "willdurand/negotiation": {
-        "version": "v2.3.1"
     },
     "zendframework/zend-code": {
         "version": "3.3.1"

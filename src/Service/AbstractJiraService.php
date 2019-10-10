@@ -17,10 +17,12 @@ use GuzzleHttp\Exception\RequestException;
 abstract class AbstractJiraService
 {
     protected $jiraUrl;
+    protected $customFieldMappings;
 
-    public function __construct($jiraUrl)
+    public function __construct($jiraUrl, $customFieldMappings)
     {
         $this->jiraUrl = $jiraUrl;
+        $this->customFieldMappings = $customFieldMappings;
     }
 
     /**
@@ -330,6 +332,30 @@ abstract class AbstractJiraService
     }
 
     /**
+     * Get all Jira custom fields.
+     *
+     * @return mixed
+     */
+    public function getCustomFields()
+    {
+        return $this->get('/rest/api/2/field');
+    }
+
+    /**
+     * Get custom field id by field name.
+     *
+     * These refer to mappings set in jira_economics.local.yaml.
+     *
+     * @param string $fieldName
+     *
+     * @return string
+     */
+    public function getCustomFieldId($fieldName)
+    {
+        return isset($this->customFieldMappings[$fieldName]) ? 'customfield_'.$this->customFieldMappings[$fieldName] : false;
+    }
+
+    /**
      * Get tempo custom fields.
      *
      * @return mixed
@@ -373,6 +399,30 @@ abstract class AbstractJiraService
     public function getCurrentUser()
     {
         $result = $this->get('/rest/api/2/myself');
+
+        return $result;
+    }
+
+    /**
+     * Get users from search.
+     *
+     * @return mixed
+     */
+    public function searchUser($username)
+    {
+        $result = $this->get('/rest/api/2/user/search', ['username' => $username]);
+
+        return $result;
+    }
+
+    /**
+     * Create a new jira user.
+     *
+     * @return mixed
+     */
+    public function createUser($user)
+    {
+        $result = $this->post('/rest/api/2/user', $user);
 
         return $result;
     }
@@ -485,7 +535,7 @@ abstract class AbstractJiraService
      */
     public function getExpenses(array $query = [])
     {
-        $result = $this->get('/rest/tempo-core/1/expense/', $query);
+        $result = $this->get('/rest/tempo-core/1/expense', $query);
 
         return $result;
     }

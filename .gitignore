@@ -41,8 +41,9 @@ npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
 
-# Private files
-private/*
+# Files
+files/*
+
 ###> squizlabs/php_codesniffer ###
 /.phpcs-cache
 /phpcs.xml

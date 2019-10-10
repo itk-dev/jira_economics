@@ -1,6 +1,12 @@
 parameters:
+    custom_fields: ~
     billing_receiver_account: ~
     billing_material_numbers: ~
+    gs_billing_project_id: ~
+    gs_billing_material_id: ~
+    gs_billing_receiver_psp: ~
+    gs_billing_receiver_account: ~
+    gs_billing_worklog_hour_price: ~
     portal:
         menu:
             grafisk_service:
@@ -40,7 +46,7 @@ parameters:
                 title: 'Dash'
                 desc: 'App oversigt'
                 icon: 'fa-th-large'
-                routeName: 'portal_index'
+                routeName: 'jira_index'
                 # active: '/' === $pathInfo
 
             planning:
@@ -74,31 +80,14 @@ parameters:
             sprint_report:
                 title: 'Sprintrapport'
                 desc: 'Generér sprintrapport'
-                icon: 'fa-braille'
+                icon: 'fa-file-alt'
                 routeName: 'sprint_report_index'
 
-            # @TODO: Add when ready.
-
-            # taskWizard:
-            #     title: 'Task wizard'
-            #     desc: 'Opret mange tasks på en gang.'
-            #     icon: 'fa-tasks'
-            #     routeName: 'index'
-            #     # active: false
-
-            # order:
-            #     title: 'Ordre'
-            #     desc: 'Opret ordrepakker ud fra tasks i Jira'
-            #     icon: 'fa-box-open'
-            #     routeName: 'index'
-            #     # active: false
-
-            # sprintplan:
-            #     title: 'Sprintrapport'
-            #     desc: 'Generér sprintrapport'
-            #     icon: 'fa-braille'
-            #     routeName: 'index'
-            #     # active: false
+            gs_billing:
+                title: 'Grafisk service fakturering'
+                desc: 'Lav udtræk af grafiske opgaver'
+                icon: 'fa-file-export'
+                routeName: 'graphic_service_billing_index'
 
             portal:
                 title: 'Portal'
@@ -136,28 +125,23 @@ parameters:
                 routeName: 'expense_new'
                 btnTxt: 'Opret en udgift'
 
+            sprint_report:
+                title: 'Sprintrapport'
+                desc: 'Generér sprintrapport'
+                icon: 'fa-file-alt'
+                routeName: 'sprint_report_index'
+                btnTxt: 'Lav sprintrapport'
 
-            # @TODO: Add when ready.
+            gs_billing:
+                title: 'Grafisk service fakturering'
+                desc: 'Lav udtræk af grafiske opgaver'
+                icon: 'fa-file-export'
+                routeName: 'graphic_service_billing_index'
+                btnTxt: 'Lav udtræk'
 
-            # taskWizard:
-            #     title: 'Task wizard'
-            #     desc: 'Opret mange tasks på en gang.'
-            #     icon: 'fa-tasks'
-            #     routeName: 'index'
-            #     btnTxt: 'Bliv Task wizard'
-
-            # order:
-            #     title: 'Ordre'
-            #     desc: 'Opret ordrepakker ud fra tasks i Jira'
-            #     icon: 'fa-box-open'
-            #     routeName: 'index'
-            #     btnTxt: 'Pak en Ordre'
-
-            # sprintplan:
-            #     title: 'Sprintrapport'
-            #     desc: 'Generér sprintrapport'
-            #     icon: 'fa-braille'
-            #     routeName: 'index'
-            #     btnTxt: 'Se sprintrapporter'
-
-    user_created.email: ~
+    gsorder_bundle:
+        field_debitor: ~
+        gs_files_directory: '%env(resolve:GS_FILES_DIRECTORY)%'
+        form_file_gs_upload_size: '%env(resolve:FORM_FILE_GS_UPLOAD_SIZE)%'
+        gs_order_project_id: '%env(resolve:GS_ORDER_PROJECT_ID)%'
+        gs_order_issuetype_id: '%env(resolve:GS_ORDER_ISSUETYPE_ID)%'

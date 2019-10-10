@@ -5,6 +5,9 @@ service_order_form:
     header: Profil
     name: Navn
     email: E-mail
+  full_name:
+    label: Navn
+    help: Angiv dit fulde navn
   job_description:
     header: Opgavebeskrivelse
     title:
@@ -17,6 +20,7 @@ service_order_form:
       help: Angiv produktspecifikationer. F.eks. størrelse, materiale, typer, osv.
     files:
       label: Upload filer
+      comment: Omdøbt af system
       help: Der kan uploades et ubegrænset antal filer til dette felt. 100 MB grænse. Hvis filerne er større end 100 MB, kan du indsætte et link til filerne i kommentarfeltet.
   order_line:
     amount:
@@ -29,6 +33,7 @@ service_order_form:
     header: Hvem skal betale?
     debitor:
       label: Debitornummer
+      help_header: Tidligere anvendte debitorer:
     marketing_account:
       label: Borgerservice og bibliotekers markedsføringskonto?
       help: Markedsføringskontoen er en pulje i Borgerservice og Biblioteker til borgerrettet information om arrangementer og kurser i bibliotekerne samt generelle borgerservicekampagner.
@@ -53,4 +58,6 @@ service_order_form:
   receipt:
     title: Bestilling oprettet
     sub_text: Bestillingen er oprettet. Du vil høre nærmere.
-
+service_order_email.subject: Ordre modtaget ved ITK Grafisk Service
+service_order_email.header: Bestilling modtaget.
+service_order_email.subheader: ITK Grafisk Service har modtaget din bestilling. Vi vender tilbage.

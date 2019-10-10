@@ -6,11 +6,40 @@ import Moment from 'react-moment';
 const WorklogSelectTable = (props) => {
     const { t } = props;
 
+    const getNumberOfSelectedWorklogs = () => {
+        return props.worklogs.reduce((carry, value) => {
+            return carry + (value.selected || value.addedToOtherInvoice ? 1 : 0);
+        }, 0);
+    };
+
+    const toggleSelectAll = () => {
+        if (getNumberOfSelectedWorklogs() === props.worklogs.length) {
+            props.worklogs.map((worklog) => {
+                if (worklog.selected) {
+                    props.handleSelectOnChange(worklog);
+                }
+            });
+        } else {
+            props.worklogs.map((worklog) => {
+                if (!worklog.selected && !worklog.addedToOtherInvoice) {
+                    props.handleSelectOnChange(worklog);
+                }
+            });
+        }
+    };
+
     return (
         <table className={'table'}>
             <thead>
                 <tr>
-                    <th> </th>
+                    <th>
+                        <input
+                            name={'selectAll'}
+                            type="checkbox"
+                            aria-label={ getNumberOfSelectedWorklogs() === props.worklogs.length ? t('invoice_entry.table.deselect_all') : t('invoice_entry.table.select_all') }
+                            checked={ getNumberOfSelectedWorklogs() === props.worklogs.length }
+                            onChange={ () => { toggleSelectAll(); } }/>
+                    </th>
                     <th>{t('invoice_entry.table.worklog')}</th>
                     <th>{t('invoice_entry.table.billed')}</th>
                     <th>{t('invoice_entry.table.epic')}</th>

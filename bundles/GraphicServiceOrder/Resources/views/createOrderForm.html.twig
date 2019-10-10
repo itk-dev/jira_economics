@@ -12,40 +12,45 @@
     </div>
     <h4 class="mt-4">{{ 'service_order_form.profile.header'|trans }}</h4>
     <div>
-      <div class="mb-2">
-        <span class="label"><strong>{{ 'service_order_form.profile.name'|trans }}:</strong></span>
-        <span class="value">Martin Yde Granath</span>
+      <div class="form-group no-gutters">
+        <label>{{ 'service_order_form.profile.email'|trans }}:</label>
+        <span class="value">{{ user_email }}</span>
       </div>
-      <div class="mb-2">
-        <span class="label"><strong>{{ 'service_order_form.profile.email'|trans }}:</strong></span>
-        <span class="value">my@aarhus.dk</span>
-      </div>
+      {{ form_row(form.full_name) }}
     </div>
     <h4 class="mt-4">{{ 'service_order_form.job_description.header'|trans }}</h4>
     {{ form_row(form.job_title) }}
     <div class="order-lines">
-      {# store the prototype on the data-prototype attribute #}
       <ul class="lines" data-prototype="{{ form_widget(form.order_lines.vars.prototype)|e('html_attr') }}">
-        {# iterate over each existing tag and render its only field: name #}
         {% for order_line in form.order_lines %}
           <li>{{ form_row(order_line) }}</li>
         {% endfor %}
       </ul>
-      {# Hide order lines #}
       {{ form_widget(form.order_lines) }}
-      {{ form_row(form.description) }}
     </div>
-    <div>
-      {{ form_row(form.files) }}
-      <ul id="fileList">
-        <!-- The file list will be shown here -->
+    {{ form_row(form.description) }}
+    <div class="multi-upload-lines">
+      <label>{{ form_label(form.multi_upload) }}</label>
+      {# store the prototype on the data-prototype attribute #}
+      <ul class="file-lines" data-prototype="{{ form_widget(form.multi_upload.vars.prototype)|e('html_attr') }}">
+        {% for upload in form.multi_upload %}
+          <li>{{ form_row(upload) }}</li>
+        {% endfor %}
       </ul>
-      {{ form_row(form.files_uploaded) }}
+      {{ form_help(form.multi_upload) }}
+      {{ form_widget(form.multi_upload) }}
     </div>
     <h4 class="mt-4">{{ 'service_order_form.job_payment.header'|trans }}</h4>
     <div class="row">
       <div class="form-group col-md-6">
         {{ form_row(form.debitor) }}
+        <small class="form-text text-muted">
+          <div class="debitor-validator">Debitor: <span class="js-debtor-exists">Ukendt</span></div>
+          {{ 'service_order_form.job_payment.debitor.help_header'|trans }}
+            {% for debtor in options.used_debtors %}
+              <span class="badge badge-secondary js-fill-debtor">{{ debtor }}</span>
+            {% endfor %}
+        </small>
       </div>
       <div class="form-check col-md-6 marketing-account">
         {{ form_row(form.marketing_account) }}
@@ -72,7 +77,7 @@
     </div>
     <div class="row">
       <div class="form-group col-md-6">
-        {{ form_row(form.date) }}
+        {{ form_row(form.date, {'attr': {'class': 'js-datepicker'}}) }}
       </div>
     </div>
     <div class="row">
@@ -88,8 +93,9 @@
     </button>
     </div>
   </div>
-
-
+  <script type="text/javascript">
+    let allDebtors = {{ options.all_debtors|raw }};
+  </script>
 {% endblock %}
 
 {% block javascripts %}

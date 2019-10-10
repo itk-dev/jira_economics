@@ -18,15 +18,13 @@ parameters:
     env(JIRA_TOKEN): null
 
     site_name: '%env(SITE_NAME)%'
+    site_description: '%env(SITE_DESCRIPTION)%'
     site_url: '%env(SITE_URL)%'
     site_logo_path: '%env(SITE_LOGO_PATH)%'
+    site_logo_url: '%site_url%/%site_logo_path%'
     mailer_name: '%env(MAILER_NAME)%'
     mailer_email: '%env(MAILER_EMAIL)%'
-    user_created_user_subject: ''
-    user_created_user_header: ''
-    user_created_user_body: ''
-    user_created_user_button_text: ''
-    user_created_user_footer: ''
+    jira_debitor_field: '%env(resolve:JIRA_DEBITOR_FIELD)%'
 
 services:
     # default configuration for services in *this* file
@@ -54,12 +52,14 @@ services:
             $tokenStorage: '@security.token_storage'
             $customerKey: '%env(JIRA_OAUTH_CUSTOMER_KEY)%'
             $pemPath: '%env(resolve:JIRA_OAUTH_PEM_PATH)%'
+            $customFieldMappings: '%custom_fields%'
 
     App\Service\HammerService:
         arguments:
             $jiraUrl: '%env(JIRA_URL)%'
             $apiUser: '%env(JIRA_USER)%'
             $apiPass: '%env(JIRA_PASS)%'
+            $customFieldMappings: '%custom_fields%'
 
     App\Service\OwnCloudService:
         arguments:
@@ -74,21 +74,3 @@ services:
     App\Form\ProfileFormType:
         arguments:
             $class: App\Entity\User
-
-    App\Service\UserManager:
-        arguments:
-            - '@fos_user.util.password_updater'
-            - '@fos_user.util.canonical_fields_updater'
-            - '@fos_user.object_manager'
-            - '@fos_user.util.token_generator'
-            - '@twig'
-            - '@router'
-            - '@fos_user.mailer'
-            - '@mailer'
-            -
-                user_class: '%fos_user.model.user.class%'
-                user_created:
-                    sender:
-                        email: '%mailer_email%'
-                        name: '%mailer_name%'
-                    email: '%user_created.email%'

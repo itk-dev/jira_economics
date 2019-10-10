@@ -12,6 +12,7 @@ namespace GraphicServiceOrder\Form;
 
 use App\Service\HammerService;
 use GraphicServiceOrder\Entity\GsOrder;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormInterface;
@@ -20,28 +21,31 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class GraphicServiceOrderForm extends AbstractType
 {
+    /* @var \App\Service\HammerService */
     private $hammerService;
+    /* @var \Symfony\Component\DependencyInjection\ContainerInterface */
     private $container;
+    /* @var array */
+    private $params;
 
-    public function __construct(HammerService $hammerService, ContainerInterface $container, array $options = [])
+    public function __construct(HammerService $hammerService, ContainerInterface $container, array $gsOrderConfiguration)
     {
         $this->hammerService = $hammerService;
         $this->container = $container;
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
+        $this->params = new ParameterBag($gsOrderConfiguration);
     }
 
     /**
@@ -52,26 +56,21 @@ class GraphicServiceOrderForm extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $allowed_file_types = [
-            'application/pdf',
-            'application/zip',
-            'image/jpeg',
-            'image/png',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        ];
-
-        // Add file upload endpoint.
-        $helper = $this->container->get('oneup_uploader.templating.uploader_helper');
-        $endpoint = $helper->endpoint('gsorder');
-
         $builder
+            ->add('full_name', TextType::class, [
+                'label' => 'service_order_form.full_name.label',
+                'constraints' => [
+                    new NotNull(['groups' => 'base']),
+                ],
+                'help' => 'service_order_form.full_name.help',
+                'required' => false,
+            ])
+
             ->add('job_title', TextType::class, [
                 'label' => 'service_order_form.job_description.title.label',
                 'constraints' => [
                     new NotNull(['groups' => 'base']),
                 ],
-                'attr' => ['class' => 'form-control'],
-                'help_attr' => ['class' => 'form-text text-muted'],
                 'help' => 'service_order_form.job_description.title.help',
                 'required' => false,
             ])
@@ -81,42 +80,32 @@ class GraphicServiceOrderForm extends AbstractType
                 'allow_delete' => true,
                 'entry_options' => ['label' => false],
             ])
-            ->add('description', TextareaType::class, [
-                'label' => 'service_order_form.job_description.description.label',
-                'attr' => ['class' => 'form-control', 'required'],
-                'help_attr' => ['class' => 'form-text text-muted'],
-                'help' => 'service_order_form.job_description.description.help',
+            ->add('multi_upload', CollectionType::class, [
+                'label' => 'service_order_form.job_description.files.label',
+                'entry_type' => FileType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'mapped' => false,
+                'entry_options' => [
+                    'label' => false,
+                    'required' => false,
+                    'constraints' => [
+                        new File([
+                            'maxSize' => $this->params->get('form_file_gs_upload_size'),
+                        ]),
+                    ],
+                ],
+                'help' => 'service_order_form.job_description.files.help',
                 'required' => false,
             ])
-      // Using OneupUploaderBundle and ajax for uploading the files, see GsUploadListener and jquery-fileupload-config.js
-            ->add('files', FileType::class, [
-                'label' => 'service_order_form.job_description.files.label',
-                'constraints' => [
-                    new All([
-                        new File([
-                            'maxSize' => getenv('FORM_FILE_GS_UPLOAD_SIZE'),
-                            'mimeTypes' => $allowed_file_types,
-                        ]),
-                    ]),
-                ],
-                'attr' => ['class' => 'form-control', 'data-url' => $endpoint],
-                'help_attr' => ['class' => 'form-text text-muted'],
-                'help' => 'service_order_form.job_description.files.help',
-                'required' => 0,
-                'multiple' => true,
-            ])
-      // Using OneupUploaderBundle and ajax for uploading the files, causes the 'files' field to be empty on submit.
-      // We add the uploaded files to a hidden field, to store them until form submit.
-            ->add('files_uploaded', HiddenType::class, [
-                'mapped' => false,
+            ->add('description', TextareaType::class, [
+                'label' => 'service_order_form.job_description.description.label',
+                'help' => 'service_order_form.job_description.description.help',
+                'required' => false,
             ])
             ->add('debitor', NumberType::class, [
                 'label' => 'service_order_form.job_payment.debitor.label',
                 'constraints' => [
-                    new NotNull([
-                        'groups' => 'debitor',
-                        'message' => 'service_order_form.job_payment.debitor.constraint.not_null',
-                    ]),
                     new Length([
                         'groups' => 'debitor',
                         'min' => 4,
@@ -125,7 +114,6 @@ class GraphicServiceOrderForm extends AbstractType
                         'maxMessage' => 'service_order_form.job_payment.debitor.constraint.max',
                     ]),
                 ],
-                'attr' => ['class' => 'form-control'],
                 'required' => false,
             ])
             ->add('marketing_account', CheckboxType::class, [
@@ -133,9 +121,7 @@ class GraphicServiceOrderForm extends AbstractType
                 'constraints' => [
                     new NotNull(['groups' => 'marketing_account']),
                 ],
-                'attr' => ['class' => 'form-check-input'],
                 'required' => false,
-                'help_attr' => ['class' => 'form-text text-muted'],
                 'help' => 'service_order_form.job_payment.marketing_account.help',
             ])
             ->add('department', TextType::class, [
@@ -143,7 +129,6 @@ class GraphicServiceOrderForm extends AbstractType
                 'constraints' => [
                     new NotNull(['groups' => 'base']),
                 ],
-                'attr' => ['class' => 'form-control'],
                 'required' => false,
             ])
             ->add('address', TextType::class, [
@@ -151,15 +136,13 @@ class GraphicServiceOrderForm extends AbstractType
                 'constraints' => [
                     new NotNull(['groups' => 'base']),
                 ],
-                'attr' => ['class' => 'form-control'],
                 'required' => false,
             ])
-            ->add('postal_code', TextType::class, [
+            ->add('postal_code', NumberType::class, [
                 'label' => 'service_order_form.job_delivery.postal_code.label',
                 'constraints' => [
                     new NotNull(['groups' => 'base']),
                 ],
-                'attr' => ['class' => 'form-control'],
                 'required' => false,
             ])
             ->add('city', TextType::class, [
@@ -167,7 +150,6 @@ class GraphicServiceOrderForm extends AbstractType
                 'constraints' => [
                     new NotNull(['groups' => 'base']),
                 ],
-                'attr' => ['class' => 'form-control'],
                 'required' => false,
             ])
             ->add('date', DateType::class, [
@@ -177,19 +159,16 @@ class GraphicServiceOrderForm extends AbstractType
                 'constraints' => [
                     new NotNull(['groups' => 'base']),
                 ],
-                'attr' => ['class' => 'form-control js-datepicker'],
                 'required' => false,
             ])
             ->add('delivery_description', TextareaType::class, [
                 'label' => 'service_order_form.job_delivery.delivery_description.label',
-                'attr' => ['class' => 'form-control', 'required'],
-                'help_attr' => ['class' => 'form-text text-muted'],
                 'help' => 'service_order_form.job_delivery.delivery_description.help',
                 'required' => false,
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'service_order_form.save.label',
-                'attr' => ['class' => 'btn btn-primary'],
+                'attr' => ['class' => 'btn-primary'],
             ]);
     }
 
@@ -201,6 +180,8 @@ class GraphicServiceOrderForm extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
+            'used_debtors' => null,
+            'all_debtors' => null,
             'data_class' => GsOrder::class,
             'validation_groups' => function (FormInterface $form) {
                 $data = $form->getData();
