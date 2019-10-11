@@ -71,7 +71,8 @@ th, td {
 
 // Sticky table head
 @supports (position: sticky) {
-    thead.sticky-top {
+    th.sticky-top {
+        top: -1px; // Eliminate a visual bug in Chrome where the table behind is visible above the sticky element.
         background-color: white;
     }
 }
