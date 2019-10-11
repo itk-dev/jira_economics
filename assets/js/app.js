@@ -24,3 +24,7 @@ require('@fortawesome/fontawesome-free/js/all.js');
 
 // Add select2
 require('select2');
+
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+});

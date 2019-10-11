@@ -48,8 +48,11 @@
                             <div class="main-sidebar col-12 col-md-2 pt-md-3 order-1 order-md-0">
                                 {{ block('sidebar') }}
                             </div>
+                            <div class="main-content col-12 col-md-10 py-md-3 px-md-5 order-0 order-md-1">
+                        {% else %}
+                            <div class="main-content col py-md-3 px-md-5">
                         {% endif %}
-                        <div class="main-content col-12 col-md-10 py-md-3 px-md-5 order-0 order-md-1">
+
                             {% block flash_messages %}
                                 {% for label, messages in app.flashes %}
                                     {% set raw = label matches '/^raw[:-]/' %}
