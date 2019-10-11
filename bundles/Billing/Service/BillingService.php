@@ -1101,6 +1101,6 @@ class BillingService extends JiraService
      */
     public function clearCache()
     {
-        $this->cache->flushAll();
+        return $this->cache->flushAll();
     }
 }

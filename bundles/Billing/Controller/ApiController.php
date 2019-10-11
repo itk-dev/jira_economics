@@ -341,14 +341,4 @@ class ApiController extends Controller
     ) {
         return new JsonResponse($billingService->getProjectAccounts($projectId));
     }
-
-    /**
-     * @Route("/clear_cache", name="clear_cache")
-     */
-    public function clearCache(BillingService $billingService)
-    {
-        $billingService->clearCache();
-
-        return new JsonResponse(['cache_clear' => true]);
-    }
 }
