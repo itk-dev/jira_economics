@@ -14,6 +14,7 @@ use App\Service\MenuService;
 use Billing\Service\BillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 class IndexController extends AbstractController
@@ -55,6 +56,19 @@ class IndexController extends AbstractController
 
         return $this->render('@Billing/table.html.twig', [
             'html' => $mock->saveHTML(),
+            'global_menu_items' => $menuService->getGlobalMenuItems(),
+        ]);
+    }
+
+    /**
+     * @Route("/clear_cache", name="clear_cache")
+     */
+    public function clearCache(BillingService $billingService, MenuService $menuService)
+    {
+        $success = $billingService->clearCache();
+
+        return $this->render('@BillingBundle/empty.html.twig', [
+            'message' => 'Clear cache: '.($success ? 'true' : 'false'),
             'global_menu_items' => $menuService->getGlobalMenuItems(),
         ]);
     }
