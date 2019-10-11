@@ -1,43 +1,4 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}JIRA Economics{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-
-    {{ encore_entry_link_tags('billing') }}
-{% endblock %}
-
-{% block sidebar %}
-    <p>{{ "sidebar.title"|trans }}</p>
-    <a class="btn btn-primary btn-block" href="/jira/billing/new"><i class="fas fa-plus-circle fa-fw"></i> {{ "sidebar.btn.new"|trans }}</a>
-    <div class="navbar navbar-light align-items-start pl-md-0 pr-md-0">
-        <nav class="nav flex-md-column justify-content-md-center">
-            <a class="nav-link" href="/jira/billing/">{{ "sidebar.btn.invoices"|trans }}</a>
-        </nav>
-    </div>
-    <p class="small text-muted mt-3">Opret eller rediger fakturaer ud fra tasks i Jira.</p>
-    <p class="small text-muted">For at oprette en ny faktura skal du klikke på knappen "Ny faktura".</p>
-    <p class="small text-muted">Ønsker du at redigere en faktura, skal du klikke på den i listen over igangværende fakturaer.</p>
-
-    <button style="position: absolute; bottom: 1em"  type="button" class="btn btn-danger" data-toggle="modal" data-target=".clear-cache-confirm">
-        <i class="fas fa-trash-alt fa-fw"></i> {{ "sidebar.btn.clear_cache"|trans }}
-    </button>
-
-    <div class="modal fade clear-cache-confirm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-body">
-                    {{ 'sidebar.clear_cache_confirm_text'|trans }}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ 'sidebar.btn.cancel'|trans }}</button>
-                    <a class="btn btn-primary" id="billingClearCache" href="{{ path('clear_cache')}}">{{ 'sidebar.btn.clear_cache_confirm'|trans }}</a>
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock %}
+{% extends '@Billing/index.html.twig' %}
 
 {% block content %}
     {% if message is defined %}
@@ -45,12 +6,4 @@
     {% endif %}
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('[data-toggle="popover"]').popover();
-        });
-    </script>
-{% endblock %}
+{% block javascripts %}{% endblock %}
