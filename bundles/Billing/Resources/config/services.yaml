@@ -25,4 +25,4 @@ services:
 
     billing.cache:
         class: Doctrine\Common\Cache\FilesystemCache
-        arguments: ['%kernel.cache_dir%']
+        arguments: ['%kernel.cache_dir%/billing']

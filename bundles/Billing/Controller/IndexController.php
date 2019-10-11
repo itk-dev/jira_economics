@@ -60,6 +60,19 @@ class IndexController extends AbstractController
     }
 
     /**
+     * @Route("/clear_cache", name="clear_cache")
+     */
+    public function clearCache(BillingService $billingService, MenuService $menuService)
+    {
+        $success = $billingService->clearCache();
+
+        return $this->render('@BillingBundle/empty.html.twig', [
+            'message' => 'Clear cache: '.($success ? 'true' : 'false'),
+            'global_menu_items' => $menuService->getGlobalMenuItems(),
+        ]);
+    }
+
+    /**
      * @Route("/{reactRouting}", name="billing_index", defaults={"reactRouting": null}, requirements={"reactRouting"=".+"})
      */
     public function billing(MenuService $menuService)
