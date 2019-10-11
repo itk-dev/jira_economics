@@ -32,6 +32,8 @@ const resources = {
             'home_page.filter.creator': 'Oprettet af',
             'home_page.filter.creator_option.all': 'Alle',
             'home_page.table.creator': 'Oprettet af',
+            'new_invoice.no_category': 'Ingen kategori',
+            'new_invoice.no_customer': 'Ingen kunde',
             'invoice.choose_project': 'Vælg projekt',
             'invoice.modals.delete_entry.title': 'Slet fakturalinje',
             'invoice.modals.delete_entry.body': 'Er du sikker på du vil slette denne fakturalinje?',
