@@ -76,7 +76,9 @@ class UserController extends AdminController implements EventSubscriberInterface
     public function prePersistUserEntity(User $user)
     {
         $this->userManager->updateUser($user, false);
-        $this->userManager->notifyUserCreated($user, false);
+        if (!$this->userManager->getNotifyUserOnCreate()) {
+            $this->userManager->notifyUserCreated($user, false);
+        }
         $this->showInfo('User %user% notified', ['%user%' => $user]);
     }
 
