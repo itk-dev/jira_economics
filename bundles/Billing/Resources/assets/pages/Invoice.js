@@ -215,14 +215,14 @@ class Invoice extends Component {
         const invoiceId = this.props.match.params.invoiceId;
         const invoiceRecorded = this.props.invoice.data.recorded ? t('invoice.recorded_true') : t('invoice.recorded_false');
 
-        const accountOptions = this.state.accounts ? Object.keys(this.state.accounts).map((keyName) => {
+        let accountOptions = this.state.accounts ? Object.keys(this.state.accounts).map((keyName) => {
             return {
                 'value': parseInt(keyName),
                 'label': keyName + ': ' + this.state.accounts[keyName].name
             };
         }) : [];
 
-        const paidByAccountOptions = this.state.toAccounts ? Object.keys(this.state.toAccounts).map((keyName) => {
+        let paidByAccountOptions = this.state.toAccounts ? Object.keys(this.state.toAccounts).map((keyName) => {
             return {
                 'value': keyName,
                 'label': keyName + ': ' + this.state.toAccounts[keyName].name
@@ -260,7 +260,7 @@ class Invoice extends Component {
                             {this.props.invoice.loading &&
                                 <Spinner/>
                             }
-                            {this.state.formPaidByAccount !== null &&
+                            {this.state.invoice !== null &&
                                 <Form onSubmit={this.handleSubmit.bind(this)}>
                                     <Form.Group>
                                         <Form.Label htmlFor={'formDescription'}>
@@ -290,9 +290,10 @@ class Invoice extends Component {
                                                 placeholder={t('invoice.form.select_account')}
                                                 aria-label={t('invoice.form.label.customer_account')}
                                                 isSearchable={true}
+                                                isClearable={true}
                                                 onChange={
                                                     selectedOption => {
-                                                        this.setState({ formAccount: selectedOption.value });
+                                                        this.setState({ formAccount: selectedOption ? selectedOption.value : null });
                                                     }
                                                 }
                                                 isDisabled={this.state.invoice && this.state.invoice.recorded}
@@ -311,11 +312,12 @@ class Invoice extends Component {
                                             value={ paidByAccountOptions.filter(item => this.state.formPaidByAccount === item.value) }
                                             name={'formPaidByAccount'}
                                             isSearchable={true}
+                                            isClearable={true}
                                             placeholder={t('invoice.form.select_account')}
                                             aria-label={t('invoice.form.label.paid_by_account')}
                                             onChange={
                                                 selectedOption => {
-                                                    this.setState({ formPaidByAccount: selectedOption.value });
+                                                    this.setState({ formPaidByAccount: selectedOption ? selectedOption.value : null });
                                                 }
                                             }
                                             isDisabled={this.state.invoice && this.state.invoice.recorded}
