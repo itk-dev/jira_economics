@@ -1,7 +1,15 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
-    {{ form(form) }}
+    {{ form_start(form) }}
+        {{ form_row(form.project) }}
+        {{ form_row(form.issue_key) }}
+        {{ form_row(form.category) }}
+        <div class="text-right">
+            <a href="{{ path('expense_admin_category_index') }}">{{ 'expense.category_admin'|trans }}</a>
+        </div>
+        {{ form_rest(form) }}
+    {{ form_end(form) }}
 {% endblock %}
 
 {% block stylesheets %}
