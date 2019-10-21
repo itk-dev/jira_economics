@@ -215,14 +215,14 @@ class Invoice extends Component {
         const invoiceId = this.props.match.params.invoiceId;
         const invoiceRecorded = this.props.invoice.data.recorded ? t('invoice.recorded_true') : t('invoice.recorded_false');
 
-        let accountOptions = this.state.accounts ? Object.keys(this.state.accounts).map((keyName) => {
+        const accountOptions = this.state.accounts ? Object.keys(this.state.accounts).map((keyName) => {
             return {
                 'value': parseInt(keyName),
                 'label': keyName + ': ' + this.state.accounts[keyName].name
             };
         }) : [];
 
-        let paidByAccountOptions = this.state.toAccounts ? Object.keys(this.state.toAccounts).map((keyName) => {
+        const paidByAccountOptions = this.state.toAccounts ? Object.keys(this.state.toAccounts).map((keyName) => {
             return {
                 'value': keyName,
                 'label': keyName + ': ' + this.state.toAccounts[keyName].name
