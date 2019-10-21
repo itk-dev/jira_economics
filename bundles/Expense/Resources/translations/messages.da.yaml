@@ -44,3 +44,4 @@ expense.new.quantity.placeholder: ''
 expense.new.quantity: Antal
 expense.new.search_for_issue_in_project: 'Søg efter sag i projektet {project}'
 expense.new.submit: 'Opret'
+expense.category_admin: Administrér kategorier
