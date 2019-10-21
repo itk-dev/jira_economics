@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7375453a260e678968e06fdc80137835",
+    "content-hash": "65b1b43f3d8a0eef241541bf276414c0",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -2056,16 +2056,16 @@
         },
         {
             "name": "itk-dev/user-management-bundle",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/itk-dev/user-management-bundle.git",
-                "reference": "5848c02342558e7b138816bbc7c89f7e8cb3bec7"
+                "reference": "f091c72ea1b817e51c536c13daaf463a78eac88a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/itk-dev/user-management-bundle/zipball/5848c02342558e7b138816bbc7c89f7e8cb3bec7",
-                "reference": "5848c02342558e7b138816bbc7c89f7e8cb3bec7",
+                "url": "https://api.github.com/repos/itk-dev/user-management-bundle/zipball/f091c72ea1b817e51c536c13daaf463a78eac88a",
+                "reference": "f091c72ea1b817e51c536c13daaf463a78eac88a",
                 "shasum": ""
             },
             "require": {
@@ -2094,7 +2094,7 @@
                 }
             ],
             "description": "User management made easier",
-            "time": "2019-10-09T19:34:32+00:00"
+            "time": "2019-10-15T11:01:51+00:00"
         },
         {
             "name": "jdorn/sql-formatter",
