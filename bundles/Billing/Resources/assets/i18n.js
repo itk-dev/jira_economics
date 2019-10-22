@@ -114,7 +114,7 @@ const resources = {
             'invoice_entry.title': 'Udfyld fakturalinje',
             'invoice_entry.save_choices': 'Gem valg',
             'invoice_entry.choose_worklogs': 'Vælg worklogs',
-            'invoice_entry.form.to_account': 'Kontonr.',
+            'invoice_entry.form.to_account': 'Betales til konto',
             'invoice_entry.form.product': 'Vare',
             'invoice_entry.form.product_placeholder': 'Varenavn',
             'invoice_entry.form.description': 'Beskrivelse',
