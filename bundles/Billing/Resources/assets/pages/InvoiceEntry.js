@@ -362,10 +362,11 @@ export class InvoiceEntry extends Component {
                                 name={'selectedToAccount'}
                                 placeholder={t('invoice.form.select_account')}
                                 isSearchable={true}
+                                isClearable={true}
                                 aria-label={t('invoice_entry.form.to_account')}
                                 onChange={
                                     selectedOption => {
-                                        this.setState({ selectedToAccount: selectedOption.value });
+                                        this.setState({ selectedToAccount: selectedOption ? selectedOption.value : null });
                                     }
                                 }
                                 options={toAccountOptions}
@@ -379,10 +380,11 @@ export class InvoiceEntry extends Component {
                                 name={'materialNumber'}
                                 placeholder={t('invoice.form.select_account')}
                                 isSearchable={true}
+                                isClearable={true}
                                 aria-label={t('invoice_entry.form.material_number')}
                                 onChange={
                                     selectedOption => {
-                                        this.setState({ materialNumber: selectedOption.value });
+                                        this.setState({ materialNumber: selectedOption ? selectedOption.value : null });
                                     }
                                 }
                                 options={materialOptions}

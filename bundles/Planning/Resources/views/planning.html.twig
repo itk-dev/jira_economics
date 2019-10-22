@@ -17,14 +17,12 @@
                 </div>
                 <input type="text" class="form-control" placeholder="" aria-label="filter" aria-describedby="basic-addon1" v-model="userFilter">
             </div>
-
-            <div class="table-responsive">
                 <table class="table table-bordered table-sm" id="table-projects">
                     <thead>
                     <tr>
-                        <th colspan="3">
+                        <th colspan="3" class="sticky-top">
                         </th>
-                        <th v-html="sprint.name" v-for="sprint in sprints"></th>
+                        <th v-html="sprint.name" v-for="sprint in sprints"  class="sticky-top"></th>
                     </tr>
                     </thead>
                     <tbody v-for="user in filteredUsers" v-if="!hideUsers.hasOwnProperty(user.key) || hideUsers[user.key] === false">
@@ -86,7 +84,6 @@
                     </tr>
                     </tbody>
                 </table>
-            </div>
             <div>
                 <div><i class="fas fa-eye-slash"></i> <strong>{{ 'planning.ignored_users'|trans }}</strong></div>
                 <div v-for="user in filteredUsers" v-if="hideUsers.hasOwnProperty(user.key) && hideUsers[user.key] === true">
@@ -106,56 +103,53 @@
                 </div>
                 <input type="text" class="form-control" placeholder="" aria-label="filter" aria-describedby="basic-addon1" v-model="projectFilter">
             </div>
-
-            <div class="table-responsive">
-                <table class="table table-bordered table-sm" id="table-projects">
-                    <thead>
+            <table class="table table-bordered table-sm" id="table-projects">
+                <thead>
+                <tr>
+                    <th colspan="3" class="sticky-top">
+                    </th>
+                    <th v-html="sprint.name" v-for="sprint in sprints" class="sticky-top"></th>
+                </tr>
+                </thead>
+                <tbody v-for="project in filteredProjects">
+                <tr>
+                    <td>
+                        <strong v-html="project.name"></strong>
+                        <a v-on:click="toggleKey(project.id)" class="toggle">
+                            <span v-html="getToggle(project.id)"></span>
+                        </a>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td v-html="getRemainingEstimat(project, sprint)" v-for="sprint in sprints"></td>
+                </tr>
+                <template v-for="user in project.users" v-if="keyToggled(project.id)">
                     <tr>
-                        <th colspan="3">
-                        </th>
-                        <th v-html="sprint.name" v-for="sprint in sprints"></th>
-                    </tr>
-                    </thead>
-                    <tbody v-for="project in filteredProjects">
-                    <tr>
+                        <td></td>
                         <td>
-                            <strong v-html="project.name"></strong>
-                            <a v-on:click="toggleKey(project.id)" class="toggle">
-                                <span v-html="getToggle(project.id)"></span>
+                            <strong v-html="user.displayName"></strong>
+                            <a v-on:click="toggleKey(project.id + '-' + user.key)" class="toggle">
+                                <span v-html="getToggle(project.id + '-' + user.key)"></span>
                             </a>
                         </td>
                         <td></td>
-                        <td></td>
-                        <td v-html="getRemainingEstimat(project, sprint)" v-for="sprint in sprints"></td>
+                        <td :colspan="sprints.length"></td>
                     </tr>
-                    <template v-for="user in project.users" v-if="keyToggled(project.id)">
-                        <tr>
-                            <td></td>
-                            <td>
-                                <strong v-html="user.displayName"></strong>
-                                <a v-on:click="toggleKey(project.id + '-' + user.key)" class="toggle">
-                                    <span v-html="getToggle(project.id + '-' + user.key)"></span>
-                                </a>
-                            </td>
-                            <td></td>
-                            <td :colspan="sprints.length"></td>
-                        </tr>
-                        <tr v-for="issue in user.issues" v-if="keyToggled(project.id + '-' + user.key)">
-                            <td></td>
-                            <td style="padding-left: 1em">
-                                <span v-html="issue.fields.summary"></span>
-                            </td>
-                            <td>
-                                <a :href="'{{ jiraUrl }}/browse/' + issue.key">
-                                    <span v-html="issue.key"></span>
-                                </a>
-                            </td>
-                            <td v-html="getRemainingEstimatIssue(sprint, issue)" v-for="sprint in sprints"></td>
-                        </tr>
-                    </template>
-                    </tbody>
-                </table>
-            </div>
+                    <tr v-for="issue in user.issues" v-if="keyToggled(project.id + '-' + user.key)">
+                        <td></td>
+                        <td style="padding-left: 1em">
+                            <span v-html="issue.fields.summary"></span>
+                        </td>
+                        <td>
+                            <a :href="'{{ jiraUrl }}/browse/' + issue.key">
+                                <span v-html="issue.key"></span>
+                            </a>
+                        </td>
+                        <td v-html="getRemainingEstimatIssue(sprint, issue)" v-for="sprint in sprints"></td>
+                    </tr>
+                </template>
+                </tbody>
+            </table>
         </div>
     </div>
 {% endblock %}

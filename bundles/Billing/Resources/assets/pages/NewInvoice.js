@@ -175,20 +175,33 @@ class NewInvoice extends Component {
                                     value={this.state.selectedCustomerAccount}
                                     name={'selectedCustomerAccount'}
                                     placeholder={t('invoice.form.select_account')}
+                                    isClearable={true}
                                     isSearchable={true}
                                     aria-label={t('new_invoice.select_customer_account')}
                                     onChange={
                                         selectedOption => {
-                                            this.setState({ selectedCustomerAccount: selectedOption });
+                                            this.setState({ selectedCustomerAccount: selectedOption ? selectedOption.value : null });
                                         }
                                     }
                                     options={
                                         Object.keys(this.props.accounts.data).map((keyName) => {
+                                            let label = this.props.accounts.data[keyName].name;
+
+                                            label = label + ' - ' + (this.props.accounts.data[keyName].customer ? this.props.accounts.data[keyName].customer.key : t('new_invoice.no_customer'));
+
+                                            if (!this.props.accounts.data[keyName].category) {
+                                                label = label + ' - ' + t('new_invoice.no_category');
+                                            } else {
+                                                if (this.props.accounts.data[keyName].category.name === 'INTERN') {
+                                                    label = label + ' - PSP: ' + this.props.accounts.data[keyName].key;
+                                                } else {
+                                                    label = label + ' - EAN: ' + this.props.accounts.data[keyName].key;
+                                                }
+                                            }
+
                                             return {
                                                 'value': this.props.accounts.data[keyName].id,
-                                                'label': this.props.accounts.data[keyName].category.name === 'INTERN'
-                                                    ? this.props.accounts.data[keyName].name + ': ' + (this.props.accounts.data[keyName].customer ? this.props.accounts.data[keyName].customer.key : '') + ' - PSP: ' + this.props.accounts.data[keyName].key
-                                                    : this.props.accounts.data[keyName].name + ': ' + (this.props.accounts.data[keyName].customer ? this.props.accounts.data[keyName].customer.key : '') + ' - EAN: ' + this.props.accounts.data[keyName].key
+                                                'label': label
                                             };
                                         })
                                     }
