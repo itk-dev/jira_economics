@@ -175,11 +175,12 @@ class NewInvoice extends Component {
                                     value={this.state.selectedCustomerAccount}
                                     name={'selectedCustomerAccount'}
                                     placeholder={t('invoice.form.select_account')}
+                                    isClearable={true}
                                     isSearchable={true}
                                     aria-label={t('new_invoice.select_customer_account')}
                                     onChange={
                                         selectedOption => {
-                                            this.setState({ selectedCustomerAccount: selectedOption });
+                                            this.setState({ selectedCustomerAccount: selectedOption ? selectedOption.value : null });
                                         }
                                     }
                                     options={
