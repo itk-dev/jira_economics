@@ -180,7 +180,7 @@ class NewInvoice extends Component {
                                     aria-label={t('new_invoice.select_customer_account')}
                                     onChange={
                                         selectedOption => {
-                                            this.setState({ selectedCustomerAccount: selectedOption ? selectedOption.value : null });
+                                            this.setState({ selectedCustomerAccount: selectedOption });
                                         }
                                     }
                                     options={
