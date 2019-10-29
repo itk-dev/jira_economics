@@ -93,8 +93,8 @@ class GraphicServiceOrderController extends AbstractController
      */
     public function showDeliveryNote(GsOrder $order)
     {
-      return $this->render('@GraphicServiceOrderBundle/showDeliveryNote.html.twig', [
-        'order' => $order,
-      ]);
+        return $this->render('@GraphicServiceOrderBundle/showDeliveryNote.html.twig', [
+            'order' => $order,
+        ]);
     }
 }

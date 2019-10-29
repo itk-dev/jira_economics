@@ -60,25 +60,25 @@ class OrderService
     /* @var \Symfony\Component\HttpFoundation\Request */
     private $requestStack;
 
-  /**
-   * OrderService constructor.
-   *
-   * @param \Doctrine\ORM\EntityManagerInterface $entityManager
-   * @param \App\Service\HammerService $hammerService
-   * @param \App\Service\OwnCloudService $ownCloudService
-   * @param \GraphicServiceOrder\Repository\GsOrderRepository $gsOrderRepository
-   * @param \Symfony\Component\HttpKernel\KernelInterface $appKernel
-   * @param \Symfony\Component\Messenger\MessageBusInterface $messageBus
-   * @param string $ownCloudFilesFolder
-   * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-   * @param \GraphicServiceOrder\Service\FileUploader $fileUploader
-   * @param \ItkDev\UserManagementBundle\Doctrine\UserManager $userManager
-   * @param \Swift_Mailer $swiftMailer
-   * @param \Twig\Environment $twig
-   * @param \Symfony\Contracts\Translation\TranslatorInterface $translator
-   * @param array $gsOrderConfiguration
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
-   */
+    /**
+     * OrderService constructor.
+     *
+     * @param \Doctrine\ORM\EntityManagerInterface                                                $entityManager
+     * @param \App\Service\HammerService                                                          $hammerService
+     * @param \App\Service\OwnCloudService                                                        $ownCloudService
+     * @param \GraphicServiceOrder\Repository\GsOrderRepository                                   $gsOrderRepository
+     * @param \Symfony\Component\HttpKernel\KernelInterface                                       $appKernel
+     * @param \Symfony\Component\Messenger\MessageBusInterface                                    $messageBus
+     * @param string                                                                              $ownCloudFilesFolder
+     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
+     * @param \GraphicServiceOrder\Service\FileUploader                                           $fileUploader
+     * @param \ItkDev\UserManagementBundle\Doctrine\UserManager                                   $userManager
+     * @param \Swift_Mailer                                                                       $swiftMailer
+     * @param \Twig\Environment                                                                   $twig
+     * @param \Symfony\Contracts\Translation\TranslatorInterface                                  $translator
+     * @param array                                                                               $gsOrderConfiguration
+     * @param \Symfony\Component\HttpFoundation\RequestStack                                      $requestStack
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
         HammerService $hammerService,
@@ -335,7 +335,7 @@ class OrderService
                 ],
                 $this->hammerService->getCustomFieldId('Debitor') => (string) $gsOrder->getDebitor(),
                 $this->hammerService->getCustomFieldId('Marketing Account') => $gsOrder->getMarketingAccount() ? [0 => ['value' => 'Markedsføringskonto']] : null,
-                $this->hammerService->getCustomFieldId('Delivery Note URL') => $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . '/jira/delivery_note/' . $gsOrder->getId()
+                $this->hammerService->getCustomFieldId('Delivery Note URL') => $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost().'/jira/delivery_note/'.$gsOrder->getId(),
             ],
         ];
 
