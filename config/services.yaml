@@ -2,9 +2,9 @@
 # Files in the packages/ subdirectory configure your dependencies.
 
 imports:
-    - { resource: create_project_config.local.yaml, ignore_errors: false }
+    - { resource: create_project_config.local.yaml, ignore_errors: true }
     - { resource: jira_economics.yaml, ignore_errors: false }
-    - { resource: jira_economics.local.yaml, ignore_errors: false }
+    - { resource: jira_economics.local.yaml, ignore_errors: true }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
