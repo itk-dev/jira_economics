@@ -20,3 +20,4 @@ twig:
         sender:
             email: '%mailer_email%'
             name: '%mailer_name%'
+        gs_address: '%gs_address%'
