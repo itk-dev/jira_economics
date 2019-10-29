@@ -8,6 +8,7 @@ parameters:
         'Sprint': ~
         'Faktureret': ~
         'Marketing Account': ~
+        'Delivery Note URL': ~
 
     billing_receiver_account: ~
     billing_material_numbers: ~

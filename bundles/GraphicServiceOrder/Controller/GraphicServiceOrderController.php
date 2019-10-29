@@ -28,7 +28,7 @@ class GraphicServiceOrderController extends AbstractController
     /**
      * Create a service order.
      *
-     * @Route("/", name="form")
+     * @Route("/create-graphic-service-order", name="form")
      *
      * @param \Symfony\Component\HttpFoundation\Request                                           $request
      * @param \GraphicServiceOrder\Service\OrderService                                           $orderService
@@ -69,7 +69,7 @@ class GraphicServiceOrderController extends AbstractController
     /**
      * Receipt page displayed when an order was created.
      *
-     * @Route("/submitted/{id}", name="submitted")
+     * @Route("/create-graphic-service-order/submitted/{id}", name="submitted")
      *
      * @param \GraphicServiceOrder\Entity\GsOrder $order
      *
@@ -78,6 +78,22 @@ class GraphicServiceOrderController extends AbstractController
     public function showOrderSubmitted(GsOrder $order)
     {
         return $this->render('@GraphicServiceOrderBundle/showOrderSubmitted.html.twig', [
+            'order' => $order,
+        ]);
+    }
+
+    /**
+     * Receipt page displayed when an order was created.
+     *
+     * @Route("/jira/delivery_note/{id}", name="delivery_note")
+     *
+     * @param \GraphicServiceOrder\Entity\GsOrder $order
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function showDeliveryNote(GsOrder $order)
+    {
+        return $this->render('@GraphicServiceOrderBundle/showDeliveryNote.html.twig', [
             'order' => $order,
         ]);
     }
