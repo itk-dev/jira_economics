@@ -25,6 +25,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Swift_Mailer;
 use Twig\Environment;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class OrderService
 {
@@ -56,25 +57,28 @@ class OrderService
     private $translator;
     /* @var \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface */
     private $params;
+    /* @var \Symfony\Component\HttpFoundation\Request */
+    private $requestStack;
 
-    /**
-     * OrderService constructor.
-     *
-     * @param \Doctrine\ORM\EntityManagerInterface                                                $entityManager
-     * @param \App\Service\HammerService                                                          $hammerService
-     * @param \App\Service\OwnCloudService                                                        $ownCloudService
-     * @param \GraphicServiceOrder\Repository\GsOrderRepository                                   $gsOrderRepository
-     * @param \Symfony\Component\HttpKernel\KernelInterface                                       $appKernel
-     * @param \Symfony\Component\Messenger\MessageBusInterface                                    $messageBus
-     * @param string                                                                              $ownCloudFilesFolder
-     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-     * @param \GraphicServiceOrder\Service\FileUploader                                           $fileUploader
-     * @param \ItkDev\UserManagementBundle\Doctrine\UserManager                                   $userManager
-     * @param \Swift_Mailer                                                                       $swiftMailer
-     * @param \Twig\Environment                                                                   $twig
-     * @param \Symfony\Contracts\Translation\TranslatorInterface                                  $translator
-     * @param array                                                                               $gsOrderConfiguration
-     */
+  /**
+   * OrderService constructor.
+   *
+   * @param \Doctrine\ORM\EntityManagerInterface $entityManager
+   * @param \App\Service\HammerService $hammerService
+   * @param \App\Service\OwnCloudService $ownCloudService
+   * @param \GraphicServiceOrder\Repository\GsOrderRepository $gsOrderRepository
+   * @param \Symfony\Component\HttpKernel\KernelInterface $appKernel
+   * @param \Symfony\Component\Messenger\MessageBusInterface $messageBus
+   * @param string $ownCloudFilesFolder
+   * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
+   * @param \GraphicServiceOrder\Service\FileUploader $fileUploader
+   * @param \ItkDev\UserManagementBundle\Doctrine\UserManager $userManager
+   * @param \Swift_Mailer $swiftMailer
+   * @param \Twig\Environment $twig
+   * @param \Symfony\Contracts\Translation\TranslatorInterface $translator
+   * @param array $gsOrderConfiguration
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   */
     public function __construct(
         EntityManagerInterface $entityManager,
         HammerService $hammerService,
@@ -89,7 +93,8 @@ class OrderService
         Swift_Mailer $swiftMailer,
         Environment $twig,
         TranslatorInterface $translator,
-        array $gsOrderConfiguration
+        array $gsOrderConfiguration,
+        RequestStack $requestStack
     ) {
         $this->entityManager = $entityManager;
         $this->hammerService = $hammerService;
@@ -105,6 +110,7 @@ class OrderService
         $this->twig = $twig;
         $this->translator = $translator;
         $this->params = new ParameterBag($gsOrderConfiguration);
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -213,6 +219,10 @@ class OrderService
      */
     public function createOrder(GsOrder $gsOrder, $form)
     {
+        $gsOrder->setIssueId(0);
+        $gsOrder->setIssueKey(0);
+        $this->entityManager->persist($gsOrder);
+        $this->entityManager->flush();
         // Create a task on a jira project.
         $taskCreated = $this->createOrderTask($gsOrder);
 
@@ -308,6 +318,7 @@ class OrderService
             $this->hammerService->createUser($userFields);
             $author = $userFields['name'];
         }
+
         $description = $this->getDescription($gsOrder);
         $data = [
             'fields' => [
@@ -324,6 +335,7 @@ class OrderService
                 ],
                 $this->hammerService->getCustomFieldId('Debitor') => (string) $gsOrder->getDebitor(),
                 $this->hammerService->getCustomFieldId('Marketing Account') => $gsOrder->getMarketingAccount() ? [0 => ['value' => 'Markedsføringskonto']] : null,
+                $this->hammerService->getCustomFieldId('Delivery Note URL') => $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost() . '/jira/delivery_note/' . $gsOrder->getId()
             ],
         ];
 
