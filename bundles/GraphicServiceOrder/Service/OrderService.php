@@ -25,7 +25,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Swift_Mailer;
 use Twig\Environment;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class OrderService
 {
@@ -57,8 +57,8 @@ class OrderService
     private $translator;
     /* @var \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface */
     private $params;
-    /* @var \Symfony\Component\HttpFoundation\Request */
-    private $requestStack;
+    /* @var \Symfony\Component\Routing\Generator\UrlGeneratorInterface  */
+    private $router;
 
     /**
      * OrderService constructor.
@@ -77,7 +77,7 @@ class OrderService
      * @param \Twig\Environment                                                                   $twig
      * @param \Symfony\Contracts\Translation\TranslatorInterface                                  $translator
      * @param array                                                                               $gsOrderConfiguration
-     * @param \Symfony\Component\HttpFoundation\RequestStack                                      $requestStack
+     * @param \Symfony\Component\Routing\Generator\UrlGeneratorInterface                          $router
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -94,7 +94,7 @@ class OrderService
         Environment $twig,
         TranslatorInterface $translator,
         array $gsOrderConfiguration,
-        RequestStack $requestStack
+        UrlGeneratorInterface $router
     ) {
         $this->entityManager = $entityManager;
         $this->hammerService = $hammerService;
@@ -110,7 +110,7 @@ class OrderService
         $this->twig = $twig;
         $this->translator = $translator;
         $this->params = new ParameterBag($gsOrderConfiguration);
-        $this->requestStack = $requestStack;
+        $this->router = $router;
     }
 
     /**
@@ -219,6 +219,8 @@ class OrderService
      */
     public function createOrder(GsOrder $gsOrder, $form)
     {
+        // We don't allow null values for id and key, so we set a temporary
+        // value here, only to change it immediately after from created jira issue.
         $gsOrder->setIssueId(0);
         $gsOrder->setIssueKey(0);
         $this->entityManager->persist($gsOrder);
@@ -335,7 +337,7 @@ class OrderService
                 ],
                 $this->hammerService->getCustomFieldId('Debitor') => (string) $gsOrder->getDebitor(),
                 $this->hammerService->getCustomFieldId('Marketing Account') => $gsOrder->getMarketingAccount() ? [0 => ['value' => 'Markedsføringskonto']] : null,
-                $this->hammerService->getCustomFieldId('Delivery Note URL') => $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost().'/jira/delivery_note/'.$gsOrder->getId(),
+                $this->hammerService->getCustomFieldId('Delivery Note URL') => $this->router->generate('graphic_service_order_delivery_note', ['id' => $gsOrder->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
             ],
         ];
 

@@ -21,10 +21,12 @@ parameters:
     site_description: '%env(SITE_DESCRIPTION)%'
     site_url: '%env(SITE_URL)%'
     site_logo_path: '%env(SITE_LOGO_PATH)%'
+    gs_address: '%env(GS_ADDRESS)%'
     site_logo_url: '%site_url%/%site_logo_path%'
     mailer_name: '%env(MAILER_NAME)%'
     mailer_email: '%env(MAILER_EMAIL)%'
     jira_debitor_field: '%env(resolve:JIRA_DEBITOR_FIELD)%'
+
 
 services:
     # default configuration for services in *this* file
