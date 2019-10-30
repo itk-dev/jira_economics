@@ -77,6 +77,11 @@ class GsOrder
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
+    private $phone;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
     private $address;
 
     /**
@@ -232,6 +237,18 @@ class GsOrder
         $this->department = $department;
 
         return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+      return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+      $this->phone = $phone;
+
+      return $this;
     }
 
     public function getAddress(): ?string

@@ -17,6 +17,11 @@
         <span class="value">{{ user_email }}</span>
       </div>
       {{ form_row(form.full_name) }}
+      <div class="row">
+        <div class="form-group col-md-6">
+          {{ form_row(form.phone) }}
+        </div>
+      </div>
     </div>
     <h4 class="mt-4">{{ 'service_order_form.job_description.header'|trans }}</h4>
     {{ form_row(form.job_title) }}

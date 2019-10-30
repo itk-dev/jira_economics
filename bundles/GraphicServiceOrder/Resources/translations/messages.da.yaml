@@ -8,6 +8,8 @@ service_order_form:
   full_name:
     label: Navn
     help: Angiv dit fulde navn
+  phone:
+    label: Telefonnummer
   job_description:
     header: Opgavebeskrivelse
     title:

@@ -49,6 +49,11 @@ class User extends BaseUser
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
+    private $phone;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
     private $address;
 
     /**
@@ -118,6 +123,18 @@ class User extends BaseUser
         $this->department = $department;
 
         return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+      return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+      $this->phone = $phone;
+
+      return $this;
     }
 
     public function getAddress(): ?string

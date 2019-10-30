@@ -66,6 +66,14 @@ class GraphicServiceOrderForm extends AbstractType
                 'required' => false,
             ])
 
+            ->add('phone', TextType::class, [
+              'label' => 'service_order_form.phone.label',
+              'constraints' => [
+                new NotNull(['groups' => 'base']),
+              ],
+              'required' => false,
+            ])
+
             ->add('job_title', TextType::class, [
                 'label' => 'service_order_form.job_description.title.label',
                 'constraints' => [

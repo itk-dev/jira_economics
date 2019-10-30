@@ -128,6 +128,7 @@ class OrderService
             if (false === $dontUseDefaults) {
                 $gsOrder
                     ->setFullName($user->getFullName())
+                    ->setPhone($user->getPhone())
                     ->setAddress($user->getAddress())
                     ->setDepartment($user->getDepartment())
                     ->setPostalcode($user->getPostalCode())
@@ -193,6 +194,7 @@ class OrderService
             $user
                 ->setFullName($gsOrder->getFullName())
                 ->setDepartment($gsOrder->getDepartment())
+                ->setPhone($gsOrder->getPhone())
                 ->setAddress($gsOrder->getAddress())
                 ->setPostalCode($gsOrder->getPostalcode())
                 ->setCity($gsOrder->getCity());
