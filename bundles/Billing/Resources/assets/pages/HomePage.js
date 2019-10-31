@@ -126,7 +126,7 @@ class HomePage extends Component {
                     this.toggleItem(invoice.id);
 
                     this.setState((prevState) => ({
-                        ...prevState,
+                        ...prevState
                     }));
                 }
             });
@@ -359,6 +359,7 @@ class HomePage extends Component {
                                                 <input
                                                     name={'selectAll'}
                                                     type="checkbox"
+                                                    aria-label={t('home_page.select_all')}
                                                     checked={!!this.allSelected(invoices) }
                                                     onChange={ () => { this.toggleSelectAll(invoices); } }/>
                                             </th>
@@ -382,6 +383,7 @@ class HomePage extends Component {
                                                     <input
                                                         name={'item-toggle-' + item.id}
                                                         type="checkbox"
+                                                        aria-label={t('home_page.select')}
                                                         checked={!!this.state.selectedItems[item.id] }
                                                         onChange={ () => { this.toggleItem(item.id); } }
                                                     />

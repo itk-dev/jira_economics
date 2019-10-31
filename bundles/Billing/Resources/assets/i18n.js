@@ -142,7 +142,9 @@ const resources = {
             'home_page.exported_filter.exported': 'Eksporterede',
             'home_page.exported_filter.not_exported': 'Ikke eksporterede',
             'home_page.filter.exported': 'Eksporterede',
-            'home_page.filter.exported_option.all': 'Alle'
+            'home_page.filter.exported_option.all': 'Alle',
+            'home_page.select_all': 'Vælg alle',
+            'home_page.select': 'Vælg alle'
         }
     }
 };
