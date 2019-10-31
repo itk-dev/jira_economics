@@ -31,7 +31,6 @@ class HomePage extends Component {
                 exportedFilter: ''
             },
             allInvoices: {},
-            allSelected: false,
             showModal: false,
             invoiceIdToDelete: null,
             selectedItems: {}
@@ -108,7 +107,6 @@ class HomePage extends Component {
 
     handleFilterChange = (field, value) => {
         this.setState((prevState) => ({
-            selectedItems: {},
             filterValues: {
                 ...prevState.filterValues,
                 [field]: value
@@ -117,10 +115,9 @@ class HomePage extends Component {
     };
 
     toggleSelectAll = (invoices) => {
-        if (Object.keys(this.state.selectedItems).length === invoices.length) {
+        if (this.allSelected(invoices)) {
             this.setState((prevState) => ({
                 ...prevState,
-                allSelected: false,
                 selectedItems: {}
             }));
         } else {
@@ -130,11 +127,16 @@ class HomePage extends Component {
 
                     this.setState((prevState) => ({
                         ...prevState,
-                        allSelected: true
                     }));
                 }
             });
         }
+    };
+
+    allSelected = (invoices) => {
+        const selectedKeys = Object.keys(this.state.selectedItems);
+        const invoicesKeys = invoices.map(invoice => invoice.id + '');
+        return invoicesKeys.every(elem => selectedKeys.indexOf(elem) > -1);
     };
 
     render () {
@@ -357,7 +359,7 @@ class HomePage extends Component {
                                                 <input
                                                     name={'selectAll'}
                                                     type="checkbox"
-                                                    checked={!!this.state.allSelected }
+                                                    checked={!!this.allSelected(invoices) }
                                                     onChange={ () => { this.toggleSelectAll(invoices); } }/>
                                             </th>
                                         }
