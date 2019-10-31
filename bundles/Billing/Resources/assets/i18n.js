@@ -138,7 +138,11 @@ const resources = {
             'new_invoice.form.name': 'Fakturaoverskrift',
             'new_invoice.form.name_placeholder': 'Vælg fakturaoverskrift',
             'new_invoice.select_customer_account': 'Kundekonto',
-            'new_invoice.select_our_account': 'Modtagerkonto'
+            'new_invoice.select_our_account': 'Modtagerkonto',
+            'home_page.exported_filter.exported': 'Eksporterede',
+            'home_page.exported_filter.not_exported': 'Ikke eksporterede',
+            'home_page.filter.exported': 'Eksporterede',
+            'home_page.filter.exported_option.all': 'Alle'
         }
     }
 };

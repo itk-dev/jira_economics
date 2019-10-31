@@ -27,7 +27,8 @@ class HomePage extends Component {
         this.state = {
             filterValues: {
                 creationDateSorting: 'asc',
-                creatorFilter: ''
+                creatorFilter: '',
+                exportedFilter: ''
             },
             allInvoices: {},
             showModal: false,
@@ -162,6 +163,17 @@ class HomePage extends Component {
             }
         ];
 
+        const exportedFilterOptions = [
+            {
+                value: true,
+                label: t('home_page.exported_filter.exported')
+            },
+            {
+                value: false,
+                label: t('home_page.exported_filter.not_exported')
+            }
+        ];
+
         const tabs = [
             {
                 title: t('home_page.tab.not_recorded'),
@@ -227,7 +239,11 @@ class HomePage extends Component {
             {
                 title: t('home_page.tab.recorded'),
                 keyEvent: 'posted',
-                items: invoices.filter(item => item.recorded),
+                items: invoices.filter(item => item.recorded).filter(
+                    item => this.state.filterValues.exportedFilter === '' ||
+                        (this.state.filterValues.exportedFilter === true && item.exportedDate !== null) ||
+                        (this.state.filterValues.exportedFilter === false && item.exportedDate === null)
+                ),
                 invoiceActions: (
                     <ButtonGroup
                         className="btn-group-sm float-right"
@@ -292,6 +308,21 @@ class HomePage extends Component {
                                         onChange={(selectedOption) => this.handleFilterChange('creatorFilter', selectedOption ? selectedOption.value : '')}
                                         options={creatorFilterOptions}
                                     />
+                                    {tab.keyEvent === 'posted' &&
+                                        <div>
+                                            <label htmlFor={'exportedFilter'}>{t('home_page.filter.exported')}</label>
+                                            <Select
+                                                id={'exportedFilter'}
+                                                value={exportedFilterOptions.filter(item => this.state.filterValues.exportedFilter === item.value)}
+                                                name={'exportedFilter'}
+                                                isClearable={true}
+                                                aria-label={t('home_page.filter.exported')}
+                                                placeholder={t('home_page.filter.exported_option.all')}
+                                                onChange={(selectedOption) => this.handleFilterChange('exportedFilter', selectedOption ? selectedOption.value : '')}
+                                                options={exportedFilterOptions}
+                                            />
+                                        </div>
+                                    }
                                 </Form.Group>
                             </Form>
                             <Table responsive striped hover borderless>
