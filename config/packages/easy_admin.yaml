@@ -94,8 +94,8 @@ easy_admin:
                       label: portal.user.fullName
                     - property: department
                       label: portal.user.department
-                    - property: phone
-                      label: portal.user.phone
+
+
                     - property: address
                       label: portal.user.address
                     - property: postalCode

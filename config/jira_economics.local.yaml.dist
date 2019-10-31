@@ -9,6 +9,10 @@ parameters:
         'Faktureret': ~
         'Marketing Account': ~
         'Delivery Note URL': ~
+        'Phone number': ~
+        'Department': ~
+        'Delivery date': ~
+        'Order lines': ~
 
     billing_receiver_account: ~
     billing_material_numbers: ~

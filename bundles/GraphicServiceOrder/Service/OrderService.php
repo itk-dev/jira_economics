@@ -340,6 +340,11 @@ class OrderService
                 $this->hammerService->getCustomFieldId('Debitor') => (string) $gsOrder->getDebitor(),
                 $this->hammerService->getCustomFieldId('Marketing Account') => $gsOrder->getMarketingAccount() ? [0 => ['value' => 'Markedsføringskonto']] : null,
                 $this->hammerService->getCustomFieldId('Delivery Note URL') => $this->router->generate('graphic_service_order_delivery_note', ['id' => $gsOrder->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
+                $this->hammerService->getCustomFieldId('Debitor') => (string) $gsOrder->getDebitor(),
+                $this->hammerService->getCustomFieldId('Phone number') => (string) $gsOrder->getPhone(),
+                $this->hammerService->getCustomFieldId('Department') => (string) $gsOrder->getDepartment(),
+                $this->hammerService->getCustomFieldId('Delivery date') => $gsOrder->getDate()->format('Y-m-d'),
+                $this->hammerService->getCustomFieldId('Order lines') => $this->getOrderLinesAsText($gsOrder),
             ],
         ];
 
@@ -390,6 +395,23 @@ class OrderService
         return $response;
     }
 
+  /**
+   * Crete orderlines as text.
+   *
+   * @param \GraphicServiceOrder\Entity\GsOrder $orderData
+   *
+   * @return string
+   */
+    private function getOrderLinesAsText(GsOrder $orderData)
+    {
+      $orderLines = '';
+      foreach ($orderData->getOrderLines() as $order) {
+        $orderLines .= $order['amount'].' '.$order['type'].'\\\\ ';
+      }
+
+      return $orderLines;
+    }
+
     /**
      * Create description for task.
      *
@@ -401,21 +423,10 @@ class OrderService
     {
         // Create task description.
         $description = '*Opgavebeskrivelse* \\\\ ';
-        foreach ($orderData->getOrderLines() as $order) {
-            $description .= '- '.$order['amount'].' '.$order['type'].'\\\\ ';
-        }
         $description .= $orderData->getDescription().'\\\\ ';
         $description .= ' \\\\ ';
         $description .= '[Åbn filer i OwnCloud|'.$this->ownCloudFilesFolder.'] \\\\ ';
-        $description .= ' \\\\ ';
 
-        // Create payment description.
-        $description .= '*Hvem skal betale?* \\\\ ';
-        if ($orderData->getMarketingAccount()) {
-            $description .= 'Borgerservice og bibliotekers markedsføringskonto. \\\\ ';
-        } else {
-            $description .= 'Debitor. \\\\ ';
-        }
         $description .= ' \\\\ ';
 
         // Create delivery description.
@@ -423,7 +434,6 @@ class OrderService
         $description .= $orderData->getDepartment().' \\\\ ';
         $description .= $orderData->getAddress().'\\\\ ';
         $description .= $orderData->getPostalcode().' '.$orderData->getCity().'\\\\ ';
-        $description .= 'Leveringsdato: '.$orderData->getDate()->format('d-m-Y').'\\\\ ';
         $description .= ' \\\\ ';
         $description .= $orderData->getDeliveryDescription();
 
