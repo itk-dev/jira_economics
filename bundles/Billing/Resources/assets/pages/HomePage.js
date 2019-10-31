@@ -27,7 +27,8 @@ class HomePage extends Component {
         this.state = {
             filterValues: {
                 creationDateSorting: 'asc',
-                creatorFilter: ''
+                creatorFilter: '',
+                exportedFilter: ''
             },
             allInvoices: {},
             showModal: false,
@@ -36,6 +37,7 @@ class HomePage extends Component {
         };
 
         this.handleFilterChange.bind(this);
+        this.toggleSelectAll.bind(this);
     };
 
     componentDidMount () {
@@ -112,6 +114,31 @@ class HomePage extends Component {
         }));
     };
 
+    toggleSelectAll = (invoices) => {
+        if (this.allSelected(invoices)) {
+            this.setState((prevState) => ({
+                ...prevState,
+                selectedItems: {}
+            }));
+        } else {
+            invoices.map((invoice) => {
+                if (!this.state.selectedItems[invoice.id]) {
+                    this.toggleItem(invoice.id);
+
+                    this.setState((prevState) => ({
+                        ...prevState
+                    }));
+                }
+            });
+        }
+    };
+
+    allSelected = (invoices) => {
+        const selectedKeys = Object.keys(this.state.selectedItems);
+        const invoicesKeys = invoices.map(invoice => invoice.id + '');
+        return invoicesKeys.every(elem => selectedKeys.indexOf(elem) > -1);
+    };
+
     render () {
         const { t } = this.props;
 
@@ -159,6 +186,17 @@ class HomePage extends Component {
             {
                 value: 'asc',
                 label: t('home_page.sorting.oldest')
+            }
+        ];
+
+        const exportedFilterOptions = [
+            {
+                value: true,
+                label: t('home_page.exported_filter.exported')
+            },
+            {
+                value: false,
+                label: t('home_page.exported_filter.not_exported')
             }
         ];
 
@@ -226,8 +264,12 @@ class HomePage extends Component {
             },
             {
                 title: t('home_page.tab.recorded'),
-                keyEvent: 'posted',
-                items: invoices.filter(item => item.recorded),
+                keyEvent: 'recorded',
+                items: invoices.filter(item => item.recorded).filter(
+                    item => this.state.filterValues.exportedFilter === '' ||
+                        (this.state.filterValues.exportedFilter === true && item.exportedDate !== null) ||
+                        (this.state.filterValues.exportedFilter === false && item.exportedDate === null)
+                ),
                 invoiceActions: (
                     <ButtonGroup
                         className="btn-group-sm float-right"
@@ -292,20 +334,42 @@ class HomePage extends Component {
                                         onChange={(selectedOption) => this.handleFilterChange('creatorFilter', selectedOption ? selectedOption.value : '')}
                                         options={creatorFilterOptions}
                                     />
+                                    {tab.keyEvent === 'recorded' &&
+                                        <div>
+                                            <label htmlFor={'exportedFilter'}>{t('home_page.filter.exported')}</label>
+                                            <Select
+                                                id={'exportedFilter'}
+                                                value={exportedFilterOptions.filter(item => this.state.filterValues.exportedFilter === item.value)}
+                                                name={'exportedFilter'}
+                                                isClearable={true}
+                                                aria-label={t('home_page.filter.exported')}
+                                                placeholder={t('home_page.filter.exported_option.all')}
+                                                onChange={(selectedOption) => this.handleFilterChange('exportedFilter', selectedOption ? selectedOption.value : '')}
+                                                options={exportedFilterOptions}
+                                            />
+                                        </div>
+                                    }
                                 </Form.Group>
                             </Form>
                             <Table responsive striped hover borderless>
                                 <thead>
                                     <tr>
-                                        {tab.keyEvent === 'posted' &&
-                                            <th> </th>
+                                        {tab.keyEvent === 'recorded' &&
+                                            <th>
+                                                <input
+                                                    name={'selectAll'}
+                                                    type="checkbox"
+                                                    aria-label={t('home_page.select_all')}
+                                                    checked={!!this.allSelected(invoices) }
+                                                    onChange={ () => { this.toggleSelectAll(invoices); } }/>
+                                            </th>
                                         }
                                         <th>{t('home_page.table.invoice')}</th>
                                         <th>{t('home_page.table.project')}</th>
                                         <th>{t('home_page.table.creator')}</th>
                                         <th>{t('home_page.table.date')}</th>
                                         <th>{t('home_page.table.amount')}</th>
-                                        {tab.keyEvent === 'posted' &&
+                                        {tab.keyEvent === 'recorded' &&
                                             <th>{t('home_page.table.exported_date')}</th>
                                         }
                                         <th className="text-right">{t('home_page.table.functions')}</th>
@@ -314,12 +378,13 @@ class HomePage extends Component {
                                 <tbody>
                                     {tab.items.map((item) => (
                                         <tr key={item.id}>
-                                            {tab.keyEvent === 'posted' &&
+                                            {tab.keyEvent === 'recorded' &&
                                                 <td>
                                                     <input
                                                         name={'item-toggle-' + item.id}
                                                         type="checkbox"
-                                                        value={ this.state.selectedItems[item.id] }
+                                                        aria-label={t('home_page.select')}
+                                                        checked={!!this.state.selectedItems[item.id] }
                                                         onChange={ () => { this.toggleItem(item.id); } }
                                                     />
                                                 </td>
@@ -337,7 +402,7 @@ class HomePage extends Component {
                                             <td>
                                                 <strong>{item.totalPrice}</strong>
                                             </td>
-                                            {tab.keyEvent === 'posted' &&
+                                            {tab.keyEvent === 'recorded' &&
                                                 <td>
                                                     {item.exportedDate &&
                                                         <Moment format="DD-MM-YYYY">{item.exportedDate}</Moment>
