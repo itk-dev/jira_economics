@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -67,11 +68,11 @@ class GraphicServiceOrderForm extends AbstractType
             ])
 
             ->add('phone', TextType::class, [
-              'label' => 'service_order_form.phone.label',
-              'constraints' => [
-                new NotNull(['groups' => 'base']),
-              ],
-              'required' => false,
+                'label' => 'service_order_form.phone.label',
+                'constraints' => [
+                    new NotNull(['groups' => 'base']),
+                ],
+                'required' => false,
             ])
 
             ->add('job_title', TextType::class, [
@@ -131,6 +132,14 @@ class GraphicServiceOrderForm extends AbstractType
                 ],
                 'required' => false,
                 'help' => 'service_order_form.job_payment.marketing_account.help',
+            ])
+            ->add('library', ChoiceType::class, [
+                'label' => 'service_order_form.job_payment.library.label',
+                'choices' => $this->params->get('gs_libraries'),
+                'help' => 'service_order_form.job_payment.library.help',
+                'constraints' => [
+                    new NotNull(['groups' => 'marketing_account']),
+                ],
             ])
             ->add('department', TextType::class, [
                 'label' => 'service_order_form.job_delivery.department.label',

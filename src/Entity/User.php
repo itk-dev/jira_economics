@@ -127,14 +127,14 @@ class User extends BaseUser
 
     public function getPhone(): ?string
     {
-      return $this->phone;
+        return $this->phone;
     }
 
     public function setPhone(?string $phone): self
     {
-      $this->phone = $phone;
+        $this->phone = $phone;
 
-      return $this;
+        return $this;
     }
 
     public function getAddress(): ?string

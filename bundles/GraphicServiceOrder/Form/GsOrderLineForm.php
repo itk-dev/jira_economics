@@ -27,10 +27,10 @@ class GsOrderLineForm extends AbstractType
                 'help' => 'service_order_form.order_line.amount.help',
                 'required' => false,
                 'constraints' => [
-                  new Regex([
-                    'pattern' => '/^[-+]?[1-9]\d*$/',
-                    'message' => 'service_order_form.order_line.constraint.pattern',
-                  ]),
+                    new Regex([
+                        'pattern' => '/^[-+]?[1-9]\d*$/',
+                        'message' => 'service_order_form.order_line.constraint.pattern',
+                    ]),
                 ],
             ])
             ->add('type', TextType::class, [

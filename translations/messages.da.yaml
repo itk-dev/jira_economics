@@ -38,3 +38,4 @@ ROLE_JIRA: Jira
 ROLE_USER: Bruger
 
 jira.title: Jira Apps
+profile.title: Profil

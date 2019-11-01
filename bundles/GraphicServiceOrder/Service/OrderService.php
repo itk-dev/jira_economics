@@ -181,6 +181,18 @@ class OrderService
     }
 
     /**
+     * Get all libraries defined in jira_economics.local.yaml.
+     *
+     * @return mixed
+     */
+    public function getLibraries()
+    {
+        $libraries = $this->params->get('gs_libraries');
+
+        return $libraries;
+    }
+
+    /**
      * Update active user with submitted values.
      *
      * @param $gsOrder
@@ -345,6 +357,7 @@ class OrderService
                 $this->hammerService->getCustomFieldId('Department') => (string) $gsOrder->getDepartment(),
                 $this->hammerService->getCustomFieldId('Delivery date') => $gsOrder->getDate()->format('Y-m-d'),
                 $this->hammerService->getCustomFieldId('Order lines') => $this->getOrderLinesAsText($gsOrder),
+                $this->hammerService->getCustomFieldId('Library') => $gsOrder->getLibrary(),
             ],
         ];
 
@@ -395,21 +408,21 @@ class OrderService
         return $response;
     }
 
-  /**
-   * Crete orderlines as text.
-   *
-   * @param \GraphicServiceOrder\Entity\GsOrder $orderData
-   *
-   * @return string
-   */
+    /**
+     * Crete orderlines as text.
+     *
+     * @param \GraphicServiceOrder\Entity\GsOrder $orderData
+     *
+     * @return string
+     */
     private function getOrderLinesAsText(GsOrder $orderData)
     {
-      $orderLines = '';
-      foreach ($orderData->getOrderLines() as $order) {
-        $orderLines .= $order['amount'].' '.$order['type'].'\\\\ ';
-      }
+        $orderLines = '';
+        foreach ($orderData->getOrderLines() as $order) {
+            $orderLines .= $order['amount'].' '.$order['type'].'\\\\ ';
+        }
 
-      return $orderLines;
+        return $orderLines;
     }
 
     /**
