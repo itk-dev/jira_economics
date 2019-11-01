@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<div class="container-fluid bg-light p-3 p-sm-5" style="min-height: 100vh;">
+    {% if site_logo_url|default(false) %}
+        <div class="row justify-content-center mt-5 mb-3">
+            <div class="col-4 col-sm-2">
+                <div class="bg-primary rounded-circle p-3">
+                    <img src="{{ site_logo_url }}" alt="{{ site_logo_alt ?? 'logo' }}" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <div class="row justify-content-center">
+        <div class="col col-sm-6">
+            {% if site_name|default(false) %}
+                <h1 class="text-center mb-5">{{ site_name }}</h1>
+                {% if site_description|default(false) %}
+                    <p class="text-center lead mb-3">{{ site_description }} </p>
+                {% endif %}
+            {% endif %}
+            {% block fos_user_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
