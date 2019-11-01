@@ -649,13 +649,13 @@ class BillingService extends JiraService
         $invoice->setRecorded(true);
         $invoice->setRecordedDate(new \DateTime());
 
-        if ($invoice->getCustomerAccountId() == null) {
+        if (null === $invoice->getCustomerAccountId()) {
             throw new Exception('Customer account id not set.', 400);
         }
 
         $customerAccount = $this->getAccount($invoice->getCustomerAccountId());
 
-        if ($customerAccount == null) {
+        if (null === $customerAccount) {
             throw new Exception('Jira: Customer account does not exist', 400);
         }
 
@@ -687,8 +687,8 @@ class BillingService extends JiraService
 
         // Set billed field in Jira for each worklog.
         foreach ($invoice->getInvoiceEntries() as $invoiceEntry) {
-            if (($error = $this->validateInvoiceEntry($invoiceEntry)) !== true) {
-                throw new Exception('Invalid invoice entry ' . $invoiceEntry->getId() . ': ' . $error, 400);
+            if (true !== ($error = $this->validateInvoiceEntry($invoiceEntry))) {
+                throw new Exception('Invalid invoice entry '.$invoiceEntry->getId().': '.$error, 400);
             }
 
             foreach ($invoiceEntry->getWorklogs() as $worklog) {

@@ -17,7 +17,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Billing\Service\BillingService;
 
@@ -247,9 +246,7 @@ class ApiController extends Controller
             $invoice = $billingService->recordInvoice($invoiceId);
 
             return new JsonResponse($invoice);
-        }
-        catch (Exception $e)
-        {
+        } catch (Exception $e) {
             return new JsonResponse(['message' => $e->getMessage()], $e->getCode());
         }
     }
