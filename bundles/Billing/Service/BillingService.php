@@ -687,7 +687,7 @@ class BillingService extends JiraService
 
         // Set billed field in Jira for each worklog.
         foreach ($invoice->getInvoiceEntries() as $invoiceEntry) {
-            if (true !== ($error = $this->validateInvoiceEntry($invoiceEntry))) {
+            if (true !== ($error = $this->checkInvoiceEntry($invoiceEntry))) {
                 throw new Exception('Invalid invoice entry '.$invoiceEntry->getId().': '.$error, 400);
             }
 
@@ -714,7 +714,7 @@ class BillingService extends JiraService
         return $this->getInvoiceArray($invoice);
     }
 
-    private function validateInvoiceEntry(InvoiceEntry $invoiceEntry)
+    private function checkInvoiceEntry(InvoiceEntry $invoiceEntry)
     {
         if (!isset($invoiceEntryData['entryType'])) {
             return 'entryType not set';
