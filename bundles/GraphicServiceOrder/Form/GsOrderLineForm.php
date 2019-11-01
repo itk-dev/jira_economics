@@ -13,25 +13,20 @@ namespace GraphicServiceOrder\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 class GsOrderLineForm extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('amount', TextType::class, [
+            ->add('amount', NumberType::class, [
                 'label' => 'service_order_form.order_line.amount.label',
                 'attr' => ['class' => 'form-control'],
                 'help_attr' => ['class' => 'form-text text-muted'],
                 'help' => 'service_order_form.order_line.amount.help',
                 'required' => false,
-                'constraints' => [
-                    new Regex([
-                        'pattern' => '/^[-+]?[1-9]\d*$/',
-                        'message' => 'service_order_form.order_line.constraint.pattern',
-                    ]),
-                ],
+                'html5' => true,
             ])
             ->add('type', TextType::class, [
                 'label' => 'service_order_form.order_line.type.label',
