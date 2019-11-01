@@ -1,6 +1,8 @@
-"use strict";
+'use strict';
 
-Object.defineProperty(exports, "__esModule", {
+// This is a modified version of 'redux-api/lib/adapters/fetch'.
+
+Object.defineProperty(exports, '__esModule', {
     value: true
 });
 
@@ -9,9 +11,11 @@ exports.default = function (fetch) {
         return fetch(url, opts).then(function (resp) {
             // Normalize IE9's response to HTTP 204 when Win error 1223.
             var status = resp.status === 1223 ? 204 : resp.status;
-            var statusText = resp.status === 1223 ? "No Content" : resp.statusText;
+            var statusText = resp.status === 1223 ? 'No Content' : resp.statusText;
 
             if (status >= 400) {
+                // Ignored since this is a modification of 'redux-api/lib/adapters/fetch', to include resp.
+                // eslint-disable-next-line prefer-promise-reject-errors
                 return Promise.reject({ status: status, statusText: statusText, resp: resp });
             } else {
                 return toJSON(resp).then(function (data) {
@@ -26,7 +30,7 @@ exports.default = function (fetch) {
     };
 };
 
-function processData(data) {
+function processData (data) {
     try {
         return JSON.parse(data);
     } catch (err) {
@@ -34,7 +38,7 @@ function processData(data) {
     }
 }
 
-function toJSON(resp) {
+function toJSON (resp) {
     if (resp.text) {
         return resp.text().then(processData);
     } else if (resp instanceof Promise) {
@@ -44,4 +48,4 @@ function toJSON(resp) {
     }
 }
 
-module.exports = exports["default"];
+module.exports = exports['default'];
