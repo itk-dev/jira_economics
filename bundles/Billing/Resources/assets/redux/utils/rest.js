@@ -1,5 +1,5 @@
 import reduxApi from 'redux-api';
-import adapterFetch from 'redux-api/lib/adapters/fetch';
+import customFetch from './custom-fetch';
 import fetch from 'cross-fetch';
 
 export default reduxApi({
@@ -56,10 +56,7 @@ export default reduxApi({
         reducerName: 'invoice',
         url: '/jira/billing/jira_api/invoice/:id',
         options: {
-            method: 'delete',
-            headers: {
-                'Access-Control-Request-Method': 'DELETE'
-            }
+            method: 'delete'
         }
     },
     getInvoiceEntry: {
@@ -84,10 +81,7 @@ export default reduxApi({
         reducerName: 'invoiceEntry',
         url: '/jira/billing/jira_api/invoice_entry/:id',
         options: {
-            method: 'delete',
-            headers: {
-                'Access-Control-Request-Method': 'DELETE'
-            }
+            method: 'delete'
         }
     },
     getInvoices: {
@@ -116,4 +110,4 @@ export default reduxApi({
         url: '/jira/billing/jira_api/current_user',
         cache: { expire: 5 * 60 }
     }
-}).use('fetch', adapterFetch(fetch));
+}).use('fetch', customFetch(fetch));

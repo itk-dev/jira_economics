@@ -11,11 +11,13 @@
 namespace Billing\Controller;
 
 use App\Service\JiraService;
+use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Billing\Service\BillingService;
 
@@ -241,7 +243,15 @@ class ApiController extends Controller
      */
     public function recordInvoice(BillingService $billingService, $invoiceId)
     {
-        return new JsonResponse($billingService->recordInvoice($invoiceId));
+        try {
+            $invoice = $billingService->recordInvoice($invoiceId);
+
+            return new JsonResponse($invoice);
+        }
+        catch (Exception $e)
+        {
+            return new JsonResponse(['message' => $e->getMessage()], $e->getCode());
+        }
     }
 
     /**
