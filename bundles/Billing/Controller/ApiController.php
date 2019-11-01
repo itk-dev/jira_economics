@@ -11,6 +11,7 @@
 namespace Billing\Controller;
 
 use App\Service\JiraService;
+use Billing\Exception\InvoiceException;
 use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -237,8 +238,6 @@ class ApiController extends Controller
      * @param $invoiceId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
-     *
-     * @throws \Exception
      */
     public function recordInvoice(BillingService $billingService, $invoiceId)
     {
@@ -246,7 +245,7 @@ class ApiController extends Controller
             $invoice = $billingService->recordInvoice($invoiceId);
 
             return new JsonResponse($invoice);
-        } catch (Exception $e) {
+        } catch (InvoiceException $e) {
             return new JsonResponse(['message' => $e->getMessage()], $e->getCode());
         }
     }

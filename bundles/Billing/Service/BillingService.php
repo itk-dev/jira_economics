@@ -16,6 +16,7 @@ use Billing\Entity\InvoiceEntry;
 use Billing\Entity\Project;
 use Billing\Entity\Worklog;
 use Billing\Entity\Expense;
+use Billing\Exception\InvoiceException;
 use Billing\Repository\ExpenseRepository;
 use Billing\Repository\InvoiceRepository;
 use Billing\Repository\WorklogRepository;
@@ -640,7 +641,7 @@ class BillingService extends JiraService
      *
      * @return array
      *
-     * @throws Exception
+     * @throws InvoiceException
      */
     public function recordInvoice($invoiceId)
     {
@@ -650,24 +651,24 @@ class BillingService extends JiraService
         $invoice->setRecordedDate(new \DateTime());
 
         if (null === $invoice->getCustomerAccountId()) {
-            throw new Exception('Customer account id not set.', 400);
+            throw new InvoiceException('Customer account id not set.', 400);
         }
 
         $customerAccount = $this->getAccount($invoice->getCustomerAccountId());
 
         if (null === $customerAccount) {
-            throw new Exception('Jira: Customer account does not exist', 400);
+            throw new InvoiceException('Jira: Customer account does not exist', 400);
         }
 
         // Confirm that required fields are set for account.
         if (!isset($customerAccount->category)) {
-            throw new Exception('Jira: Category not set.', 400);
+            throw new InvoiceException('Jira: Category not set.', 400);
         }
         if (!isset($customerAccount->customer)) {
-            throw new Exception('Jira: Customer not set.', 400);
+            throw new InvoiceException('Jira: Customer not set.', 400);
         }
         if (!isset($customerAccount->contact)) {
-            throw new Exception('Jira: Contact not set.', 400);
+            throw new InvoiceException('Jira: Contact not set.', 400);
         }
 
         if (isset($customerAccount->category)) {
@@ -688,7 +689,7 @@ class BillingService extends JiraService
         // Set billed field in Jira for each worklog.
         foreach ($invoice->getInvoiceEntries() as $invoiceEntry) {
             if (true !== ($error = $this->checkInvoiceEntry($invoiceEntry))) {
-                throw new Exception('Invalid invoice entry '.$invoiceEntry->getId().': '.$error, 400);
+                throw new InvoiceException('Invalid invoice entry '.$invoiceEntry->getId().': '.$error, 400);
             }
 
             foreach ($invoiceEntry->getWorklogs() as $worklog) {
