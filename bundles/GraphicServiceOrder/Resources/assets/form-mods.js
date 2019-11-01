@@ -6,7 +6,7 @@ $(document).ready(function () {
     let libraries = $('.js-library');
     libraries.hide();
 
-    function changeForm() {
+    function changeForm () {
         if ($('#graphic_service_order_form_marketing_account').is(':checked')) {
             debtor.val('');
             debtor.prop('disabled', true);
