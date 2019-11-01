@@ -8,6 +8,8 @@ service_order_form:
   full_name:
     label: Navn
     help: Angiv dit fulde navn
+  phone:
+    label: Telefonnummer
   job_description:
     header: Opgavebeskrivelse
     title:
@@ -36,7 +38,11 @@ service_order_form:
       help_header: Tidligere anvendte debitorer:
     marketing_account:
       label: Borgerservice og bibliotekers markedsføringskonto?
+      receiptlabel: Markedsføringskonto
       help: Markedsføringskontoen er en pulje i Borgerservice og Biblioteker til borgerrettet information om arrangementer og kurser i bibliotekerne samt generelle borgerservicekampagner.
+    library:
+      label: Vælg bibliotek
+      help: Angiv hvilket bibliotek du bestiller på vegne af.
   job_delivery:
     header: Hvor skal ordren leveres?
     department:
