@@ -12,7 +12,6 @@ namespace Billing\Controller;
 
 use App\Service\JiraService;
 use Billing\Exception\InvoiceException;
-use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
