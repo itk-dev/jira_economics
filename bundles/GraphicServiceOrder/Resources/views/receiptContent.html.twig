@@ -4,6 +4,14 @@
     <span class="value">{{ order.issueKey }}</span>
 </div>
 <div class="mb-2">
+    <span class="label"><strong>{{ 'service_order_form.full_name.label'|trans }}:</strong></span>
+    <span class="value">{{ order.fullName }}</span>
+</div>
+<div class="mb-2">
+    <span class="label"><strong>{{ 'service_order_form.phone.label'|trans }}:</strong></span>
+    <span class="value">{{ order.phone }}</span>
+</div>
+<div class="mb-2">
     <span class="label"><strong>{{ 'service_order_form.job_description.title.label'|trans }}:</strong></span>
     <span class="value">{{ order.jobTitle }}</span>
 </div>
@@ -37,7 +45,8 @@
 <h3 class="mt-4">{{ 'service_order_form.job_payment.header'|trans }}</h3>
 <div class="mb-2">
     {% if order.marketingAccount %}
-        <span class="label"><strong>{{ 'service_order_form.job_payment.marketing_account.label'|trans }}:</strong></span>
+        <span class="label"><strong>{{ 'service_order_form.job_payment.marketing_account.receiptlabel'|trans }}:</strong></span>
+        {{ order.library }}
     {% else %}
         <span class="label"><strong>{{ 'service_order_form.job_payment.debitor.label'|trans }}:</strong></span>
         <span class="value">{{ order.debitor }}</span>

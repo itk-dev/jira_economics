@@ -72,7 +72,17 @@ class GsOrder
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      */
+    private $library;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
     private $department;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $phone;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -222,6 +232,18 @@ class GsOrder
         return $this;
     }
 
+    public function getLibrary(): ?string
+    {
+        return $this->library;
+    }
+
+    public function setLibrary(?string $library): self
+    {
+        $this->library = $library;
+
+        return $this;
+    }
+
     public function getDepartment(): ?string
     {
         return $this->department;
@@ -230,6 +252,18 @@ class GsOrder
     public function setDepartment(?string $department): self
     {
         $this->department = $department;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
 
         return $this;
     }
