@@ -717,31 +717,31 @@ class BillingService extends JiraService
 
     private function checkInvoiceEntry(InvoiceEntry $invoiceEntry)
     {
-        if (!isset($invoiceEntryData['entryType'])) {
+        if (!$invoiceEntry->getEntryType()) {
             return 'entryType not set';
         }
 
-        if (!isset($invoiceEntryData['amount'])) {
+        if (!$invoiceEntry->getAmount()) {
             return 'amount not set';
         }
 
-        if (!isset($invoiceEntryData['price'])) {
+        if (!$invoiceEntry->getPrice()) {
             return 'price not set';
         }
 
-        if (!isset($invoiceEntryData['description'])) {
+        if (!$invoiceEntry->getDescription()) {
             return 'description not set';
         }
 
-        if (!isset($invoiceEntryData['account'])) {
+        if (!$invoiceEntry->getAccount()) {
             return 'account not set';
         }
 
-        if (!isset($invoiceEntryData['materialNumber'])) {
+        if (!$invoiceEntry->getMaterialNumber()) {
             return 'materialNumber not set';
         }
 
-        if (!isset($invoiceEntryData['product'])) {
+        if (!$invoiceEntry->getProduct()) {
             return 'product not set';
         }
 
