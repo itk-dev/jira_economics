@@ -13,12 +13,13 @@ namespace GraphicServiceBilling\Controller;
 use App\Service\MenuService;
 use GraphicServiceBilling\Service\GraphicServiceBillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -96,21 +97,20 @@ class MainController extends AbstractController
             $spreadsheet = $graphicServiceBillingService->exportTasksToSpreadsheet($entries);
 
             if ($download) {
-                $writer = IOFactory::createWriter($spreadsheet, 'Csv');
+                $writer = new Csv($spreadsheet);
                 $writer->setDelimiter(';');
                 $writer->setEnclosure('');
                 $writer->setLineEnding("\r\n");
                 $writer->setSheetIndex(0);
                 $filename = 'faktura'.date('d-m-Y').($marketing ? '-marketing' : '-not_marketing').'-from'.$from->format('d-m-Y').'-to'.$to->format('d-m-Y').'.csv';
 
-                $contentType = 'text/csv';
+                $writer->save('php://output');
 
-                $response = new StreamedResponse(
-                    function () use ($writer) {
-                        $writer->save('php://output');
-                    }
-                );
-                $response->headers->set('Content-Type', $contentType);
+                $csvOutput = ob_get_clean();
+                $csvOutputEncoded = mb_convert_encoding($csvOutput, 'Windows-1252');
+
+                $response = new Response($csvOutputEncoded);
+                $response->headers->set('Content-Type', 'text/csv');
                 $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
                 $response->headers->set('Cache-Control', 'max-age=0');
 

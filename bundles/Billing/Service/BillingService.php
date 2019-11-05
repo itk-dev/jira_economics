@@ -16,10 +16,12 @@ use Billing\Entity\InvoiceEntry;
 use Billing\Entity\Project;
 use Billing\Entity\Worklog;
 use Billing\Entity\Expense;
+use Billing\Exception\InvoiceException;
 use Billing\Repository\ExpenseRepository;
 use Billing\Repository\InvoiceRepository;
 use Billing\Repository\WorklogRepository;
 use Doctrine\Common\Cache\CacheProvider;
+use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -164,7 +166,7 @@ class BillingService extends JiraService
             try {
                 $account = $this->getAccount($invoice->getCustomerAccountId());
                 $account->defaultPrice = $this->getAccountDefaultPrice($invoice->getCustomerAccountId());
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 $account = null;
             }
         }
@@ -198,7 +200,7 @@ class BillingService extends JiraService
      *
      * @return array invoiceData
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function postInvoice($invoiceData)
     {
@@ -639,7 +641,7 @@ class BillingService extends JiraService
      *
      * @return array
      *
-     * @throws \Exception
+     * @throws InvoiceException
      */
     public function recordInvoice($invoiceId)
     {
@@ -648,7 +650,26 @@ class BillingService extends JiraService
         $invoice->setRecorded(true);
         $invoice->setRecordedDate(new \DateTime());
 
+        if (null === $invoice->getCustomerAccountId()) {
+            throw new InvoiceException('Customer account id not set.', 400);
+        }
+
         $customerAccount = $this->getAccount($invoice->getCustomerAccountId());
+
+        if (null === $customerAccount) {
+            throw new InvoiceException('Jira: Customer account does not exist', 400);
+        }
+
+        // Confirm that required fields are set for account.
+        if (!isset($customerAccount->category)) {
+            throw new InvoiceException('Jira: Category not set.', 400);
+        }
+        if (!isset($customerAccount->customer)) {
+            throw new InvoiceException('Jira: Customer not set.', 400);
+        }
+        if (!isset($customerAccount->contact)) {
+            throw new InvoiceException('Jira: Contact not set.', 400);
+        }
 
         if (isset($customerAccount->category)) {
             $invoice->setLockedType($customerAccount->category->name);
@@ -667,6 +688,10 @@ class BillingService extends JiraService
 
         // Set billed field in Jira for each worklog.
         foreach ($invoice->getInvoiceEntries() as $invoiceEntry) {
+            if (true !== ($error = $this->checkInvoiceEntry($invoiceEntry))) {
+                throw new InvoiceException('Invalid invoice entry '.$invoiceEntry->getId().': '.$error, 400);
+            }
+
             foreach ($invoiceEntry->getWorklogs() as $worklog) {
                 $this->put('/rest/tempo-timesheets/4/worklogs/'.$worklog->getWorklogId(), [
                     'attributes' => [
@@ -690,6 +715,39 @@ class BillingService extends JiraService
         return $this->getInvoiceArray($invoice);
     }
 
+    private function checkInvoiceEntry(InvoiceEntry $invoiceEntry)
+    {
+        if (!$invoiceEntry->getEntryType()) {
+            return 'entryType not set';
+        }
+
+        if (!$invoiceEntry->getAmount()) {
+            return 'amount not set';
+        }
+
+        if (!$invoiceEntry->getPrice()) {
+            return 'price not set';
+        }
+
+        if (!$invoiceEntry->getDescription()) {
+            return 'description not set';
+        }
+
+        if (!$invoiceEntry->getAccount()) {
+            return 'account not set';
+        }
+
+        if (!$invoiceEntry->getMaterialNumber()) {
+            return 'materialNumber not set';
+        }
+
+        if (!$invoiceEntry->getProduct()) {
+            return 'product not set';
+        }
+
+        return true;
+    }
+
     public function markInvoiceAsExported($invoiceId)
     {
         $invoice = $this->invoiceRepository->findOneBy(['id' => $invoiceId]);
@@ -708,7 +766,7 @@ class BillingService extends JiraService
      *
      * @return \PhpOffice\PhpSpreadsheet\Spreadsheet
      *
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheetException
      */
     public function exportInvoicesToSpreadsheet(array $invoiceIds)
     {
@@ -726,14 +784,14 @@ class BillingService extends JiraService
                 continue;
             }
 
-            if ($invoice->getExportedDate()) {
+            if ($invoice->getRecorded()) {
                 $internal = 'INTERN' === $invoice->getLockedType();
                 $customerKey = $invoice->getLockedCustomerKey();
                 $accountKey = $invoice->getLockedAccountKey();
                 $salesChannel = $invoice->getLockedSalesChannel();
                 $contactName = $invoice->getLockedContactName();
             } else {
-                // If the invoice has not been exported yet.
+                // If the invoice has not been recorded yet.
                 $customerAccount = $this->getAccount($invoice->getCustomerAccountId());
 
                 $internal = 'INTERN' === $customerAccount->category->name;
@@ -776,21 +834,32 @@ class BillingService extends JiraService
             ++$row;
 
             foreach ($invoice->getInvoiceEntries() as $invoiceEntry) {
+                $materialNumber = $invoiceEntry->getMaterialNumber();
+                $product = $invoiceEntry->getProduct();
+                $amount = $invoiceEntry->getAmount();
+                $price = $invoiceEntry->getPrice();
+                $account = $invoiceEntry->getAccount();
+
+                // Ignore lines that have missing data.
+                if (!$materialNumber || !$product || !$amount || !$price || $account) {
+                    continue;
+                }
+
                 // Generate invoice lines (L).
                 // A. "Linietype"
                 $sheet->setCellValueByColumnAndRow(1, $row, 'L');
                 // B. "Materiale (vare)nr.
-                $sheet->setCellValueByColumnAndRow(2, $row, str_pad($invoiceEntry->getMaterialNumber(), 18, '0', STR_PAD_LEFT));
+                $sheet->setCellValueByColumnAndRow(2, $row, str_pad($materialNumber, 18, '0', STR_PAD_LEFT));
                 // C. "Beskrivelse"
-                $sheet->setCellValueByColumnAndRow(3, $row, $invoiceEntry->getProduct());
+                $sheet->setCellValueByColumnAndRow(3, $row, $product);
                 // D. "Ordremængde"
-                $sheet->setCellValueByColumnAndRow(4, $row, number_format($invoiceEntry->getAmount(), 3, ',', ''));
+                $sheet->setCellValueByColumnAndRow(4, $row, number_format($amount, 3, ',', ''));
                 // E. "Beløb pr. enhed"
-                $sheet->setCellValueByColumnAndRow(5, $row, number_format($invoiceEntry->getPrice(), 2, ',', ''));
+                $sheet->setCellValueByColumnAndRow(5, $row, number_format($price, 2, ',', ''));
                 // F. "Priser fra SAP"
                 $sheet->setCellValueByColumnAndRow(6, $row, 'NEJ');
                 // G. "PSP-element nr."
-                $sheet->setCellValueByColumnAndRow(7, $row, $invoiceEntry->getAccount());
+                $sheet->setCellValueByColumnAndRow(7, $row, $account);
 
                 ++$row;
             }
