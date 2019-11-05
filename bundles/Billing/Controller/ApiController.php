@@ -16,7 +16,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Billing\Service\BillingService;
 
@@ -254,7 +254,7 @@ class ApiController extends Controller
      *
      * @param \Billing\Service\BillingService $billingService
      *
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
@@ -273,16 +273,16 @@ class ApiController extends Controller
         $writer->setEnclosure('');
         $writer->setLineEnding("\r\n");
         $writer->setSheetIndex(0);
+
+        $writer->save('php://output');
+
+        $csvOutput = ob_get_clean();
+        $csvOutputEncoded = mb_convert_encoding($csvOutput, 'Windows-1252');
+
+        $response = new Response($csvOutputEncoded);
         $filename = 'invoices-'.date('d-m-Y').'.csv';
 
-        $contentType = 'text/csv';
-
-        $response = new StreamedResponse(
-            function () use ($writer) {
-                $writer->save('php://output');
-            }
-        );
-        $response->headers->set('Content-Type', $contentType);
+        $response->headers->set('Content-Type', 'text/csv');
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
         $response->headers->set('Cache-Control', 'max-age=0');
 
