@@ -153,6 +153,8 @@ export class InvoiceEntry extends Component {
     }
 
     handleSubmit = (event) => {
+        const { t } = this.props;
+
         event.preventDefault();
         const { dispatch } = this.props;
         const invoiceId = this.state.invoice.id;
@@ -164,6 +166,18 @@ export class InvoiceEntry extends Component {
         let amount = this.state.amount;
         let id = this.state.invoiceEntry.id;
         let materialNumber = this.state.materialNumber;
+
+        // Validate that account has been selected.
+        if (!account) {
+            Bus.emit('flash', ({ message: t('invoice_entry.error.no_account'), type: 'danger' }));
+            return;
+        }
+
+        // Validate that material number has been selected.
+        if (!materialNumber) {
+            Bus.emit('flash', ({ message: t('invoice_entry.error.no_material_number'), type: 'danger' }));
+            return;
+        }
 
         let entryData = {
             id,
@@ -399,6 +413,7 @@ export class InvoiceEntry extends Component {
                                 className="form-control"
                                 aria-describedby="enterVarenr"
                                 onChange={this.handleChange}
+                                required={true}
                                 value={ this.state.product }
                                 placeholder={t('invoice_entry.form.product_placeholder')}>
                             </input>
@@ -412,6 +427,7 @@ export class InvoiceEntry extends Component {
                                 className="form-control"
                                 aria-describedby="enterBeskrivelse"
                                 onChange={this.handleChange}
+                                required={true}
                                 value={ this.state.description }
                                 placeholder={t('invoice_entry.form.description_placeholder')}>
                             </input>
@@ -426,6 +442,7 @@ export class InvoiceEntry extends Component {
                                 className="form-control"
                                 aria-describedby="enterHoursSpent"
                                 onChange={this.handleChange}
+                                required={true}
                                 value={this.state.amount}
                                 readOnly={['worklog', 'expense'].indexOf(this.state.invoiceEntry.entryType) !== -1}>
                             </input>
@@ -440,6 +457,7 @@ export class InvoiceEntry extends Component {
                                 className="form-control"
                                 aria-describedby="enterUnitPrice"
                                 onChange={this.handleChange}
+                                required={true}
                                 value={this.state.price}
                                 readOnly={['expense'].indexOf(this.state.invoiceEntry.entryType) !== -1}>
                             </input>

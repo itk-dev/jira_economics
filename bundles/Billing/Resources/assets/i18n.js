@@ -144,7 +144,9 @@ const resources = {
             'home_page.filter.exported': 'Eksporterede',
             'home_page.filter.exported_option.all': 'Alle',
             'home_page.select_all': 'Vælg alle',
-            'home_page.select': 'Vælg alle'
+            'home_page.select': 'Vælg alle',
+            'invoice_entry.error.no_material_number': 'Materialenummer mangler',
+            'invoice_entry.error.no_account': 'Til konto ikke valgt'
         }
     }
 };

@@ -196,7 +196,7 @@ class GraphicServiceBillingService
             }
 
             // Ignore already billed issues.
-            if (isset($issue->fields->{$billedCustomFieldId}) && 'Faktureret' === $issue->fields->{$billedCustomFieldId}->value) {
+            if (isset($issue->fields->{$billedCustomFieldId}) && 'Faktureret' === $issue->fields->{$billedCustomFieldId}[0]->value) {
                 continue;
             }
 

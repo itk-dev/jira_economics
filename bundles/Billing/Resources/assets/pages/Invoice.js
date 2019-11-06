@@ -154,7 +154,11 @@ class Invoice extends Component {
                 'invoice': response
             }))
             .catch((reason) => {
-                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+                reason.resp.text().then(
+                    text => Bus.emit('flash', ({ message: text, type: 'danger' }))
+                ).catch(e =>
+                    Bus.emit('flash', ({ message: JSON.stringify(e), type: 'danger' }))
+                );
             });
     };
 
