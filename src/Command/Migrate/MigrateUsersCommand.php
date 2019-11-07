@@ -93,10 +93,7 @@ class MigrateUsersCommand extends Command
     private function getData(string $path)
     {
         if (!is_readable($path)) {
-            throw new InvalidArgumentException(sprintf(
-                'Invalid path: %s',
-                $path
-            ));
+            throw new InvalidArgumentException(sprintf('Invalid path: %s', $path));
         }
 
         return $this->serializer->decode(file_get_contents($path), 'csv');

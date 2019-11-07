@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -32,9 +33,6 @@ class MainController extends AbstractController
     /**
      * @Route("", name="index")
      *
-     * @param \Symfony\Component\HttpFoundation\Request                   $request
-     * @param \App\Service\MenuService                                    $menuService
-     * @param \GraphicServiceBilling\Service\GraphicServiceBillingService $graphicServiceBillingService
      * @param $boundProjectId
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -45,7 +43,11 @@ class MainController extends AbstractController
     public function index(Request $request, MenuService $menuService, GraphicServiceBillingService $graphicServiceBillingService, $boundProjectId)
     {
         $startDayOfWeek = (new \DateTime('this week'))->setTime(0, 0);
-        $endDayOfWeek = (new \DateTime($startDayOfWeek->format('c')))->add(new \DateInterval('P6D'));
+        try {
+            $endDayOfWeek = (new \DateTime($startDayOfWeek->format('c')))->add(new \DateInterval('P6D'));
+        } catch (\Exception $e) {
+            throw new HttpException(400, 'Invalid endDayOfWeek.');
+        }
 
         $formBuilder = $this->createFormBuilder();
         $formBuilder->add('from', DateType::class, [
@@ -93,7 +95,12 @@ class MainController extends AbstractController
             $marketing = $form->get('marketing')->getData();
 
             $tasks = $graphicServiceBillingService->getAllNonBilledFinishedTasks($boundProjectId, $from, $to, $marketing);
-            $entries = $graphicServiceBillingService->createExportData($tasks);
+
+            if ($marketing) {
+                $entries = $graphicServiceBillingService->createExportDataMarketing($tasks);
+            } else {
+                $entries = $graphicServiceBillingService->createExportDataNotMarketing($tasks);
+            }
             $spreadsheet = $graphicServiceBillingService->exportTasksToSpreadsheet($entries);
 
             if ($download) {
@@ -133,6 +140,7 @@ class MainController extends AbstractController
                 $preview = new \DOMDocument();
                 $d->loadHTML($html);
                 $body = $d->getElementsByTagName('body')->item(0);
+                /* @var \DOMNode $child */
                 foreach ($body->childNodes as $child) {
                     if ('style' === $child->tagName) {
                         continue;

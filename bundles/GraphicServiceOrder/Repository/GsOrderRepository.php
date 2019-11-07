@@ -10,8 +10,8 @@
 
 namespace GraphicServiceOrder\Repository;
 
-use GraphicServiceOrder\Entity\GsOrder;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use GraphicServiceOrder\Entity\GsOrder;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**

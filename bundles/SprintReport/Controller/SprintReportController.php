@@ -23,9 +23,6 @@ class SprintReportController extends AbstractController
     /**
      * @Route("", methods={"GET"}, name="index")
      *
-     * @param \App\Service\MenuService $menuService
-     * @param SprintReportService      $sprintReportService
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function selectBoard(MenuService $menuService, SprintReportService $sprintReportService)
@@ -44,8 +41,6 @@ class SprintReportController extends AbstractController
     /**
      * @Route("board/{boardId}", methods={"GET"}, name="select_project")
      *
-     * @param \App\Service\MenuService $menuService
-     * @param SprintReportService      $sprintReportService
      * @param $boardId
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -69,8 +64,6 @@ class SprintReportController extends AbstractController
     /**
      * @Route("board/{boardId}/project/{pid}", methods={"GET"}, name="select_version")
      *
-     * @param \App\Service\MenuService $menuService
-     * @param SprintReportService      $sprintReportService
      * @param $boardId
      * @param $pid
      *
@@ -95,8 +88,6 @@ class SprintReportController extends AbstractController
     /**
      * @Route("board/{boardId}/version/{vid}", methods={"GET"}, name="sprint_report")
      *
-     * @param \App\Service\MenuService $menuService
-     * @param SprintReportService      $sprintReportService
      * @param $boardId
      * @param $vid
      *

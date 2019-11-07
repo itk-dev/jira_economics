@@ -18,14 +18,14 @@ use GraphicServiceOrder\Entity\GsOrder;
 use GraphicServiceOrder\Message\OwnCloudShareMessage;
 use GraphicServiceOrder\Repository\GsOrderRepository;
 use ItkDev\UserManagementBundle\Doctrine\UserManager;
+use Swift_Mailer;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Swift_Mailer;
-use Twig\Environment;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class OrderService
 {
@@ -63,21 +63,7 @@ class OrderService
     /**
      * OrderService constructor.
      *
-     * @param \Doctrine\ORM\EntityManagerInterface                                                $entityManager
-     * @param \App\Service\HammerService                                                          $hammerService
-     * @param \App\Service\OwnCloudService                                                        $ownCloudService
-     * @param \GraphicServiceOrder\Repository\GsOrderRepository                                   $gsOrderRepository
-     * @param \Symfony\Component\HttpKernel\KernelInterface                                       $appKernel
-     * @param \Symfony\Component\Messenger\MessageBusInterface                                    $messageBus
-     * @param string                                                                              $ownCloudFilesFolder
-     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-     * @param \GraphicServiceOrder\Service\FileUploader                                           $fileUploader
-     * @param \ItkDev\UserManagementBundle\Doctrine\UserManager                                   $userManager
-     * @param \Swift_Mailer                                                                       $swiftMailer
-     * @param \Twig\Environment                                                                   $twig
-     * @param \Symfony\Contracts\Translation\TranslatorInterface                                  $translator
-     * @param array                                                                               $gsOrderConfiguration
-     * @param \Symfony\Component\Routing\Generator\UrlGeneratorInterface                          $router
+     * @param \GraphicServiceOrder\Service\FileUploader $fileUploader
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -224,7 +210,6 @@ class OrderService
     }
 
     /**
-     * @param \GraphicServiceOrder\Entity\GsOrder $gsOrder
      * @param $form
      *
      * @throws \Twig\Error\LoaderError
@@ -262,8 +247,6 @@ class OrderService
 
     /**
      * Handle file transfer to OwnCloud.
-     *
-     * @param \GraphicServiceOrder\Entity\GsOrder $order
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
@@ -311,8 +294,6 @@ class OrderService
 
     /**
      * Create a Jira task from a form submission.
-     *
-     * @param \GraphicServiceOrder\Entity\GsOrder $gsOrder
      *
      * @return mixed
      */
@@ -410,8 +391,6 @@ class OrderService
 
     /**
      * Crete orderlines as text.
-     *
-     * @param \GraphicServiceOrder\Entity\GsOrder $orderData
      *
      * @return string
      */

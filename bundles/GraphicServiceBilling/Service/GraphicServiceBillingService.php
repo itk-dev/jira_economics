@@ -26,7 +26,6 @@ class GraphicServiceBillingService
      * GraphicServiceBillingService constructor.
      *
      * @param $boundProjectId
-     * @param \Billing\Service\BillingService $billingService
      * @param $boundReceiverAccount
      * @param $boundReceiverPSP
      * @param $boundMaterialId
@@ -51,33 +50,136 @@ class GraphicServiceBillingService
     /**
      * Create export data for the given tasks.
      *
-     * @param $tasks
+     * @param array $tasks array of Jira tasks
      *
      * @return array
      */
-    public function createExportData($tasks)
+    public function createExportDataMarketing(array $tasks)
     {
         // Get debtor custom field.
-        $debtorCustomFieldId = $this->billingService->getCustomFieldId('Debitor');
+        $debtorFieldId = $this->billingService->getCustomFieldId('Debitor');
+        $marketingAccountFieldId = $this->billingService->getCustomFieldId('Marketing Account');
+        $libraryFieldId = $this->billingService->getCustomFieldId('Library');
 
         $entries = [];
 
         foreach ($tasks as $task) {
-            // Strip file link and \\ from description.
-            $description = $task->fields->description;
-            $description = preg_replace('/\\\\ \[Åbn filer i OwnCloud.*]\\ /i', '', $description);
-            $description = preg_replace('/\\\\/', '', $description);
+            $marketingAccount = $task->fields->{$marketingAccountFieldId} ?? false;
 
-            // Add summary and task key to start of description.
-            $description = implode('', [
-                $task->fields->summary,
-                ' ('.$task->key.'): ',
-                $description,
+            if ('Markedsføringskonto' !== $marketingAccount[0]->value) {
+                continue;
+            }
+
+            $description = '';
+
+            $library = $task->fields->{$libraryFieldId};
+
+            if (isset($entries[$library])) {
+                $header = $entries[$library]->header;
+            } else {
+                // Create header line data.
+                $header = (object) [
+                    'debtor' => $this->boundReceiverAccount,
+                    'salesChannel' => '10',
+                    'internal' => true,
+                    'description' => $description,
+                    'supplier' => $this->boundReceiverAccount,
+                    'library' => $library,
+                    'marketing' => $marketingAccount,
+                ];
+            }
+
+            // Get worklogs and expenses for task.
+            $worklogs = $this->billingService->getIssueWorklogs($task->id);
+            $expenses = $this->billingService->getExpenses([
+                'scopeId' => $task->id,
+                'scopeType' => 'ISSUE',
             ]);
+
+            // Bail out if there is nothing to bill for task.
+            if (0 === \count($worklogs) && 0 === \count($expenses)) {
+                continue;
+            }
+
+            $header->description = $header->description.(\strlen($header->description) > 0 ? ', ' : '').$task->fields->reporter->displayName.': '.$task->key;
+
+            $lines = [];
+
+            // Create line data for worklogs.
+            if (\count($worklogs) > 0) {
+                $worklogsSum = array_reduce($worklogs, function ($carry, $item) {
+                    $carry = $carry + $item->timeSpentSeconds;
+
+                    return $carry;
+                }, 0);
+
+                // From seconds to hours.
+                $worklogsSum = $worklogsSum / 60.0 / 60.0;
+
+                $lines[] = (object) [
+                    'materialNumber' => $this->boundMaterialId,
+                    'product' => 'Design: '.$library,
+                    'amount' => 1,
+                    'price' => $worklogsSum * $this->boundWorklogPricePerHour,
+                    'psp' => $this->boundReceiverPSP,
+                ];
+            }
+
+            // Create line data for expenses.
+            if (\count($expenses) > 0) {
+                $expensesSum = array_reduce($expenses, function ($carry, $item) {
+                    $carry = $carry + $item->amount;
+
+                    return $carry;
+                }, 0);
+
+                $lines[] = (object) [
+                    'materialNumber' => $this->boundMaterialId,
+                    'product' => 'Tryk: '.$library,
+                    'amount' => 1,
+                    'price' => $expensesSum,
+                    'psp' => $this->boundReceiverPSP,
+                ];
+            }
+
+            if (isset($entries[$library])) {
+                $entries[$library]->lines = array_merge($entries[$library]->lines, $lines);
+            } else {
+                $entries[$library] = (object) [
+                    'header' => $header,
+                    'lines' => $lines,
+                ];
+            }
+        }
+
+        return $entries;
+    }
+
+    /**
+     * Create export data for the given tasks.
+     *
+     * @param array $tasks array of Jira tasks
+     *
+     * @return array
+     */
+    public function createExportDataNotMarketing(array $tasks)
+    {
+        // Get debtor custom field.
+        $debtorFieldId = $this->billingService->getCustomFieldId('Debitor');
+        $entries = [];
+
+        foreach ($tasks as $task) {
+            $description = $this->getTaskDescription($task);
+            $debtor = $task->fields->{$debtorFieldId} ?? false;
+
+            if (!$debtor) {
+                // If no debtor has been set, ignore the task.
+                continue;
+            }
 
             // Create header line data.
             $header = (object) [
-                'debtor' => isset($task->fields->{$debtorCustomFieldId}) ? $task->fields->{$debtorCustomFieldId} : '',
+                'debtor' => $debtor,
                 'salesChannel' => '10',
                 'internal' => true,
                 'contactName' => $task->fields->reporter->displayName,
@@ -146,11 +248,32 @@ class GraphicServiceBillingService
     }
 
     /**
+     * Get task description.
+     *
+     * @param \stdClass $task the Jira task
+     *
+     * @return string
+     */
+    private function getTaskDescription(\stdClass $task)
+    {
+        $orderLinesFieldId = $this->billingService->getCustomFieldId('Order lines');
+
+        // Get order lines from jira task.
+        $orderLines = $task->fields->{$orderLinesFieldId} ?? '';
+
+        return implode('', [
+            $task->key.': ',
+            // Replace \\ in orderLines string field with .
+            preg_replace('/\\\\\\\\/', '.', $orderLines),
+        ]);
+    }
+
+    /**
      * Mark the chosen issues a billed in Jira.
      *
-     * @param $issues
+     * @param array $issues array of Jira issues
      */
-    public function markIssuesAsBilled($issues)
+    public function markIssuesAsBilled(array $issues)
     {
         $billedCustomFieldId = $this->billingService->getCustomFieldId('Faktureret');
 
@@ -171,16 +294,11 @@ class GraphicServiceBillingService
      * Get all tasks in the interval from the project that have not been
      * billed and that have the status "Done".
      *
-     * @param $projectId
-     * @param \DateTime|null $from
-     * @param \DateTime|null $to
-     * @param bool           $marketing
+     * @param int $projectId the Jira project id
      *
      * @return array
-     *
-     * @throws \Exception
      */
-    public function getAllNonBilledFinishedTasks($projectId, \DateTime $from = null, \DateTime $to = null, bool $marketing = false)
+    public function getAllNonBilledFinishedTasks(int $projectId, \DateTime $from = null, \DateTime $to = null, bool $marketing = false)
     {
         $billedCustomFieldId = $this->billingService->getCustomFieldId('Faktureret');
         $marketingAccountCustomFieldId = $this->billingService->getCustomFieldId('Marketing Account');
@@ -201,7 +319,13 @@ class GraphicServiceBillingService
             }
 
             // Ignore issues that are not resolved within the selected period.
-            $resolutionDate = new \DateTime($issue->fields->resolutiondate);
+            try {
+                $resolutionDate = new \DateTime($issue->fields->resolutiondate);
+            } catch (\Exception $e) {
+                // If resolution does not exist, ignore the issue.
+                continue;
+            }
+
             if (null !== $from) {
                 $diffFrom = $resolutionDate->diff($from)->format('%R');
                 if ('+' === $diffFrom) {
@@ -236,19 +360,19 @@ class GraphicServiceBillingService
     /**
      * Export the selected tasks to a spreadsheet.
      *
-     * @param array $tasks
+     * @param array $invoiceEntries array of invoice entries
      *
      * @return \PhpOffice\PhpSpreadsheet\Spreadsheet
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
-    public function exportTasksToSpreadsheet(array $tasks)
+    public function exportTasksToSpreadsheet(array $invoiceEntries)
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $row = 1;
 
-        foreach ($tasks as $entry) {
+        foreach ($invoiceEntries as $entry) {
             $header = $entry->header;
 
             // Generate header line (H).
@@ -269,7 +393,7 @@ class GraphicServiceBillingService
             // I. "Ordreart"
             $sheet->setCellValueByColumnAndRow(9, $row, $header->internal ? 'ZIRA' : 'ZRA');
             // O. "Kunderef.ID"
-            $sheet->setCellValueByColumnAndRow(15, $row, substr('Att: '.$header->contactName, 0, 35));
+            $sheet->setCellValueByColumnAndRow(15, $row, isset($header->contactName) ? substr('Att: '.$header->contactName, 0, 35) : '');
             // P. "Toptekst, yderligere spec i det hvide felt på fakturaen"
             $sheet->setCellValueByColumnAndRow(16, $row, substr($header->description, 0, 500));
             // Q. "Leverandør"

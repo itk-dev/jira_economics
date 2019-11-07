@@ -10,8 +10,8 @@
 
 namespace GraphicServiceOrder\Repository;
 
-use GraphicServiceOrder\Entity\Debtor;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use GraphicServiceOrder\Entity\Debtor;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**

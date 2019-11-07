@@ -11,20 +11,20 @@
 namespace Billing\Service;
 
 use App\Service\JiraService;
+use Billing\Entity\Expense;
 use Billing\Entity\Invoice;
 use Billing\Entity\InvoiceEntry;
 use Billing\Entity\Project;
 use Billing\Entity\Worklog;
-use Billing\Entity\Expense;
 use Billing\Exception\InvoiceException;
 use Billing\Repository\ExpenseRepository;
 use Billing\Repository\InvoiceRepository;
 use Billing\Repository\WorklogRepository;
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Doctrine\ORM\EntityManagerInterface;
 
 class BillingService extends JiraService
 {
@@ -42,11 +42,6 @@ class BillingService extends JiraService
      * @param $tokenStorage
      * @param $customerKey
      * @param $pemPath
-     * @param CacheProvider                         $cache
-     * @param \Doctrine\ORM\EntityManagerInterface  $entityManager
-     * @param \Billing\Repository\WorklogRepository $worklogRepository
-     * @param \Billing\Repository\ExpenseRepository $expenseRepository
-     * @param \Billing\Repository\InvoiceRepository $invoiceRepository
      * @param $boundReceiverAccount
      * @param $boundCustomFieldMappings
      */
@@ -150,9 +145,6 @@ class BillingService extends JiraService
 
     /**
      * Get invoice as array.
-     *
-     * @param \Billing\Entity\Invoice $invoice
-     * @param bool                    $withAccount
      *
      * @return array
      */
@@ -394,8 +386,6 @@ class BillingService extends JiraService
     /**
      * Get invoice entry as array.
      *
-     * @param \Billing\Entity\InvoiceEntry $invoiceEntry
-     *
      * @return array
      */
     private function getInvoiceEntryArray(InvoiceEntry $invoiceEntry)
@@ -461,9 +451,6 @@ class BillingService extends JiraService
     /**
      * Set invoiceEntry from data array.
      *
-     * @param \Billing\Entity\InvoiceEntry $invoiceEntry
-     * @param array                        $invoiceEntryData
-     *
      * @return \Billing\Entity\InvoiceEntry
      */
     private function setInvoiceEntryValuesFromData(InvoiceEntry $invoiceEntry, array $invoiceEntryData)
@@ -525,9 +512,7 @@ class BillingService extends JiraService
                         $this->entityManager->persist($worklog);
                     } else {
                         if ($worklog->getInvoiceEntry()->getId() === $invoiceEntry->getId()) {
-                            throw new HttpException(
-                                'Used by other invoice entry.'
-                            );
+                            throw new HttpException('Used by other invoice entry.');
                         }
                     }
                 }
@@ -564,9 +549,7 @@ class BillingService extends JiraService
                     } else {
                         if ($expense->getInvoiceEntry()
                             ->getId() === $invoiceEntry->getId()) {
-                            throw new HttpException(
-                                'Used by other invoice entry.'
-                            );
+                            throw new HttpException('Used by other invoice entry.');
                         }
                     }
                 }

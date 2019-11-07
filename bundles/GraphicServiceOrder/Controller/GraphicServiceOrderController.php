@@ -11,10 +11,10 @@
 namespace GraphicServiceOrder\Controller;
 
 use GraphicServiceOrder\Entity\GsOrder;
+use GraphicServiceOrder\Form\GraphicServiceOrderForm;
 use GraphicServiceOrder\Service\OrderService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use GraphicServiceOrder\Form\GraphicServiceOrderForm;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -29,10 +29,6 @@ class GraphicServiceOrderController extends AbstractController
      * Create a service order.
      *
      * @Route("/create-graphic-service-order", name="form")
-     *
-     * @param \Symfony\Component\HttpFoundation\Request                                           $request
-     * @param \GraphicServiceOrder\Service\OrderService                                           $orderService
-     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      *
@@ -71,8 +67,6 @@ class GraphicServiceOrderController extends AbstractController
      *
      * @Route("/create-graphic-service-order/submitted/{id}", name="submitted")
      *
-     * @param \GraphicServiceOrder\Entity\GsOrder $order
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function showOrderSubmitted(GsOrder $order)
@@ -86,8 +80,6 @@ class GraphicServiceOrderController extends AbstractController
      * Receipt page displayed when an order was created.
      *
      * @Route("/jira/delivery_note/{id}", name="delivery_note")
-     *
-     * @param \GraphicServiceOrder\Entity\GsOrder $order
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */

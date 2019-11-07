@@ -70,9 +70,6 @@ class UserController extends AdminController implements EventSubscriberInterface
         $this->preUpdateUserEntity($entity);
     }
 
-    /**
-     * @param \App\Entity\User $user
-     */
     public function prePersistUserEntity(User $user)
     {
         $this->userManager->updateUser($user, false);
