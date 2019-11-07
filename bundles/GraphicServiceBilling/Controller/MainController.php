@@ -32,8 +32,8 @@ class MainController extends AbstractController
     /**
      * @Route("", name="index")
      *
-     * @param \Symfony\Component\HttpFoundation\Request                   $request
-     * @param \App\Service\MenuService                                    $menuService
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \App\Service\MenuService $menuService
      * @param \GraphicServiceBilling\Service\GraphicServiceBillingService $graphicServiceBillingService
      * @param $boundProjectId
      *
@@ -41,6 +41,7 @@ class MainController extends AbstractController
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     * @throws \Exception
      */
     public function index(Request $request, MenuService $menuService, GraphicServiceBillingService $graphicServiceBillingService, $boundProjectId)
     {
@@ -93,7 +94,13 @@ class MainController extends AbstractController
             $marketing = $form->get('marketing')->getData();
 
             $tasks = $graphicServiceBillingService->getAllNonBilledFinishedTasks($boundProjectId, $from, $to, $marketing);
-            $entries = $graphicServiceBillingService->createExportData($tasks);
+
+            if ($marketing) {
+                $entries = $graphicServiceBillingService->createExportDataMarketing($tasks);
+            }
+            else {
+                $entries = $graphicServiceBillingService->createExportDataNotMarketing($tasks);
+            }
             $spreadsheet = $graphicServiceBillingService->exportTasksToSpreadsheet($entries);
 
             if ($download) {

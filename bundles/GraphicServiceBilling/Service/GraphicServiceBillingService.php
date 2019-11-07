@@ -10,6 +10,7 @@
 
 namespace GraphicServiceBilling\Service;
 
+use Billing\Exception\InvoiceException;
 use Billing\Service\BillingService;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
@@ -54,30 +55,141 @@ class GraphicServiceBillingService
      * @param $tasks
      *
      * @return array
+     * @throws \Billing\Exception\InvoiceException
      */
-    public function createExportData($tasks)
+    public function createExportDataMarketing($tasks)
     {
         // Get debtor custom field.
-        $debtorCustomFieldId = $this->billingService->getCustomFieldId('Debitor');
+        $debtorFieldId = $this->billingService->getCustomFieldId('Debitor');
+        $marketingAccountFieldId = $this->billingService->getCustomFieldId('Marketing Account');
+        $libraryFieldId = $this->billingService->getCustomFieldId('Library');
 
         $entries = [];
 
         foreach ($tasks as $task) {
-            // Strip file link and \\ from description.
-            $description = $task->fields->description;
-            $description = preg_replace('/\\\\ \[Åbn filer i OwnCloud.*]\\ /i', '', $description);
-            $description = preg_replace('/\\\\/', '', $description);
+            $marketingAccount = $task->fields->{$marketingAccountFieldId} ?? false;
 
-            // Add summary and task key to start of description.
-            $description = implode('', [
-                $task->fields->summary,
-                ' ('.$task->key.'): ',
-                $description,
+            if (!$marketingAccount[0]->value === 'Markedsføringskonto') {
+                continue;
+            }
+
+            $description = '';
+
+            $library = $task->fields->{$libraryFieldId};
+
+            if (isset($entries[$library])) {
+                $header = $entries[$library]->header;
+            }
+            else {
+                // Create header line data.
+                $header = (object) [
+                    'debtor' => $this->boundReceiverAccount,
+                    'salesChannel' => '10',
+                    'internal' => true,
+                    'description' => $description,
+                    'supplier' => $this->boundReceiverAccount,
+                    'library' => $library,
+                    'marketing' => $marketingAccount,
+                ];
+            }
+
+            // Get worklogs and expenses for task.
+            $worklogs = $this->billingService->getIssueWorklogs($task->id);
+            $expenses = $this->billingService->getExpenses([
+                'scopeId' => $task->id,
+                'scopeType' => 'ISSUE',
             ]);
+
+            // Bail out if there is nothing to bill for task.
+            if (0 === \count($worklogs) && 0 === \count($expenses)) {
+                continue;
+            }
+
+            $header->description = $header->description . (strlen($header->description) > 0 ? ', ' : '') . $task->fields->reporter->displayName . ': ' . $task->key;
+
+            $lines = [];
+
+            // Create line data for worklogs.
+            if (\count($worklogs) > 0) {
+                $worklogsSum = array_reduce($worklogs, function ($carry, $item) {
+                    $carry = $carry + $item->timeSpentSeconds;
+
+                    return $carry;
+                }, 0);
+
+                // From seconds to hours.
+                $worklogsSum = $worklogsSum / 60.0 / 60.0;
+
+                $lines[] = (object) [
+                    'materialNumber' => $this->boundMaterialId,
+                    'product' => 'Design: '.$library,
+                    'amount' => 1,
+                    'price' => $worklogsSum * $this->boundWorklogPricePerHour,
+                    'psp' => $this->boundReceiverPSP,
+                ];
+            }
+
+            // Create line data for expenses.
+            if (\count($expenses) > 0) {
+                $expensesSum = array_reduce($expenses, function ($carry, $item) {
+                    $carry = $carry + $item->amount;
+
+                    return $carry;
+                }, 0);
+
+                $lines[] = (object) [
+                    'materialNumber' => $this->boundMaterialId,
+                    'product' => 'Tryk: '.$library,
+                    'amount' => 1,
+                    'price' => $expensesSum,
+                    'psp' => $this->boundReceiverPSP,
+                ];
+            }
+
+            if (isset($entries[$library])) {
+                $entries[$library]->lines = array_merge($entries[$library]->lines, $lines);
+            }
+            else {
+                $entries[$library] = (object) [
+                    'header' => $header,
+                    'lines' => $lines,
+                ];
+            }
+        }
+
+        return $entries;
+    }
+
+    /**
+     * Create export data for the given tasks.
+     *
+     * @param $tasks
+     *
+     * @return array
+     * @throws \Billing\Exception\InvoiceException
+     */
+    public function createExportDataNotMarketing($tasks)
+    {
+        // Get debtor custom field.
+        $debtorFieldId = $this->billingService->getCustomFieldId('Debitor');
+        $orderLinesFieldId = $this->billingService->getCustomFieldId('Order lines');
+        $entries = [];
+
+        foreach ($tasks as $task) {
+            $description = implode('', [
+                $task->key.': ',
+                preg_replace("/\\\\\\\\/", '.', $task->fields->{$orderLinesFieldId}),
+            ]);
+
+            $debtor = $task->fields->{$debtorFieldId} ?? false;
+
+            if (!$debtor) {
+                throw new InvoiceException('No debtor set');
+            }
 
             // Create header line data.
             $header = (object) [
-                'debtor' => isset($task->fields->{$debtorCustomFieldId}) ? $task->fields->{$debtorCustomFieldId} : '',
+                'debtor' => $debtor,
                 'salesChannel' => '10',
                 'internal' => true,
                 'contactName' => $task->fields->reporter->displayName,
@@ -269,7 +381,7 @@ class GraphicServiceBillingService
             // I. "Ordreart"
             $sheet->setCellValueByColumnAndRow(9, $row, $header->internal ? 'ZIRA' : 'ZRA');
             // O. "Kunderef.ID"
-            $sheet->setCellValueByColumnAndRow(15, $row, substr('Att: '.$header->contactName, 0, 35));
+            $sheet->setCellValueByColumnAndRow(15, $row, isset($header->contactName) ? substr('Att: '.$header->contactName, 0, 35) : '');
             // P. "Toptekst, yderligere spec i det hvide felt på fakturaen"
             $sheet->setCellValueByColumnAndRow(16, $row, substr($header->description, 0, 500));
             // Q. "Leverandør"
