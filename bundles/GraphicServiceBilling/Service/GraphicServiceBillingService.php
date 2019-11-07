@@ -27,7 +27,6 @@ class GraphicServiceBillingService
      * GraphicServiceBillingService constructor.
      *
      * @param $boundProjectId
-     * @param \Billing\Service\BillingService $billingService
      * @param $boundReceiverAccount
      * @param $boundReceiverPSP
      * @param $boundMaterialId
@@ -55,6 +54,7 @@ class GraphicServiceBillingService
      * @param $tasks
      *
      * @return array
+     *
      * @throws \Billing\Exception\InvoiceException
      */
     public function createExportDataMarketing($tasks)
@@ -69,7 +69,7 @@ class GraphicServiceBillingService
         foreach ($tasks as $task) {
             $marketingAccount = $task->fields->{$marketingAccountFieldId} ?? false;
 
-            if (!$marketingAccount[0]->value === 'Markedsføringskonto') {
+            if ('Markedsføringskonto' !== $marketingAccount[0]->value) {
                 continue;
             }
 
@@ -79,8 +79,7 @@ class GraphicServiceBillingService
 
             if (isset($entries[$library])) {
                 $header = $entries[$library]->header;
-            }
-            else {
+            } else {
                 // Create header line data.
                 $header = (object) [
                     'debtor' => $this->boundReceiverAccount,
@@ -105,7 +104,7 @@ class GraphicServiceBillingService
                 continue;
             }
 
-            $header->description = $header->description . (strlen($header->description) > 0 ? ', ' : '') . $task->fields->reporter->displayName . ': ' . $task->key;
+            $header->description = $header->description.(\strlen($header->description) > 0 ? ', ' : '').$task->fields->reporter->displayName.': '.$task->key;
 
             $lines = [];
 
@@ -148,8 +147,7 @@ class GraphicServiceBillingService
 
             if (isset($entries[$library])) {
                 $entries[$library]->lines = array_merge($entries[$library]->lines, $lines);
-            }
-            else {
+            } else {
                 $entries[$library] = (object) [
                     'header' => $header,
                     'lines' => $lines,
@@ -166,6 +164,7 @@ class GraphicServiceBillingService
      * @param $tasks
      *
      * @return array
+     *
      * @throws \Billing\Exception\InvoiceException
      */
     public function createExportDataNotMarketing($tasks)
@@ -178,7 +177,7 @@ class GraphicServiceBillingService
         foreach ($tasks as $task) {
             $description = implode('', [
                 $task->key.': ',
-                preg_replace("/\\\\\\\\/", '.', $task->fields->{$orderLinesFieldId}),
+                preg_replace('/\\\\\\\\/', '.', $task->fields->{$orderLinesFieldId}),
             ]);
 
             $debtor = $task->fields->{$debtorFieldId} ?? false;
@@ -284,9 +283,6 @@ class GraphicServiceBillingService
      * billed and that have the status "Done".
      *
      * @param $projectId
-     * @param \DateTime|null $from
-     * @param \DateTime|null $to
-     * @param bool           $marketing
      *
      * @return array
      *
@@ -347,8 +343,6 @@ class GraphicServiceBillingService
 
     /**
      * Export the selected tasks to a spreadsheet.
-     *
-     * @param array $tasks
      *
      * @return \PhpOffice\PhpSpreadsheet\Spreadsheet
      *

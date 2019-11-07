@@ -32,9 +32,6 @@ class MainController extends AbstractController
     /**
      * @Route("", name="index")
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \App\Service\MenuService $menuService
-     * @param \GraphicServiceBilling\Service\GraphicServiceBillingService $graphicServiceBillingService
      * @param $boundProjectId
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -97,8 +94,7 @@ class MainController extends AbstractController
 
             if ($marketing) {
                 $entries = $graphicServiceBillingService->createExportDataMarketing($tasks);
-            }
-            else {
+            } else {
                 $entries = $graphicServiceBillingService->createExportDataNotMarketing($tasks);
             }
             $spreadsheet = $graphicServiceBillingService->exportTasksToSpreadsheet($entries);
