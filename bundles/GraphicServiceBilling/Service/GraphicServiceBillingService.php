@@ -50,7 +50,7 @@ class GraphicServiceBillingService
     /**
      * Create export data for the given tasks.
      *
-     * @param array $tasks Array of Jira tasks.
+     * @param array $tasks array of Jira tasks
      *
      * @return array
      */
@@ -158,7 +158,7 @@ class GraphicServiceBillingService
     /**
      * Create export data for the given tasks.
      *
-     * @param array $tasks Array of Jira tasks.
+     * @param array $tasks array of Jira tasks
      *
      * @return array
      */
@@ -271,7 +271,7 @@ class GraphicServiceBillingService
     /**
      * Mark the chosen issues a billed in Jira.
      *
-     * @param array $issues Array of Jira issues.
+     * @param array $issues array of Jira issues
      */
     public function markIssuesAsBilled(array $issues)
     {
@@ -294,7 +294,7 @@ class GraphicServiceBillingService
      * Get all tasks in the interval from the project that have not been
      * billed and that have the status "Done".
      *
-     * @param int $projectId The Jira project id.
+     * @param int $projectId the Jira project id
      *
      * @return array
      */
@@ -360,7 +360,7 @@ class GraphicServiceBillingService
     /**
      * Export the selected tasks to a spreadsheet.
      *
-     * @param array $invoiceEntries Array of invoice entries.
+     * @param array $invoiceEntries array of invoice entries
      *
      * @return \PhpOffice\PhpSpreadsheet\Spreadsheet
      *
