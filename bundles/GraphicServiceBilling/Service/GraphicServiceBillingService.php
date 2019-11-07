@@ -10,7 +10,6 @@
 
 namespace GraphicServiceBilling\Service;
 
-use Billing\Exception\InvoiceException;
 use Billing\Service\BillingService;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
@@ -51,13 +50,11 @@ class GraphicServiceBillingService
     /**
      * Create export data for the given tasks.
      *
-     * @param $tasks
+     * @param array $tasks Array of Jira tasks.
      *
      * @return array
-     *
-     * @throws \Billing\Exception\InvoiceException
      */
-    public function createExportDataMarketing($tasks)
+    public function createExportDataMarketing(array $tasks)
     {
         // Get debtor custom field.
         $debtorFieldId = $this->billingService->getCustomFieldId('Debitor');
@@ -161,29 +158,23 @@ class GraphicServiceBillingService
     /**
      * Create export data for the given tasks.
      *
-     * @param $tasks
+     * @param array $tasks Array of Jira tasks.
      *
      * @return array
-     *
-     * @throws \Billing\Exception\InvoiceException
      */
-    public function createExportDataNotMarketing($tasks)
+    public function createExportDataNotMarketing(array $tasks)
     {
         // Get debtor custom field.
         $debtorFieldId = $this->billingService->getCustomFieldId('Debitor');
-        $orderLinesFieldId = $this->billingService->getCustomFieldId('Order lines');
         $entries = [];
 
         foreach ($tasks as $task) {
-            $description = implode('', [
-                $task->key.': ',
-                preg_replace('/\\\\\\\\/', '.', $task->fields->{$orderLinesFieldId}),
-            ]);
-
+            $description = $this->getTaskDescription($task);
             $debtor = $task->fields->{$debtorFieldId} ?? false;
 
             if (!$debtor) {
-                throw new InvoiceException('No debtor set');
+                // If no debtor has been set, ignore the task.
+                continue;
             }
 
             // Create header line data.
@@ -257,11 +248,32 @@ class GraphicServiceBillingService
     }
 
     /**
+     * Get task description.
+     *
+     * @param \stdClass $task the Jira task
+     *
+     * @return string
+     */
+    private function getTaskDescription(\stdClass $task)
+    {
+        $orderLinesFieldId = $this->billingService->getCustomFieldId('Order lines');
+
+        // Get order lines from jira task.
+        $orderLines = $task->fields->{$orderLinesFieldId} ?? '';
+
+        return implode('', [
+            $task->key.': ',
+            // Replace \\ in orderLines string field with .
+            preg_replace('/\\\\\\\\/', '.', $orderLines),
+        ]);
+    }
+
+    /**
      * Mark the chosen issues a billed in Jira.
      *
-     * @param $issues
+     * @param array $issues Array of Jira issues.
      */
-    public function markIssuesAsBilled($issues)
+    public function markIssuesAsBilled(array $issues)
     {
         $billedCustomFieldId = $this->billingService->getCustomFieldId('Faktureret');
 
@@ -282,13 +294,11 @@ class GraphicServiceBillingService
      * Get all tasks in the interval from the project that have not been
      * billed and that have the status "Done".
      *
-     * @param $projectId
+     * @param int $projectId The Jira project id.
      *
      * @return array
-     *
-     * @throws \Exception
      */
-    public function getAllNonBilledFinishedTasks($projectId, \DateTime $from = null, \DateTime $to = null, bool $marketing = false)
+    public function getAllNonBilledFinishedTasks(int $projectId, \DateTime $from = null, \DateTime $to = null, bool $marketing = false)
     {
         $billedCustomFieldId = $this->billingService->getCustomFieldId('Faktureret');
         $marketingAccountCustomFieldId = $this->billingService->getCustomFieldId('Marketing Account');
@@ -309,7 +319,13 @@ class GraphicServiceBillingService
             }
 
             // Ignore issues that are not resolved within the selected period.
-            $resolutionDate = new \DateTime($issue->fields->resolutiondate);
+            try {
+                $resolutionDate = new \DateTime($issue->fields->resolutiondate);
+            } catch (\Exception $e) {
+                // If resolution does not exist, ignore the issue.
+                continue;
+            }
+
             if (null !== $from) {
                 $diffFrom = $resolutionDate->diff($from)->format('%R');
                 if ('+' === $diffFrom) {
@@ -344,17 +360,19 @@ class GraphicServiceBillingService
     /**
      * Export the selected tasks to a spreadsheet.
      *
+     * @param array $invoiceEntries Array of invoice entries.
+     *
      * @return \PhpOffice\PhpSpreadsheet\Spreadsheet
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
-    public function exportTasksToSpreadsheet(array $tasks)
+    public function exportTasksToSpreadsheet(array $invoiceEntries)
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $row = 1;
 
-        foreach ($tasks as $entry) {
+        foreach ($invoiceEntries as $entry) {
             $header = $entry->header;
 
             // Generate header line (H).
