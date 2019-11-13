@@ -96,7 +96,7 @@ class ProjectBillingService
             }
 
             // Update description.
-            $header->description = $header->description.(\strlen($header->description) > 0 ? ', ' : '').$task->key;
+            $header->description = $header->description.' '.$task->key;
 
             $lines = [];
 
@@ -163,7 +163,7 @@ class ProjectBillingService
                 'salesChannel' => $account->category->key,
                 'internal' => true,
                 'contactName' => $account->contact->displayName,
-                'description' => '',
+                'description' => $account->name.": ",
                 'supplier' => $this->boundReceiverAccount,
             ];
         }
@@ -173,7 +173,7 @@ class ProjectBillingService
                 'salesChannel' => $account->category->key,
                 'internal' => false,
                 'contactName' => $account->contact->displayName,
-                'description' => '',
+                'description' => $account->name.": ",
                 'supplier' => $this->boundReceiverAccount,
                 'ean' => $account->key,
             ];
