@@ -189,6 +189,8 @@ class ProjectBillingService
     {
         $billedCustomFieldId = $this->billingService->getCustomFieldId('Faktureret');
 
+        // @TODO: Mark each worklog and expense as billed as well in the issues.
+
         foreach ($issues as $issue) {
             $this->billingService->put('/rest/api/2/issue/'.$issue->id, (object) [
                 'fields' => [

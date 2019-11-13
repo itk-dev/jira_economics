@@ -119,9 +119,10 @@ class MainController extends AbstractController
                 $writer->setSheetIndex(0);
                 $filename = 'faktura'.date('d-m-Y').'-from'.$from->format('d-m-Y').'-to'.$to->format('d-m-Y').'.csv';
 
+                ob_start();
                 $writer->save('php://output');
-
                 $csvOutput = ob_get_clean();
+
                 $csvOutputEncoded = mb_convert_encoding($csvOutput, 'Windows-1252');
 
                 $response = new Response($csvOutputEncoded);
