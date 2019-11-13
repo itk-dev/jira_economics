@@ -39,3 +39,7 @@ sprint_report:
 graphic_service_billing:
     prefix: /jira
     resource: "@GraphicServiceBillingBundle/Resources/config/routing.yaml"
+
+project_billing:
+    prefix: /jira
+    resource: "@ProjectBillingBundle/Resources/config/routing.yaml"
