@@ -19,6 +19,14 @@
     </div>
     <div class="row">
         <div class="col m-2">
+            {{form_row(form.supplier)}}
+        </div>
+        <div class="col m-2">
+            {{form_row(form.psp)}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col m-2">
             {{form_row(form.submit)}}
 
             {% if preview is defined and preview != null %}

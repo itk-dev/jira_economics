@@ -3,11 +3,8 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
-            $boundReceiverAccount: '%gs_billing_receiver_account%'
-            $boundReceiverPSP: '%gs_billing_receiver_psp%'
-            $boundProjectId: '%gs_billing_project_id%'
-            $boundMaterialId: '%gs_billing_material_id%'
-            $boundWorklogPricePerHour: '%gs_billing_worklog_hour_price%'
+            $boundExternalMaterialId: '%project_billing_external_material_id%'
+            $boundInternalMaterialId: '%project_billing_internal_material_id%'
 
     ProjectBilling\:
         resource: '../../*'

@@ -18,7 +18,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -34,14 +36,12 @@ class MainController extends AbstractController
     /**
      * @Route("", name="index")
      *
-     * @param $boundProjectId
-     *
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function index(Request $request, MenuService $menuService, ProjectBillingService $projectBillingService, $boundProjectId)
+    public function index(Request $request, MenuService $menuService, ProjectBillingService $projectBillingService)
     {
         $startDayOfWeek = (new \DateTime('this week'))->setTime(0, 0);
         try {
@@ -68,6 +68,15 @@ class MainController extends AbstractController
             'label' => 'project_billing_form.to',
             'data' => $endDayOfWeek,
             'widget' => 'single_text',
+        ]);
+        $formBuilder->add('supplier', NumberType::class, [
+            'label' => 'project_billing_form.supplier',
+            'required' => true,
+            'html5' => true,
+        ]);
+        $formBuilder->add('psp', TextType::class, [
+            'label' => 'project_billing_form.psp',
+            'required' => true,
         ]);
         $formBuilder->add('project', ChoiceType::class, [
             'label' => 'project_billing_form.project',
@@ -103,9 +112,11 @@ class MainController extends AbstractController
             $to = $form->get('to')->getData()->add(new \DateInterval('P1D'));
 
             $selectedProject = $form->get('project')->getData();
+            $selectedPSP = $form->get('psp')->getData();
+            $selectedSupplier = $form->get('supplier')->getData();
 
             $tasks = $projectBillingService->getAllNonBilledFinishedTasks((int) $selectedProject, $from, $to);
-            $entries = $projectBillingService->createExportData($tasks);
+            $entries = $projectBillingService->createExportData($tasks, $selectedSupplier, $selectedPSP);
 
             $spreadsheet = $projectBillingService->exportTasksToSpreadsheet($entries);
 
