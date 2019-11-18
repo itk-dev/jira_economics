@@ -7,6 +7,8 @@ parameters:
     gs_billing_receiver_psp: ~
     gs_billing_receiver_account: ~
     gs_billing_worklog_hour_price: ~
+    project_billing_internal_material_id: ~
+    project_billing_external_material_id: ~
     portal:
         menu:
             grafisk_service:
