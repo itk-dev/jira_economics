@@ -189,9 +189,8 @@ class ProjectBillingService
     {
         $billedCustomFieldId = $this->billingService->getCustomFieldId('Faktureret');
 
-        // @TODO: Mark each worklog and expense as billed as well in the issues.
-
         foreach ($issues as $issue) {
+            // Mark issue as billed.
             $this->billingService->put('/rest/api/2/issue/'.$issue->id, (object) [
                 'fields' => [
                     $billedCustomFieldId => [
@@ -201,6 +200,9 @@ class ProjectBillingService
                     ],
                 ],
             ]);
+
+            // @TODO: Mark each worklog as billed in Jira?
+            // @TODO: Mark each worklog and expense as billed in JiraEconomics?
         }
     }
 
@@ -217,40 +219,50 @@ class ProjectBillingService
     public function getAllNonBilledFinishedTasks(int $projectId, \DateTime $from = null, \DateTime $to = null)
     {
         $billedCustomFieldId = $this->billingService->getCustomFieldId('Faktureret');
+        $accountFieldId = $this->billingService->getCustomFieldId('Account');
+
+        $accounts = $this->billingService->getAllAccounts();
+        $accounts = array_reduce($accounts, function ($carry, $account) {
+            $carry[$account->id] = $account;
+            return $carry;
+        }, []);
+
+        $jqls = [
+            'status=done',
+        ];
+
+        if ($from != null) {
+            $jqls = array_merge($jqls, [
+                'resolutiondate>="'.$from->format('Y/m/d').'"',
+            ]);
+        }
+        if ($to != null) {
+            $jqls = array_merge($jqls, [
+                'resolutiondate<="'.$to->format('Y/m/d').'"',
+            ]);
+        }
+
+        // @TODO: Replace with more precise call to Jira, to avoid a lot of issues that are not relevant and have to be filtered out afterwards.
+        $issues = $this->billingService->getProjectIssues($projectId, null, $jqls);
 
         $notBilledIssues = [];
 
-        $issues = $this->billingService->getProjectIssues($projectId);
-
         foreach ($issues as $issue) {
-            // Ignore issues that are not Done.
-            if ('done' !== $issue->fields->status->statusCategory->key) {
-                continue;
-            }
-
             // Ignore already billed issues.
             if (isset($issue->fields->{$billedCustomFieldId}) && 'Faktureret' === $issue->fields->{$billedCustomFieldId}[0]->value) {
                 continue;
             }
 
-            // Ignore issues that are not resolved within the selected period.
-            try {
-                $resolutionDate = new \DateTime($issue->fields->resolutiondate);
-            } catch (\Exception $e) {
-                // If resolution does not exist, ignore the issue.
+            // Check that an account has been set for the issue.
+            if (!isset($issue->fields->{$accountFieldId}) || !isset($accounts[$issue->fields->{$accountFieldId}->id])) {
                 continue;
             }
-            if (null !== $from) {
-                $diffFrom = $resolutionDate->diff($from)->format('%R');
-                if ('+' === $diffFrom) {
-                    continue;
-                }
-            }
-            if (null !== $to) {
-                $diffTo = $resolutionDate->diff($to)->format('%R');
-                if ('-' === $diffTo) {
-                    continue;
-                }
+
+            $account = $accounts[$issue->fields->{$accountFieldId}->id];
+
+            // Ignore issue if the account is a KLIP account.
+            if ($account->category->name == 'KLIP') {
+              continue;
             }
 
             $notBilledIssues[$issue->id] = $issue;
@@ -262,19 +274,41 @@ class ProjectBillingService
     /**
      * Export the selected tasks to a spreadsheet.
      *
-     * @param array $invoiceEntries array of invoice entries
+     * @param array $entries Array of invoice entries of the form:
+     *
+     *     (object) [
+     *       'header' => [
+     *         'debtor' => DEBTOR,
+     *         'salesChannel' => SALES_CHANNEL,
+     *         'internal' => true/false,
+     *         'contactName' => CONTACT_NAME,
+     *         'description' => DESCRIPTION,
+     *         'supplier' => SUPPLIER,
+     *         'ean' => EAN_FOR_EXTERNAL,
+     *       ],
+     *       'lines' => [
+     *         (object) [
+     *           'materialNumber' => MATERIAL_NUMBER',
+     *           'product' => PRODUCT,
+     *           'amount' => AMOUNT,
+     *           'price' => PRICE,
+     *           'psp' => 'PSP',
+     *         ],
+     *         ...
+     *       ],
+     *     ];
      *
      * @return \PhpOffice\PhpSpreadsheet\Spreadsheet
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
-    public function exportTasksToSpreadsheet(array $invoiceEntries)
+    public function exportTasksToSpreadsheet(array $entries)
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $row = 1;
 
-        foreach ($invoiceEntries as $entry) {
+        foreach ($entries as $entry) {
             $header = $entry->header;
 
             // Generate header line (H).

@@ -39,3 +39,6 @@ ROLE_USER: Bruger
 
 jira.title: Jira Apps
 profile.title: Profil
+
+login.heading: ITK Economics
+login.jira: Log ind med Jira
