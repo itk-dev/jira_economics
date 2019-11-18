@@ -26,7 +26,6 @@ class ProjectBillingService
      * ProjectBillingService constructor.
      *
      * @param $boundProjectId
-     * @param \Billing\Service\BillingService $billingService
      * @param $boundReceiverAccount
      * @param $boundReceiverPSP
      * @param $boundMaterialId
@@ -66,6 +65,7 @@ class ProjectBillingService
         $accounts = $this->billingService->getAllAccounts();
         $accounts = array_reduce($accounts, function ($carry, $account) {
             $carry[$account->id] = $account;
+
             return $carry;
         }, []);
 
@@ -75,7 +75,7 @@ class ProjectBillingService
             $account = $task->fields->{$accountFieldId};
             $account = $accounts[$account->id];
 
-            $internal = $account->category->name == 'INTERN';
+            $internal = 'INTERN' === $account->category->name;
 
             if (isset($entries[$account->id])) {
                 $header = $entries[$account->id]->header;
@@ -154,8 +154,9 @@ class ProjectBillingService
         return $entries;
     }
 
-    private function createHeaderForAccount($account) {
-        $internal = $account->category->name == 'INTERN';
+    private function createHeaderForAccount($account)
+    {
+        $internal = 'INTERN' === $account->category->name;
 
         if ($internal) {
             return (object) [
@@ -163,17 +164,16 @@ class ProjectBillingService
                 'salesChannel' => $account->category->key,
                 'internal' => true,
                 'contactName' => $account->contact->displayName,
-                'description' => $account->name.": ",
+                'description' => $account->name.': ',
                 'supplier' => $this->boundReceiverAccount,
             ];
-        }
-        else {
+        } else {
             return (object) [
                 'debtor' => $account->customer->key,
                 'salesChannel' => $account->category->key,
                 'internal' => false,
                 'contactName' => $account->contact->displayName,
-                'description' => $account->name.": ",
+                'description' => $account->name.': ',
                 'supplier' => $this->boundReceiverAccount,
                 'ean' => $account->key,
             ];
@@ -210,10 +210,10 @@ class ProjectBillingService
      * Get all tasks in the interval from the project that have not been
      * billed and that have the status "Done".
      *
-     * @param int $projectId The Jira project id
+     * @param int            $projectId The Jira project id
+     * @param \DateTime|null $from      start of interval
+     * @param \DateTime|null $to        end of interval
      *
-     * @param \DateTime|null $from Start of interval.
-     * @param \DateTime|null $to End of interval.
      * @return array
      */
     public function getAllNonBilledFinishedTasks(int $projectId, \DateTime $from = null, \DateTime $to = null)
@@ -224,6 +224,7 @@ class ProjectBillingService
         $accounts = $this->billingService->getAllAccounts();
         $accounts = array_reduce($accounts, function ($carry, $account) {
             $carry[$account->id] = $account;
+
             return $carry;
         }, []);
 
@@ -231,12 +232,12 @@ class ProjectBillingService
             'status=done',
         ];
 
-        if ($from != null) {
+        if (null !== $from) {
             $jqls = array_merge($jqls, [
                 'resolutiondate>="'.$from->format('Y/m/d').'"',
             ]);
         }
-        if ($to != null) {
+        if (null !== $to) {
             $jqls = array_merge($jqls, [
                 'resolutiondate<="'.$to->format('Y/m/d').'"',
             ]);
@@ -261,8 +262,8 @@ class ProjectBillingService
             $account = $accounts[$issue->fields->{$accountFieldId}->id];
 
             // Ignore issue if the account is a KLIP account.
-            if ($account->category->name == 'KLIP') {
-              continue;
+            if ('KLIP' === $account->category->name) {
+                continue;
             }
 
             $notBilledIssues[$issue->id] = $issue;

@@ -11,9 +11,9 @@
 namespace ProjectBilling\Controller;
 
 use App\Service\MenuService;
-use ProjectBilling\Service\ProjectBillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use ProjectBilling\Service\ProjectBillingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -34,9 +34,6 @@ class MainController extends AbstractController
     /**
      * @Route("", name="index")
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \App\Service\MenuService $menuService
-     * @param \ProjectBilling\Service\ProjectBillingService $projectBillingService
      * @param $boundProjectId
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -57,6 +54,7 @@ class MainController extends AbstractController
 
         $projectOptions = array_reduce($projects, function ($carry, $project) {
             $carry[$project->name] = $project->id;
+
             return $carry;
         }, []);
 
@@ -106,7 +104,7 @@ class MainController extends AbstractController
 
             $selectedProject = $form->get('project')->getData();
 
-            $tasks = $projectBillingService->getAllNonBilledFinishedTasks((int)$selectedProject, $from, $to);
+            $tasks = $projectBillingService->getAllNonBilledFinishedTasks((int) $selectedProject, $from, $to);
             $entries = $projectBillingService->createExportData($tasks);
 
             $spreadsheet = $projectBillingService->exportTasksToSpreadsheet($entries);

@@ -1060,7 +1060,7 @@ class BillingService extends JiraService
      *
      * @param $projectId
      * @param string $issueType
-     * @param array|null $additionalJQL
+     *
      * @return array
      */
     public function getProjectIssues($projectId, string $issueType = null, array $additionalJQL = null)
@@ -1073,7 +1073,7 @@ class BillingService extends JiraService
             $jql = $jql.' and issuetype='.$issueType;
         }
 
-        if ($additionalJQL !== null) {
+        if (null !== $additionalJQL) {
             foreach ($additionalJQL as $addJql) {
                 $jql = $jql.' and '.$addJql;
             }
