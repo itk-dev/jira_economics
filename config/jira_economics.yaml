@@ -93,7 +93,7 @@ parameters:
 
             project_billing:
                 title: 'Projekt fakturering'
-                desc: 'Lav fakturaer for et projekt udfra Accounts på de enkelte issues'
+                desc: 'Lav fakturaer for et projekt ud fra Accounts på de enkelte issues'
                 icon: 'fa-file-invoice-dollar'
                 routeName: 'project_billing_index'
 
@@ -149,7 +149,7 @@ parameters:
 
             project_billing:
                 title: 'Projekt fakturering'
-                desc: 'Lav fakturaer for et projekt udfra Accounts på de enkelte issues'
+                desc: 'Lav fakturaer for et projekt ud fra Accounts på de enkelte issues'
                 icon: 'fa-file-invoice-dollar'
                 routeName: 'project_billing_index'
                 btnTxt: 'Lav udtræk'

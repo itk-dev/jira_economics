@@ -1075,7 +1075,7 @@ class BillingService extends JiraService
 
         if (null !== $additionalJQL) {
             foreach ($additionalJQL as $addJql) {
-                $jql = $jql.' and '.$addJql;
+                $jql = $jql.' and ('.$addJql.')';
             }
         }
 
