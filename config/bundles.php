@@ -22,6 +22,7 @@ return [
     SprintReport\SprintReportBundle::class => ['all' => true],
     CreateProject\CreateProjectBundle::class => ['all' => true],
     GraphicServiceBilling\GraphicServiceBillingBundle::class => ['all' => true],
+    ProjectBilling\ProjectBillingBundle::class => ['all' => true],
     GraphicServiceOrder\GraphicServiceOrderBundle::class => ['all' => true],
     Vich\UploaderBundle\VichUploaderBundle::class => ['all' => true],
     Expense\ExpenseBundle::class => ['all' => true],

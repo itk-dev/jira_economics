@@ -1059,11 +1059,11 @@ class BillingService extends JiraService
      * Get project issues of a given issue type.
      *
      * @param $projectId
-     * @param null $issueType
+     * @param string $issueType
      *
      * @return array
      */
-    public function getProjectIssues($projectId, $issueType = null)
+    public function getProjectIssues($projectId, string $issueType = null, array $additionalJQL = null)
     {
         $issues = [];
 
@@ -1071,6 +1071,12 @@ class BillingService extends JiraService
 
         if (null !== $issueType) {
             $jql = $jql.' and issuetype='.$issueType;
+        }
+
+        if (null !== $additionalJQL) {
+            foreach ($additionalJQL as $addJql) {
+                $jql = $jql.' and ('.$addJql.')';
+            }
         }
 
         $startAt = 0;

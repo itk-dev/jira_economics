@@ -72,6 +72,7 @@
             "GraphicServiceBilling\\": "bundles/GraphicServiceBilling/",
             "GraphicServiceOrder\\": "bundles/GraphicServiceOrder/",
             "Planning\\": "bundles/Planning/",
+            "ProjectBilling\\": "bundles/ProjectBilling/",
             "SprintReport\\": "bundles/SprintReport/"
         }
     },
