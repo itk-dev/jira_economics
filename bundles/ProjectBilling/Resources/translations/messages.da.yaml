@@ -1,0 +1,11 @@
+project_billing_form:
+    download: Hent CSV
+    preview: Preview
+    show_preview: Vis preview
+    from: Fra
+    to: Til
+    project: Projekt
+    mark_as_billed: Marker Jira tasks som "Faktureret".
+    mark_as_billed_help: Hvis du henter udtrækket som csv og denne checkbox er krydset af, vil alle Jira tasks, der er inkluderet blive markeret som faktureret. De vil ikke indgå i fremadrettede udtræk. Hvis man manuelt fjerner "Faktureret" i Jira, kan tasken igen faktureres.
+    supplier: Leverandør
+    psp: PSP-element nr.

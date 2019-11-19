@@ -33,3 +33,6 @@ parameters:
         gs_order_project_id: '%env(resolve:GS_ORDER_PROJECT_ID)%'
         gs_order_issuetype_id: '%env(resolve:GS_ORDER_ISSUETYPE_ID)%'
         libraries: ~
+
+    project_billing_external_material_id: ~
+    project_billing_internal_material_id: ~

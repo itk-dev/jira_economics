@@ -1,0 +1,4 @@
+controllers:
+    resource: "@ProjectBillingBundle/Controller"
+    type: annotation
+    prefix: /projectbilling

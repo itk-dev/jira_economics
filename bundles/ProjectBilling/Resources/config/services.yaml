@@ -1,0 +1,15 @@
+services:
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $boundExternalMaterialId: '%project_billing_external_material_id%'
+            $boundInternalMaterialId: '%project_billing_internal_material_id%'
+
+    ProjectBilling\:
+        resource: '../../*'
+        exclude: '../../{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    ProjectBilling\Controller\:
+        resource: '../../Controller'
+        tags: ['controller.service_arguments']
