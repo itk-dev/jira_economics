@@ -100,4 +100,28 @@ class JiraService extends AbstractJiraService
 
         return $middleware;
     }
+
+    /**
+     * Get current user.
+     *
+     * @return mixed
+     */
+    public function getCurrentUser()
+    {
+        $result = $this->get('/rest/api/2/myself');
+
+        return $result;
+    }
+
+    /**
+     * Get current user permissions.
+     *
+     * @return mixed
+     */
+    public function getCurrentUserPermissions()
+    {
+        $result = $this->get('/rest/api/2/mypermissions');
+
+        return $result;
+    }
 }
