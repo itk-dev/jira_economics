@@ -133,10 +133,10 @@ class JiraService extends AbstractJiraService
     public function getPermissionsList()
     {
         $list = [];
-        $rest_permissions = $this->getCurrentUserPermissions();
-        if (property_exists($rest_permissions, 'permissions')) {
-            foreach ($rest_permissions->permissions as $permission_name => $value) {
-                if (property_exists($value, 'havePermission') && true === $value->havePermission) {
+        $restPermissions = $this->getCurrentUserPermissions();
+        if (isset($restPermissions->permissions) && \is_object($restPermissions->permissions)) {
+            foreach ($restPermissions->permissions as $permission_name => $value) {
+                if (isset($value->havePermission) && true === $value->havePermission) {
                     $list[] = $permission_name;
                 }
             }
