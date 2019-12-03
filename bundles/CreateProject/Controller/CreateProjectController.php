@@ -41,7 +41,7 @@ class CreateProjectController extends Controller
     public function createProject(Request $request, MenuService $menuService)
     {
         $options = [
-            'user_permissions' => $this->jiraService->getCurrentUserPermissions(),
+            'user_permissions' => $this->jiraService->getPermissionsList(),
         ];
         $form = $this->createForm(CreateProjectForm::class, null, $options);
         $form->handleRequest($request);

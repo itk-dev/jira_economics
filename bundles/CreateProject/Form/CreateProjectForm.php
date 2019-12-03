@@ -98,8 +98,7 @@ class CreateProjectForm extends AbstractType
                 'help_attr' => ['class' => 'form-text text-muted'],
                 'help' => 'create_project_form.team.help',
             ]);
-        $permissions = $this->jiraService->getPermissionsList();
-        if (\in_array('ADMINISTER', $permissions)) {
+        if (\in_array('ADMINISTER', $options['user_permissions'])) {
             $builder->add('account', ChoiceType::class, [
                 'label' => 'create_project_form.account.label',
                 'choices' => $this->getAccountChoices(),
