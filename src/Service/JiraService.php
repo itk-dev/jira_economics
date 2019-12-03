@@ -124,4 +124,24 @@ class JiraService extends AbstractJiraService
 
         return $result;
     }
+
+    /**
+     * Get list of allowed permissions for current user.
+     *
+     * @return array
+     */
+    public function getPermissionsList()
+    {
+        $list = [];
+        $rest_permissions = $this->getCurrentUserPermissions();
+        if (property_exists($rest_permissions, 'permissions')) {
+            foreach ($rest_permissions->permissions as $permission_name => $value) {
+                if (property_exists($value, 'havePermission') && 1 === $value->havePermission) {
+                    $list[] = $permission_name;
+                }
+            }
+        }
+
+        return $list;
+    }
 }

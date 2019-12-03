@@ -98,7 +98,8 @@ class CreateProjectForm extends AbstractType
                 'help_attr' => ['class' => 'form-text text-muted'],
                 'help' => 'create_project_form.team.help',
             ]);
-        if ($options['user_permissions']->permissions->ADMINISTER->havePermission) {
+        $permissions = $this->jiraService->getPermissionsList();
+        if (\in_array('ADMINISTER', $permissions)) {
             $builder->add('account', ChoiceType::class, [
                 'label' => 'create_project_form.account.label',
                 'choices' => $this->getAccountChoices(),
@@ -275,7 +276,7 @@ class CreateProjectForm extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'user_permissions' => $this->jiraService->getCurrentUserPermissions(),
+            'user_permissions' => null,
             'validation_groups' => function (FormInterface $form) {
                 $data = $form->getData();
                 if (true === $data['new_account']) {
