@@ -392,18 +392,6 @@ abstract class AbstractJiraService
     }
 
     /**
-     * Get current user.
-     *
-     * @return mixed
-     */
-    public function getCurrentUser()
-    {
-        $result = $this->get('/rest/api/2/myself');
-
-        return $result;
-    }
-
-    /**
      * Get users from search.
      *
      * @return mixed

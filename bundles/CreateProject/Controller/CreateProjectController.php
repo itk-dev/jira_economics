@@ -11,6 +11,7 @@
 namespace CreateProject\Controller;
 
 use App\Service\HammerService;
+use App\Service\JiraService;
 use App\Service\MenuService;
 use CreateProject\Form\CreateProjectForm;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -23,11 +24,13 @@ use Symfony\Component\Routing\Annotation\Route;
 class CreateProjectController extends Controller
 {
     private $hammerService;
+    private $jiraService;
     private $formData;
 
-    public function __construct(HammerService $hammerService)
+    public function __construct(HammerService $hammerService, JiraService $jiraService)
     {
         $this->hammerService = $hammerService;
+        $this->jiraService = $jiraService;
     }
 
     /**
@@ -37,7 +40,10 @@ class CreateProjectController extends Controller
      */
     public function createProject(Request $request, MenuService $menuService)
     {
-        $form = $this->createForm(CreateProjectForm::class);
+        $options = [
+            'user_permissions' => $this->jiraService->getPermissionsList(),
+        ];
+        $form = $this->createForm(CreateProjectForm::class, null, $options);
         $form->handleRequest($request);
 
         $this->formData = [
@@ -46,7 +52,7 @@ class CreateProjectController extends Controller
             'accounts' => $this->hammerService->getAllAccounts(),
             'projectCategories' => $this->hammerService->getAllProjectCategories(),
             'allTeamsConfig' => $this->getParameter('teamconfig'),
-            'user' => $this->hammerService->getCurrentUser(),
+            'user' => $this->jiraService->getCurrentUser(),
             'jira_url' => $_ENV['JIRA_URL'],
         ];
 

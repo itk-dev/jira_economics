@@ -40,21 +40,25 @@
     <div class="form-group">
       {{ form_row(form.team) }}
     </div>
-    <div class="form-group">
-      {{ form_row(form.account) }}
-      {{ form_row(form.new_account) }}
-    </div>
-    <div class="form-group toggle-account-group collapse">
-      {{ form_row(form.new_account_name) }}
-      {{ form_row(form.new_account_key) }}
-      {{ form_row(form.new_account_contact) }}
-      {{ form_row(form.new_account_customer) }}
-      {{ form_row(form.new_customer) }}
-      <div class="form-group toggle-customer-group collapse">
-        {{ form_row(form.new_customer_name) }}
-        {{ form_row(form.new_customer_key) }}
+    {% if form.account is defined %}
+      <div class="form-group">
+        {% if form.account is defined %}{{ form_row(form.account) }}{% endif %}
+        {% if form.new_account is defined %}{{ form_row(form.new_account) }}{% endif %}
       </div>
-    </div>
+    {% endif %}
+    {% if form.account is defined %}
+      <div class="form-group toggle-account-group collapse">
+        {% if form.new_account_name is defined %}{{ form_row(form.new_account_name) }}{% endif %}
+        {% if form.new_account_key is defined %}{{ form_row(form.new_account_key) }}{% endif %}
+        {% if form.new_account_contact is defined %}{{ form_row(form.new_account_contact) }}{% endif %}
+        {% if form.new_account_customer is defined %}{{ form_row(form.new_account_customer) }}{% endif %}
+        {% if form.new_customer is defined %}{{ form_row(form.new_customer) }}{% endif %}
+        <div class="form-group toggle-customer-group collapse">
+          {% if form.new_customer_name is defined %}{{ form_row(form.new_customer_name) }}{% endif %}
+          {% if form.new_customer_key is defined %}{{ form_row(form.new_customer_key) }}{% endif %}
+        </div>
+      </div>
+    {% endif %}
     {{ form_end(form) }}
     <div id="create_project_form_save_text" style="display: none;">
     <button class="btn btn-primary" type="button" disabled>
