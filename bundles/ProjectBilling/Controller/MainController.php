@@ -11,6 +11,7 @@
 namespace ProjectBilling\Controller;
 
 use App\Service\MenuService;
+use Billing\Service\BillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use ProjectBilling\Service\ProjectBillingService;
@@ -20,7 +21,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -41,7 +42,7 @@ class MainController extends AbstractController
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function index(Request $request, MenuService $menuService, ProjectBillingService $projectBillingService)
+    public function index(Request $request, MenuService $menuService, ProjectBillingService $projectBillingService, BillingService $billingService, $boundDescription, $boundSupplier)
     {
         $startDayOfWeek = (new \DateTime('this week'))->setTime(0, 0);
         try {
@@ -58,6 +59,12 @@ class MainController extends AbstractController
             return $carry;
         }, []);
 
+        $toAccounts = $billingService->getToAccounts();
+        $pspOptions = array_reduce($toAccounts, function ($carry, $account) {
+            $carry[$account->name.' ('.$account->key.')'] = $account->key;
+            return $carry;
+        }, []);
+
         $formBuilder = $this->createFormBuilder();
         $formBuilder->add('from', DateType::class, [
             'label' => 'project_billing_form.from',
@@ -69,19 +76,26 @@ class MainController extends AbstractController
             'data' => $endDayOfWeek,
             'widget' => 'single_text',
         ]);
-        $formBuilder->add('supplier', NumberType::class, [
-            'label' => 'project_billing_form.supplier',
-            'required' => true,
-            'html5' => true,
+        $formBuilder->add('description', TextareaType::class, [
+            'label' => 'project_billing_form.description',
+            'help' => 'project_billing_form.description_help',
+            'required' => false,
+            'data' => $boundDescription,
         ]);
-        $formBuilder->add('psp', TextType::class, [
+        $formBuilder->add('psp', ChoiceType::class, [
             'label' => 'project_billing_form.psp',
             'required' => true,
+            'choices' => $pspOptions,
         ]);
         $formBuilder->add('project', ChoiceType::class, [
             'label' => 'project_billing_form.project',
             'choices' => $projectOptions,
             'required' => true,
+        ]);
+        $formBuilder->add('includeProjectNameInHeader', CheckboxType::class, [
+            'label' => 'project_billing_form.include_project_name_in_header',
+            'required' => false,
+            'data' => true,
         ]);
         $formBuilder->add('markAsBilled', CheckboxType::class, [
             'label' => 'project_billing_form.mark_as_billed',
@@ -113,10 +127,11 @@ class MainController extends AbstractController
 
             $selectedProject = $form->get('project')->getData();
             $selectedPSP = $form->get('psp')->getData();
-            $selectedSupplier = $form->get('supplier')->getData();
+            $description = $form->get('description')->getData();
+            $includeProjectNameInHeader = $form->get('includeProjectNameInHeader')->getData();
 
             $tasks = $projectBillingService->getAllNonBilledFinishedTasks((int) $selectedProject, $from, $to);
-            $entries = $projectBillingService->createExportData($tasks, $selectedSupplier, $selectedPSP);
+            $entries = $projectBillingService->createExportData($tasks, $boundSupplier, $selectedPSP, $selectedProject, $from, $to, $description, $includeProjectNameInHeader);
 
             $spreadsheet = $projectBillingService->exportTasksToSpreadsheet($entries);
 

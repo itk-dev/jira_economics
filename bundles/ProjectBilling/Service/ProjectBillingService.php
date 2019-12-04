@@ -45,13 +45,17 @@ class ProjectBillingService
     /**
      * Create export data for the given tasks.
      *
-     * @param array $tasks array of Jira tasks
-     * @param $supplier
-     * @param $psp
-     *
+     * @param array $tasks array of Jira tasks.
+     * @param int $supplier supplier number.
+     * @param string $psp PSP string.
+     * @param int $selectedProject Jira project ID.
+     * @param \DateTime $from Invoice from time.
+     * @param \DateTime $to Invoice to time.
+     * @param string $description
+     * @param bool $includeProjectNameInHeader
      * @return array
      */
-    public function createExportData(array $tasks, int $supplier, string $psp)
+    public function createExportData(array $tasks, int $supplier, string $psp, int $selectedProject, \DateTime $from, \DateTime $to, string $description, bool $includeProjectNameInHeader = false)
     {
         $entries = [];
         $accounts = $this->billingService->getAllAccounts();
@@ -60,6 +64,8 @@ class ProjectBillingService
 
             return $carry;
         }, []);
+
+        $project = $this->billingService->getProject($selectedProject);
 
         $accountFieldId = $this->billingService->getCustomFieldId('Account');
 
@@ -72,7 +78,7 @@ class ProjectBillingService
             if (isset($entries[$account->id])) {
                 $header = $entries[$account->id]->header;
             } else {
-                $header = $this->createHeaderForAccount($account, $supplier);
+                $header = $this->createHeaderForAccount($account, $supplier, $from, $to, $project, $description, $includeProjectNameInHeader);
             }
 
             // Get worklogs and expenses for task.
@@ -86,9 +92,6 @@ class ProjectBillingService
             if (0 === \count($worklogs) && 0 === \count($expenses)) {
                 continue;
             }
-
-            // Update description.
-            $header->description = $header->description.' '.$task->key;
 
             $lines = [];
 
@@ -109,7 +112,7 @@ class ProjectBillingService
 
                 $lines[] = (object) [
                     'materialNumber' => $internal ? $this->boundInternalMaterialId : $this->boundExternalMaterialId,
-                    'product' => $task->fields->summary,
+                    'product' => $task->key.': '.$task->fields->summary,
                     'amount' => $worklogsSum,
                     'price' => $accounts[$account->id]->defaultPrice,
                     'psp' => $psp,
@@ -125,8 +128,8 @@ class ProjectBillingService
                 }, 0);
 
                 $lines[] = (object) [
-                    'materialNumber' => $internal ? 103361 : 100006,
-                    'product' => $task->fields->summary,
+                    'materialNumber' => $internal ? $this->boundInternalMaterialId : $this->boundExternalMaterialId,
+                    'product' => $task->key.': '.$task->fields->summary,
                     'amount' => 1,
                     'price' => $expensesSum,
                     'psp' => $psp,
@@ -146,7 +149,7 @@ class ProjectBillingService
         return $entries;
     }
 
-    private function createHeaderForAccount($account, $supplier)
+    private function createHeaderForAccount($account, $supplier, \DateTime $from, \DateTime $to, $project, $description, $includeProjectNameInHeader)
     {
         $internal = 'INTERN' === $account->category->name;
 
@@ -156,7 +159,7 @@ class ProjectBillingService
                 'salesChannel' => $account->category->key,
                 'internal' => true,
                 'contactName' => $account->contact->displayName,
-                'description' => $account->name.': ',
+                'description' => ($includeProjectNameInHeader ? $project->name.' - ' : '').$account->name.' ('.$from->format('d/m/Y').' - '.$to->format('d/m/Y').'). '.$description,
                 'supplier' => $supplier,
             ];
         } else {
@@ -165,7 +168,7 @@ class ProjectBillingService
                 'salesChannel' => $account->category->key,
                 'internal' => false,
                 'contactName' => $account->contact->displayName,
-                'description' => $account->name.': ',
+                'description' => ($includeProjectNameInHeader ? $project->name.' - ' : '').$account->name.' ('.$from->format('d/m/Y').' - '.$to->format('d/m/Y').'). '.$description,
                 'supplier' => $supplier,
                 'ean' => $account->key,
             ];
