@@ -18,6 +18,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="Billing\Repository\ProjectRepository")
+ *
  * @UniqueEntity("jiraId")
  */
 class Project extends AbstractEntity

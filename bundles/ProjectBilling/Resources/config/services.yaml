@@ -5,6 +5,8 @@ services:
         bind:
             $boundExternalMaterialId: '%project_billing_external_material_id%'
             $boundInternalMaterialId: '%project_billing_internal_material_id%'
+            $boundDescription: '%project_billing_default_text%'
+            $boundSupplier: '%project_billing_supplier%'
 
     ProjectBilling\:
         resource: '../../*'
