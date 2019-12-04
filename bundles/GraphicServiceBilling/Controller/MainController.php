@@ -33,6 +33,9 @@ class MainController extends AbstractController
     /**
      * @Route("", name="index")
      *
+     * @param \Symfony\Component\HttpFoundation\Request                   $request
+     * @param \App\Service\MenuService                                    $menuService
+     * @param \GraphicServiceBilling\Service\GraphicServiceBillingService $graphicServiceBillingService
      * @param $boundProjectId
      *
      * @return \Symfony\Component\HttpFoundation\Response

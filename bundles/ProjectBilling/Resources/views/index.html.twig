@@ -8,6 +8,10 @@
         <div class="col m-2">
             {{form_row(form.project)}}
         </div>
+        <div class="col m-2">
+            <label>{{ 'project_billing_form.include_project_name_in_header_label'|trans }}</label>
+            {{form_row(form.includeProjectNameInHeader)}}
+        </div>
     </div>
     <div class="row">
         <div class="col m-2">
@@ -19,8 +23,10 @@
     </div>
     <div class="row">
         <div class="col m-2">
-            {{form_row(form.supplier)}}
+            {{form_row(form.description)}}
         </div>
+    </div>
+    <div class="row">
         <div class="col m-2">
             {{form_row(form.psp)}}
         </div>
