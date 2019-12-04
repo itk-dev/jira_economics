@@ -20,6 +20,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Entity()
  * @ORM\Table(name="fos_user")
+ *
  * @UniqueEntity(fields={"email"})
  */
 class User extends BaseUser

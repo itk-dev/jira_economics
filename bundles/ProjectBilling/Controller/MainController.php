@@ -19,7 +19,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request;
@@ -62,6 +61,7 @@ class MainController extends AbstractController
         $toAccounts = $billingService->getToAccounts();
         $pspOptions = array_reduce($toAccounts, function ($carry, $account) {
             $carry[$account->name.' ('.$account->key.')'] = $account->key;
+
             return $carry;
         }, []);
 

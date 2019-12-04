@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping\Table;
 
 /**
  * @Table(name="expense_category")
+ *
  * @ORM\Entity(repositoryClass="Expense\Repository\ExpenseCategoryRepository")
  */
 class Category

@@ -45,14 +45,15 @@ class ProjectBillingService
     /**
      * Create export data for the given tasks.
      *
-     * @param array $tasks array of Jira tasks.
-     * @param int $supplier supplier number.
-     * @param string $psp PSP string.
-     * @param int $selectedProject Jira project ID.
-     * @param \DateTime $from Invoice from time.
-     * @param \DateTime $to Invoice to time.
-     * @param string $description
-     * @param bool $includeProjectNameInHeader
+     * @param array     $tasks                      array of Jira tasks
+     * @param int       $supplier                   supplier number
+     * @param string    $psp                        PSP string
+     * @param int       $selectedProject            jira project ID
+     * @param \DateTime $from                       invoice from time
+     * @param \DateTime $to                         invoice to time
+     * @param string    $description
+     * @param bool      $includeProjectNameInHeader
+     *
      * @return array
      */
     public function createExportData(array $tasks, int $supplier, string $psp, int $selectedProject, \DateTime $from, \DateTime $to, string $description, bool $includeProjectNameInHeader = false)
@@ -272,27 +273,27 @@ class ProjectBillingService
      *
      * @param array $entries Array of invoice entries of the form:
      *
-     *     (object) [
-     *       'header' => [
-     *         'debtor' => DEBTOR,
-     *         'salesChannel' => SALES_CHANNEL,
-     *         'internal' => true/false,
-     *         'contactName' => CONTACT_NAME,
-     *         'description' => DESCRIPTION,
-     *         'supplier' => SUPPLIER,
-     *         'ean' => EAN_FOR_EXTERNAL,
-     *       ],
-     *       'lines' => [
-     *         (object) [
-     *           'materialNumber' => MATERIAL_NUMBER',
-     *           'product' => PRODUCT,
-     *           'amount' => AMOUNT,
-     *           'price' => PRICE,
-     *           'psp' => 'PSP',
-     *         ],
-     *         ...
-     *       ],
-     *     ];
+     *                       (object) [
+     *                       'header' => [
+     *                       'debtor' => DEBTOR,
+     *                       'salesChannel' => SALES_CHANNEL,
+     *                       'internal' => true/false,
+     *                       'contactName' => CONTACT_NAME,
+     *                       'description' => DESCRIPTION,
+     *                       'supplier' => SUPPLIER,
+     *                       'ean' => EAN_FOR_EXTERNAL,
+     *                       ],
+     *                       'lines' => [
+     *                       (object) [
+     *                       'materialNumber' => MATERIAL_NUMBER',
+     *                       'product' => PRODUCT,
+     *                       'amount' => AMOUNT,
+     *                       'price' => PRICE,
+     *                       'psp' => 'PSP',
+     *                       ],
+     *                       ...
+     *                       ],
+     *                       ];
      *
      * @return \PhpOffice\PhpSpreadsheet\Spreadsheet
      *
