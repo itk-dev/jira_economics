@@ -18,7 +18,8 @@ class GraphicServiceBillingService
     private $boundProjectId;
     private $billingService;
     private $boundReceiverAccount;
-    private $boundReceiverPSP;
+    private $boundReceiverPSPExpenses;
+    private $boundReceiverPSPWorklogs;
     private $boundMaterialId;
     private $boundWorklogPricePerHour;
 
@@ -26,8 +27,10 @@ class GraphicServiceBillingService
      * GraphicServiceBillingService constructor.
      *
      * @param $boundProjectId
+     * @param \Billing\Service\BillingService $billingService
      * @param $boundReceiverAccount
-     * @param $boundReceiverPSP
+     * @param $boundReceiverPSPWorklogs
+     * @param $boundReceiverPSPExpenses
      * @param $boundMaterialId
      * @param $boundWorklogPricePerHour
      */
@@ -35,14 +38,16 @@ class GraphicServiceBillingService
         $boundProjectId,
         BillingService $billingService,
         $boundReceiverAccount,
-        $boundReceiverPSP,
+        $boundReceiverPSPWorklogs,
+        $boundReceiverPSPExpenses,
         $boundMaterialId,
         $boundWorklogPricePerHour
     ) {
         $this->boundProjectId = $boundProjectId;
         $this->billingService = $billingService;
         $this->boundReceiverAccount = $boundReceiverAccount;
-        $this->boundReceiverPSP = $boundReceiverPSP;
+        $this->boundReceiverPSPExpenses = $boundReceiverPSPExpenses;
+        $this->boundReceiverPSPWorklogs = $boundReceiverPSPWorklogs;
         $this->boundMaterialId = $boundMaterialId;
         $this->boundWorklogPricePerHour = $boundWorklogPricePerHour;
     }
@@ -121,7 +126,7 @@ class GraphicServiceBillingService
                     'product' => 'Design: '.$library,
                     'amount' => 1,
                     'price' => $worklogsSum * $this->boundWorklogPricePerHour,
-                    'psp' => $this->boundReceiverPSP,
+                    'psp' => $this->boundReceiverPSPWorklogs,
                 ];
             }
 
@@ -138,7 +143,7 @@ class GraphicServiceBillingService
                     'product' => 'Tryk: '.$library,
                     'amount' => 1,
                     'price' => $expensesSum,
-                    'psp' => $this->boundReceiverPSP,
+                    'psp' => $this->boundReceiverPSPExpenses,
                 ];
             }
 
@@ -217,7 +222,7 @@ class GraphicServiceBillingService
                     'product' => 'Design: '.$task->fields->summary,
                     'amount' => 1,
                     'price' => $worklogsSum * $this->boundWorklogPricePerHour,
-                    'psp' => $this->boundReceiverPSP,
+                    'psp' => $this->boundReceiverPSPWorklogs,
                 ];
             }
 
@@ -234,7 +239,7 @@ class GraphicServiceBillingService
                     'product' => 'Tryk: '.$task->fields->summary,
                     'amount' => 1,
                     'price' => $expensesSum,
-                    'psp' => $this->boundReceiverPSP,
+                    'psp' => $this->boundReceiverPSPExpenses,
                 ];
             }
 
