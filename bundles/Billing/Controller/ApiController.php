@@ -11,13 +11,14 @@
 namespace Billing\Controller;
 
 use App\Service\JiraService;
+use Billing\Exception\InvoiceException;
+use Billing\Service\BillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Billing\Service\BillingService;
 
 /**
  * Class ApiController.
@@ -219,7 +220,6 @@ class ApiController extends Controller
     /**
      * @Route("/project_worklogs/{projectId}", name="api_project_worklogs")
      *
-     * @param \Billing\Service\BillingService $billingService
      * @param $projectId
      *
      * @return mixed
@@ -232,24 +232,25 @@ class ApiController extends Controller
     /**
      * @Route("/record_invoice/{invoiceId}", name="api_record_invoice", methods={"PUT"})
      *
-     * @param \Billing\Service\BillingService $billingService
      * @param $invoiceId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
-     *
-     * @throws \Exception
      */
     public function recordInvoice(BillingService $billingService, $invoiceId)
     {
-        return new JsonResponse($billingService->recordInvoice($invoiceId));
+        try {
+            $invoice = $billingService->recordInvoice($invoiceId);
+
+            return new JsonResponse($invoice);
+        } catch (InvoiceException $e) {
+            return new JsonResponse(['message' => $e->getMessage()], $e->getCode());
+        }
     }
 
     /**
      * @Route("/export_invoices", name="api_export_invoices", methods={"GET"})
      *
-     * @param \Billing\Service\BillingService $billingService
-     *
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
@@ -268,16 +269,16 @@ class ApiController extends Controller
         $writer->setEnclosure('');
         $writer->setLineEnding("\r\n");
         $writer->setSheetIndex(0);
+
+        $writer->save('php://output');
+
+        $csvOutput = ob_get_clean();
+        $csvOutputEncoded = mb_convert_encoding($csvOutput, 'Windows-1252');
+
+        $response = new Response($csvOutputEncoded);
         $filename = 'invoices-'.date('d-m-Y').'.csv';
 
-        $contentType = 'text/csv';
-
-        $response = new StreamedResponse(
-            function () use ($writer) {
-                $writer->save('php://output');
-            }
-        );
-        $response->headers->set('Content-Type', $contentType);
+        $response->headers->set('Content-Type', 'text/csv');
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
         $response->headers->set('Cache-Control', 'max-age=0');
 
@@ -317,8 +318,6 @@ class ApiController extends Controller
     /**
      * @Route("/project_expenses/{projectId}", name="api_expenses_for_project")
      *
-     * @param \Billing\Service\BillingService $billingService
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function getExpensesForProject(BillingService $billingService, $projectId)
@@ -328,9 +327,6 @@ class ApiController extends Controller
 
     /**
      * @Route("/account/project/{projectId}", name="get_accounts_by_project_id")
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \Billing\Service\BillingService           $billingService
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */

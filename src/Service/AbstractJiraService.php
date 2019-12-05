@@ -10,8 +10,8 @@
 
 namespace App\Service;
 
-use Expense\Entity\Category as ExpenseCategory;
 use Expense\Entity\Category;
+use Expense\Entity\Category as ExpenseCategory;
 use GuzzleHttp\Exception\RequestException;
 
 abstract class AbstractJiraService
@@ -392,18 +392,6 @@ abstract class AbstractJiraService
     }
 
     /**
-     * Get current user.
-     *
-     * @return mixed
-     */
-    public function getCurrentUser()
-    {
-        $result = $this->get('/rest/api/2/myself');
-
-        return $result;
-    }
-
-    /**
      * Get users from search.
      *
      * @return mixed
@@ -443,9 +431,6 @@ abstract class AbstractJiraService
 
     /**
      * @see https://docs.atlassian.com/software/jira/docs/api/REST/8.3.1/?_ga=2.202569298.2139473575.1564917078-393255252.1550779361#api/2/issue-getIssuePickerResource
-     *
-     * @param string $project
-     * @param string $query
      *
      * @return mixed
      */

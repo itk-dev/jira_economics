@@ -18,14 +18,14 @@ use GraphicServiceOrder\Entity\GsOrder;
 use GraphicServiceOrder\Message\OwnCloudShareMessage;
 use GraphicServiceOrder\Repository\GsOrderRepository;
 use ItkDev\UserManagementBundle\Doctrine\UserManager;
+use Swift_Mailer;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Swift_Mailer;
-use Twig\Environment;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class OrderService
 {
@@ -63,21 +63,7 @@ class OrderService
     /**
      * OrderService constructor.
      *
-     * @param \Doctrine\ORM\EntityManagerInterface                                                $entityManager
-     * @param \App\Service\HammerService                                                          $hammerService
-     * @param \App\Service\OwnCloudService                                                        $ownCloudService
-     * @param \GraphicServiceOrder\Repository\GsOrderRepository                                   $gsOrderRepository
-     * @param \Symfony\Component\HttpKernel\KernelInterface                                       $appKernel
-     * @param \Symfony\Component\Messenger\MessageBusInterface                                    $messageBus
-     * @param string                                                                              $ownCloudFilesFolder
-     * @param \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage
-     * @param \GraphicServiceOrder\Service\FileUploader                                           $fileUploader
-     * @param \ItkDev\UserManagementBundle\Doctrine\UserManager                                   $userManager
-     * @param \Swift_Mailer                                                                       $swiftMailer
-     * @param \Twig\Environment                                                                   $twig
-     * @param \Symfony\Contracts\Translation\TranslatorInterface                                  $translator
-     * @param array                                                                               $gsOrderConfiguration
-     * @param \Symfony\Component\Routing\Generator\UrlGeneratorInterface                          $router
+     * @param \GraphicServiceOrder\Service\FileUploader $fileUploader
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -128,6 +114,7 @@ class OrderService
             if (false === $dontUseDefaults) {
                 $gsOrder
                     ->setFullName($user->getFullName())
+                    ->setPhone($user->getPhone())
                     ->setAddress($user->getAddress())
                     ->setDepartment($user->getDepartment())
                     ->setPostalcode($user->getPostalCode())
@@ -180,6 +167,18 @@ class OrderService
     }
 
     /**
+     * Get all libraries defined in jira_economics.local.yaml.
+     *
+     * @return mixed
+     */
+    public function getLibraries()
+    {
+        $libraries = $this->params->get('gs_libraries');
+
+        return $libraries;
+    }
+
+    /**
      * Update active user with submitted values.
      *
      * @param $gsOrder
@@ -193,6 +192,7 @@ class OrderService
             $user
                 ->setFullName($gsOrder->getFullName())
                 ->setDepartment($gsOrder->getDepartment())
+                ->setPhone($gsOrder->getPhone())
                 ->setAddress($gsOrder->getAddress())
                 ->setPostalCode($gsOrder->getPostalcode())
                 ->setCity($gsOrder->getCity());
@@ -210,7 +210,6 @@ class OrderService
     }
 
     /**
-     * @param \GraphicServiceOrder\Entity\GsOrder $gsOrder
      * @param $form
      *
      * @throws \Twig\Error\LoaderError
@@ -248,8 +247,6 @@ class OrderService
 
     /**
      * Handle file transfer to OwnCloud.
-     *
-     * @param \GraphicServiceOrder\Entity\GsOrder $order
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
@@ -298,8 +295,6 @@ class OrderService
     /**
      * Create a Jira task from a form submission.
      *
-     * @param \GraphicServiceOrder\Entity\GsOrder $gsOrder
-     *
      * @return mixed
      */
     private function createOrderTask(GsOrder $gsOrder)
@@ -338,6 +333,12 @@ class OrderService
                 $this->hammerService->getCustomFieldId('Debitor') => (string) $gsOrder->getDebitor(),
                 $this->hammerService->getCustomFieldId('Marketing Account') => $gsOrder->getMarketingAccount() ? [0 => ['value' => 'Markedsføringskonto']] : null,
                 $this->hammerService->getCustomFieldId('Delivery Note URL') => $this->router->generate('graphic_service_order_delivery_note', ['id' => $gsOrder->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
+                $this->hammerService->getCustomFieldId('Debitor') => (string) $gsOrder->getDebitor(),
+                $this->hammerService->getCustomFieldId('Phone number') => (string) $gsOrder->getPhone(),
+                $this->hammerService->getCustomFieldId('Department') => (string) $gsOrder->getDepartment(),
+                $this->hammerService->getCustomFieldId('Delivery date') => $gsOrder->getDate()->format('Y-m-d'),
+                $this->hammerService->getCustomFieldId('Order lines') => $this->getOrderLinesAsText($gsOrder),
+                $this->hammerService->getCustomFieldId('Library') => $gsOrder->getLibrary(),
             ],
         ];
 
@@ -389,6 +390,21 @@ class OrderService
     }
 
     /**
+     * Crete orderlines as text.
+     *
+     * @return string
+     */
+    private function getOrderLinesAsText(GsOrder $orderData)
+    {
+        $orderLines = '';
+        foreach ($orderData->getOrderLines() as $order) {
+            $orderLines .= $order['amount'].' '.$order['type'].'\\\\ ';
+        }
+
+        return $orderLines;
+    }
+
+    /**
      * Create description for task.
      *
      * @param $orderData
@@ -399,21 +415,10 @@ class OrderService
     {
         // Create task description.
         $description = '*Opgavebeskrivelse* \\\\ ';
-        foreach ($orderData->getOrderLines() as $order) {
-            $description .= '- '.$order['amount'].' '.$order['type'].'\\\\ ';
-        }
         $description .= $orderData->getDescription().'\\\\ ';
         $description .= ' \\\\ ';
         $description .= '[Åbn filer i OwnCloud|'.$this->ownCloudFilesFolder.'] \\\\ ';
-        $description .= ' \\\\ ';
 
-        // Create payment description.
-        $description .= '*Hvem skal betale?* \\\\ ';
-        if ($orderData->getMarketingAccount()) {
-            $description .= 'Borgerservice og bibliotekers markedsføringskonto. \\\\ ';
-        } else {
-            $description .= 'Debitor. \\\\ ';
-        }
         $description .= ' \\\\ ';
 
         // Create delivery description.
@@ -421,7 +426,6 @@ class OrderService
         $description .= $orderData->getDepartment().' \\\\ ';
         $description .= $orderData->getAddress().'\\\\ ';
         $description .= $orderData->getPostalcode().' '.$orderData->getCity().'\\\\ ';
-        $description .= 'Leveringsdato: '.$orderData->getDate()->format('d-m-Y').'\\\\ ';
         $description .= ' \\\\ ';
         $description .= $orderData->getDeliveryDescription();
 

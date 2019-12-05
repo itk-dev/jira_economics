@@ -13,12 +13,14 @@ namespace GraphicServiceBilling\Controller;
 use App\Service\MenuService;
 use GraphicServiceBilling\Service\GraphicServiceBillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -44,7 +46,11 @@ class MainController extends AbstractController
     public function index(Request $request, MenuService $menuService, GraphicServiceBillingService $graphicServiceBillingService, $boundProjectId)
     {
         $startDayOfWeek = (new \DateTime('this week'))->setTime(0, 0);
-        $endDayOfWeek = (new \DateTime($startDayOfWeek->format('c')))->add(new \DateInterval('P6D'));
+        try {
+            $endDayOfWeek = (new \DateTime($startDayOfWeek->format('c')))->add(new \DateInterval('P6D'));
+        } catch (\Exception $e) {
+            throw new HttpException(400, 'Invalid endDayOfWeek.');
+        }
 
         $formBuilder = $this->createFormBuilder();
         $formBuilder->add('from', DateType::class, [
@@ -92,25 +98,29 @@ class MainController extends AbstractController
             $marketing = $form->get('marketing')->getData();
 
             $tasks = $graphicServiceBillingService->getAllNonBilledFinishedTasks($boundProjectId, $from, $to, $marketing);
-            $entries = $graphicServiceBillingService->createExportData($tasks);
+
+            if ($marketing) {
+                $entries = $graphicServiceBillingService->createExportDataMarketing($tasks);
+            } else {
+                $entries = $graphicServiceBillingService->createExportDataNotMarketing($tasks);
+            }
             $spreadsheet = $graphicServiceBillingService->exportTasksToSpreadsheet($entries);
 
             if ($download) {
-                $writer = IOFactory::createWriter($spreadsheet, 'Csv');
+                $writer = new Csv($spreadsheet);
                 $writer->setDelimiter(';');
                 $writer->setEnclosure('');
                 $writer->setLineEnding("\r\n");
                 $writer->setSheetIndex(0);
                 $filename = 'faktura'.date('d-m-Y').($marketing ? '-marketing' : '-not_marketing').'-from'.$from->format('d-m-Y').'-to'.$to->format('d-m-Y').'.csv';
 
-                $contentType = 'text/csv';
+                $writer->save('php://output');
 
-                $response = new StreamedResponse(
-                    function () use ($writer) {
-                        $writer->save('php://output');
-                    }
-                );
-                $response->headers->set('Content-Type', $contentType);
+                $csvOutput = ob_get_clean();
+                $csvOutputEncoded = mb_convert_encoding($csvOutput, 'Windows-1252');
+
+                $response = new Response($csvOutputEncoded);
+                $response->headers->set('Content-Type', 'text/csv');
                 $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
                 $response->headers->set('Cache-Control', 'max-age=0');
 
@@ -133,6 +143,7 @@ class MainController extends AbstractController
                 $preview = new \DOMDocument();
                 $d->loadHTML($html);
                 $body = $d->getElementsByTagName('body')->item(0);
+                /* @var \DOMNode $child */
                 foreach ($body->childNodes as $child) {
                     if ('style' === $child->tagName) {
                         continue;

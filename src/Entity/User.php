@@ -20,6 +20,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Entity()
  * @ORM\Table(name="fos_user")
+ *
  * @UniqueEntity(fields={"email"})
  */
 class User extends BaseUser
@@ -45,6 +46,11 @@ class User extends BaseUser
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $department;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $phone;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -116,6 +122,18 @@ class User extends BaseUser
     public function setDepartment(?string $department): self
     {
         $this->department = $department;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
 
         return $this;
     }

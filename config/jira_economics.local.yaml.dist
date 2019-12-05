@@ -9,6 +9,11 @@ parameters:
         'Faktureret': ~
         'Marketing Account': ~
         'Delivery Note URL': ~
+        'Phone number': ~
+        'Department': ~
+        'Delivery date': ~
+        'Order lines': ~
+        'Library': ~
 
     billing_receiver_account: ~
     billing_material_numbers: ~
@@ -18,7 +23,8 @@ parameters:
 
     gs_billing_material_id: ~
     gs_billing_project_id: ~
-    gs_billing_receiver_psp: ~
+    gs_billing_receiver_psp_expenses: ~
+    gs_billing_receiver_psp_worklogs: ~
     gs_billing_receiver_account: ~
     gs_billing_worklog_hour_price: ~
 
@@ -27,3 +33,9 @@ parameters:
         form_file_gs_upload_size: '%env(resolve:FORM_FILE_GS_UPLOAD_SIZE)%'
         gs_order_project_id: '%env(resolve:GS_ORDER_PROJECT_ID)%'
         gs_order_issuetype_id: '%env(resolve:GS_ORDER_ISSUETYPE_ID)%'
+        libraries: ~
+
+    project_billing_external_material_id: ~
+    project_billing_internal_material_id: ~
+    project_billing_default_text: ~
+    project_billing_supplier: ~

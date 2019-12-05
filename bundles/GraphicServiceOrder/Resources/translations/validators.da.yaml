@@ -9,3 +9,6 @@ service_order_form:
     postal_code:
       constraint:
         not_null: Angiv et gyldigt postnummer
+  order_line:
+    constraint:
+      pattern: Angiv et helt tal

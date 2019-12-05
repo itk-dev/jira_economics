@@ -4,9 +4,14 @@ parameters:
     billing_material_numbers: ~
     gs_billing_project_id: ~
     gs_billing_material_id: ~
-    gs_billing_receiver_psp: ~
+    gs_billing_receiver_psp_expenses: ~
+    gs_billing_receiver_psp_worklogs: ~
     gs_billing_receiver_account: ~
     gs_billing_worklog_hour_price: ~
+    project_billing_internal_material_id: ~
+    project_billing_external_material_id: ~
+    project_billing_default_text: ~
+    project_billing_supplier: ~
     portal:
         menu:
             grafisk_service:
@@ -89,6 +94,12 @@ parameters:
                 icon: 'fa-file-export'
                 routeName: 'graphic_service_billing_index'
 
+            project_billing:
+                title: 'Projekt fakturering'
+                desc: 'Lav fakturaer for et projekt ud fra Accounts på de enkelte issues'
+                icon: 'fa-file-invoice-dollar'
+                routeName: 'project_billing_index'
+
             portal:
                 title: 'Portal'
                 desc: 'Portal'
@@ -137,6 +148,13 @@ parameters:
                 desc: 'Lav udtræk af grafiske opgaver'
                 icon: 'fa-file-export'
                 routeName: 'graphic_service_billing_index'
+                btnTxt: 'Lav udtræk'
+
+            project_billing:
+                title: 'Projekt fakturering'
+                desc: 'Lav fakturaer for et projekt ud fra Accounts på de enkelte issues'
+                icon: 'fa-file-invoice-dollar'
+                routeName: 'project_billing_index'
                 btnTxt: 'Lav udtræk'
 
     gsorder_bundle:

@@ -21,7 +21,6 @@ class IndexController extends AbstractController
     /**
      * @Route("/show_export_invoice/{invoiceId}", name="api_show_export_invoice", methods={"GET"})
      *
-     * @param \Billing\Service\BillingService $billingService
      * @param $invoiceId
      *
      * @return \Symfony\Component\HttpFoundation\Response
