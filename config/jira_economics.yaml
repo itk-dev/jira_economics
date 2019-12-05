@@ -4,7 +4,8 @@ parameters:
     billing_material_numbers: ~
     gs_billing_project_id: ~
     gs_billing_material_id: ~
-    gs_billing_receiver_psp: ~
+    gs_billing_receiver_psp_expenses: ~
+    gs_billing_receiver_psp_worklogs: ~
     gs_billing_receiver_account: ~
     gs_billing_worklog_hour_price: ~
     project_billing_internal_material_id: ~
