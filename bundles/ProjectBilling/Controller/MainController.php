@@ -121,17 +121,18 @@ class MainController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $download = $form->get('download')->isClicked();
 
-            $from = $form->get('from')->getData();
+            $selectedFrom = $form->get('from')->getData();
             // Add one day, since all of $to day should be included.
-            $to = $form->get('to')->getData()->add(new \DateInterval('P1D'));
+            $selectedTo = $form->get('to')->getData();
+            $to = (clone $selectedTo)->add(new \DateInterval('P1D'));
 
             $selectedProject = $form->get('project')->getData();
             $selectedPSP = $form->get('psp')->getData();
             $description = $form->get('description')->getData();
             $includeProjectNameInHeader = $form->get('includeProjectNameInHeader')->getData();
 
-            $tasks = $projectBillingService->getAllNonBilledFinishedTasks((int) $selectedProject, $from, $to);
-            $entries = $projectBillingService->createExportData($tasks, $boundSupplier, $selectedPSP, $selectedProject, $from, $to, $description, $includeProjectNameInHeader);
+            $tasks = $projectBillingService->getAllNonBilledFinishedTasks((int) $selectedProject, $selectedFrom, $to);
+            $entries = $projectBillingService->createExportData($tasks, $boundSupplier, $selectedPSP, $selectedProject, $selectedFrom, $selectedTo, $description, $includeProjectNameInHeader);
 
             $spreadsheet = $projectBillingService->exportTasksToSpreadsheet($entries);
 
@@ -141,7 +142,7 @@ class MainController extends AbstractController
                 $writer->setEnclosure('');
                 $writer->setLineEnding("\r\n");
                 $writer->setSheetIndex(0);
-                $filename = 'faktura'.date('d-m-Y').'-from'.$from->format('d-m-Y').'-to'.$to->format('d-m-Y').'.csv';
+                $filename = 'faktura'.date('d-m-Y').'-from'.$selectedFrom->format('d-m-Y').'-to'.$selectedTo->format('d-m-Y').'.csv';
 
                 ob_start();
                 $writer->save('php://output');
