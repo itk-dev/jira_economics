@@ -824,7 +824,7 @@ class BillingService extends JiraService
                 $account = $invoiceEntry->getAccount();
 
                 // Ignore lines that have missing data.
-                if (!$materialNumber || !$product || !$amount || !$price || $account) {
+                if (!$materialNumber || !$product || !$amount || !$price || !$account) {
                     continue;
                 }
 
