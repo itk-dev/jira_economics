@@ -79,7 +79,7 @@ const WorklogSelect = (props) => {
             }
         }
 
-        let worklogUpdatedTimestamp = (new Date(item.dateUpdated)).getTime();
+        let worklogUpdatedTimestamp = (new Date(item.started)).getTime();
 
         if (filterValues.startDateFilter !== null && filterValues.startDateFilter !== '') {
             let startFilterTimestamp = filterValues.startDateFilter.getTime();
@@ -96,7 +96,7 @@ const WorklogSelect = (props) => {
 
             let endFilterTimestamp = endDate.getTime();
 
-            if (endFilterTimestamp < worklogUpdatedTimestamp) {
+            if (endFilterTimestamp <= worklogUpdatedTimestamp) {
                 return false;
             }
         }
@@ -164,7 +164,7 @@ const WorklogSelect = (props) => {
                             worker: worklog.worker,
                             billed: worklog.billed ? t('invoice_entry.billed_text') : '',
                             timeSpent: worklog.timeSpent,
-                            dateUpdated: worklog.dateUpdated,
+                            started: worklog.started,
                             addedToOtherInvoice: worklog.hasOwnProperty('addedToInvoiceEntryId') && worklog.addedToInvoiceEntryId !== props.invoiceEntryId
                         };
                     })}

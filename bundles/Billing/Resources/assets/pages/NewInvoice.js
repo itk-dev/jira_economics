@@ -168,7 +168,7 @@ class NewInvoice extends Component {
                         {!this.props.accounts.loading && this.props.accounts.hasOwnProperty('data') &&
                             <Form.Group>
                                 <Form.Label>{t('new_invoice.form.name')}</Form.Label>
-                                <Form.Control ref={this.textInput} type="text" placeholder={t('new_invoice.form.name_placeholder')}>
+                                <Form.Control ref={this.textInput} type="text" placeholder={t('new_invoice.form.name_placeholder')} required={true}>
                                 </Form.Control>
                                 <Form.Label>{t('new_invoice.select_customer_account')}</Form.Label>
                                 <Select

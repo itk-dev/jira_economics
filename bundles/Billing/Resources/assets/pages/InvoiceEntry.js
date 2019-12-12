@@ -42,7 +42,6 @@ export class InvoiceEntry extends Component {
             amount: null,
             price: null,
             product: null,
-            description: null,
             materialNumber: null,
 
             // UI state:
@@ -126,7 +125,6 @@ export class InvoiceEntry extends Component {
         if (this.state.invoice.hasOwnProperty('account') && this.state.invoiceEntry.hasOwnProperty('product')) {
             this.setState({
                 amount: this.state.invoiceEntry.amount ? this.state.invoiceEntry.amount : 0,
-                description: this.state.invoiceEntry.description ? this.state.invoiceEntry.description : '',
                 price: this.state.invoiceEntry.price
                     ? this.state.invoiceEntry.price
                     : (this.state.invoice.account ? this.state.invoice.account.defaultPrice : 0),
@@ -160,7 +158,6 @@ export class InvoiceEntry extends Component {
         const invoiceId = this.state.invoice.id;
 
         let account = this.state.selectedToAccount;
-        let description = this.state.description;
         let product = this.state.product;
         let price = parseFloat(this.state.price);
         let amount = this.state.amount;
@@ -182,7 +179,6 @@ export class InvoiceEntry extends Component {
         let entryData = {
             id,
             invoiceId,
-            description,
             account,
             product,
             price,
@@ -411,26 +407,16 @@ export class InvoiceEntry extends Component {
                                 id={'product'}
                                 name={'product'}
                                 className="form-control"
+                                maxLength={40}
                                 aria-describedby="enterVarenr"
                                 onChange={this.handleChange}
                                 required={true}
                                 value={ this.state.product }
                                 placeholder={t('invoice_entry.form.product_placeholder')}>
                             </input>
-                            <label htmlFor="description">
-                                {t('invoice_entry.form.description')}
-                            </label>
-                            <input
-                                type="text"
-                                id={'description'}
-                                name={'description'}
-                                className="form-control"
-                                aria-describedby="enterBeskrivelse"
-                                onChange={this.handleChange}
-                                required={true}
-                                value={ this.state.description }
-                                placeholder={t('invoice_entry.form.description_placeholder')}>
-                            </input>
+                            <small className="form-text text-muted mb-3">
+                                {t('invoice_entry.form.helptext.product')}
+                            </small>
                             <label htmlFor="amount">
                                 {t('invoice_entry.form.amount')}
                             </label>

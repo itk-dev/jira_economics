@@ -676,6 +676,10 @@ class BillingService extends JiraService
             }
 
             foreach ($invoiceEntry->getWorklogs() as $worklog) {
+                // @TODO: Record billed in Jira. Find a better way than below,
+                // since this can involve multiple calls to Jira, if there
+                // are many worklogs.
+                /*
                 $this->put('/rest/tempo-timesheets/4/worklogs/'.$worklog->getWorklogId(), [
                     'attributes' => [
                         '_Billed_' => [
@@ -683,6 +687,7 @@ class BillingService extends JiraService
                         ],
                     ],
                 ]);
+                */
 
                 $worklog->setIsBilled(true);
             }
@@ -834,7 +839,7 @@ class BillingService extends JiraService
                 // B. "Materiale (vare)nr.
                 $sheet->setCellValueByColumnAndRow(2, $row, str_pad($materialNumber, 18, '0', STR_PAD_LEFT));
                 // C. "Beskrivelse"
-                $sheet->setCellValueByColumnAndRow(3, $row, $product);
+                $sheet->setCellValueByColumnAndRow(3, $row, substr($product, 0, 40));
                 // D. "Ordremængde"
                 $sheet->setCellValueByColumnAndRow(4, $row, number_format($amount, 3, ',', ''));
                 // E. "Beløb pr. enhed"
