@@ -676,6 +676,10 @@ class BillingService extends JiraService
             }
 
             foreach ($invoiceEntry->getWorklogs() as $worklog) {
+                // @TODO: Record billed in Jira. Find a better way than below,
+                // since this can involve multiple calls to Jira, if there
+                // are many worklogs.
+                /*
                 $this->put('/rest/tempo-timesheets/4/worklogs/'.$worklog->getWorklogId(), [
                     'attributes' => [
                         '_Billed_' => [
@@ -683,6 +687,7 @@ class BillingService extends JiraService
                         ],
                     ],
                 ]);
+                */
 
                 $worklog->setIsBilled(true);
             }
