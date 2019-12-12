@@ -129,6 +129,7 @@ const resources = {
             'invoice_entry.table.select_all': 'Vælg alle',
             'invoice_entry.table.deselect_all': 'Fravælg alle',
             'invoice_entry.form.helptext.product': 'Max 40 tegn.',
+            'invoice_entry.table.worklog_started': 'Dato',
             'invoice.form.type': 'Type',
             'invoice.form.types.manual': '',
             'invoice.form.types.expense': 'Udgift',
