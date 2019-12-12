@@ -46,7 +46,7 @@ const WorklogSelectTable = (props) => {
                     <th>{t('invoice_entry.table.version')}</th>
                     <th>{t('invoice_entry.table.user')}</th>
                     <th>{t('invoice_entry.table.hours_spent')}</th>
-                    <th>{t('invoice_entry.table.updated')}</th>
+                    <th>{t('invoice_entry.table.worklog_started')}</th>
                 </tr>
             </thead>
             <tbody>
@@ -72,7 +72,7 @@ const WorklogSelectTable = (props) => {
                             <td>{worklog.worker}</td>
                             <td>{worklog.timeSpent}</td>
                             <td>
-                                <Moment format="DD-MM-YYYY">{worklog.dateUpdated}</Moment>
+                                <Moment format="DD-MM-YYYY">{worklog.started}</Moment>
                             </td>
                         </tr>
                     ))
