@@ -258,7 +258,7 @@ class ProjectBillingService
             $account = $accounts[$issue->fields->{$accountFieldId}->id];
 
             // Ignore issue if the account is not INTERN or EKSTERN.
-            if (!in_array($account->category->name, ['INTERN', 'EKSTERN'])) {
+            if (!\in_array($account->category->name, ['INTERN', 'EKSTERN'])) {
                 continue;
             }
 
