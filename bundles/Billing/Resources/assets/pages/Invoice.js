@@ -440,7 +440,6 @@ class Invoice extends Component {
                                             <th>{t('invoice.table.account')}</th>
                                             <th>{t('invoice.table.material_number')}</th>
                                             <th>{t('invoice.table.product')}</th>
-                                            <th>{t('invoice.table.description')}</th>
                                             <th>{t('invoice.table.amount')}</th>
                                             <th>{t('invoice.table.price')}</th>
                                             <th>{t('invoice.table.total_price')}</th>
@@ -454,7 +453,6 @@ class Invoice extends Component {
                                                 <td>{item.account}</td>
                                                 <td>{item.materialNumber}</td>
                                                 <td>{item.product}</td>
-                                                <td>{item.description}</td>
                                                 <td>{item.amount}</td>
                                                 <td>{item.price}</td>
                                                 <td>{item.amount * item.price}</td>
