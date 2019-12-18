@@ -13,9 +13,13 @@ namespace Billing\Controller;
 use App\Service\MenuService;
 use Billing\Service\BillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * @IsGranted("JIRA_APP:gs_billing")
+ */
 class IndexController extends AbstractController
 {
     /**

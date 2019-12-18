@@ -121,4 +121,11 @@ class AppService
 
         return $this->session->get($cacheKey);
     }
+
+    public function checkAccessToApp(OAuthUser $user, string $app)
+    {
+        $apps = $this->getJiraApps($user);
+
+        return \array_key_exists($app, $apps);
+    }
 }
