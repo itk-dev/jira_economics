@@ -16,7 +16,7 @@ parameters:
         'Library': ~
 
     billing_receiver_account: ~
-    billing_material_numbers: ~
+    billing_material_numbers:
         'Interne': ~
         'Eksterne m/moms': ~
         'Eksterne u/moms': ~
