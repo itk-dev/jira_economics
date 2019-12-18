@@ -24,7 +24,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Class ApiController.
  *
- * @IsGranted("JIRA_APP:gs_billing")
+ * @IsGranted("JIRA_APP:billing")
  *
  * @Route("/jira_api")
  */

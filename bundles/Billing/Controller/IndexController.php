@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @IsGranted("JIRA_APP:gs_billing")
+ * @IsGranted("JIRA_APP:billing")
  */
 class IndexController extends AbstractController
 {
