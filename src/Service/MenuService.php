@@ -71,7 +71,11 @@ class MenuService
         }
         $apps = $this->appService->getApps();
         $items = array_filter($items, static function ($app) use ($apps) {
-            return \in_array($app, ['jira', 'portal'], true)
+            return
+                // Some menu items are not apps and are access controlled by
+                // roles.
+                \in_array($app, ['admin', 'jira', 'portal'], true)
+                // Check access to app.
                 || \array_key_exists($app, $apps);
         }, ARRAY_FILTER_USE_KEY);
 
