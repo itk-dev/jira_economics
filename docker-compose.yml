@@ -39,9 +39,8 @@ services:
       - mariadb
     volumes:
       - .:/app:delegated
-    tmpfs:
-      - /app/var:size=1G
-      - /tmp:size=1G
+      - vendor-cache:/app/vendor
+      - $PWD/vendor:/app-vendor
 
   nginx:
     image: nginx:latest
@@ -90,3 +89,6 @@ services:
       - app
     volumes:
       - .:/app:delegated
+
+volumes:
+  vendor-cache:

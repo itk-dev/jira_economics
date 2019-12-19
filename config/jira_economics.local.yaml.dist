@@ -16,7 +16,7 @@ parameters:
         'Library': ~
 
     billing_receiver_account: ~
-    billing_material_numbers: ~
+    billing_material_numbers:
         'Interne': ~
         'Eksterne m/moms': ~
         'Eksterne u/moms': ~
@@ -39,3 +39,13 @@ parameters:
     project_billing_internal_material_id: ~
     project_billing_default_text: ~
     project_billing_supplier: ~
+
+    jira_app_groups:
+        # App name: Jira group names (single name or list of names)
+        planning: 'Portal app - planning'
+        newProject: ['Portal app - new project']
+        invoice: ['Portal app - invoice', 'Portal app - economy']
+        expense: ~
+        sprint_report: ~
+        gs_billing: ~
+        project_billing: ~

@@ -106,9 +106,9 @@ class JiraService extends AbstractJiraService
      *
      * @return mixed
      */
-    public function getCurrentUser()
+    public function getCurrentUser(array $query = [])
     {
-        $result = $this->get('/rest/api/2/myself');
+        $result = $this->get('/rest/api/2/myself', $query);
 
         return $result;
     }

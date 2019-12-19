@@ -25,6 +25,9 @@ class MenuService
     /** @var \App\Service\ContextService */
     protected $contextService;
 
+    /** @var \App\Service\AppService */
+    protected $appService;
+
     /** @var \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface */
     protected $parameters;
 
@@ -35,11 +38,13 @@ class MenuService
         RequestStack $requestStack,
         RouterInterface $router,
         ContextService $contextService,
+        AppService $appService,
         ParameterBagInterface $parameters
     ) {
         $this->requestStack = $requestStack;
         $this->router = $router;
         $this->contextService = $contextService;
+        $this->appService = $appService;
         $this->parameters = $parameters;
     }
 
@@ -64,6 +69,15 @@ class MenuService
         foreach ($items as &$item) {
             $item['active'] = $this->contextService->isActiveRoute($item['routeName']);
         }
+        $apps = $this->appService->getApps();
+        $items = array_filter($items, static function ($app) use ($apps) {
+            return
+                // Some menu items are not apps and are access controlled by
+                // roles.
+                \in_array($app, ['admin', 'jira', 'portal'], true)
+                // Check access to app.
+                || \array_key_exists($app, $apps);
+        }, ARRAY_FILTER_USE_KEY);
 
         return $items;
     }
