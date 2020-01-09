@@ -68,7 +68,7 @@ parameters:
                 routeName: 'create_project_form'
                 # active: $this->routeStartsWith('create_project_form' $pathInfo)
 
-            invoice:
+            billing:
                 title: 'Faktura'
                 desc: 'Opret og rediger fakturaer baseret på tasks i Jira'
                 icon: 'fa-file-invoice'
@@ -122,7 +122,7 @@ parameters:
                 routeName: 'create_project_form'
                 btnTxt: 'Opret Nyt projekt'
 
-            invoice:
+            billing:
                 title: 'Faktura'
                 desc: 'Opret og rediger fakturaer baseret på tasks i Jira'
                 icon: 'fa-file-invoice'

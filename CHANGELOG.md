@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## in develop
+
+* Fixed billing app naming.
+
 ## 1.4.0
 
 * Added permissions checks to Jira apps.
