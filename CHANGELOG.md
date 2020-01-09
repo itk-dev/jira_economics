@@ -2,6 +2,7 @@
 
 ## in develop
 
+* Upgraded to Symfony 4.4.*.
 * Fixed billing app naming.
 
 ## 1.4.0
