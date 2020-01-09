@@ -11,8 +11,8 @@
 namespace Expense\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Expense\Entity\Category;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * @method Category|null find($id, $lockMode = null, $lockVersion = null)
@@ -22,7 +22,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class ExpenseCategoryRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Category::class);
     }
