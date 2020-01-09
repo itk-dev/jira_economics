@@ -11,8 +11,8 @@
 namespace GraphicServiceOrder\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use GraphicServiceOrder\Entity\Debtor;
 use Doctrine\Persistence\ManagerRegistry;
+use GraphicServiceOrder\Entity\Debtor;
 
 /**
  * @method Debtor|null find($id, $lockMode = null, $lockVersion = null)

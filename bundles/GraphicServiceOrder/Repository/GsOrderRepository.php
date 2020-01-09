@@ -11,8 +11,8 @@
 namespace GraphicServiceOrder\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use GraphicServiceOrder\Entity\GsOrder;
 use Doctrine\Persistence\ManagerRegistry;
+use GraphicServiceOrder\Entity\GsOrder;
 
 /**
  * @method GsOrder|null find($id, $lockMode = null, $lockVersion = null)

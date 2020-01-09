@@ -11,8 +11,8 @@
 namespace Expense\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Expense\Entity\Category;
 use Doctrine\Persistence\ManagerRegistry;
+use Expense\Entity\Category;
 
 /**
  * @method Category|null find($id, $lockMode = null, $lockVersion = null)
