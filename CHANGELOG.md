@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## in develop
+
+* Changed spreadsheet export to use temporary files.
+
 ## 1.5.0
 
 * Upgraded to Symfony 4.4.*.
