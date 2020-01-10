@@ -38,6 +38,14 @@ class MainController extends AbstractController
     /**
      * @Route("", name="index")
      *
+     * @param \Symfony\Component\HttpKernel\KernelInterface $kernel
+     * @param \Symfony\Component\HttpFoundation\Request     $request
+     * @param \App\Service\MenuService                      $menuService
+     * @param \ProjectBilling\Service\ProjectBillingService $projectBillingService
+     * @param \Billing\Service\BillingService               $billingService
+     * @param $boundDescription
+     * @param $boundSupplier
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception

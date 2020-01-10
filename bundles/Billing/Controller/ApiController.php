@@ -256,8 +256,9 @@ class ApiController extends Controller
      * @Route("/export_invoices", name="api_export_invoices", methods={"GET"})
      *
      * @param \Symfony\Component\HttpKernel\KernelInterface $kernel
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \Billing\Service\BillingService $billingService
+     * @param \Symfony\Component\HttpFoundation\Request     $request
+     * @param \Billing\Service\BillingService               $billingService
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
