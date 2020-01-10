@@ -11,12 +11,12 @@
 namespace ProjectBilling\Controller;
 
 use App\Service\MenuService;
+use App\Service\PhpSpreadsheetExportService;
 use Billing\Service\BillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use ProjectBilling\Service\ProjectBillingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -25,7 +25,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -38,7 +37,7 @@ class MainController extends AbstractController
     /**
      * @Route("", name="index")
      *
-     * @param \Symfony\Component\HttpKernel\KernelInterface $kernel
+     * @param \App\Service\PhpSpreadsheetExportService      $phpSpreadsheetExportService
      * @param \Symfony\Component\HttpFoundation\Request     $request
      * @param \App\Service\MenuService                      $menuService
      * @param \ProjectBilling\Service\ProjectBillingService $projectBillingService
@@ -51,7 +50,7 @@ class MainController extends AbstractController
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function index(KernelInterface $kernel, Request $request, MenuService $menuService, ProjectBillingService $projectBillingService, BillingService $billingService, $boundDescription, $boundSupplier)
+    public function index(PhpSpreadsheetExportService $phpSpreadsheetExportService, Request $request, MenuService $menuService, ProjectBillingService $projectBillingService, BillingService $billingService, $boundDescription, $boundSupplier)
     {
         $startDayOfWeek = (new \DateTime('this week'))->setTime(0, 0);
         try {
@@ -154,18 +153,8 @@ class MainController extends AbstractController
                 $writer->setSheetIndex(0);
                 $filename = 'faktura'.date('d-m-Y').'-from'.$selectedFrom->format('d-m-Y').'-to'.$selectedTo->format('d-m-Y').'.csv';
 
-                $filesystem = new Filesystem();
-                $filesystem->mkdir($kernel->getProjectDir().'/var/tmp_files/');
-                $tempFilename = $kernel->getProjectDir().'/var/tmp_files/export'.sha1(microtime());
-
-                // Save to temp file.
-                $writer->save($tempFilename);
-
-                $csvOutput = file_get_contents($tempFilename);
-
+                $csvOutput = $phpSpreadsheetExportService->getOutputAsString($writer);
                 $csvOutputEncoded = mb_convert_encoding($csvOutput, 'Windows-1252');
-
-                $filesystem->remove($tempFilename);
 
                 $response = new Response($csvOutputEncoded);
                 $response->headers->set('Content-Type', 'text/csv');
@@ -183,16 +172,7 @@ class MainController extends AbstractController
                 // Show preview.
                 $writer = IOFactory::createWriter($spreadsheet, 'Html');
 
-                $filesystem = new Filesystem();
-                $filesystem->mkdir($kernel->getProjectDir().'/var/tmp_files/');
-                $tempFilename = $kernel->getProjectDir().'/var/tmp_files/export'.sha1(microtime());
-
-                // Save to temp file.
-                $writer->save($tempFilename);
-
-                $html = file_get_contents($tempFilename);
-
-                $filesystem->remove($tempFilename);
+                $html = $phpSpreadsheetExportService->getOutputAsString($writer);
 
                 // Extract body content.
                 $d = new \DOMDocument();

@@ -11,16 +11,15 @@
 namespace Billing\Controller;
 
 use App\Service\JiraService;
+use App\Service\PhpSpreadsheetExportService;
 use Billing\Exception\InvoiceException;
 use Billing\Service\BillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -255,16 +254,16 @@ class ApiController extends Controller
     /**
      * @Route("/export_invoices", name="api_export_invoices", methods={"GET"})
      *
-     * @param \Symfony\Component\HttpKernel\KernelInterface $kernel
-     * @param \Symfony\Component\HttpFoundation\Request     $request
-     * @param \Billing\Service\BillingService               $billingService
+     * @param \App\Service\PhpSpreadsheetExportService  $phpSpreadsheetExportService
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Billing\Service\BillingService           $billingService
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function exportInvoices(KernelInterface $kernel, Request $request, BillingService $billingService)
+    public function exportInvoices(PhpSpreadsheetExportService $phpSpreadsheetExportService, Request $request, BillingService $billingService)
     {
         $ids = $request->query->get('ids');
 
@@ -280,16 +279,7 @@ class ApiController extends Controller
         $writer->setLineEnding("\r\n");
         $writer->setSheetIndex(0);
 
-        $filesystem = new Filesystem();
-        $filesystem->mkdir($kernel->getProjectDir().'/var/tmp_files/');
-        $tempFilename = $kernel->getProjectDir().'/var/tmp_files/export'.sha1(microtime());
-
-        // Save to temp file.
-        $writer->save($tempFilename);
-
-        $csvOutput = file_get_contents($tempFilename);
-
-        $filesystem->remove($tempFilename);
+        $csvOutput = $phpSpreadsheetExportService->getOutputAsString($writer);
 
         // Change encoding to Windows-1252.
         $csvOutputEncoded = mb_convert_encoding($csvOutput, 'Windows-1252');
