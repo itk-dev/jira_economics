@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## in develop
+## 1.5.0
 
 * Upgraded to Symfony 4.4.*.
 * Fixed billing app naming.
