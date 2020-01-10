@@ -360,8 +360,8 @@ class HomePage extends Component {
                                                     name={'selectAll'}
                                                     type="checkbox"
                                                     aria-label={t('home_page.select_all')}
-                                                    checked={!!this.allSelected(invoices) }
-                                                    onChange={ () => { this.toggleSelectAll(invoices); } }/>
+                                                    checked={!!this.allSelected(tab.items) }
+                                                    onChange={ () => { this.toggleSelectAll(tab.items); } }/>
                                             </th>
                                         }
                                         <th>{t('home_page.table.invoice')}</th>
