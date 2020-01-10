@@ -45,8 +45,7 @@ class PhpSpreadsheetExportService
     public function getOutputAsString(IWriter $writer)
     {
         $filesystem = new Filesystem();
-        $filesystem->mkdir($this->kernel->getProjectDir().'/var/tmp_files');
-        $tempFilename = $filesystem->tempnam($this->kernel->getProjectDir().'/var/tmp_files', 'export_');
+        $tempFilename = $filesystem->tempnam(sys_get_temp_dir(), 'export_');
 
         // Save to temp file.
         $writer->save($tempFilename);
