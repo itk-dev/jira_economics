@@ -20,6 +20,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -254,11 +255,15 @@ class ApiController extends Controller
     /**
      * @Route("/export_invoices", name="api_export_invoices", methods={"GET"})
      *
+     * @param \Symfony\Component\HttpKernel\KernelInterface $kernel
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Billing\Service\BillingService $billingService
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function exportInvoices(Request $request, BillingService $billingService)
+    public function exportInvoices(KernelInterface $kernel, Request $request, BillingService $billingService)
     {
         $ids = $request->query->get('ids');
 
@@ -275,8 +280,8 @@ class ApiController extends Controller
         $writer->setSheetIndex(0);
 
         $filesystem = new Filesystem();
-        $filesystem->mkdir($this->get('kernel')->getProjectDir().'/var/tmp_files/');
-        $tempFilename = $this->get('kernel')->getProjectDir().'/var/tmp_files/export'.sha1(microtime());
+        $filesystem->mkdir($kernel->getProjectDir().'/var/tmp_files/');
+        $tempFilename = $kernel->getProjectDir().'/var/tmp_files/export'.sha1(microtime());
 
         // Save to temp file.
         $writer->save($tempFilename);

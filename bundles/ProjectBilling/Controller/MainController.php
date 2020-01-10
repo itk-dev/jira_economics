@@ -25,6 +25,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -42,7 +43,7 @@ class MainController extends AbstractController
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function index(Request $request, MenuService $menuService, ProjectBillingService $projectBillingService, BillingService $billingService, $boundDescription, $boundSupplier)
+    public function index(KernelInterface $kernel, Request $request, MenuService $menuService, ProjectBillingService $projectBillingService, BillingService $billingService, $boundDescription, $boundSupplier)
     {
         $startDayOfWeek = (new \DateTime('this week'))->setTime(0, 0);
         try {
@@ -146,8 +147,8 @@ class MainController extends AbstractController
                 $filename = 'faktura'.date('d-m-Y').'-from'.$selectedFrom->format('d-m-Y').'-to'.$selectedTo->format('d-m-Y').'.csv';
 
                 $filesystem = new Filesystem();
-                $filesystem->mkdir($this->get('kernel')->getProjectDir().'/var/tmp_files/');
-                $tempFilename = $this->get('kernel')->getProjectDir().'/var/tmp_files/export'.sha1(microtime());
+                $filesystem->mkdir($kernel->getProjectDir().'/var/tmp_files/');
+                $tempFilename = $kernel->getProjectDir().'/var/tmp_files/export'.sha1(microtime());
 
                 // Save to temp file.
                 $writer->save($tempFilename);
@@ -175,8 +176,8 @@ class MainController extends AbstractController
                 $writer = IOFactory::createWriter($spreadsheet, 'Html');
 
                 $filesystem = new Filesystem();
-                $filesystem->mkdir($this->get('kernel')->getProjectDir().'/var/tmp_files/');
-                $tempFilename = $this->get('kernel')->getProjectDir().'/var/tmp_files/export'.sha1(microtime());
+                $filesystem->mkdir($kernel->getProjectDir().'/var/tmp_files/');
+                $tempFilename = $kernel->getProjectDir().'/var/tmp_files/export'.sha1(microtime());
 
                 // Save to temp file.
                 $writer->save($tempFilename);
