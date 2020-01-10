@@ -16,6 +16,7 @@ use Billing\Service\BillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -273,9 +274,18 @@ class ApiController extends Controller
         $writer->setLineEnding("\r\n");
         $writer->setSheetIndex(0);
 
-        $writer->save('php://output');
+        $filesystem = new Filesystem();
+        $filesystem->mkdir($this->get('kernel')->getProjectDir().'/var/tmp_files/');
+        $tempFilename = $this->get('kernel')->getProjectDir().'/var/tmp_files/export'.sha1(microtime());
 
-        $csvOutput = ob_get_clean();
+        // Save to temp file.
+        $writer->save($tempFilename);
+
+        $csvOutput = file_get_contents($tempFilename);
+
+        $filesystem->remove($tempFilename);
+
+        // Change encoding to Windows-1252.
         $csvOutputEncoded = mb_convert_encoding($csvOutput, 'Windows-1252');
 
         $response = new Response($csvOutputEncoded);

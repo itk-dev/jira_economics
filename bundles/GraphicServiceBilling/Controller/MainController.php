@@ -15,6 +15,7 @@ use GraphicServiceBilling\Service\GraphicServiceBillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -114,10 +115,17 @@ class MainController extends AbstractController
                 $writer->setSheetIndex(0);
                 $filename = 'faktura'.date('d-m-Y').($marketing ? '-marketing' : '-not_marketing').'-from'.$from->format('d-m-Y').'-to'.$to->format('d-m-Y').'.csv';
 
-                $writer->save('php://output');
+                $filesystem = new Filesystem();
+                $filesystem->mkdir($this->get('kernel')->getProjectDir().'/var/tmp_files/');
+                $tempFilename = $this->get('kernel')->getProjectDir().'/var/tmp_files/export'.sha1(microtime());
 
-                $csvOutput = ob_get_clean();
+                // Save to temp file.
+                $writer->save($tempFilename);
+
+                $csvOutput = file_get_contents($tempFilename);
                 $csvOutputEncoded = mb_convert_encoding($csvOutput, 'Windows-1252');
+
+                $filesystem->remove($tempFilename);
 
                 $response = new Response($csvOutputEncoded);
                 $response->headers->set('Content-Type', 'text/csv');
@@ -134,9 +142,17 @@ class MainController extends AbstractController
             } else {
                 // Show preview.
                 $writer = IOFactory::createWriter($spreadsheet, 'Html');
-                ob_start();
-                $writer->save('php://output');
-                $html = ob_get_clean();
+
+                $filesystem = new Filesystem();
+                $filesystem->mkdir($this->get('kernel')->getProjectDir().'/var/tmp_files/');
+                $tempFilename = $this->get('kernel')->getProjectDir().'/var/tmp_files/export'.sha1(microtime());
+
+                // Save to temp file.
+                $writer->save($tempFilename);
+
+                $html = file_get_contents($tempFilename);
+
+                $filesystem->remove($tempFilename);
 
                 // Extract body content.
                 $d = new \DOMDocument();

@@ -750,7 +750,7 @@ class BillingService extends JiraService
      *
      * @return \PhpOffice\PhpSpreadsheet\Spreadsheet
      *
-     * @throws \PhpOffice\PhpSpreadsheetException
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
     public function exportInvoicesToSpreadsheet(array $invoiceIds)
     {

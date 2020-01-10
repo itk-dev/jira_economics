@@ -15,6 +15,7 @@ use Billing\Service\BillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -37,9 +38,17 @@ class IndexController extends AbstractController
         $spreadsheet = $billingService->exportInvoicesToSpreadsheet([$invoiceId]);
 
         $writer = IOFactory::createWriter($spreadsheet, 'Html');
-        ob_start();
-        $writer->save('php://output');
-        $html = ob_get_clean();
+
+        $filesystem = new Filesystem();
+        $filesystem->mkdir($this->get('kernel')->getProjectDir().'/var/tmp_files/');
+        $tempFilename = $this->get('kernel')->getProjectDir().'/var/tmp_files/export'.sha1(microtime());
+
+        // Save to temp file.
+        $writer->save($tempFilename);
+
+        $html = file_get_contents($tempFilename);
+
+        $filesystem->remove($tempFilename);
 
         // Extract body content.
         $d = new \DOMDocument();
