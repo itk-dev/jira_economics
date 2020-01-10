@@ -12,7 +12,7 @@ namespace Billing\Repository;
 
 use Billing\Entity\Expense;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Expense|null find($id, $lockMode = null, $lockVersion = null)
@@ -22,7 +22,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class ExpenseRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Expense::class);
     }

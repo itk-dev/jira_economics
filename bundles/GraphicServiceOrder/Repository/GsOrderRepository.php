@@ -11,8 +11,8 @@
 namespace GraphicServiceOrder\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use GraphicServiceOrder\Entity\GsOrder;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
  * @method GsOrder|null find($id, $lockMode = null, $lockVersion = null)
@@ -22,7 +22,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class GsOrderRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, GsOrder::class);
     }

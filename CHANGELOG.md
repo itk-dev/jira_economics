@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## in develop
+
+* Upgraded to Symfony 4.4.*.
+* Fixed billing app naming.
+* Removed requirement for description for invoice entries when recording invoice.
+* Moved sidebar to separate file.
+* Fixed select all recorded invoices.
+
 ## 1.4.0
 
 * Added permissions checks to Jira apps.
