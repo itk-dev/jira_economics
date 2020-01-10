@@ -2,6 +2,10 @@
 
 ## in develop
 
+* Changed spreadsheet export to use temporary files.
+
+## 1.5.0
+
 * Upgraded to Symfony 4.4.*.
 * Fixed billing app naming.
 * Removed requirement for description for invoice entries when recording invoice.

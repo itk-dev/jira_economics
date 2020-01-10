@@ -11,6 +11,7 @@
 namespace Billing\Controller;
 
 use App\Service\MenuService;
+use App\Service\PhpSpreadsheetExportService;
 use Billing\Service\BillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -25,6 +26,9 @@ class IndexController extends AbstractController
     /**
      * @Route("/show_export_invoice/{invoiceId}", name="api_show_export_invoice", methods={"GET"})
      *
+     * @param \App\Service\PhpSpreadsheetExportService $phpSpreadsheetExportService
+     * @param \Billing\Service\BillingService          $billingService
+     * @param \App\Service\MenuService                 $menuService
      * @param $invoiceId
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -32,14 +36,12 @@ class IndexController extends AbstractController
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function showExportInvoice(BillingService $billingService, MenuService $menuService, $invoiceId)
+    public function showExportInvoice(PhpSpreadsheetExportService $phpSpreadsheetExportService, BillingService $billingService, MenuService $menuService, $invoiceId)
     {
         $spreadsheet = $billingService->exportInvoicesToSpreadsheet([$invoiceId]);
 
         $writer = IOFactory::createWriter($spreadsheet, 'Html');
-        ob_start();
-        $writer->save('php://output');
-        $html = ob_get_clean();
+        $html = $phpSpreadsheetExportService->getOutputAsString($writer);
 
         // Extract body content.
         $d = new \DOMDocument();
