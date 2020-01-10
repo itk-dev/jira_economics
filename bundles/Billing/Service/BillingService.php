@@ -717,10 +717,6 @@ class BillingService extends JiraService
             return 'price not set';
         }
 
-        if (!$invoiceEntry->getDescription()) {
-            return 'description not set';
-        }
-
         if (!$invoiceEntry->getAccount()) {
             return 'account not set';
         }
