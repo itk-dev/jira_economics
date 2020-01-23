@@ -135,7 +135,11 @@ class ExpenseController extends AbstractController
                 'label' => 'expense.new.quantity',
                 'attr' => [
                     'placeholder' => 'expense.new.quantity.placeholder',
+                    'min' => 0,
+                    'step' => '.01',
                 ],
+                'scale' => 2,
+                'html5' => true,
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'expense.new.description',
