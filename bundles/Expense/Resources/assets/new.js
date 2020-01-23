@@ -61,5 +61,27 @@ $(() => {
     };
 
     $projectCtrl.on('change', buildIssuePicker);
+
+    $projectCtrl.select2({
+        placeholder: Expense.messages['expense.new.project.placeholder']
+    });
+
+    // Get previous selected project from local storage.
+    let previousSelectedProject = window.localStorage.getItem('expense.previousSelection');
+
+    // Select previous selection.
+    if (previousSelectedProject) {
+        $projectCtrl.val(previousSelectedProject);
+        $projectCtrl.trigger('change');
+    }
+
+    // Save changes to project to local storage.
+    $projectCtrl.on('select2:select', function (e) {
+        let data = e.params.data;
+        window.localStorage.setItem('expense.previousSelection', data.id);
+    });
+
+    $('#form_category').select2();
+
     buildIssuePicker();
 });

@@ -540,7 +540,7 @@ abstract class AbstractJiraService
                 'scopeId' => $data['scope_id'],
             ],
             'amount' => (int) ($data['quantity'] * $category->getUnitPrice()),
-            'description' => $data['description'],
+            'description' => $data['description'] ?? $category->getName(),
             'date' => (new \DateTime())->format(\DateTime::ATOM),
         ];
         $result = $this->post('/rest/tempo-core/1/expense/', $data);
