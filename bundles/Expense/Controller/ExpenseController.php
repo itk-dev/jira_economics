@@ -18,7 +18,6 @@ use GuzzleHttp\Exception\ClientException;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -147,7 +146,7 @@ class ExpenseController extends AbstractController
                     'placeholder' => 'expense.new.description.placeholder',
                 ],
                 'required' => false,
-                'help' => 'expense.new.description.help'
+                'help' => 'expense.new.description.help',
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'expense.new.submit',
