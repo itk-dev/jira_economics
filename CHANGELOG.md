@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## in develop
+## in release
 
 * Changed spreadsheet export to use temporary files.
 * Expense: Made description optional.
