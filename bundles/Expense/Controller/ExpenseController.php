@@ -18,7 +18,7 @@ use GuzzleHttp\Exception\ClientException;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -126,21 +126,27 @@ class ExpenseController extends AbstractController
                 'choice_label' => function (Category $category) use ($translator) {
                     return $translator->trans('expense.category.new.label_format', [
                         '%name%' => $category->getName(),
-                        '%unit_price%' => money_format('%i', $category->getUnitPrice()),
+                        '%unit_price%' => number_format($category->getUnitPrice(), 2, ',', '.'),
                     ]);
                 },
             ])
-            ->add('quantity', IntegerType::class, [
+            ->add('quantity', NumberType::class, [
                 'label' => 'expense.new.quantity',
                 'attr' => [
                     'placeholder' => 'expense.new.quantity.placeholder',
+                    'min' => 0.1,
+                    'step' => '.01',
                 ],
+                'scale' => 2,
+                'html5' => true,
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'expense.new.description',
                 'attr' => [
                     'placeholder' => 'expense.new.description.placeholder',
                 ],
+                'required' => false,
+                'help' => 'expense.new.description.help',
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'expense.new.submit',

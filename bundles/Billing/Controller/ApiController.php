@@ -11,6 +11,7 @@
 namespace Billing\Controller;
 
 use App\Service\JiraService;
+use App\Service\PhpSpreadsheetExportService;
 use Billing\Exception\InvoiceException;
 use Billing\Service\BillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -253,11 +254,16 @@ class ApiController extends Controller
     /**
      * @Route("/export_invoices", name="api_export_invoices", methods={"GET"})
      *
+     * @param \App\Service\PhpSpreadsheetExportService  $phpSpreadsheetExportService
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Billing\Service\BillingService           $billingService
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function exportInvoices(Request $request, BillingService $billingService)
+    public function exportInvoices(PhpSpreadsheetExportService $phpSpreadsheetExportService, Request $request, BillingService $billingService)
     {
         $ids = $request->query->get('ids');
 
@@ -273,9 +279,9 @@ class ApiController extends Controller
         $writer->setLineEnding("\r\n");
         $writer->setSheetIndex(0);
 
-        $writer->save('php://output');
+        $csvOutput = $phpSpreadsheetExportService->getOutputAsString($writer);
 
-        $csvOutput = ob_get_clean();
+        // Change encoding to Windows-1252.
         $csvOutputEncoded = mb_convert_encoding($csvOutput, 'Windows-1252');
 
         $response = new Response($csvOutputEncoded);
