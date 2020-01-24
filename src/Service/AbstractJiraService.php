@@ -539,7 +539,7 @@ abstract class AbstractJiraService
                 'scopeType' => $data['scope_type'],
                 'scopeId' => $data['scope_id'],
             ],
-            'amount' => (int) ($data['quantity'] * $category->getUnitPrice()),
+            'amount' => round($data['quantity'] * $category->getUnitPrice(), 2),
             'description' => $data['description'] ?? $category->getName(),
             'date' => (new \DateTime())->format(\DateTime::ATOM),
         ];
