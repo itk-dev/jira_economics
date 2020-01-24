@@ -126,7 +126,7 @@ class ExpenseController extends AbstractController
                 'choice_label' => function (Category $category) use ($translator) {
                     return $translator->trans('expense.category.new.label_format', [
                         '%name%' => $category->getName(),
-                        '%unit_price%' => money_format('%i', $category->getUnitPrice()),
+                        '%unit_price%' => number_format($category->getUnitPrice(), 2, ',', '.'),
                     ]);
                 },
             ])
@@ -134,7 +134,7 @@ class ExpenseController extends AbstractController
                 'label' => 'expense.new.quantity',
                 'attr' => [
                     'placeholder' => 'expense.new.quantity.placeholder',
-                    'min' => 0,
+                    'min' => 0.1,
                     'step' => '.01',
                 ],
                 'scale' => 2,
