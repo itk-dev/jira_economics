@@ -87,15 +87,21 @@ class MigrateUsersCommand extends Command
             $email = $row['email'];
             /** @var \App\Entity\User $user */
             $user = $this->userManager->findUserBy(['email' => $email]);
-            $isNew = null === $user;
             if (null === $user) {
+                $status = 'created';
                 $user = $this->userManager->createUser();
                 $user->setEmail($email);
+            } else {
+                $status = 'updated';
             }
             $user->setPortalApps(array_unique(array_merge($user->getPortalApps(), $apps)));
 
             $this->userManager->updateUser($user);
-            $output->writeln(sprintf($isNew ? 'User %s created' : 'User %s updated', $email));
+            $output->writeln(
+                'created' === $status
+                ? sprintf('User %s created', $email)
+                : sprintf('User %s updated', $email)
+            );
         }
     }
 
