@@ -21,7 +21,7 @@
                         <td>{{ expense.date|localizeddate('short', 'none') }}</td>
                         <td>{{ expense.expenseCategory.name }}</td>
                         <td>{{ expense.description|raw }}</td>
-                        <td class="amount">{{ expense.amount|number_format }}</td>
+                        <td class="amount">{{ expense.amount|localizednumber }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

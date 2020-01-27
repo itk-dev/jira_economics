@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## in release
+
+* Changed spreadsheet export to use temporary files.
+* Expense: Made description optional.
+* Expense: Added select2 to selects.
+* Expense: Use previous project selection
+
 ## 1.5.0
 
 * Upgraded to Symfony 4.4.*.

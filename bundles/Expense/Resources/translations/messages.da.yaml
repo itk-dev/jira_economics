@@ -34,13 +34,14 @@ expense.description: Beskrivelse
 expense.list.title: Udgifter
 expense.new.category.placeholder: 'Vælg kategori'
 expense.new.category: Kategori
-expense.new.description.placeholder: ''
+expense.new.description.placeholder: Beskriv udgiften
 expense.new.description: Beskrivelse
+expense.new.description.help: Hvis der ikke vælges en beskrivelse, får udgiften navn efter kategorien i Jira.
 expense.new.issue.help: 'Vælg projekt for at kunne vælge sag'
 expense.new.issue: Sag
 expense.new.project.placeholder: 'Vælg projekt'
 expense.new.project: 'Projekt'
-expense.new.quantity.placeholder: ''
+expense.new.quantity.placeholder: Vælg antal
 expense.new.quantity: Antal
 expense.new.search_for_issue_in_project: 'Søg efter sag i projektet {project}'
 expense.new.submit: 'Opret'

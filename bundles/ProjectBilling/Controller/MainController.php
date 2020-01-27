@@ -11,6 +11,7 @@
 namespace ProjectBilling\Controller;
 
 use App\Service\MenuService;
+use App\Service\PhpSpreadsheetExportService;
 use Billing\Service\BillingService;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
@@ -36,12 +37,20 @@ class MainController extends AbstractController
     /**
      * @Route("", name="index")
      *
+     * @param \App\Service\PhpSpreadsheetExportService      $phpSpreadsheetExportService
+     * @param \Symfony\Component\HttpFoundation\Request     $request
+     * @param \App\Service\MenuService                      $menuService
+     * @param \ProjectBilling\Service\ProjectBillingService $projectBillingService
+     * @param \Billing\Service\BillingService               $billingService
+     * @param $boundDescription
+     * @param $boundSupplier
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function index(Request $request, MenuService $menuService, ProjectBillingService $projectBillingService, BillingService $billingService, $boundDescription, $boundSupplier)
+    public function index(PhpSpreadsheetExportService $phpSpreadsheetExportService, Request $request, MenuService $menuService, ProjectBillingService $projectBillingService, BillingService $billingService, $boundDescription, $boundSupplier)
     {
         $startDayOfWeek = (new \DateTime('this week'))->setTime(0, 0);
         try {
@@ -144,10 +153,7 @@ class MainController extends AbstractController
                 $writer->setSheetIndex(0);
                 $filename = 'faktura'.date('d-m-Y').'-from'.$selectedFrom->format('d-m-Y').'-to'.$selectedTo->format('d-m-Y').'.csv';
 
-                ob_start();
-                $writer->save('php://output');
-                $csvOutput = ob_get_clean();
-
+                $csvOutput = $phpSpreadsheetExportService->getOutputAsString($writer);
                 $csvOutputEncoded = mb_convert_encoding($csvOutput, 'Windows-1252');
 
                 $response = new Response($csvOutputEncoded);
@@ -165,9 +171,8 @@ class MainController extends AbstractController
             } else {
                 // Show preview.
                 $writer = IOFactory::createWriter($spreadsheet, 'Html');
-                ob_start();
-                $writer->save('php://output');
-                $html = ob_get_clean();
+
+                $html = $phpSpreadsheetExportService->getOutputAsString($writer);
 
                 // Extract body content.
                 $d = new \DOMDocument();
