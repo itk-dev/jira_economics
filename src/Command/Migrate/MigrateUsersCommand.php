@@ -13,8 +13,10 @@ namespace App\Command\Migrate;
 use ItkDev\UserManagementBundle\Doctrine\UserManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -51,7 +53,8 @@ class MigrateUsersCommand extends Command
                 'message',
                 InputArgument::REQUIRED,
                 'Additional message'
-            );
+            )
+            ->addOption('portal-app', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Portal app');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -59,6 +62,10 @@ class MigrateUsersCommand extends Command
         $path = $input->getArgument('csv-path');
         $message = $input->getArgument('message');
         $message = $this->getMessage($message);
+        $apps = $input->getOption('portal-app');
+        if (empty($apps)) {
+            throw new RuntimeException('No apps specified');
+        }
 
         // Set the message in user manager configuration.
         $property = new \ReflectionProperty(
@@ -69,7 +76,7 @@ class MigrateUsersCommand extends Command
         $configuration = $property->getValue($this->userManager);
         // Make sure that user manager notifies users on create.
         $configuration['notify_user_on_create'] = true;
-        $configuration['user_created']['message'] = $message;
+        $configuration['user_created']['body'] = $message;
         $property->setValue($this->userManager, $configuration);
 
         $rows = $this->getData($path);
@@ -78,15 +85,23 @@ class MigrateUsersCommand extends Command
                 continue;
             }
             $email = $row['email'];
+            /** @var \App\Entity\User $user */
             $user = $this->userManager->findUserBy(['email' => $email]);
-            if (null !== $user) {
-                $output->writeln(sprintf('User %s already exists', $email));
-                continue;
+            if (null === $user) {
+                $status = 'created';
+                $user = $this->userManager->createUser();
+                $user->setEmail($email);
+            } else {
+                $status = 'updated';
             }
-            $user = $this->userManager->createUser();
-            $user->setEmail($email);
+            $user->setPortalApps(array_unique(array_merge($user->getPortalApps(), $apps)));
+
             $this->userManager->updateUser($user);
-            $output->writeln(sprintf('User %s created', $email));
+            $output->writeln(
+                'created' === $status
+                ? sprintf('User %s created', $email)
+                : sprintf('User %s updated', $email)
+            );
         }
     }
 
@@ -96,7 +111,9 @@ class MigrateUsersCommand extends Command
             throw new InvalidArgumentException(sprintf('Invalid path: %s', $path));
         }
 
-        return $this->serializer->decode(file_get_contents($path), 'csv');
+        return $this->serializer->decode(file_get_contents($path), 'csv', [
+            'as_collection' => true,
+        ]);
     }
 
     private function getMessage(string $message)
