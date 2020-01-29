@@ -1,0 +1,9 @@
+{% extends '@!ItkDevUserManagement/bundles/FOSUser/Security/login.html.twig' %}
+
+{% block fos_user_content %}
+    {% if user_login_messages|default(false) %}
+        <div class="user-login-messages">{{ user_login_messages|raw }}</div>
+    {% endif %}
+
+    {{ parent() }}
+{% endblock %}
