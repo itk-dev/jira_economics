@@ -21,3 +21,5 @@ twig:
             email: '%mailer_email%'
             name: '%mailer_name%'
         gs_address: '%gs_address%'
+
+        user_login_messages: '%user_login_messages%'

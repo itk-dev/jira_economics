@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## in release
+## 1.6.0
 
 * Changed spreadsheet export to use temporary files.
 * Expense: Made description optional.

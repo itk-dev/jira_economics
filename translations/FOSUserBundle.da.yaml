@@ -44,8 +44,8 @@ registration:
 
             For at færdiggøre valideringen af din konto, besøg venligst %confirmationUrl%
 
-            Venlig hilsen,
-            Holdet bag siden.
+            Venlig hilsen
+            ITK
 
 # Password resetting
 resetting:
@@ -70,8 +70,8 @@ resetting:
 
             For at nulstille din adgangskode, besøg venligst %confirmationUrl%
 
-            Venlig hilsen,
-            AaPlus
+            Venlig hilsen
+            ITK
     form:
         plainPassword:
             first: Først

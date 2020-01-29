@@ -163,3 +163,7 @@ parameters:
         form_file_gs_upload_size: '%env(resolve:FORM_FILE_GS_UPLOAD_SIZE)%'
         gs_order_project_id: '%env(resolve:GS_ORDER_PROJECT_ID)%'
         gs_order_issuetype_id: '%env(resolve:GS_ORDER_ISSUETYPE_ID)%'
+
+    # Overwrite this is jira_economics.local.yaml to show custom messages on the
+    # login page.
+    user_login_messages: ~
