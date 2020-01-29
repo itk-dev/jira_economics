@@ -13,7 +13,7 @@ easy_admin:
 
     entities:
         User:
-            controller: App\Controller\UserController
+            controller: ItkDev\UserManagementBundle\Controller\UserController
 
             class: App\Entity\User
             label: portal.user
