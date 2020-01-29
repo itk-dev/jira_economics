@@ -49,3 +49,6 @@ parameters:
         sprint_report: ~
         gs_billing: ~
         project_billing: ~
+
+    # user_login_messages: >-
+    #     <p>Some message to show in the login page</p>
