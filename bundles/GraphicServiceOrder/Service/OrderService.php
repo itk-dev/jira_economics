@@ -215,6 +215,7 @@ class OrderService
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function createOrder(GsOrder $gsOrder, $form)
     {
@@ -230,6 +231,9 @@ class OrderService
         // Add task values to order entity.
         $gsOrder->setIssueId($taskCreated->id);
         $gsOrder->setIssueKey($taskCreated->key);
+
+        // Create a folder with issue key as name.
+        $this->createFolder($taskCreated->key);
 
         // Store file locally.
         $gsOrder = $this->storeFile($gsOrder, $form);
@@ -258,9 +262,6 @@ class OrderService
         if (empty($files)) {
             $order->setOrderStatus('received');
         } else {
-            // Create a folder with issue key as name.
-            $this->createFolder($order->getIssueKey());
-
             // Get all files on the order that have already been shared.
             $sharedFiles = $order->getOwnCloudSharedFiles();
             foreach ($files as $file) {
@@ -330,6 +331,7 @@ class OrderService
                 'reporter' => [
                     'name' => $author,
                 ],
+                $this->hammerService->getCustomFieldId('Full name') => $gsOrder->getFullName(),
                 $this->hammerService->getCustomFieldId('Debitor') => (string) $gsOrder->getDebitor(),
                 $this->hammerService->getCustomFieldId('Marketing Account') => $gsOrder->getMarketingAccount() ? [0 => ['value' => 'Markedsføringskonto']] : null,
                 $this->hammerService->getCustomFieldId('Delivery Note URL') => $this->router->generate('graphic_service_order_delivery_note', ['id' => $gsOrder->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
