@@ -232,7 +232,6 @@ class OrderService
         $gsOrder->setIssueId($taskCreated->id);
         $gsOrder->setIssueKey($taskCreated->key);
 
-
         // Create a folder with issue key as name.
         $this->createFolder($taskCreated->key);
 
