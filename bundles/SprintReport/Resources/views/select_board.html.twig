@@ -2,7 +2,7 @@
 
 {% block content %}
     <div class="container-fluid" style="margin-top: 50px">
-        <h3>{{ 'sprint_report.select_board' | trans }}</h3>
+        <h3>{{ 'sprint_report.select_board'|trans }}</h3>
         {% for board in boards %}
             <a class="m-1 btn btn-light" href="/jira/sprint_report/board/{{ board.id }}">{{ board.name }}</a>
         {% endfor %}

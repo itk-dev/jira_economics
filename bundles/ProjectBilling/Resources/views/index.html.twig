@@ -6,34 +6,34 @@
     {{ form_start(form) }}
     <div class="row">
         <div class="col m-2">
-            {{form_row(form.project)}}
+            {{ form_row(form.project) }}
         </div>
         <div class="col m-2">
             <label>{{ 'project_billing_form.include_project_name_in_header_label'|trans }}</label>
-            {{form_row(form.includeProjectNameInHeader)}}
+            {{ form_row(form.includeProjectNameInHeader) }}
         </div>
     </div>
     <div class="row">
         <div class="col m-2">
-            {{form_row(form.from)}}
+            {{ form_row(form.from) }}
         </div>
         <div class="col m-2">
-            {{form_row(form.to)}}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col m-2">
-            {{form_row(form.description)}}
+            {{ form_row(form.to) }}
         </div>
     </div>
     <div class="row">
         <div class="col m-2">
-            {{form_row(form.psp)}}
+            {{ form_row(form.description) }}
         </div>
     </div>
     <div class="row">
         <div class="col m-2">
-            {{form_row(form.submit)}}
+            {{ form_row(form.psp) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col m-2">
+            {{ form_row(form.submit) }}
 
             {% if preview is defined and preview != null %}
                 <h2>{{ 'gs_billing_form.preview'|trans }}</h2>
@@ -43,13 +43,13 @@
     </div>
     <div class="row">
         <div class="col m-2">
-            {{form_row(form.markAsBilled)}}
-            {{form_row(form.download)}}
+            {{ form_row(form.markAsBilled) }}
+            {{ form_row(form.download) }}
         </div>
     </div>
     <div class="row">
         <div class="col m-2">
-            {{form_rest(form)}}
+            {{ form_rest(form) }}
         </div>
     </div>
     {{ form_end(form) }}
