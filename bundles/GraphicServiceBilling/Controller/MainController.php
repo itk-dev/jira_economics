@@ -108,13 +108,12 @@ class MainController extends AbstractController
             } else {
                 try {
                     $entries = $graphicServiceBillingService->createExportDataNotMarketing($tasks);
-                }
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                     $this->addFlash('danger', $e->getMessage());
                 }
             }
 
-            if ($entries !== null) {
+            if (null !== $entries) {
                 $spreadsheet = $graphicServiceBillingService->exportTasksToSpreadsheet($entries);
 
                 if ($download) {

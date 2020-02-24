@@ -12,7 +12,6 @@ namespace GraphicServiceBilling\Service;
 
 use Billing\Service\BillingService;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class GraphicServiceBillingService
 {
@@ -167,6 +166,7 @@ class GraphicServiceBillingService
      * @param array $tasks array of Jira tasks
      *
      * @return array
+     *
      * @throws \Exception
      */
     public function createExportDataNotMarketing(array $tasks)
@@ -309,10 +309,10 @@ class GraphicServiceBillingService
      * Get all tasks in the interval from the project that have not been
      * billed and that have the status "Done".
      *
-     * @param int $projectId the Jira project id
+     * @param int            $projectId the Jira project id
      * @param \DateTime|null $fromDate
      * @param \DateTime|null $toDate
-     * @param bool $marketing
+     * @param bool           $marketing
      *
      * @return array
      */
