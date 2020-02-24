@@ -6,20 +6,20 @@
     {{ form_start(form) }}
     <div class="row">
         <div class="col m-2">
-            {{form_row(form.from)}}
+            {{ form_row(form.from) }}
         </div>
         <div class="col m-2">
-            {{form_row(form.to)}}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col m-2">
-            {{form_row(form.marketing)}}
+            {{ form_row(form.to) }}
         </div>
     </div>
     <div class="row">
         <div class="col m-2">
-            {{form_row(form.submit)}}
+            {{ form_row(form.marketing) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col m-2">
+            {{ form_row(form.submit) }}
 
             {% if preview is defined and preview != null %}
                 <h2>{{ 'gs_billing_form.preview'|trans }}</h2>
@@ -29,13 +29,13 @@
     </div>
     <div class="row">
         <div class="col m-2">
-            {{form_row(form.markAsBilled)}}
-            {{form_row(form.download)}}
+            {{ form_row(form.markAsBilled) }}
+            {{ form_row(form.download) }}
         </div>
     </div>
     <div class="row">
         <div class="col m-2">
-            {{form_rest(form)}}
+            {{ form_rest(form) }}
         </div>
     </div>
     {{ form_end(form) }}
