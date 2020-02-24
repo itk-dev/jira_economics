@@ -101,56 +101,65 @@ class MainController extends AbstractController
 
             $tasks = $graphicServiceBillingService->getAllNonBilledFinishedTasks($boundProjectId, $from, $to, $marketing);
 
+            $entries = null;
+
             if ($marketing) {
                 $entries = $graphicServiceBillingService->createExportDataMarketing($tasks);
             } else {
-                $entries = $graphicServiceBillingService->createExportDataNotMarketing($tasks);
-            }
-            $spreadsheet = $graphicServiceBillingService->exportTasksToSpreadsheet($entries);
-
-            if ($download) {
-                $writer = new Csv($spreadsheet);
-                $writer->setDelimiter(';');
-                $writer->setEnclosure('');
-                $writer->setLineEnding("\r\n");
-                $writer->setSheetIndex(0);
-                $filename = 'faktura'.date('d-m-Y').($marketing ? '-marketing' : '-not_marketing').'-from'.$from->format('d-m-Y').'-to'.$to->format('d-m-Y').'.csv';
-
-                $csvOutput = $phpSpreadsheetExportService->getOutputAsString($writer);
-                $csvOutputEncoded = mb_convert_encoding($csvOutput, 'Windows-1252');
-
-                $response = new Response($csvOutputEncoded);
-                $response->headers->set('Content-Type', 'text/csv');
-                $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
-                $response->headers->set('Cache-Control', 'max-age=0');
-
-                $markAsBilled = $form->get('markAsBilled')->getData();
-
-                if ($markAsBilled) {
-                    $graphicServiceBillingService->markIssuesAsBilled($tasks);
+                try {
+                    $entries = $graphicServiceBillingService->createExportDataNotMarketing($tasks);
+                } catch (\Exception $e) {
+                    $this->addFlash('danger', $e->getMessage());
                 }
+            }
 
-                return $response;
-            } else {
-                // Show preview.
-                $writer = IOFactory::createWriter($spreadsheet, 'Html');
+            if (null !== $entries) {
+                $spreadsheet = $graphicServiceBillingService->exportTasksToSpreadsheet($entries);
 
-                $html = $phpSpreadsheetExportService->getOutputAsString($writer);
+                if ($download) {
+                    $writer = new Csv($spreadsheet);
+                    $writer->setDelimiter(';');
+                    $writer->setEnclosure('');
+                    $writer->setLineEnding("\r\n");
+                    $writer->setSheetIndex(0);
+                    $filename = 'faktura'.date('d-m-Y').($marketing ? '-marketing' : '-not_marketing').'-from'.$from->format('d-m-Y').'-to'.$to->format('d-m-Y').'.csv';
 
-                // Extract body content.
-                $d = new \DOMDocument();
-                $preview = new \DOMDocument();
-                $d->loadHTML($html);
-                $body = $d->getElementsByTagName('body')->item(0);
-                /* @var \DOMNode $child */
-                foreach ($body->childNodes as $child) {
-                    if ('style' === $child->tagName) {
-                        continue;
+                    $csvOutput = $phpSpreadsheetExportService->getOutputAsString($writer);
+                    $csvOutputEncoded = mb_convert_encoding($csvOutput, 'Windows-1252');
+
+                    $response = new Response($csvOutputEncoded);
+                    $response->headers->set('Content-Type', 'text/csv');
+                    $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+                    $response->headers->set('Cache-Control', 'max-age=0');
+
+                    $markAsBilled = $form->get('markAsBilled')->getData();
+
+                    if ($markAsBilled) {
+                        $graphicServiceBillingService->markIssuesAsBilled($tasks);
                     }
-                    if ('table' === $child->tagName) {
-                        $child->setAttribute('class', 'table table-bordered');
+
+                    return $response;
+                } else {
+                    // Show preview.
+                    $writer = IOFactory::createWriter($spreadsheet, 'Html');
+
+                    $html = $phpSpreadsheetExportService->getOutputAsString($writer);
+
+                    // Extract body content.
+                    $d = new \DOMDocument();
+                    $preview = new \DOMDocument();
+                    $d->loadHTML($html);
+                    $body = $d->getElementsByTagName('body')->item(0);
+                    /* @var \DOMNode $child */
+                    foreach ($body->childNodes as $child) {
+                        if ('style' === $child->tagName) {
+                            continue;
+                        }
+                        if ('table' === $child->tagName) {
+                            $child->setAttribute('class', 'table table-bordered');
+                        }
+                        $preview->appendChild($preview->importNode($child, true));
                     }
-                    $preview->appendChild($preview->importNode($child, true));
                 }
             }
         }

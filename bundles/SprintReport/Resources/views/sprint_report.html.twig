@@ -2,57 +2,57 @@
 
 {% block content %}
   <div class="container-fluid" style="max-width: 1400px; margin: 2em auto;">
-    <h1 style="margin-bottom: 1em">{{ 'sprint_report_version.heading' | trans }}</h1>
+    <h1 style="margin-bottom: 1em">{{ 'sprint_report_version.heading'|trans }}</h1>
     <div class="row">
       <div class="col">
         <div>
-          <h3>{{ 'sprint_report_version.heading_overview' | trans }}</h3>
+          <h3>{{ 'sprint_report_version.heading_overview'|trans }}</h3>
           <table class="table table-bordered">
             <tbody>
             <tr>
-              <td><strong>{{ 'sprint_report_version.sub.project' | trans }}: </strong></td>
+              <td><strong>{{ 'sprint_report_version.sub.project'|trans }}: </strong></td>
               <td>{{ sprintReport.project.name }}</td>
             </tr>
             <tr>
-              <td><strong>{{ 'sprint_report_version.sub.version' | trans }}: </strong></td>
+              <td><strong>{{ 'sprint_report_version.sub.version'|trans }}: </strong></td>
               <td>{{ sprintReport.version.name }}</td>
             </tr>
             <tr>
-              <td><strong>{{ 'sprint_report_version.sub.budget' | trans }}: </strong></td>
+              <td><strong>{{ 'sprint_report_version.sub.budget'|trans }}: </strong></td>
               <td><input type="number" id="input-budget"
                          style="width: 200px; border: 0"></td>
             </tr>
             <tr>
-              <td><strong>{{ 'sprint_report_version.sub.spent_hours' | trans }}: </strong></td>
+              <td><strong>{{ 'sprint_report_version.sub.spent_hours'|trans }}: </strong></td>
               <td>
                 <span id="spent_hours">{{ sprintReport.spentHours }}</span>
               </td>
             </tr>
             <tr>
-              <td><strong>{{ 'sprint_report_version.sub.remaining_hours' | trans }}: </strong></td>
+              <td><strong>{{ 'sprint_report_version.sub.remaining_hours'|trans }}: </strong></td>
               <td id="remaining_hours">
                 {{ sprintReport.remainingHours }}
               </td>
             </tr>
             <tr>
-              <td><strong>{{ 'sprint_report_version.sub.project_hours' | trans }}: </strong></td>
+              <td><strong>{{ 'sprint_report_version.sub.project_hours'|trans }}: </strong></td>
               <td id="project_hours">
                 {{ sprintReport.spentHours + sprintReport.remainingHours }}
               </td>
             </tr>
             <tr>
-              <td><strong>{{ 'sprint_report_version.sub.finished_degree' | trans }}: </strong></td>
+              <td><strong>{{ 'sprint_report_version.sub.finished_degree'|trans }}: </strong></td>
               <td><input type="number"
                          id="input_finished_degree"
                          max="100" min="0" style="width: 200px; border: 0;">
               </td>
             </tr>
             <tr>
-              <td><strong>{{ 'sprint_report_version.sub.project_forecast' | trans }}: </strong></td>
+              <td><strong>{{ 'sprint_report_version.sub.project_forecast'|trans }}: </strong></td>
               <td><span id="project_total_forecast"></span></td>
             </tr>
             <tr>
-              <td><strong>{{ 'sprint_report_version.sub.over_under_index' | trans }}: </strong></td>
+              <td><strong>{{ 'sprint_report_version.sub.over_under_index'|trans }}: </strong></td>
               <td><span id="over_under_index"></span></td>
             </tr>
             </tbody>
@@ -61,14 +61,14 @@
       </div>
     </div>
     <div>
-      <h3>{{ 'sprint_report_version.heading_phases' | trans }}</h3>
+      <h3>{{ 'sprint_report_version.heading_phases'|trans }}</h3>
       <table class="table table-bordered">
         <thead>
         <tr>
-          <th>{{ 'sprint_report_version.table.epic' | trans }}</th>
-          <th>{{ 'sprint_report_version.table.estimate' | trans }}</th>
-          <th>{{ 'sprint_report_version.table.remaining_hours' | trans }}</th>
-          <th>{{ 'sprint_report_version.table.registered_hours' | trans }}</th>
+          <th>{{ 'sprint_report_version.table.epic'|trans }}</th>
+          <th>{{ 'sprint_report_version.table.estimate'|trans }}</th>
+          <th>{{ 'sprint_report_version.table.remaining_hours'|trans }}</th>
+          <th>{{ 'sprint_report_version.table.registered_hours'|trans }}</th>
         </tr>
         </thead>
         <tbody>
@@ -85,14 +85,14 @@
     </div>
 
     <div>
-      <h3>{{ 'sprint_report_version.heading_spent_hours' | trans }}</h3>
+      <h3>{{ 'sprint_report_version.heading_spent_hours'|trans }}</h3>
       <table class="table table-bordered">
         <thead>
         <tr>
-          <th>{{ 'sprint_report_version.table.epic' | trans }}</th>
-          <th>{{ 'sprint_report_version.table.estimate' | trans }}</th>
-          <th>{{ 'sprint_report_version.table.reg' | trans }}</th>
-          <th>{{ 'sprint_report_version.table.no_sprint' | trans }}</th>
+          <th>{{ 'sprint_report_version.table.epic'|trans }}</th>
+          <th>{{ 'sprint_report_version.table.estimate'|trans }}</th>
+          <th>{{ 'sprint_report_version.table.reg'|trans }}</th>
+          <th>{{ 'sprint_report_version.table.no_sprint'|trans }}</th>
           {% for sprint in sprintReport.sprints %}
             {% if sprint.state != 'FUTURE' %}
               <th>{{ sprint.shortName }}</th>
@@ -127,14 +127,14 @@
     </div>
 
     <div>
-      <h3>{{ 'sprint_report_version.heading_planned_hours' | trans }}</h3>
+      <h3>{{ 'sprint_report_version.heading_planned_hours'|trans }}</h3>
       <table class="table table-bordered">
         <thead>
         <tr>
-          <th>{{ 'sprint_report_version.table.epic' | trans }}</th>
-          <th>{{ 'sprint_report_version.table.estimate' | trans }}</th>
-          <th>{{ 'sprint_report_version.table.remaining_hours' | trans }}</th>
-          <th>{{ 'sprint_report_version.table.planned_work_sum' | trans }}</th>
+          <th>{{ 'sprint_report_version.table.epic'|trans }}</th>
+          <th>{{ 'sprint_report_version.table.estimate'|trans }}</th>
+          <th>{{ 'sprint_report_version.table.remaining_hours'|trans }}</th>
+          <th>{{ 'sprint_report_version.table.planned_work_sum'|trans }}</th>
           {% for sprint in sprintReport.sprints %}
             {% if sprint.state == 'FUTURE' or sprint.state == 'ACTIVE' %}
               <th>{{ sprint.shortName }}</th>
