@@ -166,6 +166,8 @@ class GraphicServiceBillingService
      * @param array $tasks array of Jira tasks
      *
      * @return array
+     *
+     * @throws \Exception
      */
     public function createExportDataNotMarketing(array $tasks)
     {
@@ -177,9 +179,17 @@ class GraphicServiceBillingService
             $description = $this->getTaskDescription($task);
             $debtor = $task->fields->{$debtorFieldId} ?? false;
 
+            // If no debtor has been set, ignore the task, but display warning.
             if (!$debtor) {
-                // If no debtor has been set, ignore the task.
-                continue;
+                throw new \Exception($task->key.': Debtor not set.', 404);
+            }
+
+            // Remove surrounding whitespace.
+            $debtor = trim($debtor);
+
+            // If debtor is not numeric, ignore the task, but display warning.
+            if (!is_numeric($debtor)) {
+                throw new \Exception($task->key.': Debtor is not a number.', 400);
             }
 
             // Create header line data.
@@ -266,11 +276,13 @@ class GraphicServiceBillingService
         // Get order lines from jira task.
         $orderLines = $task->fields->{$orderLinesFieldId} ?? '';
 
-        return implode('', [
+        return trim(implode('', [
             $task->key.': ',
+            $task->fields->summary,
+            !empty($orderLines) ? '. Ordrelinjer: ' : '',
             // Replace \\ in orderLines string field with .
-            preg_replace('/\\\\\\\\/', '.', $orderLines),
-        ]);
+            !empty($orderLines) ? preg_replace('/\\\\\\\\/', '. ', $orderLines) : '',
+        ]));
     }
 
     /**
@@ -299,11 +311,14 @@ class GraphicServiceBillingService
      * Get all tasks in the interval from the project that have not been
      * billed and that have the status "Done".
      *
-     * @param int $projectId the Jira project id
+     * @param int            $projectId the Jira project id
+     * @param \DateTime|null $fromDate
+     * @param \DateTime|null $toDate
+     * @param bool           $marketing
      *
      * @return array
      */
-    public function getAllNonBilledFinishedTasks(int $projectId, \DateTime $from = null, \DateTime $to = null, bool $marketing = false)
+    public function getAllNonBilledFinishedTasks(int $projectId, \DateTime $fromDate = null, \DateTime $toDate = null, bool $marketing = false)
     {
         $billedCustomFieldId = $this->billingService->getCustomFieldId('Faktureret');
         $marketingAccountCustomFieldId = $this->billingService->getCustomFieldId('Marketing Account');
@@ -331,17 +346,14 @@ class GraphicServiceBillingService
                 continue;
             }
 
-            if (null !== $from) {
-                $diffFrom = $resolutionDate->diff($from)->format('%R');
-                if ('+' === $diffFrom) {
-                    continue;
-                }
+            // Ignore issues that are resolved before fromDate, if set.
+            if (null !== $fromDate && $resolutionDate < $fromDate) {
+                continue;
             }
-            if (null !== $to) {
-                $diffTo = $resolutionDate->diff($to)->format('%R');
-                if ('-' === $diffTo) {
-                    continue;
-                }
+
+            // Ignore issues that are resolved after toDate, if set.
+            if (null !== $toDate && $resolutionDate > $toDate) {
+                continue;
             }
 
             // Select issues that are from the marketing account or not (not both).

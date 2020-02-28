@@ -20,16 +20,13 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-        var Expense = {{
-                          {
-                              project_issues_url: project_issues_url,
-                              messages: {
-                              'expense.new.project.placeholder': 'expense.new.issue.help'|trans,
-                              'expense.new.search_for_issue_in_project': 'expense.new.search_for_issue_in_project'|trans,
-                              }
-                          }
-                          |json_encode|raw
-                      }};
+        var Expense = {{ {
+            project_issues_url: project_issues_url,
+            messages: {
+                'expense.new.project.placeholder': 'expense.new.issue.help'|trans,
+                'expense.new.search_for_issue_in_project': 'expense.new.search_for_issue_in_project'|trans,
+            }
+        }|json_encode|raw }};
     </script>
     {{ encore_entry_script_tags('expense') }}
 {% endblock %}

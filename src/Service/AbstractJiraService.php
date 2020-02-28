@@ -180,8 +180,11 @@ abstract class AbstractJiraService
         $boards = [];
 
         $start = 0;
-        while (true) {
-            $result = $this->get('/rest/agile/1.0/board?maxResults=50&startAt='.$start);
+        while ($start < 1000) {
+            $result = $this->get('/rest/agile/1.0/board', [
+                'maxResults' => 50,
+                'startAt' => $start,
+            ]);
             $boards = array_merge($boards, $result->values);
 
             if ($result->isLast) {
