@@ -279,9 +279,9 @@ class GraphicServiceBillingService
         return trim(implode('', [
             $task->key.': ',
             $task->fields->summary,
-            !empty($orderLines) ? ". Ordrelinjer: " : '',
+            !empty($orderLines) ? '. Ordrelinjer: ' : '',
             // Replace \\ in orderLines string field with .
-            !empty($orderLines) ? preg_replace('/\\\\\\\\/', ". ", $orderLines) : '',
+            !empty($orderLines) ? preg_replace('/\\\\\\\\/', '. ', $orderLines) : '',
         ]));
     }
 
