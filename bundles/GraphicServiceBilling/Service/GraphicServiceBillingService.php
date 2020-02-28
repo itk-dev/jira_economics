@@ -276,11 +276,13 @@ class GraphicServiceBillingService
         // Get order lines from jira task.
         $orderLines = $task->fields->{$orderLinesFieldId} ?? '';
 
-        return implode('', [
+        return trim(implode('', [
             $task->key.': ',
+            $task->fields->summary,
+            !empty($orderLines) ? ". Ordrelinjer: " : '',
             // Replace \\ in orderLines string field with .
-            preg_replace('/\\\\\\\\/', '.', $orderLines),
-        ]);
+            !empty($orderLines) ? preg_replace('/\\\\\\\\/', ". ", $orderLines) : '',
+        ]));
     }
 
     /**
