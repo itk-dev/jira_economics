@@ -123,7 +123,7 @@ class GraphicServiceBillingService
 
                 $lines[] = (object) [
                     'materialNumber' => $this->boundMaterialId,
-                    'product' => 'Design: '.$library,
+                    'product' => 'Design '.$library,
                     'amount' => 1,
                     'price' => $worklogsSum * $this->boundWorklogPricePerHour,
                     'psp' => $this->boundReceiverPSPWorklogs,
@@ -140,7 +140,7 @@ class GraphicServiceBillingService
 
                 $lines[] = (object) [
                     'materialNumber' => $this->boundMaterialId,
-                    'product' => 'Tryk: '.$library,
+                    'product' => 'Tryk '.$library,
                     'amount' => 1,
                     'price' => $expensesSum,
                     'psp' => $this->boundReceiverPSPExpenses,
@@ -229,7 +229,7 @@ class GraphicServiceBillingService
 
                 $lines[] = (object) [
                     'materialNumber' => $this->boundMaterialId,
-                    'product' => 'Design: '.$task->fields->summary,
+                    'product' => 'Design '.$task->fields->summary,
                     'amount' => 1,
                     'price' => $worklogsSum * $this->boundWorklogPricePerHour,
                     'psp' => $this->boundReceiverPSPWorklogs,
@@ -246,7 +246,7 @@ class GraphicServiceBillingService
 
                 $lines[] = (object) [
                     'materialNumber' => $this->boundMaterialId,
-                    'product' => 'Tryk: '.$task->fields->summary,
+                    'product' => 'Tryk '.$task->fields->summary,
                     'amount' => 1,
                     'price' => $expensesSum,
                     'psp' => $this->boundReceiverPSPExpenses,
