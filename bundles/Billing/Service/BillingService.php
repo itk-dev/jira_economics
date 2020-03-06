@@ -248,19 +248,19 @@ class BillingService extends JiraService
             throw new HttpException(400, 'Unable to update invoice with id '.$invoiceData['id'].' since it has been recorded.');
         }
 
-        if (!empty($invoiceData['name'])) {
+        if (isset($invoiceData['name'])) {
             $invoice->setName($invoiceData['name']);
         }
 
-        if (!empty($invoiceData['description'])) {
+        if (isset($invoiceData['description'])) {
             $invoice->setDescription($invoiceData['description']);
         }
 
-        if (!empty($invoiceData['customerAccountId'])) {
-            $invoice->setCustomerAccountId((int) $invoiceData['customerAccountId']);
+        if (isset($invoiceData['customerAccountId'])) {
+            $invoice->setCustomerAccountId($invoiceData['customerAccountId']);
         }
 
-        if (!empty($invoiceData['paidByAccount'])) {
+        if (isset($invoiceData['paidByAccount'])) {
             $invoice->setPaidByAccount($invoiceData['paidByAccount']);
         }
 
@@ -633,13 +633,21 @@ class BillingService extends JiraService
         $invoice->setRecorded(true);
         $invoice->setRecordedDate(new \DateTime());
 
-        if (null === $invoice->getCustomerAccountId()) {
+        $customerAccountId = $invoice->getCustomerAccountId();
+
+        if (!$customerAccountId) {
             throw new InvoiceException('Customer account id not set.', 400);
         }
 
-        $customerAccount = $this->getAccount($invoice->getCustomerAccountId());
+        try {
+            $customerAccount = $this->getAccount($customerAccountId);
+        } catch (\Exception $e) {
+            if (404 === $e->getCode()) {
+                throw new InvoiceException('Jira: Customer account not found', 404);
+            }
+        }
 
-        if (null === $customerAccount) {
+        if (!isset($customerAccount)) {
             throw new InvoiceException('Jira: Customer account does not exist', 400);
         }
 

@@ -3,60 +3,6 @@
 pipeline {
     agent any
     stages {
-        stage('Build and test') {
-            parallel {
-                stage('PHP') {
-                    agent {
-                        docker {
-                            image 'itkdev/php7.2-fpm:latest' /* 7.2 is used as phan only runs with this version */
-                            args '-v /var/lib/jenkins/.composer-cache:/.composer:rw'
-                        }
-                    }
-                    stages {
-                        stage('Build') {
-                            steps {
-                                sh 'composer install'
-                            }
-                        }
-                        stage('PHP7 compatibility') {
-                            steps {
-                                sh 'vendor/bin/phan --allow-polyfill-parser'
-
-                            }
-                        }
-                        stage('Coding standards') {
-                            steps {
-                                sh 'vendor/bin/phpcs --standard=phpcs.xml.dist'
-                                sh 'vendor/bin/php-cs-fixer --config=.php_cs.dist fix --dry-run --verbose'
-                                sh 'vendor/bin/twigcs lint templates'
-                                sh 'vendor/bin/twigcs lint bundles/Billing/Resources/views'
-                                sh 'vendor/bin/twigcs lint bundles/CreateProject/Resources/views'
-                                sh 'vendor/bin/twigcs lint bundles/GraphicServiceOrder/Resources/views'
-                            }
-                        }
-                    }
-                }
-                stage('Yarn - encore') {
-                    stages {
-                        stage('Install') {
-                            steps {
-                                sh 'docker run -v $WORKSPACE:/app -v /var/lib/jenkins/.yarn-cache:/usr/local/share/.cache/yarn:rw itkdev/yarn:latest install'
-                            }
-                        }
-                        stage('Coding standards') {
-                            steps {
-                                sh 'docker run -v $WORKSPACE:/app -v /var/lib/jenkins/.yarn-cache:/usr/local/share/.cache/yarn:rw itkdev/yarn:latest check-coding-standards'
-                            }
-                        }
-                        stage('Build') {
-                            steps {
-                                sh 'docker run -v $WORKSPACE:/app -v /var/lib/jenkins/.yarn-cache:/usr/local/share/.cache/yarn:rw itkdev/yarn:latest build'
-                            }
-                        }
-                    }
-                }
-            }
-        }
         stage('Deployment staging') {
             when {
                 branch 'release'
@@ -73,6 +19,10 @@ pipeline {
 
                 // Run migrations.
                 sh "ansible srvitkphp72stg -m shell -a 'cd /data/www/economics_srvitkphp72stg_itkdev_dk/htdocs; APP_ENV=prod php bin/console doctrine:migrations:migrate --no-interaction'"
+
+                // Build assets
+                sh 'docker run -v $WORKSPACE:/app -v /var/lib/jenkins/.yarn-cache:/usr/local/share/.cache/yarn:rw itkdev/yarn:latest install'
+                sh 'docker run -v $WORKSPACE:/app -v /var/lib/jenkins/.yarn-cache:/usr/local/share/.cache/yarn:rw itkdev/yarn:latest build'
 
                 // Copy encore assets.
                 sh "ansible srvitkphp72stg -m synchronize -a 'src=${WORKSPACE}/public/build/ dest=/data/www/economics_srvitkphp72stg_itkdev_dk/htdocs/public/build'"
@@ -94,6 +44,10 @@ pipeline {
 
                 // Run composer.
                 sh "ansible srvitkeconomics -m shell -a 'cd /data/www/portal_itkdev_dk/htdocs; composer install --no-dev -o'"
+
+                // Build assets
+                sh 'docker run -v $WORKSPACE:/app -v /var/lib/jenkins/.yarn-cache:/usr/local/share/.cache/yarn:rw itkdev/yarn:latest install'
+                sh 'docker run -v $WORKSPACE:/app -v /var/lib/jenkins/.yarn-cache:/usr/local/share/.cache/yarn:rw itkdev/yarn:latest build'
 
                 // Copy encore assets.
                 sh "ansible srvitkeconomics -m synchronize -a 'src=${WORKSPACE}/public/build/ dest=/data/www/portal_itkdev_dk/htdocs/public/build'"
