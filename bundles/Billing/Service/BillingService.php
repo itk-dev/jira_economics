@@ -641,9 +641,8 @@ class BillingService extends JiraService
 
         try {
             $customerAccount = $this->getAccount($customerAccountId);
-        }
-        catch (\Exception $e) {
-            if ($e->getCode() === 404) {
+        } catch (\Exception $e) {
+            if (404 === $e->getCode()) {
                 throw new InvoiceException('Jira: Customer account not found', 404);
             }
         }
