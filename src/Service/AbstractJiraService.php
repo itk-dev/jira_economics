@@ -401,7 +401,6 @@ abstract class AbstractJiraService
      */
     public function getUser($username)
     {
-
       try {
         $result = $this->get('/rest/api/2/user', ['username' => $username]);
       } catch (RequestException $e) {
