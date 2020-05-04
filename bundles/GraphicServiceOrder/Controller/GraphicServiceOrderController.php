@@ -42,7 +42,7 @@ class GraphicServiceOrderController extends AbstractController
         $user_email = $tokenStorage->getToken()->getUser()->getEmail();
         $jira_user = $orderService->getUser($user_email);
 
-        if ($jira_user && $jira_user->active == false) {
+        if ($jira_user && $jira_user->active === false) {
             return $this->redirectToRoute('graphic_service_order_showerror', ['error' => 'blocked']);
         }
 
@@ -98,19 +98,19 @@ class GraphicServiceOrderController extends AbstractController
         ]);
     }
 
-  /**
-   * Error page displayed if something isn't working.
-   *
-   * @param String $error
-   *
-   * @Route("/create-graphic-service-order/error/{error}", name="showerror")
-   *
-   * @return \Symfony\Component\HttpFoundation\Response
-   */
+    /**
+     * Error page displayed if something isn't working.
+     *
+     * @param String $error
+     *
+     * @Route("/create-graphic-service-order/error/{error}", name="showerror")
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function showError($error)
     {
         return $this->render('@GraphicServiceOrderBundle/showError.html.twig', [
-        'error' => $error,
+            'error' => $error,
         ]);
     }
 }

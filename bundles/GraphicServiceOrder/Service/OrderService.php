@@ -228,21 +228,21 @@ class OrderService
         // Create a task on a jira project.
         $taskCreated = $this->createOrderTask($gsOrder);
         if ($taskCreated) {
-          // Add task values to order entity.
+            // Add task values to order entity.
             $gsOrder->setIssueId($taskCreated->id);
             $gsOrder->setIssueKey($taskCreated->key);
 
-          // Create a folder with issue key as name.
+            // Create a folder with issue key as name.
             $this->createFolder($taskCreated->key);
 
-          // Store file locally.
+            // Store file locally.
             $gsOrder = $this->storeFile($gsOrder, $form);
             $gsOrder->setOrderStatus('new');
 
             $this->entityManager->persist($gsOrder);
             $this->entityManager->flush();
 
-          // Notify messenger of new job.
+            // Notify messenger of new job.
             $this->messageBus->dispatch(new OwnCloudShareMessage($gsOrder->getId()));
 
             $this->sendReceiptMail($gsOrder);
@@ -250,14 +250,14 @@ class OrderService
         }
     }
 
-  /**
-   * Get user from Jira by email.
-   *
-   * @param String $email
-   *
-   * @return mixed
-   */
-    public function getUser(String $email)
+    /**
+     * Get user from Jira by email.
+     *
+     * @param String $email
+     *
+     * @return mixed
+     */
+    public function getUser(string $email)
     {
         return $this->hammerService->getUser($email);
     }
