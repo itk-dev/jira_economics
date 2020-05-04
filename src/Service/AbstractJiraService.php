@@ -411,7 +411,7 @@ abstract class AbstractJiraService
     }
 
 
-  /**
+    /**
      * Get users from search.
      *
      * @return mixed
