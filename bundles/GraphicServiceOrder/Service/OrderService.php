@@ -253,7 +253,7 @@ class OrderService
     /**
      * Get user from Jira by email.
      *
-     * @param String $email
+     * @param string $email
      *
      * @return mixed
      */

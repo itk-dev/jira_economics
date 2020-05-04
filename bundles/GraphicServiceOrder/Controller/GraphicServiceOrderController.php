@@ -42,7 +42,7 @@ class GraphicServiceOrderController extends AbstractController
         $user_email = $tokenStorage->getToken()->getUser()->getEmail();
         $jira_user = $orderService->getUser($user_email);
 
-        if ($jira_user && $jira_user->active === false) {
+        if ($jira_user && false === $jira_user->active) {
             return $this->redirectToRoute('graphic_service_order_showerror', ['error' => 'blocked']);
         }
 
