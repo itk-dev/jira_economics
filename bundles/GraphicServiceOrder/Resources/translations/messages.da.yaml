@@ -67,3 +67,7 @@ service_order_form:
 service_order_email.subject: Ordre modtaget ved ITK Grafisk Service
 service_order_email.header: Bestilling modtaget.
 service_order_email.subheader: ITK Grafisk Service har modtaget din bestilling. Vi vender tilbage.
+service_order_errorpage:
+  title: Noget gik galt
+  user_blocked: Din bruger er blevet blokeret i systemet. Kontakt ITK.
+  default: Der er opstået en fejl. Kontakt ITK.

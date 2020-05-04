@@ -32,12 +32,20 @@ class GraphicServiceOrderController extends AbstractController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      *
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
     public function newOrder(Request $request, OrderService $orderService, TokenStorageInterface $tokenStorage)
     {
+        $user_email = $tokenStorage->getToken()->getUser()->getEmail();
+        $jira_user = $orderService->getUser($user_email);
+
+        if ($jira_user && $jira_user->active == FALSE) {
+          return $this->redirectToRoute('graphic_service_order_showerror', ['error' => 'blocked']);
+        }
+
         $gsOrder = $orderService->prepareOrder();
         $options = [
             'used_debtors' => $orderService->getUsedDebtors(),
@@ -57,7 +65,7 @@ class GraphicServiceOrderController extends AbstractController
         // The initial form build.
         return $this->render('@GraphicServiceOrderBundle/createOrderForm.html.twig', [
             'form' => $form->createView(),
-            'user_email' => $tokenStorage->getToken()->getUser()->getEmail(),
+            'user_email' => $user_email,
             'options' => $options,
         ]);
     }
@@ -88,5 +96,21 @@ class GraphicServiceOrderController extends AbstractController
         return $this->render('@GraphicServiceOrderBundle/showDeliveryNote.html.twig', [
             'order' => $order,
         ]);
+    }
+
+  /**
+   * Error page displayed if something isn't working.
+   *
+   * @param String $error
+   *
+   * @Route("/create-graphic-service-order/error/{error}", name="showerror")
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   */
+    public function showError($error)
+    {
+      return $this->render('@GraphicServiceOrderBundle/showError.html.twig', [
+        'error' => $error,
+      ]);
     }
 }
