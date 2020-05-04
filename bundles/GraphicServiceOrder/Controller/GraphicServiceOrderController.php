@@ -42,8 +42,8 @@ class GraphicServiceOrderController extends AbstractController
         $user_email = $tokenStorage->getToken()->getUser()->getEmail();
         $jira_user = $orderService->getUser($user_email);
 
-        if ($jira_user && $jira_user->active == FALSE) {
-          return $this->redirectToRoute('graphic_service_order_showerror', ['error' => 'blocked']);
+        if ($jira_user && $jira_user->active == false) {
+            return $this->redirectToRoute('graphic_service_order_showerror', ['error' => 'blocked']);
         }
 
         $gsOrder = $orderService->prepareOrder();
@@ -109,8 +109,8 @@ class GraphicServiceOrderController extends AbstractController
    */
     public function showError($error)
     {
-      return $this->render('@GraphicServiceOrderBundle/showError.html.twig', [
+        return $this->render('@GraphicServiceOrderBundle/showError.html.twig', [
         'error' => $error,
-      ]);
+        ]);
     }
 }

@@ -229,24 +229,24 @@ class OrderService
         $taskCreated = $this->createOrderTask($gsOrder);
         if ($taskCreated) {
           // Add task values to order entity.
-          $gsOrder->setIssueId($taskCreated->id);
-          $gsOrder->setIssueKey($taskCreated->key);
+            $gsOrder->setIssueId($taskCreated->id);
+            $gsOrder->setIssueKey($taskCreated->key);
 
           // Create a folder with issue key as name.
-          $this->createFolder($taskCreated->key);
+            $this->createFolder($taskCreated->key);
 
           // Store file locally.
-          $gsOrder = $this->storeFile($gsOrder, $form);
-          $gsOrder->setOrderStatus('new');
+            $gsOrder = $this->storeFile($gsOrder, $form);
+            $gsOrder->setOrderStatus('new');
 
-          $this->entityManager->persist($gsOrder);
-          $this->entityManager->flush();
+            $this->entityManager->persist($gsOrder);
+            $this->entityManager->flush();
 
           // Notify messenger of new job.
-          $this->messageBus->dispatch(new OwnCloudShareMessage($gsOrder->getId()));
+            $this->messageBus->dispatch(new OwnCloudShareMessage($gsOrder->getId()));
 
-          $this->sendReceiptMail($gsOrder);
-          $this->updateUserWithGSOrder($gsOrder);
+            $this->sendReceiptMail($gsOrder);
+            $this->updateUserWithGSOrder($gsOrder);
         }
     }
 
@@ -257,8 +257,9 @@ class OrderService
    *
    * @return mixed
    */
-    public function getUser(String $email) {
-      return $this->hammerService->getUser($email);
+    public function getUser(String $email)
+    {
+        return $this->hammerService->getUser($email);
     }
 
     /**
