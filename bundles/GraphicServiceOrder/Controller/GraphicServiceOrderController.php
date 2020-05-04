@@ -101,7 +101,7 @@ class GraphicServiceOrderController extends AbstractController
     /**
      * Error page displayed if something isn't working.
      *
-     * @param String $error
+     * @param string $error
      *
      * @Route("/create-graphic-service-order/error/{error}", name="showerror")
      *

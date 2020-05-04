@@ -410,7 +410,6 @@ abstract class AbstractJiraService
         return $result;
     }
 
-
     /**
      * Get users from search.
      *
