@@ -39,10 +39,10 @@ class GraphicServiceOrderController extends AbstractController
      */
     public function newOrder(Request $request, OrderService $orderService, TokenStorageInterface $tokenStorage)
     {
-        $user_email = $tokenStorage->getToken()->getUser()->getEmail();
-        $jira_user = $orderService->getUser($user_email);
+        $userEmail = $tokenStorage->getToken()->getUser()->getEmail();
+        $jiraUser = $orderService->getUser($userEmail);
 
-        if ($jira_user && false === $jira_user->active) {
+        if ($jiraUser && false === $jiraUser->active) {
             return $this->redirectToRoute('graphic_service_order_showerror', ['error' => 'blocked']);
         }
 
@@ -65,7 +65,7 @@ class GraphicServiceOrderController extends AbstractController
         // The initial form build.
         return $this->render('@GraphicServiceOrderBundle/createOrderForm.html.twig', [
             'form' => $form->createView(),
-            'user_email' => $user_email,
+            'user_email' => $userEmail,
             'options' => $options,
         ]);
     }
