@@ -395,6 +395,22 @@ abstract class AbstractJiraService
     }
 
     /**
+     * Get user from name.
+     *
+     * @return mixed
+     */
+    public function getUser($username)
+    {
+        try {
+            $result = $this->get('/rest/api/2/user', ['username' => $username]);
+        } catch (RequestException $e) {
+            return null;
+        }
+
+        return $result;
+    }
+
+    /**
      * Get users from search.
      *
      * @return mixed

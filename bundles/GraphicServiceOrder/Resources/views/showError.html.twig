@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+  {{ 'service_order_errorpage.title'|trans }}
+{% endblock %}
+
+{% block content %}
+  <h1>{{ 'service_order_errorpage.title'|trans }}</h1>
+  {% if error == 'blocked' %}
+    {{ 'service_order_errorpage.user_blocked'|trans }}
+  {% else %}
+    {{ 'service_order_errorpage.default'|trans }}
+  {% endif %}
+{% endblock %}
