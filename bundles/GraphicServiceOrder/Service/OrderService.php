@@ -227,26 +227,39 @@ class OrderService
         $this->entityManager->flush();
         // Create a task on a jira project.
         $taskCreated = $this->createOrderTask($gsOrder);
+        if ($taskCreated) {
+            // Add task values to order entity.
+            $gsOrder->setIssueId($taskCreated->id);
+            $gsOrder->setIssueKey($taskCreated->key);
 
-        // Add task values to order entity.
-        $gsOrder->setIssueId($taskCreated->id);
-        $gsOrder->setIssueKey($taskCreated->key);
+            // Create a folder with issue key as name.
+            $this->createFolder($taskCreated->key);
 
-        // Create a folder with issue key as name.
-        $this->createFolder($taskCreated->key);
+            // Store file locally.
+            $gsOrder = $this->storeFile($gsOrder, $form);
+            $gsOrder->setOrderStatus('new');
 
-        // Store file locally.
-        $gsOrder = $this->storeFile($gsOrder, $form);
-        $gsOrder->setOrderStatus('new');
+            $this->entityManager->persist($gsOrder);
+            $this->entityManager->flush();
 
-        $this->entityManager->persist($gsOrder);
-        $this->entityManager->flush();
+            // Notify messenger of new job.
+            $this->messageBus->dispatch(new OwnCloudShareMessage($gsOrder->getId()));
 
-        // Notify messenger of new job.
-        $this->messageBus->dispatch(new OwnCloudShareMessage($gsOrder->getId()));
+            $this->sendReceiptMail($gsOrder);
+            $this->updateUserWithGSOrder($gsOrder);
+        }
+    }
 
-        $this->sendReceiptMail($gsOrder);
-        $this->updateUserWithGSOrder($gsOrder);
+    /**
+     * Get user from Jira by email.
+     *
+     * @param string $email
+     *
+     * @return mixed
+     */
+    public function getUser(string $email)
+    {
+        return $this->hammerService->getUser($email);
     }
 
     /**
@@ -313,6 +326,7 @@ class OrderService
                 'emailAddress' => $authorEmail,
                 'displayName' => $authorEmail,
             ];
+
             $this->hammerService->createUser($userFields);
             $author = $userFields['name'];
         }
