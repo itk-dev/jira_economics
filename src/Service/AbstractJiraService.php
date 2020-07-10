@@ -410,29 +410,29 @@ abstract class AbstractJiraService
         return $result;
     }
 
-  /**
-   * Get users from search.
-   *
-   * @param $email
-   *   An email from a portal user.
-   *
-   * @return mixed|null
-   *   A Jira user or NULL.
-   */
+    /**
+     * Get users from search.
+     *
+     * @param $email
+     *   An email from a portal user
+     *
+     * @return mixed|null
+     *                    A Jira user or NULL
+     */
     public function searchUser($email)
     {
         $result = $this->get('/rest/api/2/user/search', ['username' => $email]);
         // The call searches on name, username and email which may produce.
         // multiple results. We only want those matching on email.
-        if(!empty($result)) {
-          foreach ($result as $jiraUser) {
-            if ($jiraUser->emailAddress == $email) {
-              return $jiraUser;
+        if (!empty($result)) {
+            foreach ($result as $jiraUser) {
+                if ($jiraUser->emailAddress === $email) {
+                    return $jiraUser;
+                }
             }
-          }
         }
 
-        return NULL;
+        return null;
     }
 
     /**
