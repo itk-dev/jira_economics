@@ -318,7 +318,7 @@ class OrderService
         $userSearch = $this->hammerService->searchUser($authorEmail);
         if (!empty($userSearch)) {
             // We fairly assume only one existing user matches the email.
-            $author = $userSearch[0]->key;
+            $author = $userSearch->emailAddress;
         } else {
             // If no match we create a new user.
             $userFields = [
@@ -328,7 +328,7 @@ class OrderService
             ];
 
             $this->hammerService->createUser($userFields);
-            $author = $userFields['name'];
+            $author = $userFields['emailAddress'];
         }
 
         $description = $this->getDescription($gsOrder);
