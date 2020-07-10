@@ -417,7 +417,7 @@ abstract class AbstractJiraService
      *   An email from a portal user
      *
      * @return mixed|null
-     *   A Jira user or NULL
+     *                    A Jira user or NULL
      */
     public function searchUser($email)
     {
