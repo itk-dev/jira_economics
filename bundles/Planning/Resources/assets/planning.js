@@ -146,7 +146,7 @@ require('./planning.css');
 
                 if (remainingEstimateUser > 70) {
                     return 'remaining-critical';
-                } else if (remainingEstimateUser == 60) {
+                } else if (remainingEstimateUser === 60) {
                     return 'remaining-warning';
                 } else if (remainingEstimateUser > 53 && remainingEstimateUser <= 70) {
                     return 'remaining-danger';
