@@ -143,17 +143,15 @@ require('./planning.css');
             },
             getStatusLevelClass: function (user, sprint) {
                 let remainingEstimateUser = this.getRemainingEstimatUser(user, sprint);
-
-                if (remainingEstimateUser > 70) {
+                
+                if (Number(remainingEstimateUser) === 60){ 
+                    return 'remaining-holiday';
+                } else if (remainingEstimateUser > 53) {
                     return 'remaining-critical';
-                } else if (remainingEstimateUser === 60) {
-                    return 'remaining-warning';
-                } else if (remainingEstimateUser > 53 && remainingEstimateUser <= 70) {
-                    return 'remaining-danger';
                 } else if (remainingEstimateUser > 0 && remainingEstimateUser <= 53) {
                     return 'remaining-success';
                 } else {
-                    return '';
+                    return ''; 
                 }
             },
             getRemainingEstimatUserProjectSprint: function (user, project, sprint) {
