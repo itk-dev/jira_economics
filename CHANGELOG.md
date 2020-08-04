@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## In develop
+
+* Changed color scheme to match 2 week sprints.
+
 ## 1.6.0
 
 * Changed spreadsheet export to use temporary files.
