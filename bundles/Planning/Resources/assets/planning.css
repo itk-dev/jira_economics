@@ -13,25 +13,31 @@
 }
 
 .remaining-critical {
-  color: white;
-  background-color: #880066;
+  color: black;
+  background-color: #EB886F;
   font-weight: bold;
 }
 
 .remaining-warning {
-  color: white;
-  background-color: #ffc107;
+  color: black;
+  background-color: #EB886F;
   font-weight: bold;
 }
 
 .remaining-danger {
-  color: white;
-  background-color: #dc3545;
+  color: black;
+  background-color: #EB886F;
   font-weight: bold;
 }
 
 .remaining-success {
   color: white;
-  background-color: #28a745;
+  background-color: #2FB1A2;
+  font-weight: bold;
+}
+
+.remaining-holiday {
+  color: white;
+  background-color:#264653;
   font-weight: bold;
 }

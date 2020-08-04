@@ -142,15 +142,13 @@ require('./planning.css');
                 }
             },
             getStatusLevelClass: function (user, sprint) {
-                let remainingEstimateUser = this.getRemainingEstimatUser(user, sprint);
+                let remainingEstimateUser = Number(this.getRemainingEstimatUser(user, sprint));
 
-                if (remainingEstimateUser > 35) {
+                if (remainingEstimateUser === 60) {
+                    return 'remaining-holiday';
+                } else if (remainingEstimateUser > 53) {
                     return 'remaining-critical';
-                } else if (remainingEstimateUser > 28 && remainingEstimateUser <= 30) {
-                    return 'remaining-warning';
-                } else if (remainingEstimateUser > 30 && remainingEstimateUser <= 35) {
-                    return 'remaining-danger';
-                } else if (remainingEstimateUser >= 24 && remainingEstimateUser <= 28) {
+                } else if (remainingEstimateUser > 0 && remainingEstimateUser <= 53) {
                     return 'remaining-success';
                 } else {
                     return '';
