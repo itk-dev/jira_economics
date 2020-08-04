@@ -142,9 +142,9 @@ require('./planning.css');
                 }
             },
             getStatusLevelClass: function (user, sprint) {
-                let remainingEstimateUser = this.getRemainingEstimatUser(user, sprint);
+                let remainingEstimateUser = Number(this.getRemainingEstimatUser(user, sprint));
 
-                if (Number(remainingEstimateUser) === 60) {
+                if (remainingEstimateUser === 60) {
                     return 'remaining-holiday';
                 } else if (remainingEstimateUser > 53) {
                     return 'remaining-critical';
