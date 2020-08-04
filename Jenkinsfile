@@ -54,11 +54,4 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            script {
-                slackNotifier(currentBuild.currentResult)
-            }
-        }
-    }
 }
