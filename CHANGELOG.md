@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## In develop
+## 1.8.0
 
 * Changed color scheme to match 2 week sprints.
 
