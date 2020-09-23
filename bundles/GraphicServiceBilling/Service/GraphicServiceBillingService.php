@@ -459,7 +459,8 @@ class GraphicServiceBillingService
      *
      * @return string|string[]|null
      */
-    private function sanitizeInput(string $input) {
+    private function sanitizeInput(string $input)
+    {
         return preg_replace('/[^A-Za-z0-9æÆøØåÅ]/', ' ', $input);
     }
 }
