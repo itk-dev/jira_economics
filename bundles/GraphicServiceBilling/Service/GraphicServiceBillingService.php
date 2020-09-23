@@ -392,6 +392,9 @@ class GraphicServiceBillingService
         foreach ($invoiceEntries as $entry) {
             $header = $entry->header;
 
+            // Replace all special characters with spaces.
+            $description = $this->sanitizeInput($header->description ?? '');
+
             // Generate header line (H).
             // A. "Linietype"
             $sheet->setCellValueByColumnAndRow(1, $row, 'H');
@@ -412,7 +415,7 @@ class GraphicServiceBillingService
             // O. "Kunderef.ID"
             $sheet->setCellValueByColumnAndRow(15, $row, isset($header->contactName) ? substr('Att: '.$header->contactName, 0, 35) : '');
             // P. "Toptekst, yderligere spec i det hvide felt på fakturaen"
-            $sheet->setCellValueByColumnAndRow(16, $row, substr($header->description, 0, 500));
+            $sheet->setCellValueByColumnAndRow(16, $row, substr($description, 0, 500));
             // Q. "Leverandør"
             if ($header->internal) {
                 $sheet->setCellValueByColumnAndRow(17, $row, str_pad($header->supplier, 10, '0', STR_PAD_LEFT));
@@ -423,13 +426,16 @@ class GraphicServiceBillingService
             ++$row;
 
             foreach ($lines as $line) {
+                // Replace all special characters with spaces.
+                $product = $this->sanitizeInput($line->product ?? '');
+
                 // Generate invoice lines (L).
                 // A. "Linietype"
                 $sheet->setCellValueByColumnAndRow(1, $row, 'L');
                 // B. "Materiale (vare)nr.
                 $sheet->setCellValueByColumnAndRow(2, $row, str_pad($line->materialNumber, 18, '0', STR_PAD_LEFT));
                 // C. "Beskrivelse"
-                $sheet->setCellValueByColumnAndRow(3, $row, $line->product);
+                $sheet->setCellValueByColumnAndRow(3, $row, $product);
                 // D. "Ordremængde"
                 $sheet->setCellValueByColumnAndRow(4, $row, number_format($line->amount, 3, ',', ''));
                 // E. "Beløb pr. enhed"
@@ -444,5 +450,16 @@ class GraphicServiceBillingService
         }
 
         return $spreadsheet;
+    }
+
+    /**
+     * Replace all unwanted characters from the input with spaces.
+     *
+     * @param string $input
+     *
+     * @return string|string[]|null
+     */
+    private function sanitizeInput(string $input) {
+        return preg_replace('/[^A-Za-z0-9æÆøØåÅ]/', ' ', $input);
     }
 }

@@ -152,11 +152,13 @@ class MainController extends AbstractController
                     $body = $d->getElementsByTagName('body')->item(0);
                     /* @var \DOMNode $child */
                     foreach ($body->childNodes as $child) {
-                        if ('style' === $child->tagName) {
-                            continue;
-                        }
-                        if ('table' === $child->tagName) {
-                            $child->setAttribute('class', 'table table-bordered');
+                        if (isset($child->tagName)) {
+                            if ('style' === $child->tagName) {
+                                continue;
+                            }
+                            if ('table' === $child->tagName) {
+                                $child->setAttribute('class', 'table table-bordered');
+                            }
                         }
                         $preview->appendChild($preview->importNode($child, true));
                     }
