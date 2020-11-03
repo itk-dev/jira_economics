@@ -822,7 +822,8 @@ class BillingService extends JiraService
             if (!$internal && 13 === \strlen($accountKey)) {
                 $sheet->setCellValueByColumnAndRow(18, $row, $accountKey);
             }
-
+            // X
+            $sheet->setCellValueByColumnAndRow(19, $row, substr($invoice->getName(), 0, 500));
             ++$row;
 
             foreach ($invoice->getInvoiceEntries() as $invoiceEntry) {
