@@ -146,9 +146,9 @@ require('./planning.css');
 
                 if (remainingEstimateUser === 60) {
                     return 'remaining-holiday';
-                } else if (remainingEstimateUser > 53) {
+                } else if (remainingEstimateUser > 40) {
                     return 'remaining-critical';
-                } else if (remainingEstimateUser > 0 && remainingEstimateUser <= 53) {
+                } else if (remainingEstimateUser > 30 && remainingEstimateUser <= 40) {
                     return 'remaining-success';
                 } else {
                     return '';
