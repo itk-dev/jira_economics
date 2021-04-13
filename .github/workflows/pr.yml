@@ -7,10 +7,10 @@ jobs:
         steps:
             -   uses: actions/checkout@master
             -   name: Setup PHP, with composer and extensions
-                uses: shivammathur/setup-php@master
+                uses: shivammathur/setup-php@v2
                 with:
                     php-version: 7.2
-                    extension-csv: ctype, dom, iconv, json
+                    extension: ctype, dom, iconv, json
                     coverage: none
             -   name: Validate composer files
                 run: |
@@ -22,10 +22,10 @@ jobs:
         steps:
             - uses: actions/checkout@master
             - name: Setup PHP, with composer and extensions
-              uses: shivammathur/setup-php@master
+              uses: shivammathur/setup-php@v2
               with:
                   php-version: 7.2
-                  extension-csv: ctype, dom, iconv, json
+                  extension: ctype, dom, iconv, json
                   coverage: none
             - name: Install Reviewdog
               run: |
@@ -45,10 +45,10 @@ jobs:
         steps:
             - uses: actions/checkout@master
             - name: Setup PHP, with composer and extensions
-              uses: shivammathur/setup-php@master
+              uses: shivammathur/setup-php@v2
               with:
                   php-version: 7.2
-                  extension-csv: ctype, dom, iconv, json
+                  extension: ctype, dom, iconv, json
                   coverage: none
             - name: Install Dependencies
               run: |
@@ -63,10 +63,10 @@ jobs:
         steps:
             - uses: actions/checkout@master
             - name: Setup PHP, with composer and extensions
-              uses: shivammathur/setup-php@master
+              uses: shivammathur/setup-php@v2
               with:
                   php-version: 7.2
-                  extension-csv: ctype, dom, iconv, json
+                  extension: ctype, dom, iconv, json
                   coverage: none
             - name: Install Dependencies
               run: |
@@ -81,10 +81,10 @@ jobs:
         steps:
             - uses: actions/checkout@master
             - name: Setup PHP, with composer and extensions
-              uses: shivammathur/setup-php@master
+              uses: shivammathur/setup-php@v2
               with:
                   php-version: 7.2
-                  extension-csv: ctype, dom, iconv, json
+                  extension: ctype, dom, iconv, json
                   coverage: none
             - name: Install Dependencies
               run: |
