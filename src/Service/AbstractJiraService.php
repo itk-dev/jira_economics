@@ -158,10 +158,10 @@ abstract class AbstractJiraService
             if (!isset($result->projectCategory) || 'Lukket' !== $result->projectCategory->name) {
                 $result->url = parse_url(
                     $result->self,
-                    PHP_URL_SCHEME
+                    \PHP_URL_SCHEME
                 ).'://'.parse_url(
                     $result->self,
-                    PHP_URL_HOST
+                    \PHP_URL_HOST
                 ).'/browse/'.$result->key;
                 $projects[] = $result;
             }

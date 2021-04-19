@@ -312,7 +312,7 @@ class ProjectBillingService
             // A. "Linietype"
             $sheet->setCellValueByColumnAndRow(1, $row, 'H');
             // B. "Ordregiver/Bestiller"
-            $sheet->setCellValueByColumnAndRow(2, $row, str_pad($header->debtor, 10, '0', STR_PAD_LEFT));
+            $sheet->setCellValueByColumnAndRow(2, $row, str_pad($header->debtor, 10, '0', \STR_PAD_LEFT));
             // D. "Fakturadato"
             $sheet->setCellValueByColumnAndRow(4, $row, (new \DateTime())->format('d.m.Y'));
             // E. "Bilagsdato"
@@ -331,7 +331,7 @@ class ProjectBillingService
             $sheet->setCellValueByColumnAndRow(16, $row, substr($header->description, 0, 500));
             // Q. "Leverandør"
             if ($header->internal) {
-                $sheet->setCellValueByColumnAndRow(17, $row, str_pad($header->supplier, 10, '0', STR_PAD_LEFT));
+                $sheet->setCellValueByColumnAndRow(17, $row, str_pad($header->supplier, 10, '0', \STR_PAD_LEFT));
             }
             // R. "EAN nr."
             if (!$header->internal && 13 === \strlen($header->ean)) {
@@ -347,7 +347,7 @@ class ProjectBillingService
                 // A. "Linietype"
                 $sheet->setCellValueByColumnAndRow(1, $row, 'L');
                 // B. "Materiale (vare)nr.
-                $sheet->setCellValueByColumnAndRow(2, $row, str_pad($line->materialNumber, 18, '0', STR_PAD_LEFT));
+                $sheet->setCellValueByColumnAndRow(2, $row, str_pad($line->materialNumber, 18, '0', \STR_PAD_LEFT));
                 // C. "Beskrivelse"
                 $sheet->setCellValueByColumnAndRow(3, $row, $line->product);
                 // D. "Ordremængde"
