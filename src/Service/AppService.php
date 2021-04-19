@@ -86,7 +86,7 @@ class AppService
                     static function ($app) use ($enabledApps) {
                         return \in_array($app, $enabledApps, true);
                     },
-                    ARRAY_FILTER_USE_KEY
+                    \ARRAY_FILTER_USE_KEY
                 );
             }
         }

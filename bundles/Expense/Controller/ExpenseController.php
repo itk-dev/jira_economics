@@ -98,7 +98,7 @@ class ExpenseController extends AbstractController
                 'placeholder' => 'expense.new.project.placeholder',
                 'choices' => $projects,
                 'choice_value' => 'key',
-                'choice_label' => function ($project) use ($translator) {
+                'choice_label' => function ($project) {
                     return sprintf('%s (%s)', $project->name, $project->key);
                 },
                 'data' => $selectedProject,
