@@ -77,7 +77,7 @@ class MenuService
                 \in_array($app, ['admin', 'jira', 'portal'], true)
                 // Check access to app.
                 || \array_key_exists($app, $apps);
-        }, ARRAY_FILTER_USE_KEY);
+        }, \ARRAY_FILTER_USE_KEY);
 
         return $items;
     }
