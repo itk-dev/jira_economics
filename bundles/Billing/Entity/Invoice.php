@@ -91,6 +91,16 @@ class Invoice extends AbstractEntity
      */
     private $paidByAccount;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $defaultPayToAccount;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $defaultMaterialNumber;
+
     public function __construct()
     {
         $this->invoiceEntries = new ArrayCollection();
@@ -279,6 +289,30 @@ class Invoice extends AbstractEntity
     public function setPaidByAccount(?string $paidByAccount): self
     {
         $this->paidByAccount = $paidByAccount;
+
+        return $this;
+    }
+
+    public function getDefaultPayToAccount(): ?string
+    {
+        return $this->defaultPayToAccount;
+    }
+
+    public function setDefaultPayToAccount(?string $defaultPayToAccount): self
+    {
+        $this->defaultPayToAccount = $defaultPayToAccount;
+
+        return $this;
+    }
+
+    public function getDefaultMaterialNumber(): ?string
+    {
+        return $this->defaultMaterialNumber;
+    }
+
+    public function setDefaultMaterialNumber(?string $defaultMaterialNumber): self
+    {
+        $this->defaultMaterialNumber = $defaultMaterialNumber;
 
         return $this;
     }

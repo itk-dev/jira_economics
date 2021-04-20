@@ -34,11 +34,14 @@ class Invoice extends Component {
             formDescription: null,
             formPaidByAccount: null,
             formAccount: null,
+            formDefaultPayToAccount: null,
+            formDefaultMaterialNumber: null,
 
             invoice: null,
             invoiceEntries: {},
             entryIdToDelete: null,
             toAccounts: {},
+            materialNumbers: {},
             accounts: null
         };
     };
@@ -62,12 +65,22 @@ class Invoice extends Component {
                 Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
             });
 
+        dispatch(rest.actions.getMaterialNumbers())
+            .then((response) => {
+                this.setState({ materialNumbers: response });
+            })
+            .catch((reason) => {
+                Bus.emit('flash', ({ message: JSON.stringify(reason), type: 'danger' }));
+            });
+
         dispatch(rest.actions.getInvoice({ id: `${this.props.match.params.invoiceId}` }))
             .then((response) => {
                 this.setState({
                     invoice: response,
                     formDescription: response.description ? response.description : '',
                     formPaidByAccount: response.paidByAccount ? response.paidByAccount : '',
+                    formDefaultPayToAccount: response.defaultPayToAccount ? response.defaultPayToAccount : '',
+                    formDefaultMaterialNumber: response.defaultMaterialNumber ? response.defaultMaterialNumber : '',
                     formAccount: response.accountId ? response.accountId : ''
                 });
             })
@@ -173,7 +186,9 @@ class Invoice extends Component {
             id: this.state.invoice.id,
             description: this.state.formDescription,
             paidByAccount: this.state.formPaidByAccount,
-            customerAccountId: this.state.formAccount
+            customerAccountId: this.state.formAccount,
+            defaultPayToAccount: this.state.formDefaultPayToAccount,
+            defaultMaterialNumber: this.state.formDefaultMaterialNumber
         };
 
         const { dispatch } = this.props;
@@ -232,6 +247,13 @@ class Invoice extends Component {
                 'label': keyName + ': ' + this.state.toAccounts[keyName].name
             };
         }) : [];
+
+        const materialOptions = Object.keys(this.state.materialNumbers).map((keyName) => {
+            return {
+                'value': this.state.materialNumbers[keyName].toString(),
+                'label': keyName + ': ' + this.state.materialNumbers[keyName]
+            };
+        });
 
         if (this.props.invoice.data.jiraId && this.props.invoice.data.jiraId !== parseInt(this.props.match.params.projectId)) {
             return (
@@ -330,6 +352,54 @@ class Invoice extends Component {
                                         }
                                         <small className="form-text text-muted mb-3">
                                             {t('invoice.form.helptext.paid_by_account')}
+                                        </small>
+
+                                        <Form.Label htmlFor={'formPayToAccount'}>
+                                            {t('invoice.form.label.pay_to_account')}
+                                        </Form.Label>
+                                        { this.state.toAccounts &&
+                                        <Select
+                                            value={ paidByAccountOptions.filter(item => this.state.formDefaultPayToAccount === item.value) }
+                                            name={'formPayToAccount'}
+                                            isSearchable={true}
+                                            isClearable={true}
+                                            placeholder={t('invoice.form.select_account')}
+                                            aria-label={t('invoice.form.label.default_pay_to_account')}
+                                            onChange={
+                                                selectedOption => {
+                                                    this.setState({ formDefaultPayToAccount: selectedOption ? selectedOption.value : null });
+                                                }
+                                            }
+                                            isDisabled={this.state.invoice && this.state.invoice.recorded}
+                                            options={paidByAccountOptions}
+                                        />
+                                        }
+                                        <small className="form-text text-muted mb-3">
+                                            {t('invoice.form.helptext.default_pay_to_account')}
+                                        </small>
+
+                                        <Form.Label htmlFor={'formDefaultMaterialNumber'}>
+                                            {t('invoice_entry.form.default_material_number')}
+                                        </Form.Label>
+                                        {materialOptions &&
+                                        <Select
+                                            value={ materialOptions.filter(item => this.state.formDefaultMaterialNumber === item.value) }
+                                            name={'formDefaultMaterialNumber'}
+                                            placeholder={t('invoice.form.select_default_material_number')}
+                                            isSearchable={true}
+                                            isClearable={true}
+                                            aria-label={t('invoice_entry.form.default_material_number')}
+                                            onChange={
+                                                selectedOption => {
+                                                    this.setState({ formDefaultMaterialNumber: selectedOption ? selectedOption.value : null });
+                                                }
+                                            }
+                                            isDisabled={this.state.invoice && this.state.invoice.recorded}
+                                            options={materialOptions}
+                                        />
+                                        }
+                                        <small className="form-text text-muted mb-3">
+                                            {t('invoice.form.helptext.default_material_number')}
                                         </small>
                                     </Form.Group>
                                     {this.state.invoice && !this.state.invoice.recorded &&
