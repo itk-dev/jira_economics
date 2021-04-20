@@ -354,16 +354,16 @@ class Invoice extends Component {
                                             {t('invoice.form.helptext.paid_by_account')}
                                         </small>
 
-                                        <Form.Label htmlFor={'formPayToAccount'}>
-                                            {t('invoice.form.label.pay_to_account')}
+                                        <Form.Label htmlFor={'formDefaultPayToAccount'}>
+                                            {t('invoice.form.label.default_pay_to_account')}
                                         </Form.Label>
                                         { this.state.toAccounts &&
                                         <Select
                                             value={ paidByAccountOptions.filter(item => this.state.formDefaultPayToAccount === item.value) }
-                                            name={'formPayToAccount'}
+                                            name={'formDefaultPayToAccount'}
                                             isSearchable={true}
                                             isClearable={true}
-                                            placeholder={t('invoice.form.select_account')}
+                                            placeholder={t('invoice.form.select_default_pay_to_account')}
                                             aria-label={t('invoice.form.label.default_pay_to_account')}
                                             onChange={
                                                 selectedOption => {
@@ -379,7 +379,7 @@ class Invoice extends Component {
                                         </small>
 
                                         <Form.Label htmlFor={'formDefaultMaterialNumber'}>
-                                            {t('invoice_entry.form.default_material_number')}
+                                            {t('invoice.form.label.default_material_number')}
                                         </Form.Label>
                                         {materialOptions &&
                                         <Select
@@ -388,7 +388,7 @@ class Invoice extends Component {
                                             placeholder={t('invoice.form.select_default_material_number')}
                                             isSearchable={true}
                                             isClearable={true}
-                                            aria-label={t('invoice_entry.form.default_material_number')}
+                                            aria-label={t('invoice.form.default_material_number')}
                                             onChange={
                                                 selectedOption => {
                                                     this.setState({ formDefaultMaterialNumber: selectedOption ? selectedOption.value : null });
