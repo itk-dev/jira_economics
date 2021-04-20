@@ -437,6 +437,7 @@ class BillingService extends JiraService
         }
 
         $invoiceRepository = $this->entityManager->getRepository(Invoice::class);
+        /** @var Invoice $invoice */
         $invoice = $invoiceRepository->findOneBy(['id' => $invoiceEntryData['invoiceId']]);
 
         if (!$invoice) {
@@ -449,6 +450,10 @@ class BillingService extends JiraService
 
         $invoiceEntry = new InvoiceEntry();
         $invoiceEntry->setInvoice($invoice);
+
+        // Set defaults from Invoice.
+        $invoiceEntry->setMaterialNumber($invoice->getDefaultMaterialNumber());
+        $invoiceEntry->setAccount($invoice->getDefaultPayToAccount());
 
         $this->setInvoiceEntryValuesFromData($invoiceEntry, $invoiceEntryData);
 
