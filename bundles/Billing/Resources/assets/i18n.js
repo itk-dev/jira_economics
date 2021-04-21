@@ -148,7 +148,13 @@ const resources = {
             'home_page.select_all': 'Vælg alle',
             'home_page.select': 'Vælg alle',
             'invoice_entry.error.no_material_number': 'Materialenummer mangler',
-            'invoice_entry.error.no_account': 'Til konto ikke valgt'
+            'invoice_entry.error.no_account': 'Til konto ikke valgt',
+            'invoice.form.label.default_pay_to_account': 'Forudvalgt "Til konto"',
+            'invoice.form.select_default_pay_to_account': 'Vælg forudvalgt "Til konto"',
+            'invoice.form.helptext.default_pay_to_account': 'Vælg forudvalgt "Til konto". Det bliver sat automatisk i alle fakturaindgange',
+            'invoice.form.label.default_material_number': 'Forudvalgt "Materialenummer"',
+            'invoice.form.select_default_material_number': 'Vælg forudvalgt "Materialenummer"',
+            'invoice.form.helptext.default_material_number': 'Vælg forudvalgt "Materialenummer". Det bliver sat automatisk i alle fakturaindgange'
         }
     }
 };
