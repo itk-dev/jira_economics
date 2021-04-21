@@ -182,6 +182,8 @@ class BillingService extends JiraService
             'exportedDate' => $invoice->getExportedDate() ? $invoice->getExportedDate()->format('c') : null,
             'created' => $invoice->getCreatedAt()->format('c'),
             'created_by' => $invoice->getCreatedBy(),
+            'defaultPayToAccount' => $invoice->getDefaultPayToAccount(),
+            'defaultMaterialNumber' => $invoice->getDefaultMaterialNumber(),
         ];
     }
 
@@ -262,6 +264,14 @@ class BillingService extends JiraService
 
         if (isset($invoiceData['paidByAccount'])) {
             $invoice->setPaidByAccount($invoiceData['paidByAccount']);
+        }
+
+        if (isset($invoiceData['defaultPayToAccount'])) {
+            $invoice->setDefaultPayToAccount($invoiceData['defaultPayToAccount']);
+        }
+
+        if (isset($invoiceData['defaultMaterialNumber'])) {
+            $invoice->setDefaultMaterialNumber($invoiceData['defaultMaterialNumber']);
         }
 
         if (isset($invoiceData['recorded'])) {
@@ -427,6 +437,7 @@ class BillingService extends JiraService
         }
 
         $invoiceRepository = $this->entityManager->getRepository(Invoice::class);
+        /** @var Invoice $invoice */
         $invoice = $invoiceRepository->findOneBy(['id' => $invoiceEntryData['invoiceId']]);
 
         if (!$invoice) {
@@ -439,6 +450,10 @@ class BillingService extends JiraService
 
         $invoiceEntry = new InvoiceEntry();
         $invoiceEntry->setInvoice($invoice);
+
+        // Set defaults from Invoice.
+        $invoiceEntry->setMaterialNumber($invoice->getDefaultMaterialNumber());
+        $invoiceEntry->setAccount($invoice->getDefaultPayToAccount());
 
         $this->setInvoiceEntryValuesFromData($invoiceEntry, $invoiceEntryData);
 
