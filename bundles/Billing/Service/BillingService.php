@@ -182,6 +182,8 @@ class BillingService extends JiraService
             'exportedDate' => $invoice->getExportedDate() ? $invoice->getExportedDate()->format('c') : null,
             'created' => $invoice->getCreatedAt()->format('c'),
             'created_by' => $invoice->getCreatedBy(),
+            'defaultPayToAccount' => $invoice->getDefaultPayToAccount(),
+            'defaultMaterialNumber' => $invoice->getDefaultMaterialNumber(),
         ];
     }
 
@@ -262,6 +264,14 @@ class BillingService extends JiraService
 
         if (isset($invoiceData['paidByAccount'])) {
             $invoice->setPaidByAccount($invoiceData['paidByAccount']);
+        }
+
+        if (isset($invoiceData['defaultPayToAccount'])) {
+            $invoice->setDefaultPayToAccount($invoiceData['defaultPayToAccount']);
+        }
+
+        if (isset($invoiceData['defaultMaterialNumber'])) {
+            $invoice->setDefaultMaterialNumber($invoiceData['defaultMaterialNumber']);
         }
 
         if (isset($invoiceData['recorded'])) {
@@ -427,6 +437,7 @@ class BillingService extends JiraService
         }
 
         $invoiceRepository = $this->entityManager->getRepository(Invoice::class);
+        /** @var Invoice $invoice */
         $invoice = $invoiceRepository->findOneBy(['id' => $invoiceEntryData['invoiceId']]);
 
         if (!$invoice) {
@@ -439,6 +450,10 @@ class BillingService extends JiraService
 
         $invoiceEntry = new InvoiceEntry();
         $invoiceEntry->setInvoice($invoice);
+
+        // Set defaults from Invoice.
+        $invoiceEntry->setMaterialNumber($invoice->getDefaultMaterialNumber());
+        $invoiceEntry->setAccount($invoice->getDefaultPayToAccount());
 
         $this->setInvoiceEntryValuesFromData($invoiceEntry, $invoiceEntryData);
 
@@ -797,7 +812,7 @@ class BillingService extends JiraService
             // A. "Linietype"
             $sheet->setCellValueByColumnAndRow(1, $row, 'H');
             // B. "Ordregiver/Bestiller"
-            $sheet->setCellValueByColumnAndRow(2, $row, str_pad($customerKey, 10, '0', STR_PAD_LEFT));
+            $sheet->setCellValueByColumnAndRow(2, $row, str_pad($customerKey, 10, '0', \STR_PAD_LEFT));
             // D. "Fakturadato"
             $sheet->setCellValueByColumnAndRow(4, $row, null !== $invoice->getRecordedDate() ? $invoice->getRecordedDate()->format('d.m.Y') : '');
             // E. "Bilagsdato"
@@ -816,7 +831,7 @@ class BillingService extends JiraService
             $sheet->setCellValueByColumnAndRow(16, $row, substr($invoice->getDescription(), 0, 500));
             // Q. "Leverandør"
             if ($internal) {
-                $sheet->setCellValueByColumnAndRow(17, $row, str_pad($this->boundReceiverAccount, 10, '0', STR_PAD_LEFT));
+                $sheet->setCellValueByColumnAndRow(17, $row, str_pad($this->boundReceiverAccount, 10, '0', \STR_PAD_LEFT));
             }
             // R. "EAN nr."
             if (!$internal && 13 === \strlen($accountKey)) {
@@ -841,7 +856,7 @@ class BillingService extends JiraService
                 // A. "Linietype"
                 $sheet->setCellValueByColumnAndRow(1, $row, 'L');
                 // B. "Materiale (vare)nr.
-                $sheet->setCellValueByColumnAndRow(2, $row, str_pad($materialNumber, 18, '0', STR_PAD_LEFT));
+                $sheet->setCellValueByColumnAndRow(2, $row, str_pad($materialNumber, 18, '0', \STR_PAD_LEFT));
                 // C. "Beskrivelse"
                 $sheet->setCellValueByColumnAndRow(3, $row, substr($product, 0, 40));
                 // D. "Ordremængde"
