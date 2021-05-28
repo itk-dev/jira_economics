@@ -25,6 +25,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BillingService extends JiraService
 {
@@ -34,6 +35,7 @@ class BillingService extends JiraService
     private $invoiceRepository;
     private $boundReceiverAccount;
     private $cache;
+    private $translator;
 
     /**
      * Constructor.
@@ -55,6 +57,7 @@ class BillingService extends JiraService
         WorklogRepository $worklogRepository,
         ExpenseRepository $expenseRepository,
         InvoiceRepository $invoiceRepository,
+        TranslatorInterface $translator,
         $boundReceiverAccount,
         $boundCustomFieldMappings
     ) {
@@ -66,6 +69,7 @@ class BillingService extends JiraService
         $this->invoiceRepository = $invoiceRepository;
         $this->boundReceiverAccount = $boundReceiverAccount;
         $this->cache = $cache;
+        $this->translator = $translator;
     }
 
     /**
@@ -219,6 +223,17 @@ class BillingService extends JiraService
         $invoice->setProject($project);
         $invoice->setRecorded(false);
         $invoice->setCustomerAccountId((int) $invoiceData['customerAccountId']);
+
+        // Set project default description.
+        $project = $this->getProject($invoiceData['projectId']);
+        $lead = $project->lead ? $this->getUser($project->lead->key) : null;
+        $leadName = $lead->displayName ?? '';
+        $leadMail = $lead->emailAddress ?? '';
+        $description = $this->translator->trans(
+            'invoice_default_description',
+            ['%invoiceName%' => $invoice->getName(), '%leadName%' => $leadName, '%leadMail%' => $leadMail]
+        );
+        $invoice->setDescription($description);
 
         $this->entityManager->persist($invoice);
         $this->entityManager->flush();
