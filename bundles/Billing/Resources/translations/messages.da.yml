@@ -8,3 +8,4 @@ sidebar:
         clear_cache_confirm: Ryd cachen
         cancel: Annullér
     clear_cache_confirm_text: Er du sikker på at du vil rydde cachen?
+"%invoiceName%. Questions regarding the invoice should be addressed to %leadName% (%leadMail%)": '%invoiceName%. Spørgsmål vedrørende fakturaen rettes til %leadName% (%leadMail%).'
