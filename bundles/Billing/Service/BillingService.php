@@ -230,7 +230,7 @@ class BillingService extends JiraService
         $leadName = $lead->displayName ?? '';
         $leadMail = $lead->emailAddress ?? '';
         $description = $this->translator->trans(
-            '%invoiceName%. Questions regarding the invoice should be addressed to %leadName% (%leadMail%).',
+            'invoice_default_description',
             ['%invoiceName%' => $invoice->getName(), '%leadName%' => $leadName, '%leadMail%' => $leadMail]
         );
         $invoice->setDescription($description);
