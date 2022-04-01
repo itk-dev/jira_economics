@@ -101,6 +101,16 @@ class Invoice extends AbstractEntity
      */
     private $defaultMaterialNumber;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $periodFrom;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $periodTo;
+
     public function __construct()
     {
         $this->invoiceEntries = new ArrayCollection();
@@ -313,6 +323,30 @@ class Invoice extends AbstractEntity
     public function setDefaultMaterialNumber(?string $defaultMaterialNumber): self
     {
         $this->defaultMaterialNumber = $defaultMaterialNumber;
+
+        return $this;
+    }
+
+    public function getPeriodFrom(): ?\DateTimeInterface
+    {
+        return $this->periodFrom;
+    }
+
+    public function setPeriodFrom(?\DateTimeInterface $periodFrom): self
+    {
+        $this->periodFrom = $periodFrom;
+
+        return $this;
+    }
+
+    public function getPeriodTo(): ?\DateTimeInterface
+    {
+        return $this->periodTo;
+    }
+
+    public function setPeriodTo(?\DateTimeInterface $periodTo): self
+    {
+        $this->periodTo = $periodTo;
 
         return $this;
     }
