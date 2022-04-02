@@ -80,16 +80,6 @@ services:
     ports:
       - '6379'
 
-  frontend:
-    image: node:14
-    networks:
-      - app
-    working_dir: /app
-    environment:
-      - NODE_ENV=development
-    volumes:
-      - .:/app:delegated
-
   yarn:
     image: itkdev/yarn:latest
     networks:
