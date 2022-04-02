@@ -312,10 +312,6 @@ class BillingService extends JiraService
             $invoice->setPeriodTo(new \DateTime($to));
         }
 
-        if (isset($invoiceData['defaultPayToAccount'])) {
-            $invoice->setDefaultPayToAccount($invoiceData['defaultPayToAccount']);
-        }
-
         if (isset($invoiceData['recorded'])) {
             $invoiceRecorded = $invoiceData['recorded'];
             $invoice->setRecorded($invoiceRecorded);
