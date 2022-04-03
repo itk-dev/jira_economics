@@ -228,7 +228,7 @@ class ProjectBillingService
 
         // Previously: 'status=done',
         $jqls = [
-            'status=lukket'
+            'status=lukket',
         ];
 
         if (null !== $from) {
@@ -315,9 +315,9 @@ class ProjectBillingService
         // Move ahead if the day is a saturday or sunday to ensure it is a bank day.
         // TODO: Handle holidays.
         $weekday = $todayPlus30days->format('N');
-        if ($weekday == '6') {
+        if ('6' === $weekday) {
             $todayPlus30days->add(new \DateInterval('P2D'));
-        } else if ($weekday == '7') {
+        } elseif ('7' === $weekday) {
             $todayPlus30days->add(new \DateInterval('P1D'));
         }
 
