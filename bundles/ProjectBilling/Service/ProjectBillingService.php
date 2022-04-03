@@ -172,6 +172,8 @@ class ProjectBillingService
                 'description' => ($includeProjectNameInHeader ? $project->name.' - ' : '').$account->name.' ('.$from->format('d/m/Y').' - '.$to->format('d/m/Y').'). '.$description,
                 'supplier' => $supplier,
                 'ean' => $account->key,
+                'periodFrom' => $from->format('d.m.Y'),
+                'periodTo' => $to->format('d.m.Y'),
             ];
         }
     }
@@ -224,8 +226,9 @@ class ProjectBillingService
             return $carry;
         }, []);
 
+        // Previously: 'status=done',
         $jqls = [
-            'status=done',
+            'status=lukket'
         ];
 
         if (null !== $from) {
@@ -305,6 +308,19 @@ class ProjectBillingService
         $sheet = $spreadsheet->getActiveSheet();
         $row = 1;
 
+        $today = new \DateTime();
+        $todayString = $today->format('d.m.Y');
+        $todayPlus30days = $today->add(new \DateInterval('P30D'));
+
+        // Move ahead if the day is a saturday or sunday to ensure it is a bank day.
+        // TODO: Handle holidays.
+        $weekday = $todayPlus30days->format('N');
+        if ($weekday == '6') {
+            $todayPlus30days->add(new \DateInterval('P2D'));
+        } else if ($weekday == '7') {
+            $todayPlus30days->add(new \DateInterval('P1D'));
+        }
+
         foreach ($entries as $entry) {
             $header = $entry->header;
 
@@ -314,9 +330,9 @@ class ProjectBillingService
             // B. "Ordregiver/Bestiller"
             $sheet->setCellValueByColumnAndRow(2, $row, str_pad($header->debtor, 10, '0', \STR_PAD_LEFT));
             // D. "Fakturadato"
-            $sheet->setCellValueByColumnAndRow(4, $row, (new \DateTime())->format('d.m.Y'));
+            $sheet->setCellValueByColumnAndRow(4, $row, $todayString);
             // E. "Bilagsdato"
-            $sheet->setCellValueByColumnAndRow(5, $row, (new \DateTime())->format('d.m.Y'));
+            $sheet->setCellValueByColumnAndRow(5, $row, $todayString);
             // F. "Salgsorganisation"
             $sheet->setCellValueByColumnAndRow(6, $row, '0020');
             // G. "Salgskanal"
@@ -336,6 +352,22 @@ class ProjectBillingService
             // R. "EAN nr."
             if (!$header->internal && 13 === \strlen($header->ean)) {
                 $sheet->setCellValueByColumnAndRow(18, $row, $header->ean);
+            }
+
+            // External invoices.
+            if (!$header->internal) {
+                // 38. Stiftelsesdato: dagsdato
+                $sheet->setCellValueByColumnAndRow(38, $row, $todayString);
+                // 39. Periode fra
+                $sheet->setCellValueByColumnAndRow(39, $row, $header->periodFrom);
+                // 40. Periode til
+                $sheet->setCellValueByColumnAndRow(40, $row, $header->periodTo);
+                // 46. Fordringstype oprettelse/valg : KOCIVIL
+                $sheet->setCellValueByColumnAndRow(46, $row, 'KOCIVIL');
+                // 49. Forfaldsdato: dagsdato
+                $sheet->setCellValueByColumnAndRow(49, $row, $todayString);
+                // 50. Henstand til: dagsdato + 30 dage. NB det må ikke være før faktura forfald. Skal være en bank dag.
+                $sheet->setCellValueByColumnAndRow(50, $row, $todayPlus30days->format('d.m.Y'));
             }
 
             $lines = $entry->lines;

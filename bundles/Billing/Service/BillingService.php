@@ -846,6 +846,16 @@ class BillingService extends JiraService
 
             $today = new \DateTime();
             $todayString = $today->format('d.m.Y');
+            $todayPlus30days = $today->add(new \DateInterval('P30D'));
+
+            // Move ahead if the day is a saturday or sunday to ensure it is a bank day.
+            // TODO: Handle holidays.
+            $weekday = $todayPlus30days->format('N');
+            if ($weekday == '6') {
+                $todayPlus30days->add(new \DateInterval('P2D'));
+            } else if ($weekday == '7') {
+                $todayPlus30days->add(new \DateInterval('P1D'));
+            }
 
             // Generate header line (H).
             // 1. "Linietype"
@@ -879,17 +889,6 @@ class BillingService extends JiraService
 
             // External invoices.
             if (!$internal) {
-                $todayPlus30days = $today->add(new \DateInterval('P30D'));
-
-                // Move ahead if the day is a saturday or sunday to ensure it is a bank day.
-                // TODO: Handle holidays.
-                $weekday = $todayPlus30days->format('N');
-                if ($weekday == '6') {
-                    $todayPlus30days->add(new \DateInterval('P2D'));
-                } else if ($weekday == '7') {
-                    $todayPlus30days->add(new \DateInterval('P1D'));
-                }
-
                 // 38. Stiftelsesdato: dagsdato
                 $sheet->setCellValueByColumnAndRow(38, $row, $todayString);
                 // 39. Periode fra
