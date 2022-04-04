@@ -858,6 +858,8 @@ class BillingService extends JiraService
                 $todayPlus30days->add(new \DateInterval('P1D'));
             }
 
+            $todayPlus30daysString = $todayPlus30days->format('d.m.Y');
+
             // Generate header line (H).
             // 1. "Linietype"
             $sheet->setCellValueByColumnAndRow(1, $row, 'H');
@@ -901,7 +903,7 @@ class BillingService extends JiraService
                 // 49. Forfaldsdato: dagsdato
                 $sheet->setCellValueByColumnAndRow(49, $row, $todayString);
                 // 50. Henstand til: dagsdato + 30 dage. NB det må ikke være før faktura forfald. Skal være en bank dag.
-                $sheet->setCellValueByColumnAndRow(50, $row, $todayPlus30days->format('d.m.Y'));
+                $sheet->setCellValueByColumnAndRow(50, $row, $todayPlus30daysString);
             }
 
             ++$row;

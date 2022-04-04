@@ -321,6 +321,8 @@ class ProjectBillingService
             $todayPlus30days->add(new \DateInterval('P1D'));
         }
 
+        $todayPlus30daysString = $todayPlus30days->format('d.m.Y');
+
         foreach ($entries as $entry) {
             $header = $entry->header;
 
@@ -367,7 +369,7 @@ class ProjectBillingService
                 // 49. Forfaldsdato: dagsdato
                 $sheet->setCellValueByColumnAndRow(49, $row, $todayString);
                 // 50. Henstand til: dagsdato + 30 dage. NB det må ikke være før faktura forfald. Skal være en bank dag.
-                $sheet->setCellValueByColumnAndRow(50, $row, $todayPlus30days->format('d.m.Y'));
+                $sheet->setCellValueByColumnAndRow(50, $row, $todayPlus30daysString);
             }
 
             $lines = $entry->lines;

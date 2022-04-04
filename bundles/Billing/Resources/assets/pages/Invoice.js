@@ -85,8 +85,8 @@ class Invoice extends Component {
                     formDefaultPayToAccount: response.defaultPayToAccount ? response.defaultPayToAccount : '',
                     formDefaultMaterialNumber: response.defaultMaterialNumber ? response.defaultMaterialNumber : '',
                     formAccount: response.accountId ? response.accountId : '',
-                    formPeriodFrom: response.periodFrom ? parseInt(response.periodFrom) * 1000 : '',
-                    formPeriodTo: response.periodTo ? parseInt(response.periodTo) * 1000 : ''
+                    formPeriodFrom: response.periodFrom ? parseInt(response.periodFrom) * 1000 : null,
+                    formPeriodTo: response.periodTo ? parseInt(response.periodTo) * 1000 : null
                 });
             })
             .catch((reason) => {
