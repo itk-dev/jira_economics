@@ -893,17 +893,17 @@ class BillingService extends JiraService
             // External invoices.
             if (!$internal) {
                 // 38. Stiftelsesdato: dagsdato
-                $sheet->setCellValueByColumnAndRow(38, $row, $todayString);
+                $sheet->setCellValueByColumnAndRow(25, $row, $todayString);
                 // 39. Periode fra
-                $sheet->setCellValueByColumnAndRow(39, $row, $invoice->getPeriodFrom()->format('d.m.Y'));
+                $sheet->setCellValueByColumnAndRow(26, $row, $invoice->getPeriodFrom()->format('d.m.Y'));
                 // 40. Periode til
-                $sheet->setCellValueByColumnAndRow(40, $row, $invoice->getPeriodTo()->format('d.m.Y'));
+                $sheet->setCellValueByColumnAndRow(27, $row, $invoice->getPeriodTo()->format('d.m.Y'));
                 // 46. Fordringstype oprettelse/valg : KOCIVIL
-                $sheet->setCellValueByColumnAndRow(46, $row, 'KOCIVIL');
+                $sheet->setCellValueByColumnAndRow(33, $row, 'KOCIVIL');
                 // 49. Forfaldsdato: dagsdato
-                $sheet->setCellValueByColumnAndRow(49, $row, $todayString);
+                $sheet->setCellValueByColumnAndRow(36, $row, $todayString);
                 // 50. Henstand til: dagsdato + 30 dage. NB det må ikke være før faktura forfald. Skal være en bank dag.
-                $sheet->setCellValueByColumnAndRow(50, $row, $todayPlus30daysString);
+                $sheet->setCellValueByColumnAndRow(37, $row, $todayPlus30daysString);
             }
 
             ++$row;
