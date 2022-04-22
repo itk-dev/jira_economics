@@ -113,7 +113,7 @@ class ProjectBillingService
 
                 $lines[] = (object) [
                     'materialNumber' => $internal ? $this->boundInternalMaterialId : $this->boundExternalMaterialId,
-                    'product' => $task->key.': '.$task->fields->summary,
+                    'product' => $task->key.': '.preg_replace('/\(DEVSUPP-.*\)/i', '', $task->fields->summary),
                     'amount' => $worklogsSum,
                     'price' => $accounts[$account->id]->defaultPrice,
                     'psp' => $psp,
@@ -130,7 +130,7 @@ class ProjectBillingService
 
                 $lines[] = (object) [
                     'materialNumber' => $internal ? $this->boundInternalMaterialId : $this->boundExternalMaterialId,
-                    'product' => $task->key.': '.$task->fields->summary,
+                    'product' => $task->key.': '.preg_replace('/\(DEVSUPP-.*\)/i', '', $task->fields->summary),
                     'amount' => 1,
                     'price' => $expensesSum,
                     'psp' => $psp,
@@ -383,7 +383,7 @@ class ProjectBillingService
                 // B. "Materiale (vare)nr.
                 $sheet->setCellValueByColumnAndRow(2, $row, str_pad($line->materialNumber, 18, '0', \STR_PAD_LEFT));
                 // C. "Beskrivelse"
-                $sheet->setCellValueByColumnAndRow(3, $row, $line->product);
+                $sheet->setCellValueByColumnAndRow(3, $row, substr($line->product, 0, 40));
                 // D. "Ordremængde"
                 $sheet->setCellValueByColumnAndRow(4, $row, number_format($line->amount, 3, ',', ''));
                 // E. "Beløb pr. enhed"
