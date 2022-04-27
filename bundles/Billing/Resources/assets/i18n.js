@@ -154,7 +154,11 @@ const resources = {
             'invoice.form.helptext.default_pay_to_account': 'Vælg forudvalgt "Til konto". Det bliver sat automatisk i alle fakturaindgange',
             'invoice.form.label.default_material_number': 'Forudvalgt "Materialenummer"',
             'invoice.form.select_default_material_number': 'Vælg forudvalgt "Materialenummer"',
-            'invoice.form.helptext.default_material_number': 'Vælg forudvalgt "Materialenummer". Det bliver sat automatisk i alle fakturaindgange'
+            'invoice.form.helptext.default_material_number': 'Vælg forudvalgt "Materialenummer". Det bliver sat automatisk i alle fakturaindgange',
+            'invoice.form.label.period_to': 'Periode fra',
+            'invoice.form.helptext.period_to': 'Dette felt skal udfyldes på eksterne fakturaer.',
+            'invoice.form.label.period_from': 'Periode til',
+            'invoice.form.helptext.period_from': 'Dette felt skal udfyldes på eksterne fakturaer.'
         }
     }
 };

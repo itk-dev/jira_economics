@@ -19,6 +19,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import { withTranslation, Trans } from 'react-i18next';
 import Select from 'react-select';
 import Bus from '../modules/Bus';
+import moment from 'moment';
 
 class Invoice extends Component {
     constructor (props) {
@@ -36,6 +37,8 @@ class Invoice extends Component {
             formAccount: null,
             formDefaultPayToAccount: null,
             formDefaultMaterialNumber: null,
+            formPeriodFrom: null,
+            formPeriodTo: null,
 
             invoice: null,
             invoiceEntries: {},
@@ -81,7 +84,9 @@ class Invoice extends Component {
                     formPaidByAccount: response.paidByAccount ? response.paidByAccount : '',
                     formDefaultPayToAccount: response.defaultPayToAccount ? response.defaultPayToAccount : '',
                     formDefaultMaterialNumber: response.defaultMaterialNumber ? response.defaultMaterialNumber : '',
-                    formAccount: response.accountId ? response.accountId : ''
+                    formAccount: response.accountId ? response.accountId : '',
+                    formPeriodFrom: response.periodFrom ? parseInt(response.periodFrom) * 1000 : null,
+                    formPeriodTo: response.periodTo ? parseInt(response.periodTo) * 1000 : null
                 });
             })
             .catch((reason) => {
@@ -175,6 +180,16 @@ class Invoice extends Component {
             });
     };
 
+    /**
+     * Get date value for datetime-local input.
+     *
+     * @param {Date} date - The date.
+     * @returns {string} - The date formatted for datetime-local.
+     */
+    getDateValue = (date) => {
+        return date ? moment(date).format('YYYY-MM-DD') : '';
+    };
+
     handleSubmit = (event) => {
         event.preventDefault();
 
@@ -188,7 +203,9 @@ class Invoice extends Component {
             paidByAccount: this.state.formPaidByAccount,
             customerAccountId: this.state.formAccount,
             defaultPayToAccount: this.state.formDefaultPayToAccount,
-            defaultMaterialNumber: this.state.formDefaultMaterialNumber
+            defaultMaterialNumber: this.state.formDefaultMaterialNumber,
+            periodFrom: this.state.formPeriodFrom,
+            periodTo: this.state.formPeriodTo
         };
 
         const { dispatch } = this.props;
@@ -400,6 +417,34 @@ class Invoice extends Component {
                                         }
                                         <small className="form-text text-muted mb-3">
                                             {t('invoice.form.helptext.default_material_number')}
+                                        </small>
+
+                                        <Form.Label htmlFor={'formPeriodFrom'}>
+                                            {t('invoice.form.label.period_from')}
+                                        </Form.Label>
+                                        <input
+                                            id="formPeriodFrom"
+                                            className="form-control"
+                                            type="date"
+                                            name="formPeriodFrom"
+                                            value={this.getDateValue(this.state.formPeriodFrom)}
+                                            onChange={this.handleChange.bind(this)} />
+                                        <small className="form-text text-muted mb-3">
+                                            {t('invoice.form.helptext.period_from')}
+                                        </small>
+
+                                        <Form.Label htmlFor={'formPeriodTo'}>
+                                            {t('invoice.form.label.period_to')}
+                                        </Form.Label>
+                                        <input
+                                            id="formPeriodTo"
+                                            className="form-control"
+                                            type="date"
+                                            name="formPeriodTo"
+                                            value={this.getDateValue(this.state.formPeriodTo)}
+                                            onChange={this.handleChange.bind(this)} />
+                                        <small className="form-text text-muted mb-3">
+                                            {t('invoice.form.helptext.period_to')}
                                         </small>
                                     </Form.Group>
                                     {this.state.invoice && !this.state.invoice.recorded &&
