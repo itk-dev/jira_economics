@@ -12,7 +12,10 @@ framework:
                     # e.g. 1 second delay, 2 seconds, 4 seconds
                     multiplier: 2
                     max_delay: 0
-            failed: '%env(MESSENGER_TRANSPORT_DSN)%?queue_name=failed'
+            failed:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN_FAILED)%'
+                options:
+                    auto_setup: 'false'
 
         routing:
             # Route your messages to the transports

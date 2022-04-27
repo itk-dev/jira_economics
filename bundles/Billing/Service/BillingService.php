@@ -188,6 +188,8 @@ class BillingService extends JiraService
             'created_by' => $invoice->getCreatedBy(),
             'defaultPayToAccount' => $invoice->getDefaultPayToAccount(),
             'defaultMaterialNumber' => $invoice->getDefaultMaterialNumber(),
+            'periodFrom' => $invoice->getPeriodFrom() ? $invoice->getPeriodFrom()->format('U') : null,
+            'periodTo' => $invoice->getPeriodTo() ? $invoice->getPeriodTo()->format('U') : null,
         ];
     }
 
@@ -224,6 +226,16 @@ class BillingService extends JiraService
         $invoice->setRecorded(false);
         $invoice->setCustomerAccountId((int) $invoiceData['customerAccountId']);
 
+        if (isset($invoiceData['periodFrom'])) {
+            $from = $invoiceData['periodFrom'];
+            $invoice->setPeriodFrom(new \DateTime($from));
+        }
+
+        if (isset($invoiceData['periodTo'])) {
+            $to = $invoiceData['periodTo'];
+            $invoice->setPeriodTo(new \DateTime($to));
+        }
+
         // Set project default description.
         $project = $this->getProject($invoiceData['projectId']);
         $lead = $project->lead ? $this->getUser($project->lead->key) : null;
@@ -247,6 +259,8 @@ class BillingService extends JiraService
      * @param $invoiceData
      *
      * @return array
+     *
+     * @throws Exception
      */
     public function putInvoice($invoiceData)
     {
@@ -287,6 +301,16 @@ class BillingService extends JiraService
 
         if (isset($invoiceData['defaultMaterialNumber'])) {
             $invoice->setDefaultMaterialNumber($invoiceData['defaultMaterialNumber']);
+        }
+
+        if (isset($invoiceData['periodFrom'])) {
+            $from = $invoiceData['periodFrom'];
+            $invoice->setPeriodFrom(new \DateTime($from));
+        }
+
+        if (isset($invoiceData['periodTo'])) {
+            $to = $invoiceData['periodTo'];
+            $invoice->setPeriodTo(new \DateTime($to));
         }
 
         if (isset($invoiceData['recorded'])) {
@@ -795,8 +819,6 @@ class BillingService extends JiraService
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $invoices = [];
-
         $row = 1;
 
         foreach ($invoiceIds as $invoiceId) {
@@ -823,34 +845,65 @@ class BillingService extends JiraService
                 $contactName = $customerAccount->contact->name;
             }
 
+            $today = new \DateTime();
+            $todayString = $today->format('d.m.Y');
+            $todayPlus30days = $today->add(new \DateInterval('P30D'));
+
+            // Move ahead if the day is a saturday or sunday to ensure it is a bank day.
+            // TODO: Handle holidays.
+            $weekday = $todayPlus30days->format('N');
+            if ('6' === $weekday) {
+                $todayPlus30days->add(new \DateInterval('P2D'));
+            } elseif ('7' === $weekday) {
+                $todayPlus30days->add(new \DateInterval('P1D'));
+            }
+
+            $todayPlus30daysString = $todayPlus30days->format('d.m.Y');
+
             // Generate header line (H).
-            // A. "Linietype"
+            // 1. "Linietype"
             $sheet->setCellValueByColumnAndRow(1, $row, 'H');
-            // B. "Ordregiver/Bestiller"
+            // 2. "Ordregiver/Bestiller"
             $sheet->setCellValueByColumnAndRow(2, $row, str_pad($customerKey, 10, '0', \STR_PAD_LEFT));
-            // D. "Fakturadato"
+            // 4. "Fakturadato"
             $sheet->setCellValueByColumnAndRow(4, $row, null !== $invoice->getRecordedDate() ? $invoice->getRecordedDate()->format('d.m.Y') : '');
-            // E. "Bilagsdato"
-            $sheet->setCellValueByColumnAndRow(5, $row, (new \DateTime())->format('d.m.Y'));
-            // F. "Salgsorganisation"
+            // 5. "Bilagsdato"
+            $sheet->setCellValueByColumnAndRow(5, $row, $todayString);
+            // 6. "Salgsorganisation"
             $sheet->setCellValueByColumnAndRow(6, $row, '0020');
-            // G. "Salgskanal"
+            // 7. "Salgskanal"
             $sheet->setCellValueByColumnAndRow(7, $row, $salesChannel);
-            // H. "Division"
+            // 8. "Division"
             $sheet->setCellValueByColumnAndRow(8, $row, '20');
-            // I. "Ordreart"
+            // 9. "Ordreart"
             $sheet->setCellValueByColumnAndRow(9, $row, $internal ? 'ZIRA' : 'ZRA');
-            // O. "Kunderef.ID"
+            // 15. "Kunderef.ID"
             $sheet->setCellValueByColumnAndRow(15, $row, substr('Att: '.$contactName, 0, 35));
-            // P. "Toptekst, yderligere spec i det hvide felt på fakturaen"
+            // 16. "Toptekst, yderligere spec i det hvide felt på fakturaen"
             $sheet->setCellValueByColumnAndRow(16, $row, substr($invoice->getDescription(), 0, 500));
-            // Q. "Leverandør"
+            // 17. "Leverandør"
             if ($internal) {
                 $sheet->setCellValueByColumnAndRow(17, $row, str_pad($this->boundReceiverAccount, 10, '0', \STR_PAD_LEFT));
             }
-            // R. "EAN nr."
+            // 18. "EAN nr."
             if (!$internal && 13 === \strlen($accountKey)) {
                 $sheet->setCellValueByColumnAndRow(18, $row, $accountKey);
+            }
+
+            // External invoices.
+            if (!$internal) {
+                // 38. Stiftelsesdato: dagsdato
+                $sheet->setCellValueByColumnAndRow(24, $row, $todayString);
+                // 39. Periode fra
+                $sheet->setCellValueByColumnAndRow(25, $row, $invoice->getPeriodFrom()->format('d.m.Y'));
+                // 40. Periode til
+                $sheet->setCellValueByColumnAndRow(26, $row, $invoice->getPeriodTo()->format('d.m.Y'));
+                // 46. Fordringstype oprettelse/valg : KOCIVIL
+                $sheet->setCellValueByColumnAndRow(32, $row, 'KOCIVIL');
+                // 49. Forfaldsdato: dagsdato
+                $sheet->setCellValueByColumnAndRow(35, $row, $todayString);
+                // 50. Henstand til: dagsdato + 30 dage. NB det må ikke være før faktura forfald. Skal være en bank dag.
+                $sheet->setCellValueByColumnAndRow(36, $row, $todayPlus30daysString);
             }
 
             ++$row;
@@ -868,25 +921,23 @@ class BillingService extends JiraService
                 }
 
                 // Generate invoice lines (L).
-                // A. "Linietype"
+                // 1. "Linietype"
                 $sheet->setCellValueByColumnAndRow(1, $row, 'L');
-                // B. "Materiale (vare)nr.
+                // 2. "Materiale (vare)nr.
                 $sheet->setCellValueByColumnAndRow(2, $row, str_pad($materialNumber, 18, '0', \STR_PAD_LEFT));
-                // C. "Beskrivelse"
+                // 3. "Beskrivelse"
                 $sheet->setCellValueByColumnAndRow(3, $row, substr($product, 0, 40));
-                // D. "Ordremængde"
+                // 4. "Ordremængde"
                 $sheet->setCellValueByColumnAndRow(4, $row, number_format($amount, 3, ',', ''));
-                // E. "Beløb pr. enhed"
+                // 5. "Beløb pr. enhed"
                 $sheet->setCellValueByColumnAndRow(5, $row, number_format($price, 2, ',', ''));
-                // F. "Priser fra SAP"
+                // 6. "Priser fra SAP"
                 $sheet->setCellValueByColumnAndRow(6, $row, 'NEJ');
-                // G. "PSP-element nr."
+                // 7. "PSP-element nr."
                 $sheet->setCellValueByColumnAndRow(7, $row, $account);
 
                 ++$row;
             }
-
-            $invoices[] = $invoice;
         }
 
         return $spreadsheet;

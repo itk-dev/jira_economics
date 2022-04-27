@@ -47,12 +47,14 @@ class IndexController extends AbstractController
         $d = new \DOMDocument();
         $mock = new \DOMDocument();
         $d->loadHTML($html);
-        $body = $d->getElementsByTagName('body')->item(0);
+        /** @var \DOMNode $body */
+        $body = $d->getElementsByTagName('div')->item(0);
+        /** @var \DOMNode $child */
         foreach ($body->childNodes as $child) {
-            if ('style' === $child->tagName) {
+            if (isset($child->tagName) && 'style' === $child->tagName) {
                 continue;
             }
-            if ('table' === $child->tagName) {
+            if (isset($child->tagName) && 'table' === $child->tagName) {
                 $child->setAttribute('class', 'table table-responsive table-bordered');
             }
             $mock->appendChild($mock->importNode($child, true));
