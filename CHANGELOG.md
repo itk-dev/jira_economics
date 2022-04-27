@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 1.9.0
+
+* Merged: https://github.com/itk-dev/jira_economics/pull/109
+  - Changed project billing to look for 'status=lukket' instead of 'status=done'.
+  - Added new fields to external invoices.
+  - Fixed invoice preview table styling.
+  - Added replace to remove (DEVSUPP-*) texts for ProjectBilling.
+
 ## 1.8.0
 
 * Changed color scheme to match 2 week sprints.
