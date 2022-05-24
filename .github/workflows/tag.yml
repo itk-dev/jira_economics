@@ -13,6 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Git checkout
         uses: itk-dev/actions-remote-ssh@master
         with:
