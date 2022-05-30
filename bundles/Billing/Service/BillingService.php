@@ -895,9 +895,9 @@ class BillingService extends JiraService
                 // 38. Stiftelsesdato: dagsdato
                 $sheet->setCellValueByColumnAndRow(24, $row, $todayString);
                 // 39. Periode fra
-                $sheet->setCellValueByColumnAndRow(25, $row, $invoice->getPeriodFrom()->format('d.m.Y'));
+                $sheet->setCellValueByColumnAndRow(25, $row, $invoice->getPeriodFrom() ? $invoice->getPeriodFrom()->format('d.m.Y') : '');
                 // 40. Periode til
-                $sheet->setCellValueByColumnAndRow(26, $row, $invoice->getPeriodTo()->format('d.m.Y'));
+                $sheet->setCellValueByColumnAndRow(26, $row, $invoice->getPeriodTo() ? $invoice->getPeriodTo()->format('d.m.Y') : '');
                 // 46. Fordringstype oprettelse/valg : KOCIVIL
                 $sheet->setCellValueByColumnAndRow(32, $row, 'KOCIVIL');
                 // 49. Forfaldsdato: dagsdato
