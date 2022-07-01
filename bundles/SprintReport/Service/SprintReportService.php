@@ -231,6 +231,11 @@ class SprintReportService extends JiraService
         // Sort sprints by key.
         ksort($sprints);
 
+        // Sort epics by name.
+        usort($epics, function ($a, $b) {
+            return mb_strtolower($a->name) <=> mb_strtolower($b->name);
+        });
+
         // Calculate spent, remaining hours.
         $spentHours = $spentSum / 3600;
         $remainingHours = $remainingSum / 3600;
