@@ -232,7 +232,7 @@ class SprintReportService extends JiraService
         ksort($sprints);
 
         // Sort epics by name.
-        usort($epics, function($a, $b) {
+        usort($epics, function ($a, $b) {
             return mb_strtolower($a->name) <=> mb_strtolower($b->name);
         });
 
