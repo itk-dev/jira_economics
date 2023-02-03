@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 1.9.5
+- Updated docker setup to itk-version: 3.0.0
+- Set PHP version to 7,2 to match server requirement
+- Security update composer packages for varoius CVE's for guzzle, symfony and twig
+
+## 1.9.4
+
+## 1.9.3
+
+## 1.9.2
+
+## 1.9.1
+
 ## 1.9.0
 
 * Merged: https://github.com/itk-dev/jira_economics/pull/109
